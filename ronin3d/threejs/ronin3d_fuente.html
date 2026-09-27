@@ -337,8 +337,8 @@ const COLOR = {
 const LUZ = {
   ambiente: 9.0,
   luna: 3.4,
-  antorcha: 17,
-  decaimientoAntorcha: 1.35,
+  antorcha: 9.5,
+  decaimientoAntorcha: 1.0,
   alcanceAntorcha: 9,
   linterna: 2.4,
   alcanceLinterna: 4.5,
@@ -1577,7 +1577,7 @@ function crearPostproceso() {
     compositor.setPixelRatio(pr);
     compositor.setSize(tamano.x, tamano.y);
     compositor.addPass(new RenderPass(escena, camara3d));
-    pasoBloom = new UnrealBloomPass(new THREE.Vector2(tamano.x, tamano.y), 0.6, 0.5, 0.85);
+    pasoBloom = new UnrealBloomPass(new THREE.Vector2(tamano.x, tamano.y), 0.65, 0.45, 1.0);
     compositor.addPass(pasoBloom);
     const shader = { ...SHADER_MAQUETA, uniforms: THREE.UniformsUtils.clone(SHADER_MAQUETA.uniforms) };
     shader.uniforms.resolucion.value = new THREE.Vector2(tamano.x * pr, tamano.y * pr);
@@ -2737,8 +2737,11 @@ function actualizarLogica(dt) {
       estado.ayudaRestante = Math.max(0, estado.ayudaRestante - dt);
     }
   }
-  for (const s of soldados) actualizarSoldado(s, dt);
-  separarPersonajes();
+  // Durante la intro los soldados esperan en su punto A; patrullan desde que empieza el patio
+  if (estado.escena !== 'intro') {
+    for (const s of soldados) actualizarSoldado(s, dt);
+    separarPersonajes();
+  }
   actualizarChispas(dt);
 }
 

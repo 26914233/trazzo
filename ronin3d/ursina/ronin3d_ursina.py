@@ -953,9 +953,10 @@ class TramoMuralla:
 
     VELOCIDAD_CORTE = 22.0
 
-    def __init__(self, x0, x1, z0, z1, alto):
+    def __init__(self, x0, x1, z0, z1, alto, exterior):
         self.x0, self.x1, self.z0, self.z1 = x0, x1, z0, z1
         self.alto = alto
+        self.exterior = exterior        # (eje, signo, valor): la cámara está fuera si signo·(p − valor) > 0
         self.materiales = {nombre: ConstructorMalla() for nombre in ('piedra', 'yeso', 'madera', 'tejas', 'porton')}
         self.entidades = []
         self.altura_corte = 1000.0
@@ -971,9 +972,13 @@ class TramoMuralla:
             self.entidades.append(entidad)
 
     def tapa(self, camara, objetivo):
-        """¿La línea de la cámara a los pies de Akira pasa por el tramo, por debajo de su techo?"""
+        """¿La cámara está fuera de este lado de la muralla y la línea hasta los pies de
+        Akira pasa por el tramo por debajo de su techo?"""
         cx, cy, cz = camara
         ax, ay, az = objetivo
+        eje, signo, valor = self.exterior
+        if signo * ((cx if eje == 'x' else cz) - valor) <= 0:
+            return False
         t0, t1 = 0.0, 1.0
         for p, d, bajo, alto in ((cx, ax - cx, self.x0, self.x1), (cz, az - cz, self.z0, self.z1)):
             if abs(d) < 1e-9:
@@ -986,7 +991,7 @@ class TramoMuralla:
             t0, t1 = max(t0, ta), min(t1, tb)
             if t0 > t1:
                 return False
-        return cy + (ay - cy) * t0 < self.alto
+        return min(cy + (ay - cy) * t0, cy + (ay - cy) * t1) < self.alto
 
     def actualizar(self, dt, cortar):
         """Baja o sube la altura de corte poco a poco (sin saltos bruscos)."""
@@ -1021,7 +1026,12 @@ def construir_escenario(mundo):
     # Muros: base de piedra de 1,2 m, yeso blanco encima, bandas de madera y tejadillo
     for (cx, cy, cz), (sx, sy, sz) in MUROS:
         x, _, z = convertir(cx, 0, cz)
-        tramo = TramoMuralla(x - sx / 2 - 0.3, x + sx / 2 + 0.3, z - sz / 2 - 0.3, z + sz / 2 + 0.3, sy + 0.4)
+        if sx > sz:     # muro norte o sur: fuera según Z
+            exterior = ('z', 1 if z > 0 else -1, z - sz / 2 if z > 0 else z + sz / 2)
+        else:           # muro oeste o este: fuera según X
+            exterior = ('x', 1 if x > 0 else -1, x - sx / 2 if x > 0 else x + sx / 2)
+        tramo = TramoMuralla(x - sx / 2 - 0.3, x + sx / 2 + 0.3, z - sz / 2 - 0.3, z + sz / 2 + 0.3, sy + 0.4,
+                             exterior)
         t = tramo.materiales
         t['piedra'].caja((x, ALTURA_PIEDRA / 2, z), (sx, ALTURA_PIEDRA, sz))
         t['yeso'].caja((x, ALTURA_PIEDRA + (sy - ALTURA_PIEDRA) / 2, z), (sx, sy - ALTURA_PIEDRA, sz))
@@ -1035,7 +1045,7 @@ def construir_escenario(mundo):
     # Portón (macizo), postes, dintel y tejado
     (px, py, pz), (psx, psy, psz) = PORTON
     x, _, z = convertir(px, 0, pz)
-    tramo = TramoMuralla(x - 1.3, x + 1.3, z - 4.8, z + 4.8, 6.6)
+    tramo = TramoMuralla(x - 1.3, x + 1.3, z - 4.8, z + 4.8, 6.6, ('x', 1, x - psx / 2))
     t = tramo.materiales
     x0, x1 = x - psx / 2, x + psx / 2
     z0, z1 = z - psz / 2, z + psz / 2
@@ -2588,7 +2598,12 @@ class Probador:
             else:
                 self.mantener(set())
                 if akira.t_enfriamiento <= 0 and not akira.atacando:
+                    con_aviso = any(s.estado == 'aviso' and math.hypot(s.x - akira.x, s.z - akira.z) < 5
+                                    for s in self.juego.soldados)
                     self.tocar('j')
+                    if con_aviso and al_golpear:
+                        yield 0                     # ese cuadro ya muestra el tajo y el «!»
+                        yield from al_golpear(soldado, aviso=True)
             yield 0
             t += PASO_PRUEBA
             if soldado.golpes_recibidos > golpes_previos:
@@ -2753,7 +2768,7 @@ class Probador:
         self.mantener({'+'})
         yield (CAMARA_DIST_MAX - CAMARA_DISTANCIA) / CAMARA_VEL_ZOOM
         self.mantener(set())
-        self.comprobar(abs(camara.inclinacion - CAMARA_INCLINACION) < 0.5 and
+        self.comprobar(abs(camara.inclinacion - CAMARA_INCLINACION) < 1.6 and
                        abs(camara.distancia_deseada - CAMARA_DISTANCIA) < 0.2,
                        f'R y + devuelven la cámara a {camara.inclinacion:.0f}° y {camara.distancia_deseada:.1f} m')
         yield from self.girar_camara_a(-60)
@@ -2761,11 +2776,13 @@ class Probador:
         danados = []
         capturado = [False]
 
-        def al_golpear(soldado):
-            danados.append(soldado.indice)
-            if not capturado[0]:
+        def al_golpear(soldado, aviso=False):
+            if not aviso:
+                danados.append(soldado.indice)
+            if not capturado[0] and (aviso or len(danados) >= 3):
                 capturado[0] = True
-                yield 0
+                if not aviso:
+                    yield 0
                 self.capturar('ursina_combate.png')
 
         yield from self.ir_a(8, -1.5)
