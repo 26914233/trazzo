@@ -1,7 +1,8 @@
 # RONIN — Plan de producción
 
 **Fecha:** 27 de septiembre de 2026 · **Fase actual:** prototipo (capítulo 1 jugable en Godot 4.7,
-cel-shading) · **Siguiente hito:** vertical slice.
+cel-shading) · **Alcance:** núcleo + variaciones y lanzamiento por capítulos (decidido: opción C) ·
+**Siguiente hito:** vertical slice, base del primer capítulo.
 
 Cada afirmación va marcada cuando no es obvia: **[Hecho]** comprobado, **[Estimación]** cálculo
 con incertidumbre, **[Supuesto]** algo que damos por bueno sin comprobar, **[Hipótesis]** algo que
@@ -63,6 +64,10 @@ sea una **variación** de ese núcleo, no un género nuevo:
 | Templo | Puzzles | Puzzles de entorno con moverse, saltar y cortar |
 | Ruinas | Exploración y combate | El núcleo con más exploración y un jefe |
 
+**Decidido el 27-09-2026 (DECISIÓN 1, opción C):** este núcleo con variaciones y lanzamiento por
+capítulos. El primer capítulo es castillo + planicie + aldea: el vertical slice de §5, pulido. Lo
+que hace cada lugar (la tercera columna) sigue siendo una propuesta y se cierra al construirlo.
+
 ## 4. Pilares y bucles
 
 **Pilares [propuesta]:** cada mecánica tiene que servir a uno.
@@ -81,7 +86,8 @@ sea una **variación** de ese núcleo, no un género nuevo:
 
 ## 5. Vertical slice (siguiente hito)
 
-**«Una noche en Hoshiyama»:** 15-20 minutos que prueban el núcleo y el tono.
+**«Una noche en Hoshiyama»:** 15-20 minutos que prueban el núcleo y el tono. Con la opción C,
+pulido, es la base del primer capítulo que se lanza.
 
 | Prioridad | Contenido |
 | --- | --- |
@@ -102,7 +108,7 @@ fechas ahora sería inventar: se estimarán al cerrar el vertical slice.
 
 | Qué | Cómo | Qué decide |
 | --- | --- | --- |
-| Rendimiento en móvil | APK en tu teléfono: FPS estables (meta ≥ 30) | Si Android es plataforma de lanzamiento y cuánto detalle cabe |
+| Rendimiento en móvil | APK en tu teléfono: FPS estables (meta ≥ 30; salen abajo a la derecha, junto a la versión) | Si Android es plataforma de lanzamiento y cuánto detalle cabe |
 | Completion rate del capítulo | % de 5-10 personas que llegan al portón (meta ≥ 70 %) | Si la dificultad y el onboarding funcionan |
 | Muertes y dónde | Contarlas por jugador | Qué rival o tramo ajustar |
 | Intención de seguir | «¿Jugarías el siguiente capítulo?» (meta ≥ 60 % sí) | Si el núcleo engancha lo bastante para seguir construyendo |
@@ -129,13 +135,14 @@ nada público sin tu permiso.
 - **Comisiones:** Google Play cobra un 15 % del primer millón de dólares al año; Steam, un 30 %
   **[Hecho]**. Tu cuenta de Google Play Console ya existe, pendiente de la verificación de
   identidad (la del proyecto Trazzo) **[Hecho, según el índice de Trazzo]**.
-- **Modelo:** de pago con demo gratis **[Hipótesis]**. Las proyecciones de ingresos (escenarios
-  pesimista, base y optimista) se harán al tener el vertical slice y datos de las pruebas; hacerlas
-  ahora sería inventar.
+- **Modelo:** de pago con demo gratis **[Hipótesis]**. Con capítulos hay dos caminos: el primero
+  gratis como demo y el resto de pago, o cada capítulo de pago **[Hipótesis; se decide con datos
+  del vertical slice]**. Las proyecciones de ingresos (escenarios pesimista, base y optimista) se
+  harán al tener el vertical slice y datos de las pruebas; hacerlas ahora sería inventar.
 
 ## 9. Decisiones que necesito de ti
 
-### DECISIÓN 1 — Alcance del juego
+### DECISIÓN 1 — Alcance del juego · **DECIDIDA el 27-09-2026: C**
 
 - **OPCIONES:** A) seis lugares con seis géneros completos, como está; B) un núcleo (duelo +
   exploración) y cada lugar como variación con los mismos controles (§3); C) B y además lanzar
@@ -162,7 +169,7 @@ nada público sin tu permiso.
   decidir: **K** (teclado), **LB** (mando) o el botón **Parar** (móvil) justo al «!».
 - **SIGUIENTE PASO:** probarlo y ajustar la ventana de parada (0,3 s) y el castigo por fallar.
 
-## 10. Hecho en esta sesión (27-09-2026)
+## 10. Hecho el 27-09-2026
 
 1. Proyecto Godot solo con cel-shading (HD-2D y pixel art 3D quedan en el historial de git) y
    un patio más legible de noche.
@@ -171,3 +178,6 @@ nada público sin tu permiso.
 3. Sensación de combate: pausa de impacto, cámara lenta en la parada, sacudida de cámara,
    chispas, estela de la espada y siete sonidos.
 4. Prototipo de parada y contraataque (DECISIÓN 2), con prueba automática: 15 de 15.
+5. DECISIÓN 1 cerrada: opción C (núcleo + variaciones y lanzamiento por capítulos).
+6. **APK de prueba** generado en la nube y guardado en Google Drive (`ronin-0.2-prueba.apk`):
+   muestra los FPS, «Atrás» pausa en vez de cerrar y la ayuda táctil tiene letra más grande.

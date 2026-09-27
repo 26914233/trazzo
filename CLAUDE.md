@@ -425,7 +425,12 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   apoya. Empieza y termina en el castillo de Hoshiyama.
 - **Mapa:** castillo, aldea, templo, dojo, ruinas y la planicie que los une.
 - **Decisiones cerradas (27-09-2026):** motor **Godot 4.7** con el renderizador *Compatibility*;
-  estética **cel-shading**; los textos de intro y cierre se quedan como están por ahora.
+  estética **cel-shading**; los textos de intro y cierre se quedan como están por ahora; alcance:
+  **un núcleo (duelo + exploración) con cada lugar como variación y lanzamiento por capítulos**
+  (opción C), empezando por castillo + planicie + aldea.
+- **APK de prueba:** `ronin-<versión>-prueba.apk` en la raíz de la carpeta de Drive, como con
+  Curtzz (la versión anterior pasa a «Versiones anteriores (RONIN)»). Cómo se genera:
+  `ronin3d/godot/LEEME.md`, sección «Exportar». Las claves de firma no se suben a ningún sitio.
 - **Proyecto principal:** `ronin3d/godot/`. Prueba automática:
   `godot --path ronin3d/godot --fixed-fps 30 -- --prueba` (en Linux sin pantalla, con
   `xvfb-run -a`). Las versiones Three.js y Ursina de `ronin3d/` quedan solo como referencia.

@@ -20,6 +20,8 @@ var tactil
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	# Android: «atrás» pausa en vez de cerrar el juego (ver _notification).
+	get_tree().quit_on_go_back = false
 	var argumentos := OS.get_cmdline_user_args()
 	var con_tactil := DisplayServer.is_touchscreen_available() or "--tactil" in argumentos
 	# En pantallas táctiles el clic izquierdo no ataca: cada toque lo simularía.
@@ -132,7 +134,20 @@ func _pie(para: String) -> String:
 func alternar_pausa() -> void:
 	var pausado := not get_tree().paused
 	get_tree().paused = pausado
-	hud.poner_pausa(pausado)
+	hud.poner_pausa(pausado, tactil.activo)
+
+
+# En el móvil, el botón o gesto «atrás» pausa (y en pausa, cierra), y el juego se pausa
+# solo si pasa a segundo plano (una llamada, cambiar de aplicación).
+func _notification(que: int) -> void:
+	if que == NOTIFICATION_WM_GO_BACK_REQUEST:
+		if get_tree().paused:
+			get_tree().quit()
+		else:
+			alternar_pausa()
+	elif que == NOTIFICATION_APPLICATION_PAUSED:
+		if juego and juego.fase == "jugando" and not get_tree().paused:
+			alternar_pausa()
 
 
 func _input(evento: InputEvent) -> void:

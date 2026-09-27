@@ -11,6 +11,9 @@ var marcador: Control
 var etiqueta_soldados: Label
 var etiqueta_ayuda: Label
 var etiqueta_version: Label
+var texto_version := ""
+var tiempo_fps := 0.0
+var indicacion_pausa: Label
 var texto_antes_de_pausa := false
 var capa_texto: Control
 var titulo: Label
@@ -159,12 +162,11 @@ func _crear_capa_pausa() -> void:
 	texto.text = "PAUSA"
 	_colocar(texto, Control.PRESET_CENTER, Rect2(-300, -110, 600, 80))
 	texto.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var indicacion := _etiqueta(22, Datos.CREMA)
-	remove_child(indicacion)
-	capa_pausa.add_child(indicacion)
-	indicacion.text = "ESC o ENTER: continuar      Q: salir del juego"
-	_colocar(indicacion, Control.PRESET_CENTER, Rect2(-400, 0, 800, 36))
-	indicacion.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	indicacion_pausa = _etiqueta(22, Datos.CREMA)
+	remove_child(indicacion_pausa)
+	capa_pausa.add_child(indicacion_pausa)
+	_colocar(indicacion_pausa, Control.PRESET_CENTER, Rect2(-400, 0, 800, 36))
+	indicacion_pausa.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	capa_pausa.visible = false
 
 
@@ -181,6 +183,7 @@ func poner_derrotados(cantidad: int, total: int) -> void:
 
 
 func poner_version(texto: String) -> void:
+	texto_version = texto
 	etiqueta_version.text = texto
 
 
@@ -220,17 +223,21 @@ const AYUDA_TACTIL := "Joystick: moverse (al borde, correr) · Parar justo al «
 
 func mostrar_ayuda(tactil := false) -> void:
 	# En el móvil la ayuda va arriba: abajo están el joystick y los botones.
+	# En el móvil, además, con letra más grande: la pantalla es pequeña.
 	if tactil:
-		_colocar(etiqueta_ayuda, Control.PRESET_CENTER_TOP, Rect2(-420, 66, 840, 56))
+		_colocar(etiqueta_ayuda, Control.PRESET_CENTER_TOP, Rect2(-560, 62, 1120, 64))
 	else:
 		_colocar(etiqueta_ayuda, Control.PRESET_CENTER_BOTTOM, Rect2(-600, -68, 1200, 30))
+	etiqueta_ayuda.add_theme_font_size_override("font_size", 22 if tactil else 16)
 	etiqueta_ayuda.text = AYUDA_TACTIL if tactil else AYUDA_TECLADO
 	tiempo_ayuda = 0.0
 
 
 # En pausa se oculta el texto de la historia (si lo había) para que no se mezcle con el
 # menú de pausa, y el texto deja de escribirse hasta volver.
-func poner_pausa(activa: bool) -> void:
+func poner_pausa(activa: bool, tactil := false) -> void:
+	indicacion_pausa.text = "Toca la pantalla para continuar      «Atrás»: salir del juego" if tactil \
+		else "ESC o ENTER: continuar      Q: salir del juego"
 	if activa and not capa_pausa.visible:
 		texto_antes_de_pausa = capa_texto.visible
 		capa_texto.visible = false
@@ -243,6 +250,11 @@ func _process(delta: float) -> void:
 	if capa_pausa.visible:
 		return
 	tiempo += delta
+	# FPS junto a la versión, para las pruebas en el móvil (meta: 30 o más).
+	tiempo_fps += delta
+	if tiempo_fps >= 0.5:
+		tiempo_fps = 0.0
+		etiqueta_version.text = "%s · %d FPS" % [texto_version, Engine.get_frames_per_second()]
 	if escribiendo:
 		letras += VELOCIDAD_TEXTO * delta
 		cuerpo.visible_characters = int(letras)
