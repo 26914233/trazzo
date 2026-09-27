@@ -5,6 +5,8 @@ const Datos := preload("res://scripts/datos.gd")
 
 signal vida_cambiada(vida: int)
 signal cayo
+signal ataco
+signal paro(atacante)
 
 var visual: Node3D
 var camara
@@ -22,6 +24,10 @@ var moviendose := false
 var corriendo := false
 var buffer_salto := 0.0
 var coyote := 0.0
+var tiempo_parada := 0.0
+var enfriamiento_parada := 0.0
+var pose_parada := 0.0
+var buscar_rival: Callable            # lo pone el juego: devuelve el soldado más cercano
 
 
 func _ready() -> void:
@@ -59,6 +65,40 @@ func iniciar_ataque() -> void:
 		tiempo_ataque = Datos.DURACION_ATAQUE
 		enfriamiento = Datos.ENFRIAMIENTO_ATAQUE
 		golpeados.clear()
+		tiempo_parada = 0.0
+		pose_parada = 0.0
+		ataco.emit()
+
+
+func iniciar_parada() -> void:
+	if not vivo() or empujado > 0.0 or atacando() or enfriamiento_parada > 0.0:
+		return
+	tiempo_parada = Datos.VENTANA_PARADA
+	enfriamiento_parada = Datos.ENFRIAMIENTO_PARADA
+	pose_parada = Datos.POSE_PARADA
+	# Ayuda: se gira hacia el soldado más cercano, para que parar no dependa de apuntar.
+	if buscar_rival.is_valid():
+		var rival = buscar_rival.call(global_position, Datos.ALCANCE_AYUDA_PARADA)
+		if rival:
+			var hacia: Vector3 = rival.global_position - global_position
+			hacia.y = 0.0
+			if hacia.length() > 0.01:
+				mirando = hacia.normalized()
+
+
+# La llama el soldado justo antes de que su estocada dé en Akira. Si Akira está parando
+# y mira hacia él, desvía el golpe.
+func intentar_parar(atacante) -> bool:
+	if tiempo_parada <= 0.0 or not vivo():
+		return false
+	var hacia: Vector3 = atacante.global_position - global_position
+	hacia.y = 0.0
+	if hacia.length() > 0.01 and mirando.angle_to(hacia) > deg_to_rad(Datos.CONO_PARADA / 2.0):
+		return false
+	tiempo_parada = 0.0
+	enfriamiento_parada = 0.0            # premio: puede contraatacar o volver a parar ya
+	paro.emit(atacante)
+	return true
 
 
 func recibir_golpe(desde: Vector3) -> bool:
@@ -88,6 +128,9 @@ func _physics_process(delta: float) -> void:
 	buffer_salto = maxf(0.0, buffer_salto - delta)
 	coyote = maxf(0.0, coyote - delta)
 	destello = maxf(0.0, destello - delta * 6.0)
+	tiempo_parada = maxf(0.0, tiempo_parada - delta)
+	enfriamiento_parada = maxf(0.0, enfriamiento_parada - delta)
+	pose_parada = maxf(0.0, pose_parada - delta)
 
 	var entrada := Vector2.ZERO
 	if controlable and vivo():
@@ -96,6 +139,8 @@ func _physics_process(delta: float) -> void:
 			buffer_salto = 0.12
 		if Input.is_action_just_pressed("atacar"):
 			iniciar_ataque()
+		if Input.is_action_just_pressed("parar"):
+			iniciar_parada()
 	var direccion: Vector3 = camara.derecha() * entrada.x - camara.adelante() * entrada.y
 
 	if not vivo():
@@ -109,13 +154,13 @@ func _physics_process(delta: float) -> void:
 		var rapidez := Datos.VELOCIDAD
 		if controlable and Input.is_action_pressed("correr"):
 			rapidez = Datos.VELOCIDAD_CORRER
-		if atacando() and is_on_floor():
+		if (atacando() or pose_parada > 0.0) and is_on_floor():
 			rapidez *= 0.4
 		velocity.x = direccion.x * rapidez
 		velocity.z = direccion.z * rapidez
 		moviendose = direccion.length() > 0.1
 		corriendo = moviendose and rapidez > Datos.VELOCIDAD
-		if moviendose and not atacando():
+		if moviendose and not atacando() and pose_parada <= 0.0:
 			mirando = direccion.normalized()
 		if buffer_salto > 0.0 and (is_on_floor() or coyote > 0.0):
 			velocity.y = Datos.IMPULSO_SALTO
@@ -139,7 +184,7 @@ func info() -> Dictionary:
 		"moviendose": moviendose,
 		"corriendo": corriendo,
 		"en_aire": not is_on_floor(),
-		"pose": "ataque" if atacando() else "normal",
+		"pose": "ataque" if atacando() else ("guardia" if pose_parada > 0.0 else "normal"),
 		"progreso": progreso_ataque(),
 		"visible": not parpadea,
 		"destello": destello,

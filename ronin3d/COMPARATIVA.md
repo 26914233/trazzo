@@ -1,5 +1,10 @@
 # RONIN 3D — Comparativa de motores y estéticas
 
+> **Decisión tomada (27-09-2026):** motor **Godot 4.7** y estética **cel-shading**. Este documento
+> queda como registro de cómo se decidió. El proyecto de Godot ya solo tiene cel-shading: las
+> otras dos estéticas se pueden recuperar del historial de git (commit `8ec4b1b`), y las teclas
+> 1, 2 y 3 de la sección 6 solo funcionan en esa versión.
+
 - **Fecha:** 27 de septiembre de 2026 · probado en la nube, sin tarjeta gráfica (OpenGL por software, 4 núcleos).
 - **Página con las capturas lado a lado:** https://claude.ai/artifact/6urV5FCikt9CWAUV35gBCu (privada: solo tú puedes abrirla)
 - **Jugar la versión Three.js en el navegador:** https://claude.ai/artifact/9QHgv2eQPDdww4HGcbYJaL (privada)
@@ -109,3 +114,48 @@ Descarga la rama desde GitHub (Code → Download ZIP) o el ZIP de Drive. Abre un
   vez para cargar Three.js), o el enlace de arriba. En el móvil aparecen controles táctiles.
 - **Ursina:** con Python instalado, `pip install ursina` y `python ronin3d/ursina/ronin3d_ursina.py`
   (`--ligero` para un PC justo).
+
+## 7. Otros motores que corren en tu PC y APK para los que no lo traen
+
+Investigado el 27-09-2026. **[Hecho]** = comprobado en la fuente; **[Opinión]** = criterio nuestro.
+
+**Tu PC** (Windows, 0,5-1 GB de RAM libre): la documentación de Godot pide 4 GB de RAM para el
+editor y 2 GB "podrían bastar" con un sistema ligero **[Hecho]**, y en tu PC ya funciona. Un
+motor con un editor más pesado que Godot no conviene **[Opinión]**.
+
+| Motor | ¿Corre en tu PC? | ¿Saca APK? |
+| --- | --- | --- |
+| **Godot 4.7** (elegido) | Sí, ya lo usas | Sí, directo (como Trazzo) |
+| Defold | Probable: su FAQ dice que 4 GB de RAM bastan para proyectos pequeños **[Hecho]** | Sí, sin Android Studio **[Hecho]**; pero sus herramientas están hechas para 2D y en 3D «hay que hacer mucho trabajo pesado uno mismo» **[Hecho]** |
+| raylib | Sí, es una librería muy ligera | Sí, compilando con el NDK de Android a mano **[Opinión: costoso]** |
+| Three.js, Babylon.js | Sí (en el navegador) | No directamente: ver abajo |
+| Ursina, Panda3D | Sí | Experimental: ver abajo |
+| Unity, Unreal, Bevy | No recomendables: pesados | Sí, pero no aplica |
+
+**Cómo sacar APK de los que no lo traen:**
+
+- **Three.js (o cualquier juego web):**
+  - **PWABuilder** (de Microsoft, código abierto) genera el APK en la nube con Bubblewrap, la
+    herramienta de Google para Trusted Web Activities, sin instalar Android Studio **[Hecho]**.
+    Pide que el juego esté publicado en una dirección https (por ejemplo GitHub Pages), así que
+    **habría que hacerlo público**: lo decides tú.
+  - **Capacitor** (Ionic) mete la web dentro de una app nativa; es compatible con WebGL y
+    Three.js **[Hecho]**, funciona desde Android 7 (API 24) **[Hecho]** y necesita Android Studio
+    y el SDK para compilar.
+- **Ursina (Python):** **UrsinaForMobile** es un proyecto de la comunidad para exportar juegos de
+  Ursina a Android **[Hecho]**. Se apoya en el soporte de Android de Panda3D 1.11, que su propia
+  documentación marca como experimental y «NOT production-ready» **[Hecho]**. Sirve para
+  curiosear, no para un juego que queremos publicar **[Opinión]**.
+
+**Recomendación [Opinión]:** no dedicar más tiempo a otros motores. Buscábamos PC + Android, y
+Godot ya lo cubre. Si quieres ver la versión Three.js en el móvil como app, la vía más barata es
+PWABuilder (unos minutos), pero exige publicarla en internet.
+
+**Fuentes:** [requisitos de Godot](https://docs.godotengine.org/en/stable/about/system_requirements.html) ·
+[FAQ de Defold](https://defold.com/faq/faq/) ·
+[Defold en Android (Android Developers)](https://developer.android.com/games/engines/defold/defold-configure) ·
+[Panda3D: Building for Android](https://docs.panda3d.org/1.11/cpp/distribution/building-for-android) ·
+[UrsinaForMobile](https://github.com/PaologGithub/UrsinaForMobile) ·
+[Capacitor para Android](https://capacitorjs.com/docs/android) ·
+[Capacitor y juegos](https://capacitorjs.com/docs/guides/games) ·
+[PWABuilder: APK en la nube](https://github.com/pwa-builder/pwabuilder-google-play)

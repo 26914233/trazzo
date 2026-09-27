@@ -214,8 +214,8 @@ func completar_texto() -> void:
 	cuerpo.visible_characters = -1
 
 
-const AYUDA_TECLADO := "WASD: moverse   SHIFT: correr   ESPACIO: saltar   J: atacar   Q/E: girar cámara   rueda: zoom   R/F: inclinar   ESC: pausa"
-const AYUDA_TACTIL := "Joystick: moverse (al borde, correr) · Atacar y Saltar: botones\nArrastra el dedo por la pantalla: girar la cámara"
+const AYUDA_TECLADO := "WASD: moverse   SHIFT: correr   ESPACIO: saltar   J: atacar   K: parar (justo al «!»)   Q/E: girar cámara   rueda: zoom   ESC: pausa"
+const AYUDA_TACTIL := "Joystick: moverse (al borde, correr) · Parar justo al «!» y contraatacar\nArrastra el dedo por la pantalla: girar la cámara"
 
 
 func mostrar_ayuda(tactil := false) -> void:

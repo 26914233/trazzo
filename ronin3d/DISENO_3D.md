@@ -1,5 +1,11 @@
 # RONIN 3D — Especificación común de la versión 3D
 
+> **Desde el 27-09-2026** el juego sigue solo en Godot con **cel-shading**. Esta especificación
+> sigue valiendo para el patio, los personajes, la cámara y las reglas de combate; lo que habla de
+> HD-2D, sprites y texturas pixel art queda como referencia de la comparativa. Novedades del
+> prototipo que no están aquí (parada, efectos, controles táctiles y de mando): ver
+> `godot/LEEME.md` y `godot/scripts/datos.gd`.
+
 Documento que siguen **todas** las versiones 3D (Godot, Three.js, Ursina) para que la
 comparación entre motores y estéticas sea justa: mismo patio, mismas medidas, mismos
 personajes, mismos controles y los mismos sprites y texturas (`recursos/`).

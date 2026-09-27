@@ -78,6 +78,7 @@ func _colocar_botones() -> void:
 	var pantalla := get_viewport().get_visible_rect().size
 	botones = {
 		"atacar": {"centro": pantalla - Vector2(150, 150), "radio": 72.0, "texto": "Atacar", "accion": "atacar", "dedo": -1},
+		"parar": {"centro": pantalla - Vector2(150, 330), "radio": 56.0, "texto": "Parar", "accion": "parar", "dedo": -1},
 		"saltar": {"centro": pantalla - Vector2(300, 90), "radio": 56.0, "texto": "Saltar", "accion": "saltar", "dedo": -1},
 		"pausa": {"centro": Vector2(pantalla.x - 60, 110), "radio": 34.0, "texto": "II", "accion": "", "dedo": -1},
 	}

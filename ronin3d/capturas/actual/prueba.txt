@@ -11,5 +11,8 @@ OK     ESC pausa el juego y lo reanuda  pausado=true, después=false
 OK     Tocar la pantalla sigue los textos  fase=jugando
 OK     El joystick táctil mueve a Akira  recorrió 7.2 m
 OK     El stick del mando mueve a Akira  recorrió 3.5 m
-Resultado: 12 de 12 comprobaciones correctas
-FPS al caminar por el patio: 12.8 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)
+OK     Parar justo al «!» desvía la lanza y deja al soldado sin guardia  sin guardia=true, vida de Akira=5
+OK     El contraataque tras la parada lo derriba de un golpe  derrotados=1
+OK     Parar a destiempo no sirve: la lanza alcanza a Akira  vida de Akira=4, sin guardia=false
+Resultado: 15 de 15 comprobaciones correctas
+FPS al caminar por el patio: 13.0 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)

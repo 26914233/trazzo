@@ -37,6 +37,13 @@ const EMPUJE_GOLPE := 6.0
 const TIEMPO_EMPUJE := 0.25
 const ALTO_PERSONAJE := 1.7
 const RADIO_PERSONAJE := 0.35
+# Parada (prototipo de combate de precisión): con buen momento desvía la estocada y
+# deja al soldado sin guardia; el contraataque lo derriba de un golpe.
+const VENTANA_PARADA := 0.3           # segundos en los que la parada desvía el golpe
+const ENFRIAMIENTO_PARADA := 0.6      # no se puede repetir antes (si falla)
+const POSE_PARADA := 0.45             # cuánto se ve la guardia en pantalla
+const ALCANCE_AYUDA_PARADA := 4.0     # al parar, Akira se gira hacia el soldado más cercano
+const CONO_PARADA := 110.0
 
 # --- Soldados -----------------------------------------------------------------
 const VIDA_SOLDADO := 2
@@ -53,6 +60,7 @@ const ALCANCE_LANZA := 2.1
 const ANCHO_LANZA := 0.8
 const TIEMPO_RECUPERACION := 0.6
 const TIEMPO_ATURDIDO := 0.4
+const TIEMPO_SIN_GUARDIA := 1.6       # tras una parada de Akira
 const EMPUJE_SOLDADO := 5.0
 const TIEMPO_SIN_VER := 2.0
 const TIEMPO_DESAPARECER := 1.2

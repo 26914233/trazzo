@@ -49,6 +49,7 @@ func _registrar_acciones(clic_ataca: bool) -> void:
 		"correr": [KEY_SHIFT],
 		"saltar": [KEY_SPACE],
 		"atacar": [KEY_J],
+		"parar": [KEY_K],
 		"girar_izquierda": [KEY_Q],
 		"girar_derecha": [KEY_E],
 		"acercar": [KEY_PLUS, KEY_KP_ADD, KEY_EQUAL],
@@ -85,6 +86,7 @@ func _registrar_acciones(clic_ataca: bool) -> void:
 		InputMap.action_set_deadzone(accion, 0.2)
 	var botones := {
 		"saltar": JOY_BUTTON_A, "aceptar": JOY_BUTTON_A, "atacar": JOY_BUTTON_X,
+		"parar": JOY_BUTTON_LEFT_SHOULDER,
 		"correr": JOY_BUTTON_RIGHT_SHOULDER, "pausa": JOY_BUTTON_START,
 		"acercar": JOY_BUTTON_DPAD_UP, "alejar": JOY_BUTTON_DPAD_DOWN,
 	}

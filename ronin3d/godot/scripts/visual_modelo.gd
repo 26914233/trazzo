@@ -16,6 +16,8 @@ var hombro_izq: Node3D
 var hombro_der: Node3D
 var espada_mano: Node3D
 var empunadura_cinto: Node3D
+var estela: MeshInstance3D
+var material_estela: StandardMaterial3D
 var lanza: Node3D
 var cintas: Array = []
 var materiales: Array = []
@@ -141,6 +143,37 @@ func _construir_akira() -> void:
 	_caja(espada_mano, Vector3(0.04, 0.04, 0.22), Datos.TSUKA, Vector3(0, 0, 0.05))
 	_caja(espada_mano, Vector3(0.025, 0.05, 0.85), Datos.ACERO, Vector3(0, 0, 0.58))
 	espada_mano.visible = false
+	_crear_estela()
+
+
+# Estela del corte: media luna blanca delante de Akira que aparece con el tajo y se apaga.
+func _crear_estela() -> void:
+	var herramienta := SurfaceTool.new()
+	herramienta.begin(Mesh.PRIMITIVE_TRIANGLE_STRIP)
+	var centro := Vector3(-0.15, 1.25, 0.05)
+	for i in range(21):
+		var t := i / 20.0
+		var angulo := lerpf(1.45, -0.55, t)          # de encima de la cabeza a delante y abajo
+		var interior := lerpf(0.55, 0.75, sin(t * PI))
+		var exterior := lerpf(1.2, 1.75, sin(t * PI))
+		var direccion := Vector3(0.0, sin(angulo), cos(angulo))
+		var alfa := sin(t * PI)
+		herramienta.set_color(Color(1, 1, 1, alfa * 0.2))
+		herramienta.add_vertex(centro + direccion * interior)
+		herramienta.set_color(Color(1, 1, 1, alfa))
+		herramienta.add_vertex(centro + direccion * exterior)
+	estela = MeshInstance3D.new()
+	estela.mesh = herramienta.commit()
+	material_estela = StandardMaterial3D.new()
+	material_estela.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material_estela.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material_estela.vertex_color_use_as_albedo = true
+	material_estela.cull_mode = BaseMaterial3D.CULL_DISABLED
+	material_estela.albedo_color = Color(0.92, 0.96, 1.0, 0.0)
+	estela.material_override = material_estela
+	estela.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	estela.visible = false
+	cuerpo.add_child(estela)
 
 
 # --- Soldado ---------------------------------------------------------------------------
@@ -240,13 +273,27 @@ func actualizar(delta: float, info: Dictionary) -> void:
 
 func _animar_espada(info: Dictionary) -> void:
 	var atacando: bool = info.pose == "ataque"
-	espada_mano.visible = atacando
-	empunadura_cinto.visible = not atacando
+	var guardia: bool = info.pose == "guardia"
+	espada_mano.visible = atacando or guardia
+	empunadura_cinto.visible = not espada_mano.visible
+	espada_mano.rotation = Vector3.ZERO
 	if atacando:
 		var giro := clampf(info.progreso / 0.55, 0.0, 1.0)
 		hombro_der.rotation.x = lerpf(-2.9, -0.5, ease(giro, 0.4))
 		hombro_izq.rotation.x = lerpf(-2.6, -0.8, ease(giro, 0.4))
 		torso.rotation.x = lerpf(-0.12, 0.2, giro)
+	elif guardia:
+		# Guardia: brazos al frente y la hoja cruzada hacia arriba para desviar la lanza.
+		hombro_der.rotation.x = -1.25
+		hombro_izq.rotation.x = -1.15
+		espada_mano.rotation = Vector3(-0.9, 0.0, 0.75)
+		torso.rotation.x = -0.08
+	# La estela se ve mientras corta y se apaga enseguida.
+	var brillo := 0.0
+	if atacando:
+		brillo = clampf(1.0 - absf(info.progreso - 0.35) / 0.35, 0.0, 1.0)
+	estela.visible = brillo > 0.01
+	material_estela.albedo_color.a = brillo * 0.9
 	var reposo := -0.25 if info.moviendose else -1.15
 	for i in cintas.size():
 		cintas[i].rotation.x = reposo + sin(tiempo * 9.0 + i * 1.7) * 0.22
@@ -266,6 +313,13 @@ func _animar_lanza(pose: String) -> void:
 			hombro_der.rotation.x = -1.55
 			hombro_izq.rotation.x = -1.45
 			torso.rotation.x = 0.22
+		"sin_guardia":
+			# Lanza desviada hacia un lado y el cuerpo echado atrás: está abierto.
+			lanza.position = Vector3(-0.45, 1.0, 0.1)
+			lanza.rotation = Vector3(0.9, 0, -0.9)
+			hombro_der.rotation.x = -0.4
+			hombro_izq.rotation.x = 0.5
+			torso.rotation.x = -0.32
 		_:
 			lanza.position = Vector3(-0.36, 1.25, 0.12)
 			lanza.rotation = Vector3.ZERO

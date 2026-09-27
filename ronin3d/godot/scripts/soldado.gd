@@ -7,6 +7,8 @@ const Datos := preload("res://scripts/datos.gd")
 enum Estado { PATRULLA, ALERTA, PREPARANDO, ATACANDO, RECUPERANDO, ATURDIDO, VOLVIENDO, MUERTO }
 
 signal derrotado
+signal aviso_iniciado
+signal estocada_iniciada
 
 var visual: Node3D
 var objetivo
@@ -22,6 +24,7 @@ var destello := 0.0
 var muerte := -1.0
 var moviendose := false
 var golpe_dado := false
+var sin_guardia := false              # tras una parada de Akira: el siguiente corte lo derriba
 
 
 func configurar(a: Vector3, b: Vector3, akira) -> void:
@@ -96,7 +99,8 @@ func lo_ve() -> bool:
 func recibir_golpe(desde: Vector3) -> bool:
 	if not vivo():
 		return false
-	vida -= 1
+	vida -= vida if sin_guardia else 1
+	sin_guardia = false
 	destello = 1.0
 	var empuje := _plano(global_position - desde)
 	empuje = empuje.normalized() if empuje.length() > 0.01 else -mirando
@@ -125,8 +129,19 @@ func _intentar_golpe() -> void:
 	var de_lado := (hacia - mirando * a_lo_largo).length()
 	if a_lo_largo > 0.0 and a_lo_largo < Datos.ALCANCE_LANZA + Datos.RADIO_PERSONAJE \
 			and de_lado < Datos.ANCHO_LANZA / 2.0 + Datos.RADIO_PERSONAJE:
-		objetivo.recibir_golpe(global_position)
 		golpe_dado = true
+		if objetivo.has_method("intentar_parar") and objetivo.intentar_parar(self):
+			_quedar_sin_guardia()
+		else:
+			objetivo.recibir_golpe(global_position)
+
+
+func _quedar_sin_guardia() -> void:
+	# Akira ha desviado la lanza: el soldado se tambalea hacia atrás, abierto.
+	sin_guardia = true
+	estado = Estado.ATURDIDO
+	temporizador = Datos.TIEMPO_SIN_GUARDIA
+	velocity = -mirando * 2.5
 
 
 func _physics_process(delta: float) -> void:
@@ -159,6 +174,7 @@ func _physics_process(delta: float) -> void:
 			elif absf(objetivo.global_position.y - global_position.y) < 1.0:
 				estado = Estado.PREPARANDO
 				temporizador = Datos.TIEMPO_AVISO
+				aviso_iniciado.emit()
 		Estado.PREPARANDO:
 			temporizador -= delta
 			if temporizador > Datos.TIEMPO_AVISO * 0.5:
@@ -169,6 +185,7 @@ func _physics_process(delta: float) -> void:
 				estado = Estado.ATACANDO
 				temporizador = Datos.TIEMPO_ESTOCADA
 				golpe_dado = false
+				estocada_iniciada.emit()
 		Estado.ATACANDO:
 			temporizador -= delta
 			if not golpe_dado:
@@ -184,6 +201,7 @@ func _physics_process(delta: float) -> void:
 			temporizador -= delta
 			if temporizador <= 0.0:
 				estado = Estado.ALERTA
+				sin_guardia = false
 		Estado.VOLVIENDO:
 			var punto := _punto_del_puesto()
 			deseada = _hacia(punto, Datos.VEL_PATRULLA)
@@ -216,6 +234,8 @@ func info() -> Dictionary:
 		pose = "preparando"
 	elif estado == Estado.ATACANDO:
 		pose = "estocada"
+	elif estado == Estado.ATURDIDO and sin_guardia:
+		pose = "sin_guardia"
 	return {
 		"mirando": mirando,
 		"moviendose": moviendose,

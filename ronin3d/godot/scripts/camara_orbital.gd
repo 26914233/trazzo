@@ -15,6 +15,9 @@ var centro := Vector3.ZERO
 var modo_presentacion := false
 var transicion := 0.0
 var tiempo := 0.0
+var trauma := 0.0                     # sacudida: 0 nada, 1 máxima; baja sola
+var tiempo_sacudida := 0.0
+var ruido := FastNoiseLite.new()
 
 
 func _ready() -> void:
@@ -24,6 +27,7 @@ func _ready() -> void:
 	camara.far = 320.0
 	add_child(camara)
 	camara.current = true
+	ruido.frequency = 0.3
 	colocar_de_golpe()
 
 
@@ -55,8 +59,16 @@ func altura_mirada() -> float:
 	return lerpf(2.2, 1.0, t)
 
 
+func sacudir(fuerza: float) -> void:
+	trauma = clampf(trauma + fuerza, 0.0, 1.0)
+
+
 func _process(delta: float) -> void:
 	tiempo += delta
+	# La sacudida sigue en tiempo real aunque el juego esté congelado por el impacto.
+	var real := delta / maxf(Engine.time_scale, 0.001)
+	trauma = maxf(0.0, trauma - real * 1.6)
+	tiempo_sacudida += real * 60.0
 	if not modo_presentacion and transicion <= 0.0:
 		# Con fuerza: las teclas valen 1 y el stick del mando, lo que se incline.
 		giro += Input.get_axis("girar_izquierda", "girar_derecha") * 90.0 * delta
@@ -89,6 +101,11 @@ func _colocar(mezcla: float) -> void:
 		posicion_orbita = _evitar_muros(mira_orbita, posicion_orbita)
 	var posicion := posicion_presentacion.lerp(posicion_orbita, mezcla)
 	var mira := mira_presentacion.lerp(mira_orbita, mezcla)
+	if trauma > 0.0:
+		var fuerza := trauma * trauma
+		var z := tiempo_sacudida
+		posicion += Vector3(ruido.get_noise_2d(0.0, z), ruido.get_noise_2d(50.0, z), ruido.get_noise_2d(100.0, z)) * 0.5 * fuerza
+		mira += Vector3(ruido.get_noise_2d(150.0, z), ruido.get_noise_2d(200.0, z), 0.0) * 0.25 * fuerza
 	camara.global_position = posicion
 	camara.look_at(mira, Vector3.UP)
 

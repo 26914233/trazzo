@@ -26,6 +26,10 @@ var pendientes_soltar: Array = []
 var medida_inicio_us := 0
 var medida_inicio_cuadros := 0
 var fps_medidos := 0.0
+var rival_parada = null
+var parada_pulsada := false
+var parada_vista := false
+var parada_temprana := false
 
 
 func _ready() -> void:
@@ -68,7 +72,12 @@ func _ready() -> void:
 		[20.5, _terminar_joystick],
 		[20.7, _empezar_mando],
 		[21.4, _terminar_mando],
-		[21.6, _terminar],
+		[21.6, _preparar_parada],
+		[23.2, _comprobar_parada],
+		[23.8, _comprobar_contraataque],
+		[24.0, _preparar_parada_temprana],
+		[25.8, _comprobar_parada_temprana],
+		[26.0, _terminar],
 	]
 
 
@@ -82,6 +91,8 @@ func _process(delta: float) -> void:
 	while indice < pasos.size() and tiempo >= pasos[indice][0]:
 		pasos[indice][1].call()
 		indice += 1
+	if rival_parada != null:
+		_paso_parada()
 	if combate_activo:
 		_paso_combate()
 	elif direccion_caminar != Vector3.ZERO:
@@ -350,6 +361,70 @@ func _terminar_mando() -> void:
 	_eje_mando(0.0)
 	var recorrido: float = _juego().akira.global_position.distance_to(posicion_guardada)
 	_registrar("El stick del mando mueve a Akira", recorrido > 2.0, "recorrió %.1f m" % recorrido)
+
+
+# --- Parada (combate de precisión) --------------------------------------------------------
+
+func _preparar_parada() -> void:
+	# Un soldado se acerca a atacar; Akira para justo antes de la estocada y contraataca.
+	_preparar_parada_con(_juego().soldados[2])
+
+
+func _preparar_parada_con(soldado) -> void:
+	var juego = _juego()
+	rival_parada = soldado
+	var akira = juego.akira
+	akira.vida = Datos.VIDA_MAXIMA
+	akira.invulnerable = 0.0          # si la parada falla, Akira pierde vida
+	var hacia: Vector3 = Vector3(1, 0, 0)
+	_teletransportar(rival_parada.global_position - hacia * 1.5, hacia)
+	rival_parada.process_mode = Node.PROCESS_MODE_INHERIT
+
+
+func _paso_parada() -> void:
+	if not is_instance_valid(rival_parada):
+		return
+	var info: Dictionary = rival_parada.info()
+	var momento := 0.45 if parada_temprana else 0.14    # a destiempo: nada más ver el «!»
+	if not parada_pulsada and info.aviso and rival_parada.temporizador <= momento:
+		_pulsar("parar")
+		parada_pulsada = true
+	if not parada_vista and rival_parada.sin_guardia:
+		parada_vista = true
+		_capturar("parada")
+
+
+func _comprobar_parada() -> void:
+	var akira = _juego().akira
+	_registrar("Parar justo al «!» desvía la lanza y deja al soldado sin guardia",
+		parada_vista and akira.vida == Datos.VIDA_MAXIMA,
+		"sin guardia=%s, vida de Akira=%d" % [parada_vista, akira.vida])
+	akira.mirando = (rival_parada.global_position - akira.global_position).normalized() if is_instance_valid(rival_parada) else akira.mirando
+	_pulsar("atacar")
+
+
+func _comprobar_contraataque() -> void:
+	var derribado: bool = not is_instance_valid(rival_parada) or not rival_parada.vivo()
+	_registrar("El contraataque tras la parada lo derriba de un golpe", derribado,
+		"derrotados=%d" % _juego().derrotados)
+	rival_parada = null
+	_proteger(true)
+
+
+func _preparar_parada_temprana() -> void:
+	parada_temprana = true
+	parada_pulsada = false
+	parada_vista = false
+	_preparar_parada_con(_juego().soldados[3])
+
+
+func _comprobar_parada_temprana() -> void:
+	var akira = _juego().akira
+	var herido: bool = akira.vida < Datos.VIDA_MAXIMA
+	_registrar("Parar a destiempo no sirve: la lanza alcanza a Akira", herido and not parada_vista,
+		"vida de Akira=%d, sin guardia=%s" % [akira.vida, parada_vista])
+	rival_parada = null
+	_proteger(true)
 
 
 # FPS reales mientras Akira camina por el patio (sin capturas de por medio). Con

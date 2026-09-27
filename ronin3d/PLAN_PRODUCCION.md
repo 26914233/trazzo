@@ -158,11 +158,16 @@ nada público sin tu permiso.
 - **RIESGOS:** A necesita mucho contenido y se parece a muchos juegos. B puede frustrar si el
   momento de parar no se lee bien (el aviso «!» ya ayuda).
 - **COSTE:** A, alto en animaciones y enemigos; B, bajo en contenido y medio en ajuste fino.
-- **RECOMENDACIÓN:** **B**. Hago un prototipo de parada para que lo pruebes antes de decidir.
-- **SIGUIENTE PASO:** probarlo en el capítulo 1 y ajustar la ventana de parada.
+- **RECOMENDACIÓN:** **B**. El prototipo ya está en el capítulo 1 para que lo pruebes antes de
+  decidir: **K** (teclado), **LB** (mando) o el botón **Parar** (móvil) justo al «!».
+- **SIGUIENTE PASO:** probarlo y ajustar la ventana de parada (0,3 s) y el castigo por fallar.
 
-## 10. Lo que ya está en marcha
+## 10. Hecho en esta sesión (27-09-2026)
 
-1. Proyecto Godot solo con cel-shading (HD-2D y pixel art 3D quedan en el historial de git).
-2. Exportación a Android preparada, para probar el APK en tu móvil.
-3. Sensación de combate: pausa de impacto, sacudida de cámara, estela de la espada y sonidos.
+1. Proyecto Godot solo con cel-shading (HD-2D y pixel art 3D quedan en el historial de git) y
+   un patio más legible de noche.
+2. Controles de mando y táctiles, y exportación a Android y Windows preparada: el APK se saca
+   desde tu PC como con Trazzo.
+3. Sensación de combate: pausa de impacto, cámara lenta en la parada, sacudida de cámara,
+   chispas, estela de la espada y siete sonidos.
+4. Prototipo de parada y contraataque (DECISIÓN 2), con prueba automática: 15 de 15.

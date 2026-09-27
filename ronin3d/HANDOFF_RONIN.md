@@ -2,101 +2,103 @@
 
 **Última actualización:** 27 de septiembre de 2026 · sesión de Claude Code en la nube
 **Leer entero antes de seguir.** Copia en Google Drive: `Respaldos Claude/ronin/01-Diseno/`.
+**Forma de trabajar:** las instrucciones del usuario (equipo multidisciplinario de videojuegos:
+Game Director, diseño, producción, marketing, negocio…) están en `CLAUDE.md`, en la raíz del
+repositorio. Síguelas: fases, MVP/Must/Should/Nice, formato DECISIÓN y hablar como socio.
 
 ---
 
 ## 1. Objetivo
 
-Hacer **RONIN**, un juego de samuráis con la historia de Akira, primero como prototipo 2D
-(hecho) y ahora **rehecho en 3D con estética 2D y cámara que gira alrededor**. Se probaron
-**tres estéticas** en Godot (HD-2D, pixel art 3D, cel-shading) y la misma escena en **Three.js**
-(navegador) y **Ursina** (Python) para comparar motores. **El usuario decide estética y motor**
-después de ver la comparativa; hasta entonces no se sigue construyendo.
+Convertir **RONIN** (samurái Akira, historia fija) en un juego real, divertido y viable. Tras
+comparar cinco versiones, el usuario eligió **Godot 4.7 + cel-shading** (27-09-2026). Ahora toca
+llegar al **vertical slice** «Una noche en Hoshiyama» (`ronin3d/PLAN_PRODUCCION.md`, §5).
 
 ## 2. Hecho
 
-- **Prototipo 2D** (`samurai.py`, Pygame, un solo archivo): intro, capítulo 1 en el castillo,
-  cierre y salida a **la planicie** (mapa abierto con castillo, aldea, templo, dojo, ruinas,
-  río, minimapa y mapa con M). `samurai.py` **no existía en el repo**: se reconstruyó desde la
-  descripción del usuario.
-- **Especificación común 3D** `ronin3d/DISENO_3D.md` y **sprites/texturas pixel art**
-  compartidos en `ronin3d/recursos/` (`generar_recursos.py`).
-- **Godot 4.7.2** (`ronin3d/godot/`, renderizador Compatibility): capítulo 1 completo con las
-  **tres estéticas** que se cambian con las teclas 1/2/3. Prueba automática **9 de 9** en las
-  tres. FPS en la nube (OpenGL por software, 1280 × 720): HD-2D 9,5 · Pixel 17,6 · Cel 12,3.
-  Memoria en la prueba: unos 415-458 MB (con render por software).
-- **Three.js r170** (`ronin3d/threejs/ronin3d.html`, un solo HTML jugable, también en el móvil
-  con controles táctiles): HD-2D, prueba **47 de 47**. 6,3 FPS en las mismas condiciones;
-  728 MB contando todo el navegador.
-- **Ursina 7.0** (`ronin3d/ursina/ronin3d_ursina.py`, un solo archivo, opción `--ligero`):
-  HD-2D, prueba **34 de 34**. 20,1 FPS; 276 MB.
-- **Comparativa** `ronin3d/COMPARATIVA.md` + página con las capturas lado a lado + hojas
-  `capturas/comparativa_esteticas.jpg` y `capturas/comparativa_motores.jpg`.
-- **Recomendación dada:** motor **Godot** (único de los tres que llega a Android, como Trazzo;
-  tiene editor) y estética **HD-2D** (la más parecida a 2D; alternativa: pixel art 3D si se
-  quiere girar la cámara sin cambios bruscos de vista y lo más ligero).
-- **Respaldo en Google Drive** `Respaldos Claude/ronin/` (índice, ZIP de la rama, documentos,
-  capturas y archivos de cada motor) y handoff en Vertiso Memory (ámbito `ronin-juego`).
+- **Prototipo 2D** `samurai.py` (Pygame): capítulo 1 + salida a la planicie. Se reconstruyó
+  porque no existía en el repo.
+- **Comparativa** de motores y estéticas (Godot HD-2D/pixel/cel, Three.js, Ursina) con FPS y
+  memoria medidos: `ronin3d/COMPARATIVA.md`, página privada
+  https://claude.ai/artifact/6urV5FCikt9CWAUV35gBCu y versión Three.js jugable
+  https://claude.ai/artifact/9QHgv2eQPDdww4HGcbYJaL. Incluye otros motores y cómo sacar APK de
+  los que no lo traen (§7).
+- **Decisión:** Godot 4.7 (Compatibility) + cel-shading; textos de intro y cierre sin cambios.
+- **Godot solo con cel-shading** (`ronin3d/godot/`): HD-2D y pixel art 3D retirados (quedan en
+  el commit `8ec4b1b`). Patio más legible de noche.
+- **Controles:** teclado/ratón, **mando** y **pantalla táctil** (joystick, Atacar, Parar,
+  Saltar, pausa, arrastrar para la cámara, tocar para seguir). `--tactil` los muestra en el PC.
+- **Combate de precisión (prototipo):** K / LB / botón «Parar» justo al aviso «!» desvía la
+  estocada, el soldado queda sin guardia 1,6 s y el contraataque lo derriba de un golpe; a
+  destiempo no sirve. **Sensación:** pausa de impacto, cámara lenta en la parada, sacudida,
+  chispas, estela de la espada y 7 sonidos generados (`sonidos/generar_sonidos.py`).
+- **Exportación** preparada: `export_presets.cfg` con Android (APK arm64) y Windows; icono
+  provisional; compresión ETC2/ASTC activada.
+- **Prueba automática: 15 de 15** (flujo, HUD, cámara, espada, muros, portón, pausa, toques,
+  joystick, mando, parada a tiempo, contraataque, parada a destiempo). ~11-13 FPS en la nube con
+  render por software.
+- **Plan de producción** `ronin3d/PLAN_PRODUCCION.md`: pitch, diagnóstico (alcance, nombre,
+  combate), pilares, bucles, vertical slice, validación, riesgos, negocio y decisiones.
+- **`CLAUDE.md`** con las instrucciones del usuario para todas las sesiones de Claude Code.
 
 ## 3. En curso / pendiente del usuario
 
-1. **Elegir estética:** HD-2D, pixel art 3D o cel-shading (o una mezcla).
-2. **Confirmar motor:** Godot (recomendado), Three.js o Ursina.
-3. Revisar los **textos provisionales** de la intro y el cierre (escritos solo con la
-   historia base; suponen que los soldados obedecen a Genzo y que Akira sale ya ronin).
+1. **DECISIÓN 1 — Alcance:** recomendación C (núcleo + variaciones y lanzar por capítulos).
+2. **DECISIÓN 2 — Combate:** recomendación B (precisión). Probar el prototipo de parada.
+3. **Probar el APK en el móvil:** exportar desde Godot en su PC (como hizo con Trazzo), o dar
+   permiso para descargar ~1,3 GB de plantillas + ~165 MB de herramientas de Android y generarlo
+   en la nube.
 4. Si tiene el `samurai.py` original, subirlo.
 
 ## 4. Siguiente
 
-1. Con la estética y el motor elegidos: pulir el capítulo 1 en 3D (combate, sonido,
-   animaciones, más vistas de sprite si es HD-2D).
-2. Salida del castillo a **la planicie en 3D** (mundo abierto con los cinco lugares).
-3. Módulos por lugar: aldea (rol: diálogos, misiones, tienda, descanso), templo (puzzles),
-   dojo (ritmo/reflejos para aprender técnicas), ruinas (exploración y combate), planicie
-   (viaje y encuentros al azar con dados; propuesta: chō-han).
-4. Exportar a Android (APK) como ya se hizo con Trazzo.
+1. Con las decisiones: vertical slice (§5 del plan): ajustar la parada con lo que diga el
+   usuario, un rival distinto (arquero o capitán), salida a la planicie con un encuentro de
+   dados, aldea mínima, menú y guardado, música.
+2. Mejorar personajes (siguen hechos de piezas simples) y la estela/efectos tras verlos en el
+   móvil.
+3. Buscar nombre o subtítulo propio antes de cualquier página de tienda.
 
 ## 5. Dónde está todo
 
 | Qué | Dónde |
 | --- | --- |
 | Código | GitHub `26914233/trazzo`, rama `claude/ronin-pygame-setup-szn3rn` (repo público) |
-| Índice del proyecto | `ronin3d/LEEME.md` (mismo formato que el de Trazzo) |
-| Prototipo 2D | `samurai.py` · `pip install pygame` · `python samurai.py` (`--planicie` empieza en el mapa) |
-| Versiones 3D | `ronin3d/godot/` (principal), `ronin3d/threejs/`, `ronin3d/ursina/`; cada una con su `LEEME.md` |
+| Instrucciones para Claude | `CLAUDE.md` (raíz) |
+| Índice del proyecto | `ronin3d/LEEME.md` |
+| El juego | `ronin3d/godot/` (LEEME con controles, combate, exportación y prueba) |
+| Plan | `ronin3d/PLAN_PRODUCCION.md` |
 | Comparativa | `ronin3d/COMPARATIVA.md` · página privada https://claude.ai/artifact/6urV5FCikt9CWAUV35gBCu |
-| Jugar en el navegador | página privada https://claude.ai/artifact/9QHgv2eQPDdww4HGcbYJaL (versión Three.js) |
-| Capturas | `ronin3d/capturas/` (`godot_<estética>_*.png`, `threejs_*.png`, `ursina_*.png`) |
+| Capturas de hoy | `ronin3d/capturas/actual/` |
 | Respaldo | Google Drive `Respaldos Claude/ronin/` (01-Diseno, 02-Prototipo-2D, 03-Godot, 04-Otros-motores) |
 | Memoria | Vertiso Memory, handoff con ámbito `ronin-juego` |
 
-**Cómo pasar esto a un proyecto de Claude:** en claude.ai, abre el proyecto de RONIN y añade
-a sus archivos este documento (está en Google Drive, `Respaldos Claude/ronin/01-Diseno/`; si el
-proyecto no deja elegirlo desde Drive, descárgalo y súbelo) y, si quieres, `COMPARATIVA.md` y
-`LEEME.md`. Para retomar en un chat nuevo, basta con decir: «Lee HANDOFF_RONIN.md y sigue con
-RONIN; mi elección es: estética …, motor …». Si el chat tiene Vertiso Memory, el traspaso
-también está allí (ámbito `ronin-juego`).
+**Cómo pasar esto a un proyecto de Claude:** en claude.ai, abre el proyecto de RONIN y añade a
+sus archivos este documento (está en Google Drive, `Respaldos Claude/ronin/01-Diseno/`; si el
+proyecto no deja elegirlo desde Drive, descárgalo y súbelo), junto con `PLAN_PRODUCCION.md`.
+Para retomar en un chat nuevo: «Lee HANDOFF_RONIN.md y CLAUDE.md y sigue con RONIN; mis
+decisiones son: …». Si el chat tiene Vertiso Memory, el traspaso también está allí (ámbito
+`ronin-juego`).
 
 ## 6. Riesgos y reglas
 
 - **Historia base (no cambiar sin consultar):** Akira, guardia del señor Takeda; tras la
   traición queda como ronin; busca justicia por fuera y recuperar su honor por dentro.
   Villano: el general Genzo, mano derecha de Takeda, lo asesinó creyéndolo demasiado blando;
-  no se ve como villano y parte del pueblo lo apoya. Estructura circular: empieza y termina en
-  el castillo de Hoshiyama (mismo escenario).
-- **Mapa y géneros:** castillo (acción con espada), aldea (rol), templo (puzzles), dojo
-  (ritmo/reflejos), ruinas (exploración y combate), planicie (viaje + dados).
-- **Reglas de trabajo:** todo en español, **nombres de variables en español**, no cambiar
-  la historia sin consultar; el usuario marca la dirección.
-- **PC del usuario modesto** (Windows, 0,5-1 GB de RAM libre): Godot con el renderizador
-  *Compatibility*. Una cosa pesada a la vez. Los FPS y la memoria medidos en la nube son con
-  render por software; con tarjeta gráfica real cambian.
+  no se ve como villano y parte del pueblo lo apoya. Empieza y termina en el castillo de
+  Hoshiyama.
+- **Riesgos del plan:** alcance (seis géneros), combate poco profundo, controles táctiles para
+  combate 3D, personajes hechos de piezas, rendimiento en móvil, nombre poco distintivo.
+- **Reglas de trabajo:** todo en español, nombres de variables en español; el usuario marca la
+  dirección (decisiones con el formato DECISIÓN).
+- **PC del usuario modesto** (Windows, 0,5-1 GB de RAM libre): una cosa pesada a la vez.
 - **Respaldos en Google Drive, nunca en OneDrive.** Textos con el conector de Google Drive;
-  binarios (ZIP, capturas) con Composio `GOOGLESUPER_UPLOAD_FROM_URL` desde las URL «raw» de
-  GitHub; para reescribir un texto ya subido sin cambiar su enlace, `GOOGLESUPER_EDIT_FILE`.
-- Verificar checksums de las descargas grandes. **No publicar en redes.** Las páginas de
-  claude.ai son privadas; si se quieren compartir, lo decide el usuario.
+  binarios (ZIP, capturas, sonidos) con Composio `GOOGLESUPER_UPLOAD_FROM_URL` desde las URL
+  «raw» de GitHub; para reescribir un texto ya subido sin cambiar su enlace,
+  `GOOGLESUPER_EDIT_FILE`.
+- **Pedir permiso para descargas grandes** y verificar sumas de comprobación. **No publicar en
+  redes.** Las páginas de claude.ai son privadas; compartirlas lo decide el usuario.
 - Notas técnicas de Godot: los scripts usan `preload()` en vez de `class_name`; la prueba se
-  lanza con `godot --path ronin3d/godot --fixed-fps 30 -- --prueba --estilo=hd2d|pixel|cel`
-  (en Linux sin pantalla, con `xvfb-run`). Con Compatibility, cada luz que toca un objeto lo
-  vuelve a dibujar: el suelo y los muros van en trozos de 8 m.
+  lanza con `godot --path ronin3d/godot --fixed-fps 30 -- --prueba` (en Linux sin pantalla, con
+  `xvfb-run -a`). Con Compatibility, cada luz que toca un objeto lo vuelve a dibujar: el suelo y
+  los muros van en trozos de 8 m.

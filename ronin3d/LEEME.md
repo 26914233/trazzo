@@ -4,43 +4,41 @@ Juego de samuráis: Akira, guardia del señor Takeda, queda como ronin tras la t
 general Genzo. Busca justicia por fuera y recuperar su honor por dentro. Empieza y termina en
 el castillo de Hoshiyama.
 
-**Estado:** prototipo 2D completo (capítulo 1 y salida a la planicie) · capítulo 1 rehecho en
-3D con estética 2D y cámara que gira: en Godot con tres estéticas (prueba 9 de 9) y, para
-comparar motores, en Three.js (47 de 47) y Ursina (34 de 34). Falta que elijas estética y motor.
+**Estado:** prototipo del capítulo 1 en **Godot 4.7 con cel-shading**, jugable con teclado,
+mando y pantalla táctil, con combate de precisión en prueba (parar justo al aviso y
+contraatacar). Siguiente hito: **vertical slice** (ver `PLAN_PRODUCCION.md`).
 **Última actualización:** 27 de septiembre de 2026
-
-**Para decidir:** [página de comparación](https://claude.ai/artifact/6urV5FCikt9CWAUV35gBCu)
-(capturas lado a lado) · [jugar la versión Three.js](https://claude.ai/artifact/9QHgv2eQPDdww4HGcbYJaL)
-en el navegador · `COMPARATIVA.md`. Las dos páginas son privadas: solo las abres tú.
 
 ---
 
 ## Cómo está organizado
 
 ```
-ronin/                         (Drive: Respaldos Claude › ronin)
+ronin/                         (Google Drive: Respaldos Claude › ronin)
 ├── LEEME.md                   Este índice
 ├── RONIN_rama_completa.zip    Todo el código y las capturas (copia de la rama de GitHub)
-├── 01-Diseno/                 Traspaso, especificación 3D y comparativa de motores y estéticas
+├── 01-Diseno/                 Traspaso, plan de producción, especificación y comparativa
 ├── 02-Prototipo-2D/           samurai.py (Pygame, un solo archivo)
-├── 03-Godot/                  Versión Godot 4.7: LEEME y capturas de las tres estéticas
-└── 04-Otros-motores/          Three.js (se juega en el navegador) y Ursina (Python)
+├── 03-Godot/                  Versión Godot: LEEME, pruebas y capturas
+└── 04-Otros-motores/          Three.js y Ursina (solo como referencia)
 ```
 
 En GitHub (`26914233/trazzo`, rama `claude/ronin-pygame-setup-szn3rn`):
 
 ```
+CLAUDE.md                      Instrucciones de trabajo para Claude (equipo de videojuegos)
 samurai.py                     Prototipo 2D
 ronin3d/
 ├── LEEME.md                   Este índice
 ├── HANDOFF_RONIN.md           Traspaso para seguir en otra sesión
-├── DISENO_3D.md               Especificación común de las versiones 3D
-├── COMPARATIVA.md             Motores y estéticas: resultados y recomendación
-├── recursos/                  Sprites y texturas pixel art (generar_recursos.py)
-├── capturas/                  Capturas de las pruebas automáticas
-├── godot/                     Proyecto Godot (principal)
-├── threejs/                   Versión web (ronin3d.html)
-└── ursina/                    Versión Python (ronin3d_ursina.py)
+├── PLAN_PRODUCCION.md         Visión, alcance, vertical slice, riesgos y decisiones
+├── DISENO_3D.md               Especificación del patio y de las reglas de combate
+├── COMPARATIVA.md             Cómo se eligieron motor y estética (y otros motores y APK)
+├── godot/                     El juego (principal)
+├── capturas/                  Capturas: actual/ = versión de hoy; el resto, de la comparativa
+├── recursos/                  Sprites y texturas pixel art de la comparativa
+├── threejs/                   Versión web de la comparativa (referencia)
+└── ursina/                    Versión Python de la comparativa (referencia)
 ```
 
 ---
@@ -51,27 +49,30 @@ ronin3d/
 | --- | --- |
 | **Historia** | La de siempre (Akira, Takeda, Genzo, estructura circular en Hoshiyama). No se cambia sin consultar |
 | **Mapa** | Castillo, aldea, templo, dojo, ruinas y la planicie que los une |
-| **Géneros** | Castillo: acción con espada · aldea: rol · templo: puzzles · dojo: ritmo y reflejos · ruinas: exploración y combate · planicie: viaje y encuentros al azar con dados |
-| **Dirección** | 3D con estética 2D y cámara que gira alrededor |
+| **Dirección** | 3D con cámara que gira alrededor |
+| **Motor** | Godot 4.7 con el renderizador Compatibility (27-09-2026) |
+| **Estética** | Cel-shading (27-09-2026) |
+| **Textos de intro y cierre** | Se quedan como están por ahora; se pueden cambiar más adelante |
 | **Reglas** | Todo en español, nombres de variables en español |
 
 ## Propuestas abiertas (no son decisiones)
 
 | Tema | Propuesta | Cuándo se cierra |
 | --- | --- | --- |
-| **Estética** | HD-2D (recomendada) · Pixel art 3D · Cel-shading | Al ver la comparativa |
-| **Motor** | Godot (recomendado) · Three.js · Ursina | Al ver la comparativa |
-| **Textos de intro y cierre** | Provisionales, escritos solo con la historia base | Antes de pulir el capítulo 1 |
+| **Alcance** | Un núcleo (duelo + exploración) y cada lugar como variación; lanzar por capítulos | Ahora (DECISIÓN 1 del plan) |
+| **Estilo de combate** | Precisión: parar al aviso y contraatacar (prototipo ya jugable) | Tras probarlo (DECISIÓN 2 del plan) |
+| **Géneros por lugar** | Aldea: rol · templo: puzzles · dojo: ritmo · ruinas: exploración · planicie: viaje y dados | Con la DECISIÓN 1 |
 | **Dados de la planicie** | Chō-han (par o impar con dos dados) | Al empezar la planicie en 3D |
+| **Nombre** | «RONIN» ya lo usan otros juegos: buscar nombre o subtítulo propio | Antes de abrir una página de tienda |
 
 ---
 
 ## Lo que bloquea avanzar
 
-1. **Elegir estética** (ver `COMPARATIVA.md` o la página de comparación).
-2. **Confirmar motor.**
+1. **DECISIÓN 1 (alcance)** y **DECISIÓN 2 (estilo de combate)** de `PLAN_PRODUCCION.md`.
+2. **Probar el APK en tu móvil** (exportar desde Godot en tu PC, como con Trazzo).
 
 ## Próximo paso
 
-Con la estética elegida: pulir el capítulo 1 en 3D (combate, sonido, animaciones) y construir
-la salida del castillo a la planicie en 3D. Después, un módulo por lugar.
+Vertical slice «Una noche en Hoshiyama»: combate pulido, un rival distinto, salida a la
+planicie con un encuentro de dados y una aldea mínima.
