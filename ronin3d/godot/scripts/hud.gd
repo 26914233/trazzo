@@ -1,4 +1,4 @@
-# HUD: vida de Akira, soldados derrotados, ayuda de controles, nombre de la estética,
+# HUD: vida de Akira, soldados derrotados, ayuda de controles, versión,
 # textos de la historia (con efecto de máquina de escribir) y pausa.
 extends CanvasLayer
 
@@ -10,7 +10,8 @@ var fuente_negrita: SystemFont
 var marcador: Control
 var etiqueta_soldados: Label
 var etiqueta_ayuda: Label
-var etiqueta_estilo: Label
+var etiqueta_version: Label
+var texto_antes_de_pausa := false
 var capa_texto: Control
 var titulo: Label
 var subtitulo: Label
@@ -71,12 +72,11 @@ func _ready() -> void:
 	etiqueta_ayuda = _etiqueta(16, Datos.CREMA)
 	_colocar(etiqueta_ayuda, Control.PRESET_CENTER_BOTTOM, Rect2(-600, -68, 1200, 30))
 	etiqueta_ayuda.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	etiqueta_ayuda.text = "WASD: moverse   SHIFT: correr   ESPACIO: saltar   J: atacar   Q/E: girar cámara   rueda: zoom   1/2/3: estética   ESC: pausa"
 	etiqueta_ayuda.modulate.a = 0.0
 
-	etiqueta_estilo = _etiqueta(15, Color(0.85, 0.82, 0.72))
-	_colocar(etiqueta_estilo, Control.PRESET_BOTTOM_RIGHT, Rect2(-340, -34, 318, 24))
-	etiqueta_estilo.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	etiqueta_version = _etiqueta(15, Color(0.85, 0.82, 0.72))
+	_colocar(etiqueta_version, Control.PRESET_BOTTOM_RIGHT, Rect2(-340, -34, 318, 24))
+	etiqueta_version.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 
 	_crear_capa_texto()
 	_crear_capa_pausa()
@@ -180,8 +180,8 @@ func poner_derrotados(cantidad: int, total: int) -> void:
 	etiqueta_soldados.text = "Soldados derrotados: %d/%d" % [cantidad, total]
 
 
-func poner_estilo(texto: String) -> void:
-	etiqueta_estilo.text = texto
+func poner_version(texto: String) -> void:
+	etiqueta_version.text = texto
 
 
 func mostrar_texto(texto_titulo: String, texto_subtitulo: String, parrafos: Array, texto_pie: String) -> void:
@@ -214,15 +214,34 @@ func completar_texto() -> void:
 	cuerpo.visible_characters = -1
 
 
-func mostrar_ayuda() -> void:
+const AYUDA_TECLADO := "WASD: moverse   SHIFT: correr   ESPACIO: saltar   J: atacar   Q/E: girar cámara   rueda: zoom   R/F: inclinar   ESC: pausa"
+const AYUDA_TACTIL := "Joystick: moverse (al borde, correr) · Atacar y Saltar: botones\nArrastra el dedo por la pantalla: girar la cámara"
+
+
+func mostrar_ayuda(tactil := false) -> void:
+	# En el móvil la ayuda va arriba: abajo están el joystick y los botones.
+	if tactil:
+		_colocar(etiqueta_ayuda, Control.PRESET_CENTER_TOP, Rect2(-420, 66, 840, 56))
+	else:
+		_colocar(etiqueta_ayuda, Control.PRESET_CENTER_BOTTOM, Rect2(-600, -68, 1200, 30))
+	etiqueta_ayuda.text = AYUDA_TACTIL if tactil else AYUDA_TECLADO
 	tiempo_ayuda = 0.0
 
 
+# En pausa se oculta el texto de la historia (si lo había) para que no se mezcle con el
+# menú de pausa, y el texto deja de escribirse hasta volver.
 func poner_pausa(activa: bool) -> void:
+	if activa and not capa_pausa.visible:
+		texto_antes_de_pausa = capa_texto.visible
+		capa_texto.visible = false
+	elif not activa and capa_pausa.visible:
+		capa_texto.visible = texto_antes_de_pausa
 	capa_pausa.visible = activa
 
 
 func _process(delta: float) -> void:
+	if capa_pausa.visible:
+		return
 	tiempo += delta
 	if escribiendo:
 		letras += VELOCIDAD_TEXTO * delta

@@ -1,2 +1,4 @@
 # Carpeta que Godot genera al abrir el proyecto (caché de importación)
 .godot/
+# Exportaciones (APK, EXE): no se suben al repositorio
+/exportaciones/

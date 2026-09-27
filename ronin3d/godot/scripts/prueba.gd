@@ -1,11 +1,10 @@
 # Prueba automática: juega sola unos segundos, comprueba lo básico y guarda capturas
-# en ronin3d/capturas/. Se lanza así (sin ventana, con Xvfb en Linux):
-#   godot --path ronin3d/godot --rendering-driver opengl3 --fixed-fps 30 -- --prueba --estilo=hd2d
+# en ronin3d/capturas/actual/. Se lanza así (sin ventana, con Xvfb en Linux):
+#   godot --path ronin3d/godot --rendering-driver opengl3 --fixed-fps 30 -- --prueba
 # Sale con código 0 si todo fue bien y 1 si algo falló.
 extends Node
 
 const Datos := preload("res://scripts/datos.gd")
-const Estilos := preload("res://scripts/estilos.gd")
 const MOVIMIENTOS := ["mover_adelante", "mover_atras", "mover_izquierda", "mover_derecha"]
 
 var principal
@@ -17,7 +16,6 @@ var carpeta := ""
 var prefijo := ""
 var posicion_guardada := Vector3.ZERO
 var giro_guardado := 0.0
-var estilo_inicial := ""
 var objetivo_combate = null
 var vida_objetivo := 0
 var vida_akira := 0
@@ -32,9 +30,8 @@ var fps_medidos := 0.0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	carpeta = ProjectSettings.globalize_path("res://").path_join("../capturas").simplify_path()
-	estilo_inicial = principal.estilo
-	prefijo = "godot_%s_" % estilo_inicial
+	carpeta = ProjectSettings.globalize_path("res://").path_join("../capturas/actual").simplify_path()
+	DirAccess.make_dir_recursive_absolute(carpeta)
 	pasos = [
 		[1.2, _capturar.bind("intro")],
 		[1.3, _pulsar.bind("aceptar")],
@@ -58,9 +55,20 @@ func _ready() -> void:
 		[15.6, _comprobar_cierre],
 		[15.8, _pulsar.bind("aceptar")],
 		[16.3, _capturar.bind("cierre")],
-		[16.5, _cambiar_estilo],
-		[17.8, _comprobar_estilo],
-		[18.0, _terminar],
+		[16.5, _pulsar.bind("pausa")],
+		[16.9, _comprobar_pausa],
+		[17.3, _comprobar_reanudar],
+		[17.5, _activar_tactil],
+		[17.6, _tocar.bind(Vector2(640, 360))],
+		[17.9, _tocar.bind(Vector2(640, 360))],
+		[18.2, _tocar.bind(Vector2(640, 360))],
+		[18.4, _comprobar_toques],
+		[19.6, _empezar_joystick],
+		[20.3, _capturar.bind("tactil")],
+		[20.5, _terminar_joystick],
+		[20.7, _empezar_mando],
+		[21.4, _terminar_mando],
+		[21.6, _terminar],
 	]
 
 
@@ -171,11 +179,11 @@ func _dejar_de_caminar() -> void:
 func _comprobar_hud() -> void:
 	var pantalla := get_viewport().get_visible_rect()
 	var fuera: Array = []
-	for nombre in ["marcador", "etiqueta_soldados", "etiqueta_estilo"]:
+	for nombre in ["marcador", "etiqueta_soldados", "etiqueta_version"]:
 		var control: Control = principal.hud.get(nombre)
 		if not control.visible or not pantalla.encloses(control.get_global_rect()):
 			fuera.append(nombre)
-	var detalle := "vida, soldados y estética" if fuera.is_empty() else "fuera: " + ", ".join(PackedStringArray(fuera))
+	var detalle := "vida, soldados y versión" if fuera.is_empty() else "fuera: " + ", ".join(PackedStringArray(fuera))
 	_registrar("El HUD se ve entero en pantalla", fuera.is_empty(), detalle)
 
 
@@ -268,15 +276,80 @@ func _comprobar_cierre() -> void:
 	_registrar("Llegar al portón cierra el capítulo", _juego().fase == "cierre", "fase=" + _juego().fase)
 
 
-func _cambiar_estilo() -> void:
-	var siguiente: String = Estilos.ORDEN[(Estilos.ORDEN.find(estilo_inicial) + 1) % Estilos.ORDEN.size()]
-	_pulsar("estilo_%d" % (Estilos.ORDEN.find(siguiente) + 1))
+var pausa_vista := false
 
 
-func _comprobar_estilo() -> void:
-	var correcto: bool = principal.estilo != estilo_inicial and is_instance_valid(principal.juego)
-	_registrar("Las teclas 1/2/3 cambian de estética", correcto, "ahora: " + principal.estilo)
-	await _capturar("cambio_de_estetica")
+func _comprobar_pausa() -> void:
+	pausa_vista = get_tree().paused
+	await _capturar("pausa")
+	_pulsar("pausa")
+
+
+func _comprobar_reanudar() -> void:
+	var correcto: bool = pausa_vista and not get_tree().paused
+	_registrar("ESC pausa el juego y lo reanuda", correcto,
+		"pausado=%s, después=%s" % [pausa_vista, get_tree().paused])
+
+
+# --- Controles táctiles y mando --------------------------------------------------------
+
+func _activar_tactil() -> void:
+	principal.tactil.activar(true)
+
+
+func _evento_toque(posicion: Vector2, pulsado: bool) -> void:
+	var toque := InputEventScreenTouch.new()
+	toque.index = 0
+	toque.position = posicion
+	toque.pressed = pulsado
+	Input.parse_input_event(toque)
+
+
+func _tocar(posicion: Vector2) -> void:
+	_evento_toque(posicion, true)
+	_evento_toque(posicion, false)
+
+
+func _comprobar_toques() -> void:
+	# Tres toques: salir del cierre, completar el texto de la intro y empezar.
+	_registrar("Tocar la pantalla sigue los textos", _juego().fase == "jugando", "fase=" + _juego().fase)
+	_proteger(true)
+
+
+func _empezar_joystick() -> void:
+	posicion_guardada = _juego().akira.global_position
+	_evento_toque(Vector2(200, 520), true)
+	var arrastre := InputEventScreenDrag.new()
+	arrastre.index = 0
+	arrastre.position = Vector2(300, 520)
+	arrastre.relative = Vector2(100, 0)
+	Input.parse_input_event(arrastre)
+
+
+func _terminar_joystick() -> void:
+	_evento_toque(Vector2(300, 520), false)
+	var recorrido: float = _juego().akira.global_position.distance_to(posicion_guardada)
+	_registrar("El joystick táctil mueve a Akira", recorrido > 2.0, "recorrió %.1f m" % recorrido)
+	principal.tactil.activar(false)
+
+
+func _eje_mando(valor: float) -> void:
+	var eje := InputEventJoypadMotion.new()
+	eje.device = 0
+	eje.axis = JOY_AXIS_LEFT_X
+	eje.axis_value = valor
+	Input.parse_input_event(eje)
+
+
+func _empezar_mando() -> void:
+	posicion_guardada = _juego().akira.global_position
+	_eje_mando(1.0)
+
+
+func _terminar_mando() -> void:
+	_eje_mando(0.0)
+	var recorrido: float = _juego().akira.global_position.distance_to(posicion_guardada)
+	_registrar("El stick del mando mueve a Akira", recorrido > 2.0, "recorrió %.1f m" % recorrido)
 
 
 # FPS reales mientras Akira camina por el patio (sin capturas de por medio). Con
@@ -296,7 +369,7 @@ func _terminar_medida() -> void:
 func _terminar() -> void:
 	var fallos := resultados.filter(func(r): return not r[1])
 	var informe := PackedStringArray()
-	informe.append("Prueba automática de RONIN 3D (Godot, estética %s)" % estilo_inicial)
+	informe.append("Prueba automática de RONIN 3D (Godot, cel-shading)")
 	for r in resultados:
 		informe.append("%s  %s  %s" % ["OK   " if r[1] else "FALLO", r[0], r[2]])
 	informe.append("Resultado: %d de %d comprobaciones correctas" % [resultados.size() - fallos.size(), resultados.size()])

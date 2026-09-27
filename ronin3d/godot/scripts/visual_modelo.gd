@@ -1,4 +1,4 @@
-# Personaje hecho con piezas 3D sencillas (estéticas pixel art 3D y cel-shading).
+# Personaje hecho con piezas 3D sencillas y cel-shading.
 # Mira hacia +Z local; el nodo «cuerpo» gira hacia donde mira el personaje y las
 # piernas, brazos y armas se animan por código.
 extends Node3D
@@ -6,7 +6,7 @@ extends Node3D
 const Datos := preload("res://scripts/datos.gd")
 const TEXTURA_SOMBRA := preload("res://recursos/sombra.png")
 
-var estilos
+var aspecto
 var es_soldado := false
 var cuerpo: Node3D
 var torso: Node3D
@@ -25,8 +25,8 @@ var tiempo := 0.0
 var angulo := 0.0
 
 
-func configurar(estilos_elegidos, soldado: bool) -> void:
-	estilos = estilos_elegidos
+func configurar(aspecto_del_juego, soldado: bool) -> void:
+	aspecto = aspecto_del_juego
 	es_soldado = soldado
 	cuerpo = Node3D.new()
 	add_child(cuerpo)
@@ -50,7 +50,7 @@ func _pieza(padre: Node3D, malla: Mesh, color: Color, posicion: Vector3, por_nor
 		rotacion := Vector3.ZERO) -> MeshInstance3D:
 	var instancia := MeshInstance3D.new()
 	instancia.mesh = malla
-	var material: Material = estilos.material_personaje(color, por_normal)
+	var material: Material = aspecto.material_personaje(color, por_normal)
 	instancia.material_override = material
 	materiales.append(material)
 	instancia.position = posicion
@@ -228,7 +228,7 @@ func actualizar(delta: float, info: Dictionary) -> void:
 		_animar_espada(info)
 
 	for material in materiales:
-		estilos.poner_destello(material, info.destello)
+		aspecto.poner_destello(material, info.destello)
 	visible = info.visible
 	if info.muerte >= 0.0:
 		var caida := minf(1.0, info.muerte * 2.5)

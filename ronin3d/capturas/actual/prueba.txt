@@ -1,0 +1,15 @@
+Prueba automática de RONIN 3D (Godot, cel-shading)
+OK     La intro da paso al juego  fase=jugando
+OK     Akira camina  recorrió 8.0 m
+OK     El HUD se ve entero en pantalla  vida, soldados y versión
+OK     La cámara gira con E  giró 90°
+OK     La espada daña al soldado  derrotados=1
+OK     El soldado se defiende (resta vida o Akira gana antes)  vida de Akira 5 → 5
+OK     El muro oeste detiene a Akira  x=-23.65 (el muro empieza en −24)
+OK     Llegar al portón cierra el capítulo  fase=cierre
+OK     ESC pausa el juego y lo reanuda  pausado=true, después=false
+OK     Tocar la pantalla sigue los textos  fase=jugando
+OK     El joystick táctil mueve a Akira  recorrió 7.2 m
+OK     El stick del mando mueve a Akira  recorrió 3.5 m
+Resultado: 12 de 12 comprobaciones correctas
+FPS al caminar por el patio: 12.8 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)

@@ -3,19 +3,18 @@
 extends Node3D
 
 const Datos := preload("res://scripts/datos.gd")
-const Estilos := preload("res://scripts/estilos.gd")
+const Aspecto := preload("res://scripts/aspecto.gd")
 const ConstructorMundo := preload("res://scripts/constructor_mundo.gd")
 const Akira := preload("res://scripts/akira.gd")
 const Soldado := preload("res://scripts/soldado.gd")
 const CamaraOrbital := preload("res://scripts/camara_orbital.gd")
-const VisualSprite := preload("res://scripts/visual_sprite.gd")
 const VisualModelo := preload("res://scripts/visual_modelo.gd")
 
 signal fase_cambiada(fase: String)
 signal vida_cambiada(vida: int)
 signal derrotados_cambiados(cantidad: int, total: int)
 
-var estilos
+var aspecto
 var constructor
 var akira
 var camara
@@ -25,10 +24,10 @@ var fase := "intro"          # intro, jugando, cierre, derrota
 var tiempo_derrota := 0.0
 
 
-func iniciar(nombre_estilo: String, con_intro := true) -> void:
-	estilos = Estilos.new(nombre_estilo)
+func iniciar(con_intro := true) -> void:
+	aspecto = Aspecto.new()
 	constructor = ConstructorMundo.new()
-	constructor.construir(self, estilos)
+	constructor.construir(self, aspecto)
 
 	akira = Akira.new()
 	add_child(akira)
@@ -59,12 +58,8 @@ func iniciar(nombre_estilo: String, con_intro := true) -> void:
 
 
 func _crear_visual(soldado: bool) -> Node3D:
-	if estilos.usa_sprites():
-		var sprite = VisualSprite.new()
-		sprite.configurar(soldado)
-		return sprite
 	var modelo = VisualModelo.new()
-	modelo.configurar(estilos, soldado)
+	modelo.configurar(aspecto, soldado)
 	return modelo
 
 

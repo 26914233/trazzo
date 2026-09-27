@@ -1,5 +1,5 @@
-# Cámara que gira alrededor de Akira: Q/E, botón derecho + arrastrar, rueda o +/−
-# para el zoom y R/F para inclinarla. Al bajarla mira un poco hacia arriba, para ver
+# Cámara que gira alrededor de Akira: Q/E (o el stick derecho del mando), botón derecho +
+# arrastrar o arrastrar el dedo, rueda o +/− para el zoom y R/F para inclinarla. Al bajarla mira un poco hacia arriba, para ver
 # el torreón y la luna. Durante la intro muestra un plano fijo del castillo.
 extends Node3D
 
@@ -58,18 +58,10 @@ func altura_mirada() -> float:
 func _process(delta: float) -> void:
 	tiempo += delta
 	if not modo_presentacion and transicion <= 0.0:
-		if Input.is_action_pressed("girar_izquierda"):
-			giro -= 90.0 * delta
-		if Input.is_action_pressed("girar_derecha"):
-			giro += 90.0 * delta
-		if Input.is_action_pressed("inclinar_arriba"):
-			inclinacion += 40.0 * delta
-		if Input.is_action_pressed("inclinar_abajo"):
-			inclinacion -= 40.0 * delta
-		if Input.is_action_pressed("acercar"):
-			distancia -= 8.0 * delta
-		if Input.is_action_pressed("alejar"):
-			distancia += 8.0 * delta
+		# Con fuerza: las teclas valen 1 y el stick del mando, lo que se incline.
+		giro += Input.get_axis("girar_izquierda", "girar_derecha") * 90.0 * delta
+		inclinacion += Input.get_axis("inclinar_abajo", "inclinar_arriba") * 40.0 * delta
+		distancia += Input.get_axis("acercar", "alejar") * 8.0 * delta
 	inclinacion = clampf(inclinacion, Datos.CAMARA_INCLINACION_MIN, Datos.CAMARA_INCLINACION_MAX)
 	distancia = clampf(distancia, Datos.CAMARA_DISTANCIA_MIN, Datos.CAMARA_DISTANCIA_MAX)
 	if objetivo:
@@ -114,12 +106,19 @@ func _evitar_muros(desde: Vector3, hasta: Vector3) -> Vector3:
 	return punto + (desde - punto).normalized() * 0.4
 
 
+# Arrastrar (ratón con el botón derecho o un dedo en el móvil) gira e inclina la cámara.
+func girar_por_arrastre(relativo: Vector2) -> void:
+	if modo_presentacion or transicion > 0.0:
+		return
+	giro -= relativo.x * 0.3
+	inclinacion += relativo.y * 0.2
+
+
 func _unhandled_input(evento: InputEvent) -> void:
 	if modo_presentacion or transicion > 0.0:
 		return
 	if evento is InputEventMouseMotion and (evento.button_mask & MOUSE_BUTTON_MASK_RIGHT):
-		giro -= evento.relative.x * 0.3
-		inclinacion += evento.relative.y * 0.2
+		girar_por_arrastre(evento.relative)
 	elif evento is InputEventMouseButton and evento.pressed:
 		if evento.button_index == MOUSE_BUTTON_WHEEL_UP:
 			distancia -= 1.0

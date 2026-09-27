@@ -1,25 +1,25 @@
 # Construye el patio del castillo de Hoshiyama con las medidas de DISENO_3D.md:
 # suelo, muros, portón, torreón, pasarela, obstáculos, linternas, pozo, antorchas,
-# luna y ambiente. Los materiales los decide la estética elegida.
+# luna y ambiente. Los materiales salen de aspecto.gd (cel-shading).
 extends RefCounted
 
 const Datos := preload("res://scripts/datos.gd")
-const TEXTURA_FUEGO := preload("res://recursos/fuego.png")
 # Con el renderizador Compatibility, cada luz que toca un objeto lo vuelve a dibujar entero.
 # Por eso el suelo y los muros van en trozos (cada trozo recibe solo las luces cercanas) y
 # el terreno de fuera va en una capa que solo ilumina la luna.
 const CAPA_SOLO_LUNA := 2
 const TROZO := 8.0
 
-var estilos
+var aspecto
 var raiz: Node3D
 var antorchas: Array = []     # {"luz", "fuego", "fase", "base"}
 var tiempo := 0.0
+var sin_sombra := false       # las piezas que se crean mientras es true no dan sombra
 
 
-func construir(destino: Node3D, estilos_elegidos) -> void:
+func construir(destino: Node3D, aspecto_del_juego) -> void:
 	raiz = destino
-	estilos = estilos_elegidos
+	aspecto = aspecto_del_juego
 	_luna_y_ambiente()
 	_suelos()
 	_muros()
@@ -37,17 +37,13 @@ func actualizar(delta: float) -> void:
 	for antorcha in antorchas:
 		var t: float = tiempo * 9.0 + antorcha.fase
 		antorcha.luz.light_energy = antorcha.base * (0.86 + 0.09 * sin(t) + 0.06 * sin(t * 2.7))
-		var fuego = antorcha.fuego
-		if fuego is Sprite3D:
-			fuego.frame = int(tiempo * 10.0 + antorcha.fase) % 4
-		else:
-			fuego.scale = Vector3(1.0, 0.85 + 0.25 * abs(sin(t * 0.7)), 1.0)
+		antorcha.fuego.scale = Vector3(1.0, 0.85 + 0.25 * abs(sin(t * 0.7)), 1.0)
 
 
 # --- Piezas básicas -----------------------------------------------------------------
 
 func _material(superficie) -> Material:
-	return superficie if superficie is Material else estilos.material_superficie(superficie)
+	return superficie if superficie is Material else aspecto.material_superficie(superficie)
 
 
 func _malla(malla: Mesh, superficie, posicion: Vector3) -> MeshInstance3D:
@@ -55,6 +51,8 @@ func _malla(malla: Mesh, superficie, posicion: Vector3) -> MeshInstance3D:
 	instancia.mesh = malla
 	instancia.material_override = _material(superficie)
 	instancia.position = posicion
+	if sin_sombra:
+		instancia.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	raiz.add_child(instancia)
 	return instancia
 
@@ -127,13 +125,14 @@ func tronco_piramide(base: Vector3, ancho_abajo: float, fondo_abajo: float, anch
 func _luna_y_ambiente() -> void:
 	var mundo := WorldEnvironment.new()
 	var entorno := Environment.new()
-	estilos.configurar_entorno(entorno)
+	aspecto.configurar_entorno(entorno)
 	mundo.environment = entorno
 	raiz.add_child(mundo)
 	var luna := DirectionalLight3D.new()
 	luna.light_color = Datos.LUZ_LUNA
-	luna.light_energy = 0.95 if estilos.estilo == "cel" else 0.75
+	luna.light_energy = 0.95
 	luna.shadow_enabled = true
+	luna.shadow_opacity = 0.75    # la sombra deja pasar algo de luna: se lee mejor el patio
 	luna.directional_shadow_max_distance = 35.0
 	luna.transform.basis = Basis.looking_at(-Datos.DIRECCION_LUNA.normalized(), Vector3.UP)
 	raiz.add_child(luna)
@@ -200,7 +199,7 @@ func _porton() -> void:
 		caja(Vector3(24.5, 2.5, z), Vector3(1, 5, 1), "madera_oscura")
 	caja(Vector3(24.5, 5.3, 0), Vector3(1.4, 0.6, 8.5), "madera_oscura", false)
 	tronco_piramide(Vector3(24.5, 5.6, 0), 2.8, 9.8, 0.4, 7.6, 1.5, "tejas")
-	caja(Vector3(24.6, 2.2, 0), Vector3(0.3, 4.4, 6), estilos.material_porton())
+	caja(Vector3(24.6, 2.2, 0), Vector3(0.3, 4.4, 6), aspecto.material_superficie("porton"))
 
 
 # --- Torreón (tenshu), al norte, fuera del patio -------------------------------------------
@@ -215,8 +214,11 @@ func _ventanas(centro: Vector3, ancho: float, y: float, cantidad: int, material:
 
 
 func _torreon() -> void:
+	# La luna está baja detrás del torreón: su sombra taparía casi todo el patio y no se
+	# vería a los personajes. El torreón no da sombra (solo se nota que falta si se busca).
+	sin_sombra = true
 	var c := Vector3(0, 0, -32)
-	var ventana: Material = estilos.material_emisivo(Color("ffb45a"), 2.2)
+	var ventana: Material = aspecto.material_emisivo(Color("ffb45a"), 2.2)
 	tronco_piramide(c, 18, 18, 16.2, 16.2, 6, "muro_piedra")
 	# piso 1
 	caja(c + Vector3(0, 8.25, 0), Vector3(13, 4.5, 13), "yeso", false)
@@ -234,6 +236,7 @@ func _torreon() -> void:
 	caja(c + Vector3(0, 22.1, 0), Vector3(1.6, 0.25, 0.3), "dorado", false)
 	for lado in [-1, 1]:
 		caja(c + Vector3(0.75 * lado, 22.5, 0), Vector3(0.22, 0.7, 0.22), "dorado", false)
+	sin_sombra = false
 
 
 # --- Obstáculos ------------------------------------------------------------------------
@@ -249,7 +252,7 @@ func _pasarela_y_obstaculos() -> void:
 
 
 func _linternas() -> void:
-	var luz_interior: Material = estilos.material_emisivo(Color("ffcf8a"), 2.5)
+	var luz_interior: Material = aspecto.material_emisivo(Color("ffcf8a"), 2.5)
 	for punto in Datos.LINTERNAS:
 		var base := Vector3(punto.x, 0, punto.y)
 		cilindro(base, 0.42, 0.22, "piedra_clara", false, 0.36, 8)
@@ -303,38 +306,21 @@ func _antorchas() -> void:
 		var base := Vector3(punto.x, 0, punto.y)
 		cilindro(base, 0.07, 2.6, "madera_oscura", true, 0.06, 8)
 		cilindro(base + Vector3(0, 2.55, 0), 0.08, 0.16, "hierro", false, 0.21, 10)
-		var fuego: Node3D
-		if estilos.estilo == "cel":
-			fuego = Node3D.new()
-			fuego.position = base + Vector3(0, 2.7, 0)
-			for capa in [[0.17, 0.62, Color("ff6a1e")], [0.1, 0.4, Color("ffd66a")]]:
-				var cono := CylinderMesh.new()
-				cono.bottom_radius = capa[0]
-				cono.top_radius = 0.0
-				cono.height = capa[1]
-				cono.radial_segments = 8
-				var llama := MeshInstance3D.new()
-				llama.mesh = cono
-				llama.material_override = estilos.material_emisivo(capa[2], 3.0)
-				llama.position.y = capa[1] / 2.0
-				llama.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-				fuego.add_child(llama)
-			raiz.add_child(fuego)
-		else:
-			var sprite := Sprite3D.new()
-			sprite.texture = TEXTURA_FUEGO
-			sprite.hframes = 4
-			sprite.pixel_size = 0.034
-			sprite.offset = Vector2(0, 12)
-			sprite.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
-			sprite.shaded = false
-			sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
-			sprite.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-			sprite.modulate = Color(1.5, 1.3, 1.1)
-			sprite.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-			sprite.position = base + Vector3(0, 2.62, 0)
-			raiz.add_child(sprite)
-			fuego = sprite
+		var fuego := Node3D.new()
+		fuego.position = base + Vector3(0, 2.7, 0)
+		for capa in [[0.17, 0.62, Color("ff6a1e")], [0.1, 0.4, Color("ffd66a")]]:
+			var cono := CylinderMesh.new()
+			cono.bottom_radius = capa[0]
+			cono.top_radius = 0.0
+			cono.height = capa[1]
+			cono.radial_segments = 8
+			var llama := MeshInstance3D.new()
+			llama.mesh = cono
+			llama.material_override = aspecto.material_emisivo(capa[2], 3.0)
+			llama.position.y = capa[1] / 2.0
+			llama.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			fuego.add_child(llama)
+		raiz.add_child(fuego)
 		var luz := OmniLight3D.new()
 		luz.light_color = Datos.LUZ_ANTORCHA
 		luz.light_energy = 1.7
