@@ -90,6 +90,7 @@
     text-shadow: 3px 3px 0 #000, 0 0 28px rgba(226, 186, 98, 0.35);
     transition: opacity 0.8s;
   }
+  #tituloTexto.largo { letter-spacing: 0.07em; padding-left: 0.07em; font-size: clamp(34px, 7.5vh, 68px); }
   #subtituloTexto {
     margin: 1.4vh 0 0; font: 400 clamp(15px, 2.7vh, 23px)/1.2 var(--letra);
     color: var(--gris); text-shadow: 2px 2px 0 #000; transition: opacity 0.8s;
@@ -133,7 +134,7 @@
   body.tactil #tactil { display: block; }
   #zonaJoystick { position: fixed; left: 0; bottom: 0; width: 42vw; height: 64vh; z-index: 6; }
   #baseJoystick {
-    position: absolute; width: 132px; height: 132px; margin: -66px 0 0 -66px; border-radius: 50%;
+    position: fixed; width: 132px; height: 132px; margin: -66px 0 0 -66px; border-radius: 50%;
     border: 2px solid rgba(238, 228, 200, 0.45); background: rgba(10, 12, 30, 0.35);
     pointer-events: none;
   }
@@ -334,8 +335,8 @@ const COLOR = {
 const LUZ = {
   ambiente: 9.0,
   luna: 3.4,
-  antorcha: 17,
-  decaimientoAntorcha: 1.35,
+  antorcha: 9.5,
+  decaimientoAntorcha: 1.0,
   alcanceAntorcha: 9,
   linterna: 2.4,
   alcanceLinterna: 4.5,
@@ -524,6 +525,7 @@ function crearRenderizador() {
 }
 
 function crearEscenaYCielo() {
+  _direccionCamara = new THREE.Vector3();
   escena = new THREE.Scene();
   escena.fog = new THREE.Fog(COLOR.niebla, 30, 165);
   camara3d = new THREE.PerspectiveCamera(PARAM_CAMARA.fov, window.innerWidth / window.innerHeight, 0.3, 1200);
@@ -626,7 +628,7 @@ function crearEscenaYCielo() {
   const tamanoLuna = 2 * 780 * Math.tan(3.6 * GRADOS);
   const materialLuna = new THREE.MeshBasicMaterial({
     map: texturas.luna, alphaTest: 0.5, fog: false, depthWrite: false,
-    color: new THREE.Color(1.35, 1.32, 1.22),
+    color: new THREE.Color(1.12, 1.1, 1.04),
   });
   luna = new THREE.Mesh(new THREE.PlaneGeometry(tamanoLuna, tamanoLuna), materialLuna);
   luna.renderOrder = -8;
@@ -637,21 +639,21 @@ function crearEscenaYCielo() {
   // Halo suave alrededor de la luna
   const lienzoHalo = document.createElement('canvas');
   lienzoHalo.width = lienzoHalo.height = 128;
-  const ctx = lienzoHalo.getContext('2d');
-  const degradado = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+  const dibujo = lienzoHalo.getContext('2d');
+  const degradado = dibujo.createRadialGradient(64, 64, 0, 64, 64, 64);
   degradado.addColorStop(0.0, 'rgba(190, 205, 255, 0.55)');
   degradado.addColorStop(0.28, 'rgba(160, 180, 255, 0.22)');
   degradado.addColorStop(0.6, 'rgba(120, 140, 230, 0.06)');
   degradado.addColorStop(1.0, 'rgba(100, 120, 220, 0)');
-  ctx.fillStyle = degradado;
-  ctx.fillRect(0, 0, 128, 128);
+  dibujo.fillStyle = degradado;
+  dibujo.fillRect(0, 0, 128, 128);
   const texturaHalo = new THREE.CanvasTexture(lienzoHalo);
   texturaHalo.colorSpace = THREE.SRGBColorSpace;
   haloLuna = new THREE.Mesh(
     new THREE.PlaneGeometry(tamanoLuna * 4.2, tamanoLuna * 4.2),
     new THREE.MeshBasicMaterial({
       map: texturaHalo, transparent: true, depthWrite: false, fog: false,
-      blending: THREE.AdditiveBlending, opacity: 0.9,
+      blending: THREE.AdditiveBlending, opacity: 0.75,
     }));
   haloLuna.renderOrder = -7;
   haloLuna.frustumCulled = false;
@@ -728,8 +730,8 @@ function crearTexturaTierra() {
   // Tierra oscura del exterior (generada aquí: no hay PNG para ella en recursos/)
   const lienzo = document.createElement('canvas');
   lienzo.width = lienzo.height = 32;
-  const ctx = lienzo.getContext('2d');
-  const datos = ctx.createImageData(32, 32);
+  const dibujo = lienzo.getContext('2d');
+  const datos = dibujo.createImageData(32, 32);
   const azar = azarConSemilla(99);
   for (let i = 0; i < 32 * 32; i++) {
     const v = (azar() - 0.5) * 12;
@@ -739,7 +741,7 @@ function crearTexturaTierra() {
     else if (mota > 0.985) { r += 22; g += 22; b += 24; }
     datos.data.set([r, g, b, 255], i * 4);
   }
-  ctx.putImageData(datos, 0, 0);
+  dibujo.putImageData(datos, 0, 0);
   const t = new THREE.CanvasTexture(lienzo);
   t.colorSpace = THREE.SRGBColorSpace;
   t.magFilter = THREE.NearestFilter;
@@ -751,11 +753,11 @@ function crearTexturaTierra() {
 
 // Agujero tramado en los muros cuando se interponen entre la cámara y Akira
 function aplicarRecorte(material) {
-  material.onBeforeCompile = (shader) => {
-    shader.uniforms.uRecorteCentro = uniformesRecorte.centro;
-    shader.uniforms.uRecorteRadio = uniformesRecorte.radio;
-    shader.uniforms.uRecorteProfundidad = uniformesRecorte.profundidad;
-    shader.fragmentShader = shader.fragmentShader
+  material.onBeforeCompile = (programa) => {
+    programa.uniforms.uRecorteCentro = uniformesRecorte.centro;
+    programa.uniforms.uRecorteRadio = uniformesRecorte.radio;
+    programa.uniforms.uRecorteProfundidad = uniformesRecorte.profundidad;
+    programa.fragmentShader = programa.fragmentShader
       .replace('#include <clipping_planes_pars_fragment>', `#include <clipping_planes_pars_fragment>
         uniform vec2 uRecorteCentro;
         uniform float uRecorteRadio;
@@ -796,7 +798,7 @@ function crearMateriales() {
   materiales.piedraLinterna = lambert({ map: texturas.losa, color: '#c9c6cf' });
   materiales.agua = new THREE.MeshPhongMaterial({ color: '#0d1830', specular: '#5a6fae', shininess: 60 });
   materiales.oro = lambert({ color: '#e0b04a', emissive: '#5a3a08' });
-  materiales.ventanaLuz = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.3, 1.55, 0.72) });
+  materiales.ventanaLuz = new THREE.MeshBasicMaterial({ color: new THREE.Color(1.9, 1.3, 0.6) });
   materiales.ventanaApagada = lambert({ color: '#1a1512' });
   materiales.marco = lambert({ map: texturas.madera, color: '#4a3a30' });
   materiales.luzLinterna = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.0, 1.45, 0.75) });
@@ -967,12 +969,12 @@ function construirPatio() {
   suelo.rotation.x = -Math.PI / 2;
   escena.add(suelo);
 
-  // Terreno exterior de tierra oscura (un poco por debajo para no pelear con el suelo)
-  const geoTerreno = new THREE.PlaneGeometry(420, 420);
-  geoTerreno.attributes.uv.array.forEach((_, i, a) => { a[i] *= 420 / 2; });
+  // Terreno exterior de tierra oscura, 200 × 200 en y = −0,01 (queda bajo el suelo del patio)
+  const geoTerreno = new THREE.PlaneGeometry(200, 200);
+  geoTerreno.attributes.uv.array.forEach((_, i, a) => { a[i] *= 200 / 2; });
   const terreno = malla(geoTerreno, materiales.tierra, { sombra: false });
   terreno.rotation.x = -Math.PI / 2;
-  terreno.position.y = -0.03;
+  terreno.position.y = -0.01;
   escena.add(terreno);
 
   // Muros del recinto: 1,2 m de piedra + yeso encima + tejadillo de 1,6 × 0,4
@@ -1279,7 +1281,7 @@ function crearAntorchas() {
     escena.add(llama);
 
     const luz = new THREE.PointLight(COLOR.luzAntorcha, LUZ.antorcha, LUZ.alcanceAntorcha, LUZ.decaimientoAntorcha);
-    luz.position.set(x, 2.95, z);
+    luz.position.set(x, 2.8, z);           // fuego a 2,8 m
     escena.add(luz);
     antorchas.push({ luz, llama, textura, fase: i * 1.7 + 0.3, x, z });
   });
@@ -1317,7 +1319,7 @@ function crearLinternas() {
 // =============================================================================
 // Iluminación del sprite: poco dependiente de la dirección, para que no se vuelva
 // negro al girar la cámara (la normal mira a la cámara y el término difuso se "envuelve").
-const CHUNK_LAMBERT_SPRITE = `varying vec3 vViewPosition;
+const TROZO_LAMBERT_SPRITE = `varying vec3 vViewPosition;
 struct LambertMaterial {
 	vec3 diffuseColor;
 	float specularStrength;
@@ -1340,8 +1342,8 @@ function crearSprite(textura, anchoPx) {
   const mapa = textura.clone();
   mapa.needsUpdate = true;
   const material = new THREE.MeshLambertMaterial({ map: mapa, alphaTest: 0.5 });
-  material.onBeforeCompile = (shader) => {
-    shader.fragmentShader = shader.fragmentShader.replace('#include <lights_lambert_pars_fragment>', CHUNK_LAMBERT_SPRITE);
+  material.onBeforeCompile = (programa) => {
+    programa.fragmentShader = programa.fragmentShader.replace('#include <lights_lambert_pars_fragment>', TROZO_LAMBERT_SPRITE);
   };
   material.customProgramCacheKey = () => 'sprite-hd2d';
   const malla3d = new THREE.Mesh(geo, material);
@@ -1408,7 +1410,7 @@ function reiniciarAkira() {
     vida: PARAM_AKIRA.vidaMaxima, enSuelo: true, coyote: 0, bufferSalto: 0,
     invulnerable: 0, retroceso: 0, atacando: false, tiempoAtaque: 0, enfriamiento: 0,
     moviendo: false, corriendo: false, tiempoAnim: 0, tiempoMuerto: 0, alturaMaxima: 0,
-    velocidad: 0, tajoPendiente: false, corteIniciado: false,
+    velocidad: 0, tajoPendiente: false, corteIniciado: false, golpesRecibidos: 0,
   });
   akira.golpeados.clear();
   const sp = akira.sprite;
@@ -1426,7 +1428,7 @@ function reiniciarSoldado(s) {
     empujeX: 0, empujeZ: 0, destello: 0, tiempoMuerto: 0, caidaSigno: 1,
     tiempoAnim: s.indice * 0.37, moviendo: false, golpeoEsteAtaque: false,
     dirAtaqueX: 1, dirAtaqueZ: 0, visible: true,
-    avisoPendiente: false, estocadaPendiente: false, avisos: 0,
+    avisoPendiente: false, estocadaPendiente: false, avisos: 0, estocadas: 0,
   });
   const dx = s.b.x - s.a.x, dz = s.b.z - s.a.z, d = Math.hypot(dx, dz) || 1;
   s.mirarX = dx / d; s.mirarZ = dz / d;
@@ -1448,12 +1450,13 @@ function crearEfectos() {
   const geoTajo = new THREE.PlaneGeometry(lado, lado);
   const mapaTajo = texturas.tajo.clone();
   mapaTajo.needsUpdate = true;
+  // El destello del tajo se dibuja siempre encima (no lo tapa el soldado al que golpea)
   efectoTajo = new THREE.Mesh(geoTajo, new THREE.MeshBasicMaterial({
-    map: mapaTajo, transparent: true, depthWrite: false, alphaTest: 0.02,
+    map: mapaTajo, transparent: true, depthWrite: false, depthTest: false, alphaTest: 0.02,
     color: new THREE.Color(1.7, 1.8, 2.1), blending: THREE.AdditiveBlending, fog: false,
   }));
   efectoTajo.visible = false;
-  efectoTajo.renderOrder = 5;
+  efectoTajo.renderOrder = 20;
   escena.add(efectoTajo);
 
   const maximo = 96;
@@ -1511,7 +1514,7 @@ function actualizarChispas(dt) {
 // =============================================================================
 // Post-proceso: bloom suave + desenfoque arriba y abajo (maqueta) + viñeta
 // =============================================================================
-const SHADER_MAQUETA = {
+const EFECTO_MAQUETA = {
   name: 'ShaderMaqueta',
   uniforms: {
     tDiffuse: { value: null },
@@ -1574,11 +1577,11 @@ function crearPostproceso() {
     compositor.setPixelRatio(pr);
     compositor.setSize(tamano.x, tamano.y);
     compositor.addPass(new RenderPass(escena, camara3d));
-    pasoBloom = new UnrealBloomPass(new THREE.Vector2(tamano.x, tamano.y), 0.6, 0.5, 0.85);
+    pasoBloom = new UnrealBloomPass(new THREE.Vector2(tamano.x, tamano.y), 0.55, 0.35, 1.0);
     compositor.addPass(pasoBloom);
-    const shader = { ...SHADER_MAQUETA, uniforms: THREE.UniformsUtils.clone(SHADER_MAQUETA.uniforms) };
-    shader.uniforms.resolucion.value = new THREE.Vector2(tamano.x * pr, tamano.y * pr);
-    pasoMaqueta = new ShaderPass(shader);
+    const efecto = { ...EFECTO_MAQUETA, uniforms: THREE.UniformsUtils.clone(EFECTO_MAQUETA.uniforms) };
+    efecto.uniforms.resolucion.value = new THREE.Vector2(tamano.x * pr, tamano.y * pr);
+    pasoMaqueta = new ShaderPass(efecto);
     compositor.addPass(pasoMaqueta);
     compositor.addPass(new OutputPass());
     estado.postproceso = { activo: true, bloom: true, maqueta: true, motivo: '' };
@@ -1987,6 +1990,7 @@ function actualizarSoldado(s, dt) {
       if (s.temporizador <= 0) {
         s.estado = 'estocada';
         s.estocadaPendiente = true;
+        s.estocadas = (s.estocadas || 0) + 1;
         s.temporizador = P.tiempoEstocada;
         s.dirAtaqueX = s.mirarX;
         s.dirAtaqueZ = s.mirarZ;
@@ -2062,6 +2066,7 @@ function alturaMirada(inclinacion) {
 }
 
 const _posOrbita = { x: 0, y: 0, z: 0 };
+let _direccionCamara = null;        // se crea al cargar Three.js
 const _mirarOrbita = { x: 0, y: 0, z: 0 };
 
 function calcularOrbita(dt) {
@@ -2070,12 +2075,16 @@ function calcularOrbita(dt) {
   const mx = seguido.x, my = seguido.y + h, mz = seguido.z;
   const g = camara.giro * GRADOS, inc = camara.inclinacion * GRADOS;
   const ox = Math.sin(g) * Math.cos(inc), oy = Math.sin(inc), oz = Math.cos(g) * Math.cos(inc);
-  // La cámara no se mete detrás de los muros: se acerca si el muro corta la línea de visión
+  // La cámara no se queda detrás de un muro que la tape: si el muro corta la línea de
+  // visión y la cámara quedaría por debajo de su parte alta, se acerca. Si la cámara está
+  // por encima del muro, no se mueve: el muro se abre con un agujero tramado alrededor de Akira.
   const d = camara.distancia;
   let permitida = d;
   for (const c of obstaculosCamara) {
     const t = entradaSegmentoCaja(mx, my, mz, mx + ox * d, my + oy * d, mz + oz * d, c);
-    if (t !== Infinity && t > 0) permitida = Math.min(permitida, Math.max(1.4, t * d - 0.35));
+    if (t === Infinity || t <= 0) continue;
+    if (my + oy * d > c.maxY + 0.25) continue;
+    permitida = Math.min(permitida, Math.max(1.4, t * d - 0.35));
   }
   if (permitida < camara.distanciaEfectiva || dt <= 0) camara.distanciaEfectiva = permitida;
   else camara.distanciaEfectiva = Math.min(permitida, camara.distanciaEfectiva + (permitida - camara.distanciaEfectiva) * (1 - Math.exp(-4 * dt)));
@@ -2139,8 +2148,7 @@ function actualizarCamara(dt) {
   camara3d.updateMatrixWorld();
 
   // Orientación horizontal de la cámara, para los billboards y la regla de vistas
-  const adelante = new THREE.Vector3();
-  camara3d.getWorldDirection(adelante);
+  const adelante = camara3d.getWorldDirection(_direccionCamara);
   camara.yaw = Math.atan2(-adelante.x, -adelante.z);
   camara.derechaX = Math.cos(camara.yaw);
   camara.derechaZ = -Math.sin(camara.yaw);
@@ -2356,7 +2364,9 @@ function mostrarTexto(config) {
   const pantalla = document.getElementById('pantallaTexto');
   pantalla.classList.remove('oculto');
   pantalla.classList.toggle('derrota', config.estilo === 'derrota');
-  document.getElementById('tituloTexto').textContent = config.titulo;
+  const titulo = document.getElementById('tituloTexto');
+  titulo.textContent = config.titulo;
+  titulo.classList.toggle('largo', config.titulo.length > 8);
   document.getElementById('subtituloTexto').textContent = config.subtitulo || '';
   const pie = document.getElementById('pieTexto');
   pie.textContent = config.pie;
@@ -2557,10 +2567,7 @@ function configurarEntrada() {
   window.addEventListener('keydown', (e) => {
     const codigo = codigoTecla(e);
     if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(codigo)) e.preventDefault();
-    if (e.repeat) {
-      if (!['Enter', 'NumpadEnter', 'Space'].includes(codigo)) return;
-      return;
-    }
+    if (e.repeat) return;
     if (estado.texto) {
       if (codigo === 'Enter' || codigo === 'NumpadEnter' || codigo === 'Space') confirmarTexto();
       return;
@@ -2734,8 +2741,11 @@ function actualizarLogica(dt) {
       estado.ayudaRestante = Math.max(0, estado.ayudaRestante - dt);
     }
   }
-  for (const s of soldados) actualizarSoldado(s, dt);
-  separarPersonajes();
+  // Durante la intro los soldados esperan en su punto A; patrullan desde que empieza el patio
+  if (estado.escena !== 'intro') {
+    for (const s of soldados) actualizarSoldado(s, dt);
+    separarPersonajes();
+  }
   actualizarChispas(dt);
 }
 
@@ -2746,7 +2756,9 @@ function bucle(instanteMs) {
   let dt = ahora - ultimoInstante;
   ultimoInstante = ahora;
   if (!(dt >= 0)) dt = 0;
-  dt = Math.min(dt, 0.5);          // con fotogramas muy lentos la lógica no se queda atrás
+  // Como mucho 0,1 s de juego por fotograma: por encima de 10 FPS no cambia nada; por debajo
+  // el juego va a cámara lenta en vez de dar saltos (los soldados no atacan "entre fotogramas").
+  dt = Math.min(dt, 0.1);
   acumulado += dt;
   let pasos = 0;
   while (acumulado >= PASO_FIJO && pasos < 30) {
@@ -2812,7 +2824,8 @@ function instantaneaEstado() {
     },
     soldados: soldados.map((s) => ({
       indice: s.indice, x: redondear(s.x), y: redondear(s.y), z: redondear(s.z),
-      vida: s.vida, estado: s.estado, aviso: s.estado === 'aviso', avisos: s.avisos || 0, visible: s.visible,
+      vida: s.vida, estado: s.estado, aviso: s.estado === 'aviso', avisos: s.avisos || 0,
+      estocadas: s.estocadas || 0, visible: s.visible,
     })),
     errores: estado.errores.slice(),
   };

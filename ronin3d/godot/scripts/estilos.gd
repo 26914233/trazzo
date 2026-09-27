@@ -157,13 +157,13 @@ func configurar_entorno(entorno: Environment) -> void:
 	entorno.sky = cielo
 	entorno.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	entorno.ambient_light_color = Datos.AMBIENTE
-	entorno.ambient_light_energy = 1.2 if estilo == "cel" else 1.3
+	entorno.ambient_light_energy = 1.2 if estilo == "cel" else 2.0
 	entorno.fog_enabled = true
 	entorno.fog_light_color = Color("1a1f3c")
 	entorno.fog_density = 0.011
 	entorno.fog_sky_affect = 0.0
 	entorno.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	entorno.tonemap_exposure = 1.1
+	entorno.tonemap_exposure = 1.1 if estilo == "cel" else 1.2
 	entorno.glow_enabled = estilo != "pixel"
 	entorno.glow_intensity = 0.9
 	entorno.glow_bloom = 0.06

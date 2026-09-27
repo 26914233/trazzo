@@ -62,28 +62,33 @@ func _ready() -> void:
 	marcador.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(marcador)
 
+	# Las etiquetas se anclan a una esquina y se colocan con márgenes respecto a ella
+	# (con «position» quedarían fuera de la pantalla).
 	etiqueta_soldados = _etiqueta(18, Datos.CREMA)
-	etiqueta_soldados.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	etiqueta_soldados.position = Vector2(-300, 18)
-	etiqueta_soldados.size = Vector2(280, 30)
+	_colocar(etiqueta_soldados, Control.PRESET_TOP_RIGHT, Rect2(-320, 18, 298, 30))
 	etiqueta_soldados.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 
 	etiqueta_ayuda = _etiqueta(16, Datos.CREMA)
-	etiqueta_ayuda.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
-	etiqueta_ayuda.position = Vector2(-560, -44)
-	etiqueta_ayuda.size = Vector2(1120, 30)
+	_colocar(etiqueta_ayuda, Control.PRESET_CENTER_BOTTOM, Rect2(-600, -68, 1200, 30))
 	etiqueta_ayuda.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	etiqueta_ayuda.text = "WASD: moverse   SHIFT: correr   ESPACIO: saltar   J: atacar   Q/E: girar cámara   rueda: zoom   1/2/3: estética   ESC: pausa"
 	etiqueta_ayuda.modulate.a = 0.0
 
 	etiqueta_estilo = _etiqueta(15, Color(0.85, 0.82, 0.72))
-	etiqueta_estilo.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-	etiqueta_estilo.position = Vector2(-320, -30)
-	etiqueta_estilo.size = Vector2(300, 24)
+	_colocar(etiqueta_estilo, Control.PRESET_BOTTOM_RIGHT, Rect2(-340, -34, 318, 24))
 	etiqueta_estilo.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 
 	_crear_capa_texto()
 	_crear_capa_pausa()
+
+
+# Ancla el control con «preset» y lo coloca con un rectángulo relativo a ese ancla.
+func _colocar(control: Control, preset: Control.LayoutPreset, rectangulo: Rect2) -> void:
+	control.set_anchors_preset(preset)
+	control.offset_left = rectangulo.position.x
+	control.offset_top = rectangulo.position.y
+	control.offset_right = rectangulo.position.x + rectangulo.size.x
+	control.offset_bottom = rectangulo.position.y + rectangulo.size.y
 
 
 func _etiqueta(tamano: int, color: Color, negrita := false) -> Label:
@@ -152,14 +157,14 @@ func _crear_capa_pausa() -> void:
 	remove_child(texto)
 	capa_pausa.add_child(texto)
 	texto.text = "PAUSA"
-	texto.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	texto.position += Vector2(-100, -80)
+	_colocar(texto, Control.PRESET_CENTER, Rect2(-300, -110, 600, 80))
+	texto.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	var indicacion := _etiqueta(22, Datos.CREMA)
 	remove_child(indicacion)
 	capa_pausa.add_child(indicacion)
 	indicacion.text = "ESC o ENTER: continuar      Q: salir del juego"
-	indicacion.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	indicacion.position += Vector2(-230, 10)
+	_colocar(indicacion, Control.PRESET_CENTER, Rect2(-400, 0, 800, 36))
+	indicacion.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	capa_pausa.visible = false
 
 

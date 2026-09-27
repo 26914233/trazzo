@@ -5,6 +5,11 @@ extends RefCounted
 
 const Datos := preload("res://scripts/datos.gd")
 const TEXTURA_FUEGO := preload("res://recursos/fuego.png")
+# Con el renderizador Compatibility, cada luz que toca un objeto lo vuelve a dibujar entero.
+# Por eso el suelo y los muros van en trozos (cada trozo recibe solo las luces cercanas) y
+# el terreno de fuera va en una capa que solo ilumina la luna.
+const CAPA_SOLO_LUNA := 2
+const TROZO := 8.0
 
 var estilos
 var raiz: Node3D
@@ -127,7 +132,7 @@ func _luna_y_ambiente() -> void:
 	raiz.add_child(mundo)
 	var luna := DirectionalLight3D.new()
 	luna.light_color = Datos.LUZ_LUNA
-	luna.light_energy = 0.95 if estilos.estilo == "cel" else 0.6
+	luna.light_energy = 0.95 if estilos.estilo == "cel" else 0.75
 	luna.shadow_enabled = true
 	luna.directional_shadow_max_distance = 35.0
 	luna.transform.basis = Basis.looking_at(-Datos.DIRECCION_LUNA.normalized(), Vector3.UP)
@@ -139,19 +144,32 @@ func _luna_y_ambiente() -> void:
 func _suelos() -> void:
 	var terreno := PlaneMesh.new()
 	terreno.size = Vector2(220, 220)
-	_malla(terreno, "tierra", Vector3(0, -0.02, 0))
-	caja(Vector3(0, -0.25, 0), Vector3(48, 0.5, 32), "losa")
+	_malla(terreno, "tierra", Vector3(0, -0.02, 0)).layers = CAPA_SOLO_LUNA
+	for i in range(int(48 / TROZO)):
+		for j in range(int(32 / TROZO)):
+			var centro := Vector3(-24 + TROZO * (i + 0.5), -0.25, -16 + TROZO * (j + 0.5))
+			caja(centro, Vector3(TROZO, 0.5, TROZO), "losa", false)
+	var forma := BoxShape3D.new()
+	forma.size = Vector3(48, 0.5, 32)
+	_cuerpo(forma, Vector3(0, -0.25, 0))
 
 
 func _muro(centro: Vector3, tamano: Vector3) -> void:
 	var base := 1.2
 	var alto_yeso := tamano.y - base
 	var a_lo_largo_x := tamano.x > tamano.z
-	caja(Vector3(centro.x, base / 2.0, centro.z), Vector3(tamano.x, base, tamano.z), "muro_piedra", false)
-	caja(Vector3(centro.x, base + alto_yeso / 2.0, centro.z), Vector3(tamano.x - 0.08, alto_yeso, tamano.z - 0.08), "yeso", false)
+	var largo := tamano.x if a_lo_largo_x else tamano.z
+	# base de piedra y yeso, en trozos a lo largo del muro
+	var trozos := int(ceil(largo / TROZO))
+	for t in range(trozos):
+		var medio := -largo / 2.0 + (t + 0.5) * largo / trozos
+		var lugar := Vector3(centro.x + medio, 0, centro.z) if a_lo_largo_x else Vector3(centro.x, 0, centro.z + medio)
+		var tramo := Vector3(largo / trozos, 0, tamano.z) if a_lo_largo_x else Vector3(tamano.x, 0, largo / trozos)
+		var hundido := Vector3(0, 0, 0.08) if a_lo_largo_x else Vector3(0.08, 0, 0)
+		caja(lugar + Vector3(0, base / 2.0, 0), tramo + Vector3(0, base, 0), "muro_piedra", false)
+		caja(lugar + Vector3(0, base + alto_yeso / 2.0, 0), tramo + Vector3(0, alto_yeso, 0) - hundido, "yeso", false)
 	caja(Vector3(centro.x, 3.25, centro.z), Vector3(tamano.x + 0.04, 0.2, tamano.z + 0.04), "madera_oscura", false)
 	# pilares de madera cada 5 m, que atraviesan el muro
-	var largo := tamano.x if a_lo_largo_x else tamano.z
 	var cantidad := int(largo / 5.0)
 	for k in range(cantidad + 1):
 		var desplazamiento := -largo / 2.0 + k * largo / maxf(cantidad, 1)
@@ -249,6 +267,7 @@ func _linternas() -> void:
 		luz.light_color = Color("ffc278")
 		luz.light_energy = 0.45
 		luz.omni_range = 3.5
+		luz.light_cull_mask = ~CAPA_SOLO_LUNA & 0xFFFFF
 		luz.position = base + Vector3(0, 1.1, 0)
 		raiz.add_child(luz)
 
@@ -320,6 +339,7 @@ func _antorchas() -> void:
 		luz.light_color = Datos.LUZ_ANTORCHA
 		luz.light_energy = 1.7
 		luz.omni_range = 9.0
+		luz.light_cull_mask = ~CAPA_SOLO_LUNA & 0xFFFFF
 		luz.position = base + Vector3(0, 3.0, 0)
 		raiz.add_child(luz)
 		raiz.add_child(_chispas(base + Vector3(0, 3.0, 0)))

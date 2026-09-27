@@ -44,6 +44,7 @@ func _ready() -> void:
 		[4.6, _dejar_de_caminar],
 		[4.65, _terminar_medida],
 		[4.7, _capturar.bind("patio")],
+		[4.72, _comprobar_hud],
 		[4.8, _empezar_giro],
 		[5.8, _terminar_giro],
 		[6.0, _capturar.bind("camara_girada")],
@@ -165,6 +166,17 @@ func _dejar_de_caminar() -> void:
 	_soltar_movimiento()
 	var recorrido: float = _juego().akira.global_position.distance_to(posicion_guardada)
 	_registrar("Akira camina", recorrido > 3.0, "recorrió %.1f m" % recorrido)
+
+
+func _comprobar_hud() -> void:
+	var pantalla := get_viewport().get_visible_rect()
+	var fuera: Array = []
+	for nombre in ["marcador", "etiqueta_soldados", "etiqueta_estilo"]:
+		var control: Control = principal.hud.get(nombre)
+		if not control.visible or not pantalla.encloses(control.get_global_rect()):
+			fuera.append(nombre)
+	var detalle := "vida, soldados y estética" if fuera.is_empty() else "fuera: " + ", ".join(PackedStringArray(fuera))
+	_registrar("El HUD se ve entero en pantalla", fuera.is_empty(), detalle)
 
 
 func _empezar_giro() -> void:

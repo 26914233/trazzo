@@ -74,9 +74,10 @@ godot/
 
 ## Prueba automática
 
-Juega sola 18 segundos: pasa la intro, camina, gira la cámara, pelea con un soldado,
-choca con un muro, encuadra el torreón, llega al portón y cambia de estética. Comprueba 8
-cosas y guarda capturas en `../capturas/godot_<estética>_*.png`.
+Juega sola 18 segundos: pasa la intro, camina, mira que el HUD quepa en pantalla, gira la
+cámara, pelea con un soldado, choca con un muro, encuadra el torreón, llega al portón y
+cambia de estética. Comprueba 9 cosas, mide los FPS mientras Akira camina y guarda capturas
+en `../capturas/godot_<estética>_*.png`.
 
 ```
 godot --path ronin3d/godot --fixed-fps 30 -- --prueba --estilo=hd2d
@@ -84,7 +85,10 @@ godot --path ronin3d/godot --fixed-fps 30 -- --prueba --estilo=pixel
 godot --path ronin3d/godot --fixed-fps 30 -- --prueba --estilo=cel
 ```
 
-Resultado en la nube (Godot 4.7.2, OpenGL por software): **8 de 8** en las tres estéticas.
+Resultado en la nube (Godot 4.7.2, OpenGL por software, sin tarjeta gráfica): **9 de 9** en
+las tres estéticas. FPS al caminar por el patio a 1280 × 720: HD-2D 9,5 · Pixel art 3D 17,6 ·
+Cel-shading 12,3 (con una tarjeta gráfica real van mucho más rápido). Comparativa con los otros
+motores en `../COMPARATIVA.md`.
 
 ## Pendiente
 

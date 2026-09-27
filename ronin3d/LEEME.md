@@ -5,9 +5,13 @@ general Genzo. Busca justicia por fuera y recuperar su honor por dentro. Empieza
 el castillo de Hoshiyama.
 
 **Estado:** prototipo 2D completo (capítulo 1 y salida a la planicie) · capítulo 1 rehecho en
-3D con estética 2D y cámara que gira: en Godot con tres estéticas y, para comparar motores, en
-Three.js y Ursina.
+3D con estética 2D y cámara que gira: en Godot con tres estéticas (prueba 9 de 9) y, para
+comparar motores, en Three.js (47 de 47) y Ursina (34 de 34). Falta que elijas estética y motor.
 **Última actualización:** 27 de septiembre de 2026
+
+**Para decidir:** [página de comparación](https://claude.ai/artifact/6urV5FCikt9CWAUV35gBCu)
+(capturas lado a lado) · [jugar la versión Three.js](https://claude.ai/artifact/9QHgv2eQPDdww4HGcbYJaL)
+en el navegador · `COMPARATIVA.md`. Las dos páginas son privadas: solo las abres tú.
 
 ---
 

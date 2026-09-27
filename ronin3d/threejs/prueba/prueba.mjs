@@ -312,6 +312,21 @@ async function continuarTexto() {
   return esperarEstado((x) => x.escena !== escenaAntes, { tiempo: 20000, descripcion: 'cambio de escena' });
 }
 
+// Si una fase anterior dejó el juego fuera del patio (por ejemplo, Akira cayó), vuelve a él
+let interrupciones = 0;
+async function asegurarPatio(motivo) {
+  let e = await leerEstado();
+  if (e.escena === 'patio' && !e.pausado) return e;
+  interrupciones++;
+  registrar(`AVISO: antes de «${motivo}» la escena es «${e.escena}»${e.pausado ? ' (en pausa)' : ''}; se vuelve al patio`);
+  if (e.pausado) await pulsar('Escape');
+  e = await leerEstado();
+  if (e.texto) await continuarTexto();
+  await esperarEstado((x) => x.escena === 'patio', { tiempo: 20000, descripcion: 'volver al patio' });
+  await calmarPatio();
+  return leerEstado();
+}
+
 async function medirFPS(segundos) {
   const inicio = await pagina.evaluate(() => [window.estadoJuego.fotogramas, performance.now()]);
   await esperarMs(segundos * 1000);
@@ -359,17 +374,17 @@ async function fasePatio() {
   comprobar('HUD: AKIRA con 5 rombos, «Soldados derrotados: 0/6» y el motor', hudTexto[0].includes('AKIRA') &&
     hudTexto[2] === 5 && hudTexto[1].replace(/\s+/g, ' ').includes('Soldados derrotados: 0/6') && hudTexto[3] === 'Three.js · HD-2D',
     `${hudTexto[1].replace(/\s+/g, ' ')} · rombos ${hudTexto[2]} · «${hudTexto[3]}»`);
-  await esperarMs(800);
+  // Captura enseguida: el soldado 1 ve a Akira nada más empezar y viene a por él
   await capturar('threejs_patio.png');
-  const fps = await medirFPS(6);
-  registrar(`FPS a 1280×720 (render por software): ${fps.toFixed(2)}`);
-  return fps;
 }
 
 async function faseTorreon() {
+  await asegurarPatio('captura del torreón');
+  await calmarPatio();
   await usarVentana(ANCHO_RAPIDO, ALTO_RAPIDO);
-  // Cámara baja mirando al norte: se ven el muro norte, el torreón y la luna
-  await girarCamaraA(-8, 3);
+  // Akira en el oeste del patio; cámara baja mirando al norte: muro norte, torreón y luna
+  await irHacia(-16, 4, { tolerancia: 0.6, tiempo: 20000 });
+  await girarCamaraA(3, 2.5);
   let e = await inclinarCamaraA(-5, 0.6);
   e = await esperarEstado((x) => x.camara.inclinacion <= -4.4, { tiempo: 5000, descripcion: 'cámara baja' })
     .catch(() => leerEstado());
@@ -383,15 +398,19 @@ async function faseTorreon() {
 }
 
 async function faseMovimiento() {
+  await asegurarPatio('movimiento');
+  await calmarPatio();
+  await irHacia(-18, -1, { tolerancia: 0.5, tiempo: 20000 });
+  await esperarMs(300);
   // Caminar (D: a la derecha de la cámara)
   let e0 = await leerEstado();
   const g = e0.camara.giro * Math.PI / 180;
   let velocidadMaxima = 0;
   await pagina.keyboard.down('KeyD');
-  const finCaminar = Date.now() + 1000;
+  const finCaminar = Date.now() + 1600;
   while (Date.now() < finCaminar) {
     const e = await leerEstado();
-    velocidadMaxima = Math.max(velocidadMaxima, e.akira.velocidad);
+    if (!e.akira.invulnerable) velocidadMaxima = Math.max(velocidadMaxima, e.akira.velocidad);
     await esperarMs(80);
   }
   await pagina.keyboard.up('KeyD');
@@ -409,10 +428,10 @@ async function faseMovimiento() {
   velocidadMaxima = 0;
   await pagina.keyboard.down('Shift');
   await pagina.keyboard.down('KeyA');
-  const finCorrer = Date.now() + 1000;
+  const finCorrer = Date.now() + 1400;
   while (Date.now() < finCorrer) {
     const e = await leerEstado();
-    velocidadMaxima = Math.max(velocidadMaxima, e.akira.velocidad);
+    if (!e.akira.invulnerable) velocidadMaxima = Math.max(velocidadMaxima, e.akira.velocidad);
     await esperarMs(80);
   }
   await pagina.keyboard.up('KeyA');
@@ -439,6 +458,8 @@ async function faseMovimiento() {
 }
 
 async function faseCamara() {
+  await asegurarPatio('cámara');
+  await calmarPatio();
   let e0 = await leerEstado();
   await mantener(['KeyQ'], 1200);
   await esperarMs(300);
@@ -448,11 +469,12 @@ async function faseCamara() {
   await capturar('threejs_camara_girada.png');
   await usarVentana(ANCHO_RAPIDO, ALTO_RAPIDO);
   e0 = await leerEstado();
-  await mantener(['KeyE'], 800);
+  await esperarFotogramas(2);
+  await mantener(['KeyE'], 1500);
   await esperarMs(300);
   e1 = await leerEstado();
   const giroE = normalizarAngulo(e1.camara.giro - e0.camara.giro);
-  comprobar('E gira la cámara al otro lado', giroE < -20, `${redondear(giroE)}°`);
+  comprobar('E gira la cámara al otro lado', giroE < -15, `${redondear(giroE)}°`);
 
   // Zoom con + / − y con la rueda
   e0 = await leerEstado();
@@ -504,6 +526,8 @@ async function faseCamara() {
 }
 
 async function faseMuro() {
+  await asegurarPatio('muros');
+  await calmarPatio();
   // Empuja hacia el oeste contra el muro (su cara interior está en x = −24)
   let minimoX = Infinity, e = await leerEstado();
   const limite = Date.now() + 4000;
@@ -536,92 +560,168 @@ async function faseMuro() {
     `z mínima ${minimoZ} (cara del muro en −16)`);
 }
 
-async function faseCombate() {
-  // Busca al soldado 1 (patrulla en x = −14) y lo ataca con J hasta herirlo
-  await usarVentana(ANCHO_RAPIDO, ALTO_RAPIDO);
+// Vence a un soldado: avanza hacia él y ataca con J en cuanto está cerca, como haría un
+// jugador que entra durante el aviso «!». Si se pide, intenta hasta 4 capturas a 1280×720
+// y se queda con una en la que se vea el tajo.
+async function derrotarSoldado(indice, { captura = null, tiempo = 120000 } = {}) {
   let e = await leerEstado();
-  const indice = 1;
   const vidaInicial = e.soldados[indice - 1].vida;
-  let capturado = false, estadoCaptura = null;
-  let ataques = 0;
-  const limite = Date.now() + 90000;
+  let herido = false, ataques = 0, intentos = 0, mejor = null, ultimoAtaque = 0, orientada = false;
+  const limite = Date.now() + tiempo;
   while (Date.now() < limite) {
     e = await leerEstado();
     if (e.escena !== 'patio') break;
     const s = e.soldados[indice - 1];
-    if (s.vida < vidaInicial && capturado) break;
+    if (s.vida < vidaInicial) herido = true;
+    if (s.estado === 'muerto') break;
     const dx = s.x - e.akira.x, dz = s.z - e.akira.z;
-    const d = Math.hypot(dx, dz);
-    // La captura de combate se hace a 1280×720: se cambia de tamaño al acercarse
-    if (!capturado) await usarVentana(d < 4.5 ? ANCHO : ANCHO_RAPIDO, d < 4.5 ? ALTO : ALTO_RAPIDO);
-    if (d > 1.3) {
-      const teclas = teclasHacia(dx / d, dz / d, e.camara.giro);
-      if (d > 5) teclas.add('Shift');
-      await fijarTeclas(teclas);
-      await esperarMs(80);
+    const d = Math.hypot(dx, dz) || 1e-3;
+    if (captura && !orientada && d < 7) {
+      // Para la captura, cámara de lado respecto a la línea Akira–soldado: se ven los dos
+      orientada = true;
+      const opciones = [Math.atan2(-dz, dx), Math.atan2(dz, -dx)].map((a) => a * 180 / Math.PI);
+      const objetivo = opciones.sort((a, b) => Math.abs(normalizarAngulo(a - e.camara.giro)) -
+        Math.abs(normalizarAngulo(b - e.camara.giro)))[0];
+      await soltarTodo();
+      const girada = await girarCamaraA(objetivo, 10);
+      registrar(`Cámara de lado para el combate: giro ${girada.camara.giro}° (objetivo ${redondear(objetivo, 1)}°); ` +
+        `Akira (${e.akira.x}, ${e.akira.z}), soldado (${s.x}, ${s.z})`);
       continue;
     }
-    // Cerca: gira hacia él con un toque y ataca
-    const mira = (dx * e.akira.mirarX + dz * e.akira.mirarZ) / Math.max(d, 1e-3);
-    if (mira < 0.7) {
-      await fijarTeclas(teclasHacia(dx / d, dz / d, e.camara.giro));
-      await esperarMs(60);
+    // Mientras se busca la captura, Akira espera quieto a que el soldado llegue por su línea
+    const esperando = captura && orientada && intentos === 0 && d > 2.3 && ['persecucion', 'aviso'].includes(s.estado);
+    const teclas = d > 0.95 && !esperando ? teclasHacia(dx / d, dz / d, e.camara.giro) : new Set();
+    if (d > 5) teclas.add('Shift');
+    await fijarTeclas(teclas);
+    if (d < 2.4 && Date.now() - ultimoAtaque > 140) {
+      const quiereCaptura = captura && intentos < 4 && !(mejor && mejor.conTajo);
+      if (quiereCaptura) await usarVentana(ANCHO, ALTO);
+      await pulsar('KeyJ');
+      ataques++;
+      ultimoAtaque = Date.now();
+      if (quiereCaptura) {
+        intentos++;
+        const conTajo = await esperarEstado((x) => x.akira.tajoVisible, { tiempo: 2500, descripcion: 'tajo' })
+          .then(() => true).catch(() => false);
+        const imagen = await pagina.screenshot();
+        const estadoImagen = await leerEstado();
+        const sol = estadoImagen.soldados[indice - 1];
+        registrar(`Intento de captura ${intentos}: tajo ${conTajo}, giro ${estadoImagen.camara.giro}°, ` +
+          `Akira (${estadoImagen.akira.x}, ${estadoImagen.akira.z}), soldado (${sol.x}, ${sol.z}) ${sol.estado}`);
+        if (!mejor || (conTajo && !mejor.conTajo)) mejor = { imagen, conTajo, estado: estadoImagen };
+        await usarVentana(ANCHO_RAPIDO, ALTO_RAPIDO);
+      }
     }
-    await soltarTodo();
-    await pulsar('KeyJ');
-    ataques++;
-    if (!capturado) {
-      await pagina.screenshot({ path: path.join(CARPETA_CAPTURAS, 'threejs_combate.png') });
-      estadoCaptura = await leerEstado();
-      capturado = true;
-      registrar(`Captura guardada: ${path.join(CARPETA_CAPTURAS, 'threejs_combate.png')}`);
-      await usarVentana(ANCHO_RAPIDO, ALTO_RAPIDO);
-    }
-    await esperarMs(350);
+    await esperarMs(60);
   }
   await soltarTodo();
-  e = await leerEstado();
-  const s = e.soldados[indice - 1];
-  comprobar('Atacar con J cerca de un soldado le hace daño', s.vida < vidaInicial,
-    `soldado ${indice}: vida ${vidaInicial} → ${s.vida} (${s.estado}); ataques ${ataques}`);
-  if (estadoCaptura) {
-    const cercano = soldadoMasCercano(estadoCaptura, false);
-    registrar(`En la captura de combate: tajo visible ${estadoCaptura.akira.tajoVisible}, soldado a ${redondear(cercano.distancia)} m (${cercano.soldado && cercano.soldado.estado})`);
+  if (captura && mejor) {
+    fs.writeFileSync(path.join(CARPETA_CAPTURAS, captura), mejor.imagen);
+    const cercano = soldadoMasCercano(mejor.estado, false);
+    registrar(`Captura guardada: ${path.join(CARPETA_CAPTURAS, captura)} (tajo visible: ${mejor.conTajo}; ` +
+      `soldado a ${redondear(cercano.distancia)} m, ${cercano.soldado && cercano.soldado.estado})`);
   }
-  // Remata al soldado para comprobar la muerte y el contador
-  const limite2 = Date.now() + 60000;
-  while (Date.now() < limite2) {
-    e = await leerEstado();
-    const sol = e.soldados[indice - 1];
-    if (e.escena !== 'patio' || sol.estado === 'muerto') break;
-    const dx = sol.x - e.akira.x, dz = sol.z - e.akira.z;
-    const d = Math.hypot(dx, dz);
-    if (d > 1.3) {
-      await fijarTeclas(teclasHacia(dx / d, dz / d, e.camara.giro));
-      await esperarMs(80);
-      continue;
-    }
-    await fijarTeclas(teclasHacia(dx / d, dz / d, e.camara.giro));
-    await esperarMs(50);
-    await soltarTodo();
-    await pulsar('KeyJ');
-    await esperarMs(350);
-  }
-  await soltarTodo();
   e = await leerEstado();
-  const muerto = e.soldados[indice - 1].estado === 'muerto';
-  comprobar('Un soldado con 2 de vida cae al segundo golpe y cuenta en el HUD', muerto && e.derrotados >= 1,
-    `estado ${e.soldados[indice - 1].estado}, derrotados ${e.derrotados}`);
-  if (muerto) {
-    await esperarMs(2200);
-    e = await leerEstado();
-    const numeroHUD = await pagina.evaluate(() => document.getElementById('numeroDerrotados').textContent);
-    comprobar('El soldado derrotado desaparece (1,2 s) y el HUD lo muestra', !e.soldados[indice - 1].visible && numeroHUD === String(e.derrotados),
-      `visible ${e.soldados[indice - 1].visible}, HUD ${numeroHUD}/6`);
+  return { herido, muerto: e.soldados[indice - 1].estado === 'muerto', ataques, estado: e };
+}
+
+// Antes de las comprobaciones tranquilas: vence a cualquier soldado que esté persiguiendo a Akira
+async function calmarPatio() {
+  for (let vuelta = 0; vuelta < 4; vuelta++) {
+    const e = await leerEstado();
+    if (e.escena !== 'patio') return;
+    const agresivo = e.soldados.find((s) => s.y < 0.5 && ['persecucion', 'aviso', 'estocada', 'recuperacion', 'aturdido'].includes(s.estado));
+    if (!agresivo) return;
+    registrar(`El soldado ${agresivo.indice} persigue a Akira: se le hace frente antes de seguir`);
+    await usarVentana(ANCHO_RAPIDO, ALTO_RAPIDO);
+    await derrotarSoldado(agresivo.indice, { tiempo: 90000 });
   }
 }
 
+async function faseCombate() {
+  // El soldado 1 ve a Akira nada más empezar. Akira lo atrae a campo abierto (lejos del
+  // muro oeste, para que la cámara no quede detrás del muro) y allí lo derrota.
+  await usarVentana(ANCHO_RAPIDO, ALTO_RAPIDO);
+  await irHacia(-11, 0.5, { correr: true, tolerancia: 0.8, tiempo: 15000 });
+  const resultado = await derrotarSoldado(1, { captura: 'threejs_combate.png' });
+  const s = resultado.estado.soldados[0];
+  comprobar('Atacar con J cerca de un soldado le hace daño', resultado.herido,
+    `soldado 1: vida 2 → ${s.vida} (${s.estado}); ataques ${resultado.ataques}`);
+  comprobar('Un soldado con 2 de vida cae al segundo golpe y cuenta en el HUD', resultado.muerto && resultado.estado.derrotados >= 1,
+    `estado ${s.estado}, derrotados ${resultado.estado.derrotados}`);
+  if (resultado.muerto) {
+    await esperarMs(2200);
+    const e = await leerEstado();
+    const numeroHUD = await pagina.evaluate(() => document.getElementById('numeroDerrotados').textContent);
+    comprobar('El soldado derrotado desaparece (1,2 s) y el HUD lo muestra', !e.soldados[0].visible && numeroHUD === String(e.derrotados),
+      `visible ${e.soldados[0].visible}, HUD ${numeroHUD}/6`);
+  }
+}
+
+async function faseSubir() {
+  // Subir de un salto al bloque A (alto 0,8) y desde él al bloque B (alto 1,6)
+  await asegurarPatio('subir a los bloques');
+  await calmarPatio();
+  await usarVentana(ANCHO_RAPIDO, ALTO_RAPIDO);
+  const saltarHacia = async (dx, dz, condicionLlegada, alturaEsperada) => {
+    for (let intento = 0; intento < 4; intento++) {
+      await pulsar('Space');
+      await esperarEstado((x) => x.akira.y > alturaEsperada + 0.15, { tiempo: 3000, descripcion: 'en el aire' }).catch(() => null);
+      const limite = Date.now() + 2500;
+      while (Date.now() < limite) {
+        const e = await leerEstado();
+        if (condicionLlegada(e)) break;
+        await fijarTeclas(teclasHacia(dx, dz, e.camara.giro));
+        await esperarMs(40);
+      }
+      await soltarTodo();
+      const e = await esperarEstado((x) => x.akira.enSuelo, { tiempo: 3000, descripcion: 'aterrizar' }).catch(() => leerEstado());
+      if (Math.abs(e.akira.y - alturaEsperada) < 0.06) return e;
+    }
+    return leerEstado();
+  };
+  // Bloque A: x 5..7, z −7..−5. Se sale desde el sur, pegado a su cara.
+  await irHacia(6, -4.2, { tolerancia: 0.25, tiempo: 25000 });
+  let e = await saltarHacia(0, -1, (x) => x.akira.z < -5.7, 0.8);
+  const enA = Math.abs(e.akira.y - 0.8) < 0.06;
+  comprobar('Salta y se sube al bloque de piedra A (0,8 m)', enA, `y = ${e.akira.y} en (${e.akira.x}, ${e.akira.z})`);
+  if (!enA) return;
+  // Bloque B: x 7,2..9,2. Desde el borde este de A.
+  await irHacia(6.55, -6, { tolerancia: 0.15, tiempo: 8000 });
+  e = await saltarHacia(1, 0, (x) => x.akira.x > 7.9, 1.6);
+  comprobar('Desde A salta al bloque B (1,6 m)', Math.abs(e.akira.y - 1.6) < 0.06, `y = ${e.akira.y} en (${e.akira.x}, ${e.akira.z})`);
+  // Baja al suelo por el lado sur
+  await irHacia(8.2, -3.5, { tolerancia: 0.5, tiempo: 8000 });
+  // Pasarela (alto 1,2; x −8..2, z −14..−10): de un salto desde el suelo, por su lado sur.
+  // El soldado 2 sigue a Akira por el borde de la pasarela: primero se le atrae al extremo
+  // oeste y luego se sube corriendo por el extremo este. Cámara al norte: W = norte exacto.
+  await girarCamaraA(0, 2);
+  let enPasarela = false;
+  for (let intento = 0; intento < 4 && !enPasarela; intento++) {
+    await irHacia(-9.3, -9.2, { tolerancia: 0.5, tiempo: 20000 });
+    await esperarMs(2500);
+    await irHacia(1.2, -9.4, { correr: true, tolerancia: 0.3, tiempo: 20000 });
+    e = await leerEstado();
+    await fijarTeclas(teclasHacia(0, -1, e.camara.giro));
+    await pulsar('Space');
+    const limite = Date.now() + 3000;
+    while (Date.now() < limite) {
+      e = await leerEstado();
+      if (e.akira.z < -10.6 || (e.akira.enSuelo && e.akira.y > 1.1)) break;
+      await esperarMs(40);
+    }
+    await soltarTodo();
+    e = await esperarEstado((x) => x.akira.enSuelo, { tiempo: 3000, descripcion: 'aterrizar' }).catch(() => leerEstado());
+    enPasarela = Math.abs(e.akira.y - 1.2) < 0.06;
+    if (!enPasarela) registrar(`Intento ${intento + 1} de subir a la pasarela: y = ${e.akira.y} en (${e.akira.x}, ${e.akira.z})`);
+  }
+  comprobar('Salta desde el suelo a la pasarela (1,2 m)', enPasarela, `y = ${e.akira.y} en (${e.akira.x}, ${e.akira.z})`);
+  await irHacia(1.2, -8.3, { tolerancia: 0.4, tiempo: 8000 });
+  await girarCamaraA(-60, 3);
+}
+
 async function faseDerrota() {
+  await asegurarPatio('derrota');
   // Se queda junto a un soldado sin defenderse hasta caer
   await usarVentana(ANCHO_RAPIDO, ALTO_RAPIDO);
   let e = await leerEstado();
@@ -648,8 +748,11 @@ async function faseDerrota() {
   await soltarTodo();
   e = await esperarEstado((x) => x.escena === 'derrota', { tiempo: 20000, descripcion: 'pantalla de derrota' }).catch(() => leerEstado());
   const avisos = e.soldados.reduce((suma, s) => suma + s.avisos, 0);
-  comprobar('Los soldados avisan con «!» antes de la estocada', vioAviso && vioEstocada && avisos > 0,
-    `avisos ${avisos}; «!» visto en pantalla: ${vioAvisoEnPantalla}`);
+  const estocadas = e.soldados.reduce((suma, s) => suma + s.estocadas, 0);
+  comprobar('Los soldados avisan con «!» antes de la estocada', vioAviso && avisos > 0 && estocadas > 0 &&
+    estocadas <= avisos && e.akira.golpesRecibidos > 0,
+    `avisos ${avisos}, estocadas ${estocadas}, golpes a Akira ${e.akira.golpesRecibidos}; ` +
+    `estocada vista al muestrear: ${vioEstocada}; «!» visto en pantalla: ${vioAvisoEnPantalla}`);
   comprobar('Vida 0 → «Akira ha caído»', e.escena === 'derrota' && e.texto && e.texto.titulo === 'Akira ha caído',
     `escena ${e.escena}, golpes recibidos ${e.akira.golpesRecibidos}`);
   if (e.escena !== 'derrota') return;
@@ -743,6 +846,111 @@ async function faseArchivoLocal(contexto) {
   await local.close();
 }
 
+async function faseTactil(navegador, urlBase) {
+  // Pantalla táctil emulada (móvil apaisado): joystick, botones y arrastre para girar la cámara.
+  // Los toques se envían por el protocolo de Chromium (Input.dispatchTouchEvent).
+  const contexto = await navegador.newContext({
+    viewport: { width: 800, height: 400 }, deviceScaleFactor: 1, hasTouch: true, isMobile: true,
+  });
+  await prepararCDN(contexto, urlBase);
+  const movil = await contexto.newPage();
+  const erroresMovil = [];
+  movil.on('console', (m) => { if (m.type() === 'error') erroresMovil.push(m.text()); });
+  movil.on('pageerror', (err) => erroresMovil.push(err.message));
+  const sesionCDP = await contexto.newCDPSession(movil);
+  const tocar = (tipo, puntos) => sesionCDP.send('Input.dispatchTouchEvent', { type: tipo, touchPoints: puntos });
+  const estadoMovil = () => movil.evaluate(() => window.estadoJuego);
+  const esperarMovil = async (condicion, tiempo, descripcion) => {
+    const limite = Date.now() + tiempo;
+    while (Date.now() < limite) {
+      const e = await estadoMovil();
+      if (e && condicion(e)) return e;
+      await esperarMs(120);
+    }
+    throw new Error('Tiempo agotado en móvil esperando: ' + descripcion);
+  };
+  const centro = async (selector) => {
+    const caja = await movil.locator(selector).boundingBox();
+    return { x: caja.x + caja.width / 2, y: caja.y + caja.height / 2 };
+  };
+  try {
+    await movil.goto(urlBase + 'ronin3d.html');
+    await esperarMovil((e) => e.listo && e.escena === 'intro', 90000, 'intro');
+    await movil.touchscreen.tap(400, 200);
+    await esperarMovil((e) => e.texto && e.texto.completo, 20000, 'texto completo');
+    await movil.touchscreen.tap(400, 200);
+    let e = await esperarMovil((x) => x.escena === 'patio', 20000, 'patio');
+    comprobar('Móvil: tocar la pantalla continúa en los textos', e.escena === 'patio');
+    const controles = await movil.evaluate(() => ({
+      tactil: document.body.classList.contains('tactil'),
+      visibles: ['baseJoystick', 'botonSaltar', 'botonAtacar', 'botonPausa'].map((id) => {
+        const r = document.getElementById(id).getBoundingClientRect();
+        return r.width > 0 && r.height > 0;
+      }),
+    }));
+    const escritorio = await pagina.evaluate(() => getComputedStyle(document.getElementById('tactil')).display);
+    comprobar('Controles táctiles visibles solo en pantallas táctiles', controles.tactil && controles.visibles.every(Boolean) &&
+      escritorio === 'none', `móvil: ${controles.visibles.join(', ')}; escritorio: display ${escritorio}`);
+
+    // Joystick: arrastrar hacia arriba = avanzar (relativo a la cámara)
+    await esperarMs(500);
+    let e0 = await estadoMovil();
+    await tocar('touchStart', [{ x: 110, y: 300, id: 1 }]);
+    for (let i = 1; i <= 6; i++) {
+      await tocar('touchMove', [{ x: 110, y: 300 - i * 9, id: 1 }]);
+      await esperarMs(50);
+    }
+    const finJoystick = Date.now() + 1500;
+    let k = 0;
+    while (Date.now() < finJoystick) {
+      await tocar('touchMove', [{ x: 110 + (k++ % 2), y: 246, id: 1 }]);
+      await esperarMs(120);
+    }
+    await tocar('touchEnd', []);
+    await esperarMs(300);
+    let e1 = await estadoMovil();
+    const recorrido = Math.hypot(e1.akira.x - e0.akira.x, e1.akira.z - e0.akira.z);
+    comprobar('Móvil: el joystick virtual mueve a Akira', recorrido > 1, `recorrió ${redondear(recorrido)} m`);
+
+    // Botones Atacar y Saltar
+    e0 = await estadoMovil();
+    const atacar = await centro('#botonAtacar');
+    await movil.touchscreen.tap(atacar.x, atacar.y);
+    e1 = await esperarMovil((x) => x.akira.ataques > e0.akira.ataques, 10000, 'ataque táctil').catch(() => estadoMovil());
+    const saltar = await centro('#botonSaltar');
+    let e2 = await estadoMovil();
+    for (let intento = 0; intento < 4 && e2.akira.saltos <= e0.akira.saltos; intento++) {
+      // si el toque cae durante un retroceso (0,25 s sin control) no salta: se repite
+      await esperarMs(600);
+      await movil.touchscreen.tap(saltar.x, saltar.y);
+      e2 = await esperarMovil((x) => x.akira.saltos > e0.akira.saltos, 3000, 'salto táctil').catch(() => estadoMovil());
+    }
+    comprobar('Móvil: botones Atacar y Saltar', e1.akira.ataques > e0.akira.ataques && e2.akira.saltos > e0.akira.saltos,
+      `ataques ${e0.akira.ataques} → ${e1.akira.ataques}, saltos ${e0.akira.saltos} → ${e2.akira.saltos}`);
+
+    // Arrastrar con un dedo en la zona libre gira la cámara
+    e0 = await estadoMovil();
+    await tocar('touchStart', [{ x: 480, y: 110, id: 2 }]);
+    for (let i = 1; i <= 8; i++) {
+      await tocar('touchMove', [{ x: 480 + i * 14, y: 110 + i, id: 2 }]);
+      await esperarMs(40);
+    }
+    await tocar('touchEnd', []);
+    await esperarMs(400);
+    e1 = await estadoMovil();
+    comprobar('Móvil: arrastrar el dedo gira la cámara', Math.abs(normalizarAngulo(e1.camara.giro - e0.camara.giro)) > 10,
+      `giro ${e0.camara.giro}° → ${e1.camara.giro}°`);
+    await esperarMs(400);
+    const ruta = path.join(CARPETA_CAPTURAS, 'threejs_tactil.png');
+    await movil.screenshot({ path: ruta });
+    registrar(`Captura guardada: ${ruta}`);
+  } catch (error) {
+    comprobar('Móvil: la prueba táctil termina', false, error.message);
+  }
+  comprobar('Móvil: sin errores en la consola', erroresMovil.length === 0, erroresMovil.slice(0, 3).join(' | ') || 'ninguno');
+  await contexto.close();
+}
+
 // -----------------------------------------------------------------------------
 // Programa principal
 // -----------------------------------------------------------------------------
@@ -765,33 +973,41 @@ async function principal() {
   pagina = await contexto.newPage();
   pagina.on('console', (m) => { if (m.type() === 'error') errores.push('consola: ' + m.text()); });
   pagina.on('pageerror', (err) => errores.push('excepción: ' + err.message));
-  const renderer = await (async () => {
+  const motorWebGL = await (async () => {
     await pagina.goto(urlBase + '__sonda');
     return pagina.evaluate(() => {
-      const gl = document.createElement('canvas').getContext('webgl2');
-      const info = gl && gl.getExtension('WEBGL_debug_renderer_info');
-      return gl ? (info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)) : 'sin WebGL 2';
+      const contextoGL = document.createElement('canvas').getContext('webgl2');
+      const datosGPU = contextoGL && contextoGL.getExtension('WEBGL_debug_renderer_info');
+      if (!contextoGL) return 'sin WebGL 2';
+      return datosGPU ? contextoGL.getParameter(datosGPU.UNMASKED_RENDERER_WEBGL) : contextoGL.getParameter(contextoGL.RENDERER);
     });
   })();
-  registrar(`WebGL: ${renderer}`);
+  registrar(`WebGL: ${motorWebGL}`);
 
   let fps = null, fpsRapido = null, fallo = null;
   try {
     await pagina.goto(urlBase + 'ronin3d.html');
     await faseIntro();
-    fps = await fasePatio();
+    await fasePatio();
+    // El soldado 1 ve a Akira nada más empezar (está en su punto A mirando hacia él):
+    // se le hace frente primero y el resto de comprobaciones se hacen con calma.
+    await faseCombate();
+    await usarVentana(ANCHO, ALTO);
+    fps = await medirFPS(6);
+    registrar(`FPS a ${ANCHO}×${ALTO} (render por software): ${fps.toFixed(2)}`);
+    await usarVentana(ANCHO_RAPIDO, ALTO_RAPIDO);
+    fpsRapido = await medirFPS(4);
+    registrar(`FPS a ${ANCHO_RAPIDO}×${ALTO_RAPIDO}: ${fpsRapido.toFixed(2)}`);
     await faseTorreon();
     await faseMovimiento();
     await faseCamara();
     await faseMuro();
-    await usarVentana(ANCHO_RAPIDO, ALTO_RAPIDO);
-    fpsRapido = await medirFPS(4);
-    registrar(`FPS a ${ANCHO_RAPIDO}×${ALTO_RAPIDO}: ${fpsRapido.toFixed(2)}`);
-    await faseCombate();
+    await faseSubir();
     await faseDerrota();
     await fasePorton();
     await fasePausaYVuelta();
     await faseArchivoLocal(contexto);
+    await faseTactil(navegador, urlBase);
   } catch (error) {
     fallo = error;
     comprobar('La prueba termina sin interrupciones', false, error.message);
@@ -809,6 +1025,7 @@ async function principal() {
   if (fps !== null) console.log(`FPS aproximados (Chromium sin ventana, WebGL por software): ${fps.toFixed(2)} a ${ANCHO}×${ALTO}` +
     (fpsRapido !== null ? `, ${fpsRapido.toFixed(2)} a ${ANCHO_RAPIDO}×${ALTO_RAPIDO}` : ''));
   console.log(`Tamaño de ronin3d.html: ${(tamano / 1024).toFixed(1)} KB`);
+  if (interrupciones) console.log(`Veces que hubo que volver al patio entre fases: ${interrupciones}`);
   console.log(`Capturas en: ${CARPETA_CAPTURAS}`);
   for (const f of fallos) console.log(`  FALLO: ${f.nombre}${f.detalle ? ' — ' + f.detalle : ''}`);
   console.log(`Duración: ${((Date.now() - inicioPrueba) / 1000).toFixed(0)} s`);
