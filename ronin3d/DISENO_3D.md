@@ -58,7 +58,8 @@ Ventanas iluminadas en cada piso. Se ve por encima del muro norte.
 (22.5, −4.5), (22.5, 4.5)  (coordenadas x, z).
 
 **Cielo y luz:** noche azul oscura con estrellas. Luna grande en la dirección
-normalizar(−0.35, 0.5, −0.8) (detrás del torreón). Luz de luna direccional azulada
+normalizar(−0.3, 0.32, −0.9) (baja, unos 19° sobre el horizonte, detrás del torreón,
+para que se vea al bajar la cámara). Luz de luna direccional azulada
 #9fb4ff (intensidad baja) con sombras. Luz ambiente #1a1f3a. Niebla nocturna suave.
 
 ## 4. Personajes
@@ -95,10 +96,16 @@ normalizar(−0.35, 0.5, −0.8) (detrás del torreón). Luz de luna direccional
 ## 5. Cámara
 
 Órbita alrededor de Akira (sigue su posición con suavizado).
-- Posición = objetivo + (sen(giro)·cos(incl)·d, sen(incl)·d, cos(giro)·cos(incl)·d).
+- Punto mirado = pies de Akira + (0, h, 0), con h = 1,0 m si la inclinación es ≥ 30° y
+  subiendo linealmente hasta 2,2 m con inclinación −5° (así, al bajar la cámara, se mira
+  un poco hacia arriba y aparecen el torreón y la luna).
+- Posición = punto mirado + (sen(giro)·cos(incl)·d, sen(incl)·d, cos(giro)·cos(incl)·d).
 - Por defecto: distancia d = 12 m, inclinación 38°, giro −60°, campo de visión 38°.
 - **Q / E** giran (90°/s). **Botón derecho + arrastrar** gira e inclina.
-- **Rueda del ratón o + / −**: zoom entre 7 y 18 m. **R / F**: inclinación entre 20° y 60°.
+- **Rueda del ratón o + / −**: zoom entre 7 y 18 m. **R / F**: inclinación entre −5° y 60°.
+- **Presentación** (mientras se lee la intro): plano fijo desde el patio, cámara en
+  (6, 3, 12) mirando a (0, 9, −20), con un leve vaivén: se ven el patio norte, el
+  torreón y la luna. Al pulsar ENTER pasa suavemente (~1 s) a la órbita sobre Akira.
 
 ## 6. Controles (todas las versiones)
 
@@ -110,7 +117,7 @@ normalizar(−0.35, 0.5, −0.8) (detrás del torreón). Luz de luna direccional
 | J / clic izquierdo | Atacar con la espada |
 | Q / E, botón derecho | Girar la cámara |
 | Rueda, + / − | Zoom |
-| R / F | Inclinar la cámara |
+| R / F | Inclinar la cámara (−5° a 60°) |
 | ENTER | Continuar en los textos |
 | ESC | Pausa (Q en pausa: salir) |
 | 1 / 2 / 3 | Cambiar de estética (solo Godot) |
