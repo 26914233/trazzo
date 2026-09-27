@@ -25,6 +25,9 @@ var combate_activo := false
 var captura_combate_hecha := false
 var direccion_caminar := Vector3.ZERO
 var pendientes_soltar: Array = []
+var medida_inicio_us := 0
+var medida_inicio_cuadros := 0
+var fps_medidos := 0.0
 
 
 func _ready() -> void:
@@ -36,8 +39,10 @@ func _ready() -> void:
 		[1.2, _capturar.bind("intro")],
 		[1.3, _pulsar.bind("aceptar")],
 		[1.5, _pulsar.bind("aceptar")],
+		[1.6, _empezar_medida],
 		[3.0, _empezar_a_caminar],
 		[4.6, _dejar_de_caminar],
+		[4.65, _terminar_medida],
 		[4.7, _capturar.bind("patio")],
 		[4.8, _empezar_giro],
 		[5.8, _terminar_giro],
@@ -262,6 +267,20 @@ func _comprobar_estilo() -> void:
 	await _capturar("cambio_de_estetica")
 
 
+# FPS reales mientras Akira camina por el patio (sin capturas de por medio). Con
+# --fixed-fps cada cuadro avanza el mismo tiempo de juego, así que esto mide cuántos
+# cuadros por segundo es capaz de dibujar la máquina.
+func _empezar_medida() -> void:
+	medida_inicio_us = Time.get_ticks_usec()
+	medida_inicio_cuadros = Engine.get_frames_drawn()
+
+
+func _terminar_medida() -> void:
+	var segundos := (Time.get_ticks_usec() - medida_inicio_us) / 1000000.0
+	if segundos > 0.0:
+		fps_medidos = (Engine.get_frames_drawn() - medida_inicio_cuadros) / segundos
+
+
 func _terminar() -> void:
 	var fallos := resultados.filter(func(r): return not r[1])
 	var informe := PackedStringArray()
@@ -269,6 +288,8 @@ func _terminar() -> void:
 	for r in resultados:
 		informe.append("%s  %s  %s" % ["OK   " if r[1] else "FALLO", r[0], r[2]])
 	informe.append("Resultado: %d de %d comprobaciones correctas" % [resultados.size() - fallos.size(), resultados.size()])
+	informe.append("FPS al caminar por el patio: %.1f (%s, %s)" % [fps_medidos,
+		RenderingServer.get_video_adapter_name(), RenderingServer.get_current_rendering_driver_name()])
 	var archivo := FileAccess.open(carpeta.path_join(prefijo + "prueba.txt"), FileAccess.WRITE)
 	if archivo:
 		archivo.store_string("\n".join(informe) + "\n")
