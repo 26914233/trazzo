@@ -26,6 +26,7 @@ medidas del patio están escritas tal cual en la especificación y se convierten
 """
 
 import math
+import os
 import random
 import sys
 import time
@@ -38,6 +39,7 @@ from panda3d.core import loadPrcFileData  # noqa: E402
 
 loadPrcFileData('', 'audio-library-name null')      # el capítulo no tiene sonido
 loadPrcFileData('', 'notify-level-device fatal')     # sin avisos de mandos o joysticks
+loadPrcFileData('', 'notify-level-pnmimage error')   # sin el aviso inocuo de perfiles sRGB en PNG
 if MODO_PRUEBA:
     loadPrcFileData('', 'sync-video #f')
 
@@ -84,9 +86,11 @@ TEXTO_DERROTA = [
     "Levántate, Akira. La noche aún no ha terminado.",
 ]
 
-TEXTO_AYUDA = ('WASD / flechas: moverse · SHIFT: correr · ESPACIO: saltar · J / clic: atacar\n'
-               'Q / E o botón derecho: girar la cámara · rueda o + / −: zoom · '
-               'R / F: inclinar · ESC: pausa')
+TEXTO_AYUDA = ('<dorado>WASD<default> / flechas: moverse · <dorado>SHIFT<default>: correr · '
+               '<dorado>ESPACIO<default>: saltar · <dorado>J<default> / clic: atacar\n'
+               '<dorado>Q<default> / <dorado>E<default> o botón derecho: girar la cámara · '
+               '<dorado>rueda<default> o <dorado>+<default> / <dorado>−<default>: zoom · '
+               '<dorado>R<default> / <dorado>F<default>: inclinar · <dorado>ESC<default>: pausa')
 VELOCIDAD_TEXTO = 45            # letras por segundo, como en samurai.py
 DURACION_FUNDIDO = 0.45
 DURACION_AYUDA = 10.0
@@ -150,7 +154,7 @@ TIEMPO_RECUPERACION = 0.6
 TIEMPO_ATURDIDO = 0.4
 VEL_RETROCESO_SOLDADO = 5.0
 TIEMPO_OLVIDO = 2.0
-ALTURA_LANZA = 1.05             # altura de la estocada sobre los pies del soldado
+ALTURA_LANZA = (0.8, 1.0)       # franja de la estocada sobre los pies (saltando se esquiva)
 
 # --- Cámara -------------------------------------------------------------------
 CAMARA_DISTANCIA = 12.0
@@ -173,8 +177,8 @@ COLOR_LUNA = '#9fb4ff'
 COLOR_AMBIENTE = '#1a1f3a'
 CIELO_ARRIBA = '#06081a'
 CIELO_HORIZONTE = '#2a244c'
-INTENSIDAD_AMBIENTE = 1.25
-INTENSIDAD_LUNA = 0.55
+INTENSIDAD_AMBIENTE = 1.5
+INTENSIDAD_LUNA = 0.7
 INTENSIDAD_ANTORCHA = 1.25
 ALCANCE_ANTORCHA = 9.0
 INTENSIDAD_LINTERNA = 0.55
@@ -326,6 +330,7 @@ uniform sampler2D p3d_Texture0;
 uniform vec4 p3d_ColorScale;
 
 uniform float envoltura;        // luz envolvente (sprites: la luz de detrás también alumbra)
+uniform float realce;           // luz ambiente extra (sprites: se leen mejor en la sombra)
 uniform float umbral_alfa;      // recorte de transparencia (sprites pixel art)
 uniform vec4 destello;          // color del destello al recibir un golpe (a = cantidad)
 uniform float opacidad;         // < 1: desvanecer con tramado (sin ordenar transparencias)
@@ -365,7 +370,7 @@ void main() {
 
     vec3 N = normalize(normal_vista);
     if (!gl_FrontFacing) N = -N;
-    vec3 luz = p3d_LightModel.ambient.rgb;
+    vec3 luz = p3d_LightModel.ambient.rgb * (1.0 + realce);
 
     // Luna (direccional, con sombra)
     vec3 L = normalize(luna.position.xyz);
@@ -500,6 +505,7 @@ def poner_valores_por_defecto():
     raiz.set_shader_input('texture_scale', Vec2(1, 1))
     raiz.set_shader_input('texture_offset', Vec2(0, 0))
     raiz.set_shader_input('envoltura', 0.0)
+    raiz.set_shader_input('realce', 0.0)
     raiz.set_shader_input('umbral_alfa', 0.0)
     raiz.set_shader_input('destello', Vec4(1, 1, 1, 0))
     raiz.set_shader_input('opacidad', 1.0)
@@ -726,11 +732,15 @@ class ConstructorMalla:
         y1 = y0 + alto
         ax, az = abajo[0] / 2, abajo[1] / 2
         bx, bz = arriba[0] / 2, arriba[1] / 2
-        lados = [
-            ([(cx - ax, y0, cz + az), (cx + ax, y0, cz + az), (cx + bx, y1, cz + bz), (cx - bx, y1, cz + bz)], (0, 0, 1)),
-            ([(cx - ax, y0, cz - az), (cx + ax, y0, cz - az), (cx + bx, y1, cz - bz), (cx - bx, y1, cz - bz)], (0, 0, -1)),
-            ([(cx + ax, y0, cz - az), (cx + ax, y0, cz + az), (cx + bx, y1, cz + bz), (cx + bx, y1, cz - bz)], (1, 0, 0)),
-            ([(cx - ax, y0, cz - az), (cx - ax, y0, cz + az), (cx - bx, y1, cz + bz), (cx - bx, y1, cz - bz)], (-1, 0, 0)),
+        lados = [   # (esquinas abajo-abajo-arriba-arriba, sentido hacia fuera)
+            ([(cx - ax, y0, cz + az), (cx + ax, y0, cz + az), (cx + bx, y1, cz + bz), (cx - bx, y1, cz + bz)],
+             (0, 0, 1)),
+            ([(cx - ax, y0, cz - az), (cx + ax, y0, cz - az), (cx + bx, y1, cz - bz), (cx - bx, y1, cz - bz)],
+             (0, 0, -1)),
+            ([(cx + ax, y0, cz - az), (cx + ax, y0, cz + az), (cx + bx, y1, cz + bz), (cx + bx, y1, cz - bz)],
+             (1, 0, 0)),
+            ([(cx - ax, y0, cz - az), (cx - ax, y0, cz + az), (cx - bx, y1, cz + bz), (cx - bx, y1, cz - bz)],
+             (-1, 0, 0)),
         ]
         for puntos, fuera in lados:
             p0, p1, p2, p3 = puntos
@@ -744,7 +754,8 @@ class ConstructorMalla:
         if con_tapa and bx > 0.05 and bz > 0.05:
             self.suelo((cx, y1, cz), 2 * bx, 2 * bz, densidad, tinte)
         if con_base:
-            self.poligono([(cx - ax, y0, cz - az), (cx + ax, y0, cz - az), (cx + ax, y0, cz + az), (cx - ax, y0, cz + az)],
+            self.poligono([(cx - ax, y0, cz - az), (cx + ax, y0, cz - az),
+                           (cx + ax, y0, cz + az), (cx - ax, y0, cz + az)],
                           (0, -1, 0), (0, 0, 1), densidad, tinte_base)
 
     def cilindro(self, centro_base, radio, alto, lados=12, densidad=1.0, tinte=BLANCO,
@@ -1223,29 +1234,33 @@ class Cielo:
         # Estrellas: puntos de 2 píxeles, sin sombreador (más baratos imposible)
         azar = random.Random(5)
         hacia_luna = normalizar(convertir(*DIRECCION_LUNA))
-        puntos, tonos = [], []
-        while len(puntos) < 420:
+        grupos = {2: ([], []), 3: ([], [])}             # tamaño en píxeles: (puntos, tonos)
+        while sum(len(p) for p, _ in grupos.values()) < 1600:
             acimut = azar.uniform(0, 2 * math.pi)
             elevacion = math.asin(azar.uniform(math.sin(math.radians(6)), 1.0))
             direccion = (math.cos(elevacion) * math.cos(acimut), math.sin(elevacion),
                          math.cos(elevacion) * math.sin(acimut))
             if producto_escalar(direccion, hacia_luna) > math.cos(math.radians(9)):
                 continue
+            grande = azar.random() < 0.08
+            puntos, tonos = grupos[3 if grande else 2]
             puntos.append(escalar(direccion, self.RADIO * 0.95))
-            brillo = azar.choice((0.45, 0.55, 0.65, 0.8, 1.0))
-            tonos.append((brillo * 0.9, brillo * 0.92, brillo, 1.0))
-        estrellas = Entity(parent=self.raiz, model=Mesh(vertices=puntos, colors=tonos, mode='point',
-                                                        thickness=2, render_points_in_3d=False))
-        self._al_fondo(estrellas, 1)
+            brillo = azar.uniform(0.75, 1.0) if grande else azar.choice((0.35, 0.45, 0.55, 0.7, 0.85))
+            tinte = azar.choice(((0.9, 0.93, 1.0), (1.0, 0.95, 0.85), (0.85, 0.9, 1.0)))
+            tonos.append((brillo * tinte[0], brillo * tinte[1], brillo * tinte[2], 1.0))
+        for grosor, (puntos, tonos) in grupos.items():
+            estrellas = Entity(parent=self.raiz, model=Mesh(vertices=puntos, colors=tonos, mode='point',
+                                                            thickness=grosor, render_points_in_3d=False))
+            self._al_fondo(estrellas, 1)
 
         # Luna grande, baja, detrás del torreón, con su halo
         distancia = self.RADIO * 0.8
         centro_luna = escalar(hacia_luna, distancia)
         lado = 2 * distancia * math.tan(math.radians(3.6))
-        self.halo_luna = entidad_sin_luz(malla_centrada(lado * 3.4, lado * 3.4), TEXTURAS['halo'], con_niebla=0.0)
+        self.halo_luna = entidad_sin_luz(malla_centrada(lado * 4.2, lado * 4.2), TEXTURAS['halo'], con_niebla=0.0)
         self.halo_luna.parent = self.raiz
         self.halo_luna.position = Vec3(*escalar(hacia_luna, distancia * 1.01))
-        self.halo_luna.color = Color(0.55, 0.6, 0.9, 0.45)
+        self.halo_luna.color = Color(0.62, 0.66, 0.92, 0.62)
         self._al_fondo(self.halo_luna, 2, aditivo=True)
         self.luna = entidad_sin_luz(malla_centrada(lado, lado), TEXTURAS['luna'], con_niebla=0.0,
                                     umbral_alfa=0.5)
@@ -1300,9 +1315,23 @@ class Cielo:
 # LUCES
 # =============================================================================
 
+class LuzLuna(DirectionalLight):
+    """DirectionalLight de Ursina con la sombra ajustada a mano. Ursina programa
+    `shadows` un cuadro después de crearla y su ajuste automático abarcaría toda la escena
+    (cúpula del cielo incluida); aquí esa propiedad no toca la sombra."""
+
+    @property
+    def shadows(self):
+        return getattr(self, '_sombra_propia', False)
+
+    @shadows.setter
+    def shadows(self, valor):
+        pass
+
+
 def crear_luna(escenario):
     """Luz direccional azulada de la luna; su sombra cubre el patio y el torreón."""
-    luna = DirectionalLight(shadows=False)
+    luna = LuzLuna(shadows=False)
     luna.color = color_hex(COLOR_LUNA, INTENSIDAD_LUNA)
     hacia_luna = normalizar(convertir(*DIRECCION_LUNA))
     centro = convertir(0, 0, -8)
@@ -1310,6 +1339,7 @@ def crear_luna(escenario):
     luna.look_at(Vec3(*centro))
     nodo = luna.getChild(0)
     if not MODO_LIGERO:
+        luna._sombra_propia = True
         luna._light.set_shadow_caster(True, 2048, 2048)
         limites = escenario.getTightBounds(luna)
         if limites:
@@ -1397,6 +1427,7 @@ class SpriteVertical:
                               shader=SOMBREADOR_ILUMINADO)
         self.entidad.set_shader_input('umbral_alfa', 0.5)
         self.entidad.set_shader_input('envoltura', 1.0)
+        self.entidad.set_shader_input('realce', 0.6)
         self.entidad.set_shader_input('destello', Vec4(1, 1, 1, 0))
         self.entidad.set_shader_input('opacidad', 1.0)
         self.entidad.hide(0b0001)            # su sombra es sombra.png, no la de la luna
@@ -1707,8 +1738,8 @@ class Soldado:
 
     def _lanza_alcanza_altura(self):
         akira = self.juego.akira
-        altura_lanza = self.y + ALTURA_LANZA
-        return akira.y - 0.1 <= altura_lanza <= akira.y + ALTURA_AKIRA
+        abajo, arriba = self.y + ALTURA_LANZA[0], self.y + ALTURA_LANZA[1]
+        return akira.y < arriba and akira.y + ALTURA_AKIRA > abajo
 
     def _mover(self, vx, vz, dt, con_correa=False):
         """Mueve con colisiones, sin salirse de su plataforma ni (si persigue) de la correa."""
@@ -1721,9 +1752,9 @@ class Soldado:
                 return False
         if mundo.altura_suelo(nx, nz, self.y, RADIO_PERSONAJE) < self.y - 0.3:
             return False                    # no se tira de la pasarela ni de los bloques
-        moved = abs(nx - self.x) + abs(nz - self.z) > 1e-5
+        movido = abs(nx - self.x) + abs(nz - self.z) > 1e-5
         self.x, self.z = nx, nz
-        return moved
+        return movido
 
     def actualizar(self, dt, ia_activa=True):
         self.t_destello = max(0.0, self.t_destello - dt)
@@ -2009,6 +2040,50 @@ class Rotulo(Text):
         return nodo
 
 
+def buscar_fuente_titulos():
+    """Fuente con serifa para los títulos: Georgia en Windows; en otros sistemas, la que
+    haya. Si no se encuentra ninguna, se usa la de Ursina (OpenSans)."""
+    carpeta_windows = Path(os.environ.get('WINDIR', 'C:/Windows')) / 'Fonts'
+    candidatas = [carpeta_windows / 'georgiab.ttf', carpeta_windows / 'georgia.ttf',
+                  carpeta_windows / 'timesbd.ttf',
+                  Path('/System/Library/Fonts/Supplemental/Georgia Bold.ttf'),
+                  Path('/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf'),
+                  Path('/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf')]
+    for ruta in candidatas:
+        try:
+            if ruta.exists():
+                # loadFont quiere la ruta al estilo de Panda3D (p. ej. /c/Windows/Fonts/...)
+                fuente = application.base.loader.loadFont(Filename.fromOsSpecific(str(ruta)).getFullpath())
+                if fuente and fuente.isValid():
+                    fuente.setPixelsPerUnit(110)
+                    return fuente
+        except Exception:
+            continue
+    return None
+
+
+FUENTE_TITULOS = []         # se rellena al arrancar (necesita el cargador de Panda3D)
+
+
+def rotulo_titulo(texto, **ajustes):
+    """Rótulo con la fuente de los títulos (si la hay)."""
+    rotulo = Rotulo('', **ajustes)
+    if FUENTE_TITULOS and FUENTE_TITULOS[0]:
+        rotulo._font = FUENTE_TITULOS[0]
+    if texto:
+        rotulo.text = texto
+    return rotulo
+
+
+def panel_interfaz(padre, centro, tamano, z=0.05, opacidad=0.72):
+    """Recuadro oscuro con un fino borde dorado (HUD y pausa)."""
+    x, y = centro
+    ancho, alto = tamano
+    Entity(parent=padre, model='quad', position=(x, y, z + 0.01), scale=(ancho + 0.006, alto + 0.006),
+           color=color_rgb((150, 122, 70), 0.9))
+    Entity(parent=padre, model='quad', position=(x, y, z), scale=(ancho, alto), color=Color(0.02, 0.02, 0.05, opacidad))
+
+
 def partir_en_lineas(texto, ancho_maximo, escala):
     """Parte un párrafo en líneas que quepan en 'ancho_maximo' (unidades de la interfaz)."""
     medidor = TextNode('medidor')
@@ -2036,8 +2111,8 @@ class PantallaTexto:
     def __init__(self):
         self.raiz = Entity(parent=camera.ui, enabled=False)
         self.velo = Entity(parent=self.raiz, model='quad', scale=(4, 2), color=Color(0.01, 0.01, 0.04, 0.3), z=0.5)
-        self.titulo = Rotulo('', parent=self.raiz, position=(0, 0.405, -0.1), origin=(0, 0), scale=3.4,
-                             color=color_rgb(DORADO))
+        self.titulo = rotulo_titulo('', parent=self.raiz, position=(0, 0.405, -0.1), origin=(0, 0), scale=3.4,
+                                    color=color_rgb(DORADO))
         self.subtitulo = Rotulo('', parent=self.raiz, position=(0, 0.335, -0.1), origin=(0, 0), scale=1.15,
                                 color=color_rgb(GRIS))
         self.borde = Entity(parent=self.raiz, model='quad', color=color_rgb((90, 80, 60), 0.9), z=0.2)
@@ -2129,32 +2204,46 @@ class PantallaTexto:
 class Hud:
     def __init__(self):
         self.raiz = Entity(parent=camera.ui, enabled=False)
-        self.nombre = Rotulo('AKIRA', parent=self.raiz, position=(-0.855, 0.468, -0.1), origin=(-0.5, 0.5),
-                             scale=1.35, color=color_rgb(CREMA))
+        # Arriba a la izquierda: AKIRA y 5 rombos rojos
+        panel_interfaz(self.raiz, (-0.697, 0.452), (0.35, 0.068))
+        self.nombre = rotulo_titulo('AKIRA', parent=self.raiz, position=(-0.855, 0.452, -0.1), origin=(-0.5, 0),
+                                    scale=1.3, color=color_rgb(CREMA))
         self.rombos = []
         for i in range(VIDA_MAXIMA):
-            x = -0.845 + i * 0.045
-            fondo = Entity(parent=self.raiz, model='quad', rotation_z=45, scale=0.03, position=(x, 0.405, 0),
-                           color=Color(0.05, 0.02, 0.03, 0.9))
-            relleno = Entity(parent=self.raiz, model='quad', rotation_z=45, scale=0.021, position=(x, 0.405, -0.05),
+            x = -0.708 + i * 0.039
+            Entity(parent=self.raiz, model='quad', rotation_z=45, scale=0.027, position=(x, 0.452, 0),
+                   color=Color(0.3, 0.22, 0.12, 1))                          # contorno
+            relleno = Entity(parent=self.raiz, model='quad', rotation_z=45, scale=0.02, position=(x, 0.452, -0.05),
                              color=color_rgb(ROJO))
-            brillo = Entity(parent=self.raiz, model='quad', rotation_z=45, scale=0.007,
-                            position=(x - 0.004, 0.411, -0.06), color=Color(1, 0.72, 0.66, 0.9))
+            brillo = Entity(parent=self.raiz, model='quad', rotation_z=45, scale=0.006,
+                            position=(x - 0.0035, 0.4575, -0.06), color=Color(1, 0.72, 0.66, 0.9))
             self.rombos.append((relleno, brillo))
-        self.contador = Rotulo('Soldados derrotados: 0/6', parent=self.raiz, position=(0.855, 0.468, -0.1),
-                               origin=(0.5, 0.5), scale=1.2, color=color_rgb(CREMA))
-        self.ayuda = Rotulo(TEXTO_AYUDA, parent=self.raiz, position=(0, -0.405, -0.1), origin=(0, 0),
-                            scale=0.92, color=color_rgb(CREMA))
+        # Arriba a la derecha: soldados derrotados
+        panel_interfaz(self.raiz, (0.697, 0.452), (0.35, 0.068))
+        self.contador = Rotulo('', parent=self.raiz, position=(0.697, 0.452, -0.1), origin=(0, 0),
+                               scale=1.06, color=color_rgb(CREMA))
+        self.contador.text_colors['dorado'] = color_rgb(DORADO)
+        # Abajo: ayuda de los controles (los primeros 10 s)
+        self.grupo_ayuda = Entity(parent=self.raiz)
+        panel_interfaz(self.grupo_ayuda, (0, -0.408), (1.16, 0.088), opacidad=0.66)
+        self.ayuda = Rotulo('', parent=self.grupo_ayuda, position=(0, -0.408, -0.1), origin=(0, 0),
+                            scale=0.9, color=color_rgb(CREMA))
+        self.ayuda.text_colors['dorado'] = color_rgb(DORADO)
+        self.ayuda.text = TEXTO_AYUDA
+        # Esquina inferior derecha: motor y estética (siempre)
         self.motor = Rotulo(ROTULO_MOTOR, parent=camera.ui, position=(0.87, -0.475, -0.2), origin=(0.5, -0.5),
                             scale=0.9, color=color_rgb(GRIS, 0.9))
+        # Pausa
         self.pausa = Entity(parent=camera.ui, enabled=False)
-        Entity(parent=self.pausa, model='quad', scale=(4, 2), color=Color(0, 0, 0, 0.55), z=0.3)
-        Rotulo('Pausa', parent=self.pausa, origin=(0, 0), position=(0, 0.06, -0.1), scale=3,
-               color=color_rgb(DORADO))
-        Rotulo('ESC: continuar  ·  Q: salir', parent=self.pausa, origin=(0, 0), position=(0, -0.04, -0.1),
-               scale=1.2, color=color_rgb(CREMA))
+        Entity(parent=self.pausa, model='quad', scale=(4, 2), color=Color(0, 0, 0, 0.5), z=0.3)
+        panel_interfaz(self.pausa, (0, 0.02), (0.62, 0.22), z=0.2, opacidad=0.8)
+        rotulo_titulo('Pausa', parent=self.pausa, origin=(0, 0), position=(0, 0.055, -0.1), scale=2.8,
+                      color=color_rgb(DORADO))
+        Rotulo('ESC: continuar  ·  Q: salir', parent=self.pausa, origin=(0, 0), position=(0, -0.035, -0.1),
+               scale=1.15, color=color_rgb(CREMA))
         self.vida_mostrada = None
         self.derrotados_mostrados = None
+        self.alfa_ayuda = None
 
     def mostrar(self, visible):
         self.raiz.enabled = visible
@@ -2164,16 +2253,16 @@ class Hud:
             self.vida_mostrada = vida
             for i, (relleno, brillo) in enumerate(self.rombos):
                 lleno = i < vida
-                relleno.color = color_rgb(ROJO) if lleno else Color(0.22, 0.08, 0.08, 1)
+                relleno.color = color_rgb(ROJO) if lleno else Color(0.16, 0.06, 0.07, 1)
                 brillo.visible = lleno
         if derrotados != self.derrotados_mostrados:
             self.derrotados_mostrados = derrotados
-            self.contador.text = f'Soldados derrotados: {derrotados}/{len(PATRULLAS)}'
+            self.contador.text = f'Soldados derrotados: <dorado>{derrotados}<default>/{len(PATRULLAS)}'
         alfa = round(1.0 - limitar((t_patio - (DURACION_AYUDA - 1.0)) / 1.0, 0.0, 1.0), 2)
-        if alfa != getattr(self, '_alfa_ayuda', None):
-            self._alfa_ayuda = alfa
-            self.ayuda.enabled = alfa > 0
-            self.ayuda.color = color_rgb(CREMA, alfa)
+        if alfa != self.alfa_ayuda:
+            self.alfa_ayuda = alfa
+            self.grupo_ayuda.enabled = alfa > 0
+            self.grupo_ayuda.setAlphaScale(alfa)
 
 
 class Fundido:
@@ -2476,7 +2565,10 @@ class Probador:
         return len(tecla) == 1 and tecla.isalpha()
 
     def pulsar(self, tecla):
-        application.base.input(tecla, True) if self._es_letra(tecla) else application.base.input(tecla)
+        if self._es_letra(tecla):
+            application.base.input(tecla, True)     # Ursina recibe las letras como teclas «raw»
+        else:
+            application.base.input(tecla)
 
     def soltar(self, tecla):
         if self._es_letra(tecla):
@@ -2638,7 +2730,19 @@ class Probador:
         self.capturar('ursina_patio.png')
         yield from self.medir_fps(5.0)
 
-        # 3. Cámara con Q
+        # 3. Pausa: ESC congela la partida (aunque se mantenga W) y ESC la reanuda
+        x0, z0 = akira.x, akira.z
+        self.tocar('escape')
+        self.mantener({'w'})
+        yield 0.5
+        self.mantener(set())
+        self.comprobar(j.estado == 'pausa' and j.hud.pausa.enabled and (akira.x, akira.z) == (x0, z0),
+                       'ESC pausa la partida (Akira no se mueve)')
+        self.tocar('escape')
+        yield 0.1
+        self.comprobar(j.estado == 'patio' and not j.hud.pausa.enabled, 'ESC reanuda la partida')
+
+        # 4. Cámara con Q
         giro_inicial = camara.giro
         self.mantener({'q'})
         yield 60 / CAMARA_VEL_GIRO
@@ -2648,7 +2752,7 @@ class Probador:
         self.comprobar(abs(girado - 60) < 4, f'Q gira la cámara 90°/s ({giro_inicial:.0f}° → {camara.giro:.0f}°)')
         self.capturar('ursina_camara_girada.png')
 
-        # 4. Caminar (W, relativo a la cámara: ahora mira al norte)
+        # 5. Caminar (W, relativo a la cámara: ahora mira al norte)
         x0, z0 = akira.x, akira.z
         self.mantener({'w'})
         yield 1.0
@@ -2659,7 +2763,7 @@ class Probador:
         self.comprobar(4.4 < recorrido < 5.5, f'W: Akira camina {recorrido:.2f} m en 1 s (5 m/s)')
         self.comprobar(norte > 0.97, 'El movimiento es relativo a la cámara (W = hacia donde mira: norte)')
 
-        # 5. Correr con SHIFT
+        # 6. Correr con SHIFT
         x0, z0 = akira.x, akira.z
         self.mantener({'w', 'lshift'})
         yield 0.5
@@ -2668,7 +2772,7 @@ class Probador:
         recorrido = math.hypot(akira.x - x0, akira.z - z0)
         self.comprobar(3.6 < recorrido < 4.4, f'W + SHIFT: Akira corre {recorrido:.2f} m en 0,5 s (8 m/s)')
 
-        # 6. Saltar
+        # 7. Saltar
         altura_maxima = 0.0
         self.tocar('space')
         for _ in range(30):
@@ -2677,7 +2781,7 @@ class Probador:
         self.comprobar(1.15 < altura_maxima < 1.4, f'ESPACIO: salta {altura_maxima:.2f} m (≈1,28 m)')
         self.comprobar(akira.en_suelo and abs(akira.y) < 1e-3, 'Vuelve al suelo por la gravedad')
 
-        # 7. Muro oeste: corre contra él y salta; no lo atraviesa
+        # 8. Muro oeste: corre contra él y salta; no lo atraviesa
         yield from self.girar_camara_a(90)
         x0 = akira.x
         self.mantener({'w', 'lshift'})
@@ -2689,7 +2793,7 @@ class Probador:
         self.comprobar(x0 - akira.x > 2.5, f'Corre hacia el oeste ({x0:.1f} → {akira.x:.2f})')
         self.comprobar(akira.x >= limite - 0.01, f'No atraviesa el muro oeste (x = {akira.x:.3f} ≥ {limite:.2f})')
 
-        # 8. Zoom (rueda y + / −) e inclinación (R / F)
+        # 9. Zoom (rueda y + / −) e inclinación (R / F)
         yield 0.3
         distancia = camara.distancia_deseada
         self.tocar('wheel_up')
@@ -2709,8 +2813,9 @@ class Probador:
         self.mantener({'f'})
         yield 2.0
         self.mantener(set())
-        self.comprobar(abs(camara.inclinacion - CAMARA_INCL_MIN) < 1e-3,
-                       f'F baja la cámara hasta {camara.inclinacion:.0f}° (mira a {camara.altura_mirada(camara.inclinacion):.1f} m)')
+        altura = camara.altura_mirada(camara.inclinacion)
+        self.comprobar(abs(camara.inclinacion - CAMARA_INCL_MIN) < 1e-3 and abs(altura - 2.2) < 1e-3,
+                       f'F baja la cámara hasta {camara.inclinacion:.0f}° (mira a {altura:.1f} m sobre los pies)')
         self.mantener({'r'})
         yield 1.0
         self.mantener(set())
@@ -2720,7 +2825,7 @@ class Probador:
         self.comprobar(True, 'Arrastre con botón derecho: misma función de giro (probada por código)')
         yield from self.girar_camara_a(0)
 
-        # 9. Subir al escalón y a la pasarela, y a los bloques de piedra
+        # 10. Subir al escalón y a la pasarela, y a los bloques de piedra
         yield from self.ir_a(-20, -8.3)
         yield from self.ir_a(-3, -8.3)
         yield from self.girar_camara_a(0)
@@ -2746,7 +2851,7 @@ class Probador:
         yield 0.3
         self.comprobar(abs(akira.y - 1.6) < 0.02, f'Sube al bloque B ({akira.y:.2f} m)')
 
-        # 10. Torreón y luna: cámara baja mirando al norte desde el oeste del patio
+        # 11. Torreón y luna: cámara baja mirando al norte desde el oeste del patio
         yield from self.ir_a(6, -3.4)
         yield from self.ir_a(-7.5, -3.5)
         yield from self.girar_camara_a(5)
@@ -2761,7 +2866,7 @@ class Probador:
         self.comprobar(visibles_luna, 'La luna también se ve (baja, detrás del torreón)')
         self.capturar('ursina_torreon.png')
 
-        # 11. Combate: se activan los soldados y Akira va hacia el portón peleando
+        # 12. Combate: se activan los soldados y Akira va hacia el portón peleando
         j.ia_activa = True
         self.mantener({'r'})
         yield (CAMARA_INCLINACION - CAMARA_INCL_MIN) / CAMARA_VEL_INCLINACION
@@ -2802,12 +2907,15 @@ class Probador:
             yield 0
             tiempo += PASO_PRUEBA
         self.mantener(set())
-        self.comprobar(bool(danados), f'Los soldados reciben daño de la espada (golpes a los soldados {sorted(set(danados))})')
+        self.comprobar(bool(danados), f'Los soldados reciben daño de la espada ({akira.ataques_con_golpe} golpes; '
+                                      f'soldados {sorted(i + 1 for i in set(danados))})')
+        estocadas = sum(s.estocadas for s in j.soldados)
+        self.comprobar(estocadas > 0, f'Los soldados avisan con «!» y lanzan estocadas ({estocadas})')
         self.comprobar(j.derrotados >= 1, f'Soldados derrotados: {j.derrotados}/6')
         if akira.vida < vida_inicial:
             self.comprobar(True, f'Las lanzas también hieren a Akira (vida {vida_inicial} → {akira.vida})')
 
-        # 12. Portón: macizo y con cierre del capítulo
+        # 13. Portón: macizo y con cierre del capítulo
         yield 0.2
         self.comprobar(j.estado == 'cierre', 'Tocar el portón muestra el texto de cierre')
         limite = PORTON[0][0] - PORTON[1][0] / 2 - RADIO_PERSONAJE
@@ -2819,7 +2927,7 @@ class Probador:
         yield 0.6
         self.capturar('ursina_cierre.png')
 
-        # 13. Derrota y reintento
+        # 14. Derrota y reintento
         self.tocar('enter')                       # vuelve a la intro con un fundido
         yield 1.2
         self.comprobar(j.estado == 'intro', 'Tras el cierre, ENTER vuelve a la introducción')
@@ -2833,7 +2941,8 @@ class Probador:
             yield 0
             tiempo += PASO_PRUEBA
         yield 1.2
-        self.comprobar(j.estado == 'derrota', 'Con vida 0 aparece «Akira ha caído»')
+        self.comprobar(j.estado == 'derrota' and akira.vida == 0,
+                       'Una estocada deja a Akira sin vida y aparece «Akira ha caído»')
         self.tocar('enter')
         yield 0.3
         self.tocar('enter')
@@ -2860,6 +2969,12 @@ class Probador:
               f'({duracion:.0f} s reales).', flush=True)
         if self.fps is not None:
             print(f'FPS medidos en el patio: {self.fps:.1f}', flush=True)
+        try:                                    # memoria máxima del proceso (solo Linux/macOS)
+            import resource
+            memoria = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+            print(f'Memoria máxima del proceso: {memoria:.0f} MB (incluye el render por software)', flush=True)
+        except (ImportError, AttributeError):
+            pass
         for fallo in fallos:
             print('  Falló: ' + fallo, flush=True)
         sys.exit(1 if fallos else 0)
@@ -2881,6 +2996,7 @@ def principal():
     camera.perspective_lens.set_min_fov(CAMARA_FOV)   # campo de visión vertical de 38°
     TEXTURAS.update(cargar_texturas())
     Text.default_resolution = 1080 * Text.size * 3
+    FUENTE_TITULOS.append(buscar_fuente_titulos())
     Juego()
     app.run()
 
