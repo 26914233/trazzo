@@ -68,10 +68,11 @@ para ajustarlos después de probar.
      `godot --headless --path ronin3d/godot --export-release Android exportaciones/ronin-<versión>-prueba.apk`
   4. Comprobación con `apksigner verify --print-certs` y `aapt2 dump badging`, y la prueba
      automática sobre una exportación *release* para Linux (mismos datos que el APK).
-- **Firma:** Android solo instala una versión encima de otra si las dos llevan la misma firma. La
-  clave de prueba de la 0.2 (`CN=RONIN prueba`) se creó en la sesión de la nube y no se guardó
-  fuera de ella: si la siguiente versión se exporta en otra sesión o en tu PC, hay que desinstalar
-  la 0.2 antes de instalarla (todavía no hay partidas guardadas que perder).
+- **Firma:** Android solo instala una versión encima de otra si las dos llevan la misma firma.
+  Todas las versiones de prueba se firman con `ronin-prueba.keystore` (`CN=RONIN prueba`), la
+  clave de la 0.2, guardada con permiso del usuario en Drive › `ronin/03-Godot/firma-prueba/`
+  junto con un LEEME (alias, contraseña y cómo usarla en el PC o en la nube). Nunca va al
+  repositorio, que es público. No es la clave para Google Play.
 - **Windows:** mismo menú → **Windows** → `exportaciones/ronin3d.exe`.
 
 ## Qué hay

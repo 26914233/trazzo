@@ -49,17 +49,16 @@ pulido será el primer capítulo (castillo + planicie + aldea).
   en pausa sale), pausa automática al pasar a segundo plano y ayuda táctil con letra más grande.
   La prueba automática pasa 15/15 en el editor y en una exportación *release* para Linux. Cómo
   se genera: `ronin3d/godot/LEEME.md`, sección «Exportar».
+- **Clave de firma de prueba** guardada con permiso del usuario (27-09-2026) en Drive
+  `ronin/03-Godot/firma-prueba/` (con un LEEME): las versiones siguientes se instalan encima de
+  la 0.2 sin desinstalarla.
 
 ## 3. En curso / pendiente del usuario
 
 1. **Probar el APK en el móvil** y contar: FPS (meta ≥ 30), si los controles táctiles se
    entienden y qué tal se siente la parada.
 2. **DECISIÓN 2 — Combate:** recomendación B (precisión), después de probarla.
-3. **Clave de firma de prueba:** la de la 0.2 solo existe en la sesión de la nube que la creó
-   (no se subió a ningún sitio). Si la siguiente versión sale de otra sesión o de su PC, hay que
-   desinstalar la 0.2 antes. Si quiere que se instalen encima, que decida dónde guardar una
-   clave fija (por ejemplo, exportar siempre desde su PC, como con Curtzz).
-4. Si tiene el `samurai.py` original, subirlo.
+3. Si tiene el `samurai.py` original, subirlo.
 
 ## 4. Siguiente
 
@@ -82,6 +81,7 @@ pulido será el primer capítulo (castillo + planicie + aldea).
 | Plan | `ronin3d/PLAN_PRODUCCION.md` |
 | Comparativa | `ronin3d/COMPARATIVA.md` · página privada https://claude.ai/artifact/6urV5FCikt9CWAUV35gBCu |
 | Capturas de hoy | `ronin3d/capturas/actual/` |
+| Clave de firma de prueba | Drive `Respaldos Claude/ronin/03-Godot/firma-prueba/` (privada; nunca en GitHub) |
 | APK de prueba | Drive `Respaldos Claude/ronin/ronin-0.2-prueba.apk` (como con Curtzz: el nuevo va en la raíz con el nombre `ronin-<versión>-prueba.apk` y el anterior pasa a «Versiones anteriores (RONIN)») |
 | Respaldo | Google Drive `Respaldos Claude/ronin/` (01-Diseno, 02-Prototipo-2D, 03-Godot, 04-Otros-motores) |
 | Memoria | Vertiso Memory, handoff con ámbito `ronin-juego` |
@@ -110,8 +110,9 @@ decisiones son: …». Si el chat tiene Vertiso Memory, el traspaso también est
   «raw» de GitHub; para reescribir un texto ya subido sin cambiar su enlace,
   `GOOGLESUPER_EDIT_FILE`. El APK (que no va a GitHub, que es público) se subió con una URL de
   subida temporal del workbench de Composio (la misma que usa `upload_local_file`), `curl -X PUT`
-  desde la sesión y `GOOGLESUPER_UPLOAD_FROM_URL`; después se comprueba el MD5 en Drive. Las
-  claves de firma no salen de la sesión.
+  desde la sesión y `GOOGLESUPER_UPLOAD_FROM_URL`; después se comprueba el MD5 en Drive. La
+  clave de firma de prueba solo está en Drive (`03-Godot/firma-prueba`, guardada con permiso del
+  usuario); nunca en GitHub.
 - **Pedir permiso para descargas grandes** y verificar sumas de comprobación. **No publicar en
   redes.** Las páginas de claude.ai son privadas; compartirlas lo decide el usuario.
 - Notas técnicas de Godot: los scripts usan `preload()` en vez de `class_name`; la prueba se

@@ -22,7 +22,8 @@ ronin/                         (Google Drive: Respaldos Claude › ronin)
 ├── RONIN_rama_completa.zip    Todo el código y las capturas (copia de la rama de GitHub)
 ├── 01-Diseno/                 Traspaso, plan de producción, especificación y comparativa
 ├── 02-Prototipo-2D/           samurai.py (Pygame, un solo archivo)
-├── 03-Godot/                  Versión Godot: LEEME, pruebas, huellas SHA-256 y capturas
+├── 03-Godot/                  Versión Godot: LEEME, pruebas, huellas SHA-256, capturas y
+│                              firma-prueba/ (clave de los APK de prueba; privada)
 └── 04-Otros-motores/          Three.js y Ursina (solo como referencia)
 ```
 

@@ -430,7 +430,9 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   (opción C), empezando por castillo + planicie + aldea.
 - **APK de prueba:** `ronin-<versión>-prueba.apk` en la raíz de la carpeta de Drive, como con
   Curtzz (la versión anterior pasa a «Versiones anteriores (RONIN)»). Cómo se genera:
-  `ronin3d/godot/LEEME.md`, sección «Exportar». Las claves de firma no se suben a ningún sitio.
+  `ronin3d/godot/LEEME.md`, sección «Exportar». La clave de firma de prueba está en Drive ›
+  `ronin/03-Godot/firma-prueba/` (guardada con permiso del usuario el 27-09-2026); nunca en
+  GitHub, que es público.
 - **Proyecto principal:** `ronin3d/godot/`. Prueba automática:
   `godot --path ronin3d/godot --fixed-fps 30 -- --prueba` (en Linux sin pantalla, con
   `xvfb-run -a`). Las versiones Three.js y Ursina de `ronin3d/` quedan solo como referencia.
