@@ -36,6 +36,7 @@ ronin3d/
 ├── LEEME.md                   Este índice
 ├── HANDOFF_RONIN.md           Traspaso para seguir en otra sesión
 ├── PLAN_PRODUCCION.md         Visión, alcance, vertical slice, riesgos y decisiones
+├── PROPUESTA_MUNDO_YOKAI.md   Japón con yōkai, iaidō, bestiario, planos, animación (por decidir)
 ├── DISENO_3D.md               Especificación del patio y de las reglas de combate
 ├── COMPARATIVA.md             Cómo se eligieron motor y estética (y otros motores y APK)
 ├── godot/                     El juego (principal)
@@ -66,6 +67,7 @@ ronin3d/
 | --- | --- | --- |
 | **Estilo de combate** | Precisión: parar al aviso y contraatacar (prototipo ya jugable, también en el APK) | Tras probarlo (DECISIÓN 2 del plan) |
 | **Qué hace cada lugar** | Aldea: diálogos y encargos · templo: puzzles de entorno · dojo: técnicas con ritmo · ruinas: exploración y jefe · planicie: viaje y dados | Al construir cada lugar |
+| **Mundo yōkai** (1-10-2026) | Japón invadido por yōkai, iaidō, gran yōkai detrás de Genzo, bestiario japonizado, escenas 2D, animación anime limitada | DECISIONES 2-7 de `PROPUESTA_MUNDO_YOKAI.md` |
 | **Modelo de capítulos** | Primer capítulo gratis como demo y el resto de pago, o cada capítulo de pago | Con datos del vertical slice |
 | **Dados de la planicie** | Chō-han (par o impar con dos dados) | Al empezar la planicie en 3D |
 | **Nombre** | «RONIN» ya lo usan otros juegos: buscar nombre o subtítulo propio | Antes de abrir una página de tienda |
