@@ -317,7 +317,7 @@ milisegundo).
 - **COSTE:** A, ninguno. B, bajo en dinero (Colab gratis) y medio en tiempo de limpieza. C, la suma.
 - **RECOMENDACIÓN:** **C**, con la prueba de 10 como paso previo: si 7 de las 10 mallas te parecen
   al menos «aceptables» (3 de 5), adoptamos B para las propias.
-- **SIGUIENTE PASO:** cuando decidas, escribo la receta de Colab C10 (imagen → malla) para las 10 de la
+- **SIGUIENTE PASO:** cuando decidas, escribo la receta de Colab C14 (imagen → malla) para las 10 de la
   prueba: Bahamut, Jorōgumo, Yamata no Orochi, Nue, Gashadokuro, Kraken, Tiamat, Quimera, Ouroboros y
   Tamamo-no-Mae.
 
@@ -325,7 +325,7 @@ milisegundo).
 
 ## 9. Imágenes en Colab
 
-- **Cuaderno:** `colab/bestiario_imagenes.ipynb` (para abrirlo tú) y **receta C9** en
+- **Cuaderno:** `colab/bestiario_imagenes.ipynb` (para abrirlo tú) y **receta C13** (las C1-C12 ya están en tu carpeta de Colab) en
   `colab/INSTRUCCIONES_COLAB_BESTIARIO.md` (para la sesión que maneja Colab con colab-mcp, en el mismo
   formato que la de Heredera del Hielo). Ambas leen `06-Bestiario/prompts_colab.csv` de tu Drive.
 - **Modelo:** SDXL base 1.0 (licencia CreativeML Open RAIL++-M, uso comercial permitido con

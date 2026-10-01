@@ -292,10 +292,11 @@ cuaderno = {
     "nbformat_minor": 0,
 }
 
-CABECERA_INSTRUCCIONES = """# Instrucciones para la sesión con Colab: RONIN, imágenes del bestiario (C9)
+CABECERA_INSTRUCCIONES = """# Instrucciones para la sesión con Colab: RONIN, imágenes del bestiario (C13)
 
 Lo manejas con colab-mcp, igual que en `COLAB_INSTRUCCIONES.md` de Heredera del Hielo (las reglas 1-8
-de ese archivo valen también aquí). Reglas propias de esta receta:
+de ese archivo valen también aquí). Es la receta **C13**: las C1-C12 ya existen en la carpeta de Colab del
+usuario. Reglas propias de esta receta:
 
 1. Entorno nuevo con **T4 GPU**; lo elige el usuario. Esta receta usa SDXL base 1.0 (licencia CreativeML
    Open RAIL++-M, uso comercial permitido con restricciones de uso responsable). No hace falta ningún token.
@@ -322,7 +323,7 @@ de ese archivo valen también aquí). Reglas propias de esta receta:
    Si la celda de carga o la de generar falla, copia el error y avisa; no actualices paquetes por tu cuenta.
 
 ---------------------------------------------------------------
-## C9 · Imágenes del bestiario (T4, entorno nuevo)
+## C13 · Imágenes del bestiario (T4, entorno nuevo)
 
 Requisitos en Drive: `Respaldos Claude/ronin/06-Bestiario/prompts_colab.csv`.
 Pega cada bloque como una celda de código, en este orden (son las celdas del cuaderno
