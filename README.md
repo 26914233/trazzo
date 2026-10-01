@@ -1,3 +1,3 @@
-# Trazzo
+# Curtzz (antes Trazzo)
 
-Web del juego y política de privacidad. Publicada con GitHub Pages.
+Web de Curtzz (antes Trazzo): portada, tienda de Prismas con bono y política de privacidad. Publicada con GitHub Pages desde main.

@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Trazzo — Encierra al enemigo sin rozarlo</title>
-<meta name="description" content="Trazzo es un juego de precisión para Android: encierra al enemigo con rectángulos sin llegar a tocarlo. Cada corte cuenta, cada píxel importa.">
-<meta property="og:title" content="Trazzo">
+<title>Curtzz — Encierra al enemigo sin rozarlo</title>
+<meta name="description" content="Curtzz es un juego de precisión para Android: encierra al enemigo con rectángulos sin llegar a tocarlo. Cada corte cuenta, cada píxel importa.">
+<meta property="og:title" content="Curtzz">
 <meta property="og:description" content="Encierra al enemigo sin rozarlo. Cada corte cuenta, cada píxel importa.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%230B1020'/><rect x='22' y='22' width='56' height='56' fill='none' stroke='%2322D3EE' stroke-width='8'/><circle cx='50' cy='50' r='9' fill='%23FBBF24'/></svg>">
@@ -18,6 +18,7 @@
     --cyan:#22D3EE;
     --amber:#FBBF24;
     --green:#4ADE80;
+    --violet:#C084FC;
     --line:rgba(255,255,255,.09);
     --maxw:1080px;
   }
@@ -124,6 +125,12 @@
   .c-cyan{background:var(--cyan)}
   .c-amber{background:var(--amber)}
   .c-green{background:var(--green)}
+  .c-violet{background:var(--violet)}
+  .pack{text-decoration:none;color:var(--txt);display:flex;flex-direction:column;gap:.4rem;transition:transform .15s,border-color .15s}
+  .pack:hover{transform:translateY(-3px);border-color:var(--violet)}
+  .pack b{color:var(--violet)}
+  .pack .price{margin-top:auto;font-weight:700;font-size:1.2rem;color:#fff}
+  .pack.best{border-color:var(--violet);box-shadow:0 0 0 1px var(--violet) inset}
 
   .rule{
     border-left:3px solid var(--cyan);
@@ -159,8 +166,8 @@
   <canvas id="board" aria-hidden="true"></canvas>
   <div class="hero-inner">
     <div class="wrap">
-      <span class="badge"><span class="dot"></span>EN DESARROLLO — ANDROID</span>
-      <h1 class="brand">TRAZZO</h1>
+      <span class="badge"><span class="dot"></span>PRÓXIMAMENTE EN GOOGLE PLAY</span>
+      <h1 class="brand">CURTZZ</h1>
       <p class="tagline">Encierra al enemigo sin rozarlo.</p>
       <p class="sub">Un juego de precisión donde cada rectángulo que trazas reduce el tablero — y cada milímetro de más te cuesta la partida. Cada corte cuenta, cada píxel importa.</p>
     </div>
@@ -199,8 +206,8 @@
 
     <div class="grid">
       <div class="card">
-        <h3>Cuatro enemigos</h3>
-        <p>Rebote, Cazador, Errático y Divisor. Cada uno se lee de un vistazo y obliga a un plan distinto.</p>
+        <h3>Cuatro enemigos, diez jefes</h3>
+        <p>Rebote, Cazador, Errático y Divisor. Y en el umbral, jefes con manada, pulsos, reflejos y metrónomos que borran tu línea.</p>
       </div>
       <div class="card">
         <h3>Comodines sin límite</h3>
@@ -212,24 +219,38 @@
       </div>
       <div class="card">
         <h3>Juega como quieras</h3>
-        <p>Arrastrando el dedo o con controles de dirección. El mismo cursor, dos formas de moverlo.</p>
+        <p>La Línea sigue tu dedo; el Rectángulo se estira y se sella. O cruceta y mando para la precisión celda a celda.</p>
       </div>
     </div>
+  </div>
+</section>
+
+<section id="tienda">
+  <div class="wrap">
+    <h2>Tienda: más Prismas por el mismo precio</h2>
+    <p class="lead">Comprando aquí, en la web, cada paquete trae un <strong style="color:var(--violet)">25 % más de Prismas</strong> que en el juego, al mismo precio. Pagas con tarjeta, PSE o efectivo y recibes un código para canjear en <em>Tienda → Prismas → Canjear código</em>.</p>
+    <div class="grid packs">
+      <a class="card pack" href="tienda.html?paquete=web_250"><h3><span class="chip c-violet"></span>250 Prismas</h3><p>200 + <b>50 de bono</b></p><span class="price">1,99 US$</span></a>
+      <a class="card pack" href="tienda.html?paquete=web_690"><h3><span class="chip c-violet"></span>690 Prismas</h3><p>550 + <b>140 de bono</b></p><span class="price">4,99 US$</span></a>
+      <a class="card pack best" href="tienda.html?paquete=web_1500"><h3><span class="chip c-violet"></span>1.500 Prismas</h3><p>1.200 + <b>300 de bono</b></p><span class="price">9,99 US$</span></a>
+      <a class="card pack" href="tienda.html?paquete=web_3125"><h3><span class="chip c-violet"></span>3.125 Prismas</h3><p>2.500 + <b>625 de bono</b></p><span class="price">19,99 US$</span></a>
+    </div>
+    <p class="lead" style="margin-top:1.4rem;font-size:.9rem">Los Prismas abren el Xtremo, Cacería, Bisturí, Infinito, Supervivencia, Jefes y el Pase premium. Todo lo demás se gana jugando.</p>
   </div>
 </section>
 
 <section>
   <div class="wrap">
     <h2>Próximamente</h2>
-    <p class="lead">Trazzo está en desarrollo para Android. Todavía no hay fecha, y no se anunciará ninguna hasta que el juego esté listo de verdad.</p>
+    <p class="lead">Curtzz llega a Google Play. La fecha se anunciará cuando el juego esté listo de verdad.</p>
   </div>
 </section>
 
 <footer>
   <div class="wrap foot-row">
-    <div>© <span id="year">2026</span> Trazzo. Todos los derechos reservados.</div>
+    <div>© <span id="year">2026</span> Curtzz · thunderDarkness. Todos los derechos reservados.</div>
     <div>
-      <a href="privacidad.html">Política de privacidad</a>
+      <a href="tienda.html">Tienda</a> &nbsp;·&nbsp; <a href="privacidad.html">Política de privacidad</a>
     </div>
   </div>
 </footer>

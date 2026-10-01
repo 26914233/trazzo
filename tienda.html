@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curtzz — Tienda</title>
+<meta name="description" content="Compra Prismas de Curtzz en la web con un 25 % de bono y canjéalos en el juego con un código.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%230B1020'/><rect x='22' y='22' width='56' height='56' fill='none' stroke='%2322D3EE' stroke-width='8'/><circle cx='50' cy='50' r='9' fill='%23FBBF24'/></svg>">
+<style>
+  :root{--bg:#0B1020;--bg-2:#121a30;--txt:#E8ECF6;--muted:#94A3B8;--cyan:#22D3EE;--violet:#C084FC;--green:#4ADE80;--red:#F87171;--line:rgba(255,255,255,.09)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:0 20px}
+  header{padding:40px 0 10px}
+  header a{color:var(--muted);text-decoration:none;font-size:.9rem}
+  h1{font-size:clamp(2rem,7vw,3rem);letter-spacing:-.03em;margin:.6rem 0 .2rem}
+  h1 span{background:linear-gradient(120deg,#fff 30%,var(--violet));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .lead{color:var(--muted);max-width:60ch}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin:28px 0}
+  .pack{background:var(--bg-2);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:.35rem;cursor:pointer;color:var(--txt);font:inherit;text-align:left;transition:transform .15s,border-color .15s}
+  .pack:hover,.pack.sel{transform:translateY(-3px);border-color:var(--violet)}
+  .pack .n{font-size:1.5rem;font-weight:800}
+  .pack .b{color:var(--violet);font-size:.9rem}
+  .pack .p{margin-top:.6rem;font-weight:700;font-size:1.15rem}
+  .btn{display:inline-block;background:var(--violet);color:#1a0b2e;border:0;border-radius:12px;padding:14px 22px;font:inherit;font-weight:800;cursor:pointer}
+  .btn[disabled]{opacity:.45;cursor:not-allowed}
+  .box{background:var(--bg-2);border:1px solid var(--line);border-radius:14px;padding:22px;margin:22px 0}
+  .code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:clamp(1.1rem,5vw,1.7rem);letter-spacing:.06em;background:#0a0f1d;border:1px dashed var(--violet);border-radius:10px;padding:14px;text-align:center;margin:12px 0;word-break:break-all}
+  .ok{color:var(--green)} .bad{color:var(--red)} .muted{color:var(--muted)}
+  ol{padding-left:1.2rem;color:var(--muted)}
+  footer{border-top:1px solid var(--line);margin-top:50px;padding:30px 0 50px;color:var(--muted);font-size:.85rem}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a href="index.html">← Curtzz</a>
+    <h1><span>Tienda de Prismas</span></h1>
+    <p class="lead">El mismo precio que en el juego, con un <strong style="color:var(--violet)">25 % más de Prismas</strong>. Al pagar recibes un código para canjear en <em>Tienda → Prismas → Canjear código</em>.</p>
+  </header>
+
+  <div id="estado"></div>
+
+  <div id="compra">
+    <div class="grid" id="packs"></div>
+    <button class="btn" id="pagar" disabled>Elige un paquete</button>
+    <p class="muted" style="font-size:.85rem;margin-top:12px">El pago lo procesa Mercado Pago (tarjeta, PSE, efectivo y más, según tu país). Curtzz nunca ve los datos de tu tarjeta.</p>
+  </div>
+
+  <div class="box">
+    <strong>Cómo canjear tu código</strong>
+    <ol>
+      <li>Abre Curtzz y toca tus Prismas (arriba a la derecha) o entra en <em>Tienda → Prismas</em>.</li>
+      <li>Toca <em>Canjear código</em> y escríbelo tal cual (mayúsculas o minúsculas, da igual).</li>
+      <li>Los Prismas se suman al momento. Cada código vale una sola vez.</li>
+    </ol>
+  </div>
+</div>
+<footer>
+  <div class="wrap">© <span id="year">2026</span> Curtzz · thunderDarkness · <a href="privacidad.html">Privacidad</a> · ¿Problemas con un pago? <a href="mailto:prueba1bysisne@gmail.com">prueba1bysisne@gmail.com</a></div>
+</footer>
+
+<script>
+// URL del servidor de compras (07-Servidor en Railway). Vacía = la tienda aún no vende.
+const SERVIDOR = "";
+const PAQUETES = [
+  {id: "web_250", prismas: 250, base: 200, precio: 1.99},
+  {id: "web_690", prismas: 690, base: 550, precio: 4.99},
+  {id: "web_1500", prismas: 1500, base: 1200, precio: 9.99},
+  {id: "web_3125", prismas: 3125, base: 2500, precio: 19.99},
+];
+const $ = (s) => document.querySelector(s);
+document.getElementById("year").textContent = new Date().getFullYear();
+const params = new URLSearchParams(location.search);
+let elegido = params.get("paquete") || "";
+const fmt = (n) => n.toLocaleString("es-CO");
+
+function pintar() {
+  $("#packs").innerHTML = PAQUETES.map(p => `
+    <button class="pack${p.id === elegido ? " sel" : ""}" data-id="${p.id}">
+      <span class="n">${fmt(p.prismas)}</span>
+      <span>Prismas</span>
+      <span class="b">${fmt(p.base)} + ${fmt(p.prismas - p.base)} de bono</span>
+      <span class="p">${p.precio.toFixed(2).replace(".", ",")} US$</span>
+    </button>`).join("");
+  document.querySelectorAll(".pack").forEach(b => b.onclick = () => { elegido = b.dataset.id; pintar(); });
+  const btn = $("#pagar");
+  if (!SERVIDOR) { btn.disabled = true; btn.textContent = "La tienda abre con el lanzamiento"; return; }
+  const p = PAQUETES.find(x => x.id === elegido);
+  btn.disabled = !p;
+  btn.textContent = p ? `Pagar ${p.precio.toFixed(2).replace(".", ",")} US$` : "Elige un paquete";
+}
+
+$("#pagar").onclick = async () => {
+  const btn = $("#pagar");
+  btn.disabled = true; btn.textContent = "Abriendo el pago…";
+  try {
+    const r = await fetch(SERVIDOR + "/v1/web/pedido", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({paquete: elegido})});
+    if (!r.ok) throw new Error(r.status);
+    const d = await r.json();
+    try { localStorage.setItem("curtzz_pedido", d.pedido); } catch (e) {}
+    location.href = d.pagar;
+  } catch (e) {
+    $("#estado").innerHTML = `<div class="box bad">No se pudo abrir el pago. Prueba otra vez en un momento.</div>`;
+    pintar();
+  }
+};
+
+// Vuelta desde Mercado Pago: esperar a que el pago se confirme y enseñar el código.
+async function seguir(pid, intentos = 0) {
+  const est = $("#estado");
+  try {
+    const r = await fetch(SERVIDOR + "/v1/web/pedido/" + encodeURIComponent(pid));
+    const d = await r.json();
+    if (d.codigo) {
+      est.innerHTML = `<div class="box"><strong class="ok">¡Pago confirmado!</strong> Tu código para ${fmt(d.prismas)} Prismas:
+        <div class="code" id="codigo">${d.codigo}</div>
+        <button class="btn" id="copiar">Copiar código</button>
+        <p class="muted" style="font-size:.85rem">Guárdalo: esta página lo enseña mientras tengas el enlace.</p></div>`;
+      $("#copiar").onclick = () => navigator.clipboard.writeText(d.codigo).then(() => $("#copiar").textContent = "Copiado ✓");
+      $("#compra").style.display = "none";
+      return;
+    }
+    if (["rejected", "cancelled", "refunded", "charged_back"].includes(d.estado)) {
+      est.innerHTML = `<div class="box bad">El pago no se completó. No se ha cobrado nada; puedes intentarlo otra vez.</div>`;
+      return;
+    }
+    est.innerHTML = `<div class="box">Esperando la confirmación del pago… <span class="muted">(con PSE o efectivo puede tardar)</span></div>`;
+    if (intentos < 90) setTimeout(() => seguir(pid, intentos + 1), intentos < 20 ? 3000 : 10000);
+  } catch (e) {
+    if (intentos < 90) setTimeout(() => seguir(pid, intentos + 1), 5000);
+  }
+}
+
+pintar();
+const pid = params.get("pedido");
+if (SERVIDOR && pid) seguir(pid);
+</script>
+</body>
+</html>
