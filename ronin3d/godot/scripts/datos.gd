@@ -2,19 +2,20 @@
 # Todo sale de ronin3d/DISENO_3D.md; si cambia allí, se cambia aquí.
 extends RefCounted
 
-# --- Historia (mismos textos que el prototipo 2D, samurai.py) -------------------
+# --- Historia (textos aprobados el 1-10-2026, DECISIÓN 8A de ronin3d/HISTORIA.md) --
+# El prototipo 2D (samurai.py) conserva los textos anteriores.
 const TITULO := "RONIN"
 const SUBTITULO := "Capítulo 1 · El castillo de Hoshiyama"
 const TEXTO_INTRO := [
-	"Castillo de Hoshiyama. Akira sirve como guardia del señor Takeda.",
-	"Esta noche, el general Genzo, mano derecha de Takeda, lo ha asesinado. Para Genzo, su señor era demasiado blando para gobernar.",
-	"Los soldados del castillo ya obedecen a Genzo. Akira debe abrirse paso hasta la puerta y escapar.",
+	"Castillo de Hoshiyama. Akira sirve como guardia del shōgun Takeda, el señor de Japón.",
+	"Esta noche, el general Genzo, su mano derecha, lo ha asesinado. Para Genzo, el shōgun era demasiado blando con los yōkai.",
+	"Con el shōgun cae la barrera que separaba los mundos. Los soldados ya obedecen a Genzo y algo se mueve en las sombras del patio. Akira debe abrirse paso hasta la puerta y escapar.",
 ]
 const TITULO_CIERRE := "Fin del capítulo 1"
 const TEXTO_CIERRE := [
 	"Akira cruza la última puerta. El castillo de Hoshiyama queda a su espalda.",
 	"Sin señor al que servir, desde esta noche es un ronin.",
-	"Fuera buscará justicia. Dentro, intentará recuperar su honor.",
+	"Fuera buscará justicia. Dentro, intentará recuperar su honor. Y sobre Japón, la luna brilla más roja que nunca.",
 ]
 const TITULO_DERROTA := "Akira ha caído"
 const TEXTO_DERROTA := ["Levántate, Akira. La noche aún no ha terminado."]

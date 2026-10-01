@@ -1,4 +1,5 @@
 Prueba automática de RONIN 3D (Godot, cel-shading)
+OK     Los textos del capítulo 1 son los aprobados (shōgun Takeda, yōkai, luna roja)  intro: 3 párrafos; cierre: 3
 OK     La intro da paso al juego  fase=jugando
 OK     Akira camina  recorrió 8.0 m
 OK     El HUD se ve entero en pantalla  vida, soldados y versión
@@ -15,5 +16,9 @@ OK     Iai perfecto: soltar justo al «!» desvía la lanza y derriba al soldado
 OK     Soltar a destiempo no sirve: la lanza alcanza a Akira  vida de Akira=4, soldado en pie=true
 OK     Corte de luna: con la barra llena derriba a los soldados cercanos  derribados 2 de 2, espíritu=0.0
 OK     Animación anime: 12 poses por segundo; T cambia a suave (cada paso)  anime=12, suave=60 poses en 1 s
-Resultado: 16 de 16 comprobaciones correctas
-FPS al caminar por el patio: 12.6 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)
+OK     La galería de criaturas se abre desde la pausa y reparte páginas  8 páginas; la tercera tiene 7 criaturas y 125 piezas
+OK     Al cerrar la galería se vuelve a la pausa y el juego sigue entero  en pausa=true, juego en el árbol=true
+OK     El catálogo del bestiario se carga y todos sus datos son válidos  929 criaturas (123 con modelo propio), 0 con datos no válidos
+OK     Todas las criaturas del catálogo se construyen dentro del presupuesto de piezas  929 criaturas (1163 construcciones con los rangos 2 y 3 de 1 de cada 8) en 479 ms; rango 1: media 20.5 piezas, máximo 42; máximo con rangos: 42
+Resultado: 21 de 21 comprobaciones correctas
+FPS al caminar por el patio: 11.1 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)

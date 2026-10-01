@@ -4,6 +4,7 @@
 # Opciones (después de «--» en la línea de órdenes):
 #   --prueba   juega sola, comprueba lo básico y guarda capturas
 #   --tactil   muestra los controles táctiles en el PC (el ratón hace de dedo)
+#   --galeria  abre la galería de criaturas del bestiario (con --capturas guarda imágenes y sale)
 extends Node
 
 const Datos := preload("res://scripts/datos.gd")
@@ -12,11 +13,13 @@ const Hud := preload("res://scripts/hud.gd")
 const Prueba := preload("res://scripts/prueba.gd")
 const ControlesTactiles := preload("res://scripts/controles_tactiles.gd")
 const VisualModelo := preload("res://scripts/visual_modelo.gd")
-const VERSION := "RONIN · prototipo 0.3"
+const Galeria := preload("res://scripts/galeria.gd")
+const VERSION := "RONIN · prototipo 0.4"
 
 var hud
 var juego
 var tactil
+var galeria_abierta: Node
 
 
 func _ready() -> void:
@@ -24,6 +27,11 @@ func _ready() -> void:
 	# Android: «atrás» pausa en vez de cerrar el juego (ver _notification).
 	get_tree().quit_on_go_back = false
 	var argumentos := OS.get_cmdline_user_args()
+	if "--galeria" in argumentos:
+		var galeria = Galeria.new()
+		add_child(galeria)
+		galeria.iniciar("--capturas" in argumentos)
+		return
 	var con_tactil := DisplayServer.is_touchscreen_available() or "--tactil" in argumentos
 	# En pantallas táctiles el clic izquierdo no ataca: cada toque lo simularía.
 	_registrar_acciones(not con_tactil)
@@ -55,6 +63,7 @@ func _registrar_acciones(clic_ataca: bool) -> void:
 		"parar": [KEY_K],
 		"especial": [KEY_L],
 		"estilo_animacion": [KEY_T],
+		"galeria": [KEY_G],
 		"girar_izquierda": [KEY_Q],
 		"girar_derecha": [KEY_E],
 		"acercar": [KEY_PLUS, KEY_KP_ADD, KEY_EQUAL],
@@ -165,7 +174,42 @@ func alternar_estilo_animacion() -> void:
 		else "Animación suave")
 
 
+# Galería de criaturas del bestiario (prueba de rendimiento): sustituye al juego mientras está
+# abierta y, al volver, deja el juego en pausa tal como estaba.
+func abrir_galeria() -> void:
+	if galeria_abierta != null or juego == null:
+		return
+	var era_tactil: bool = tactil.activo
+	get_tree().paused = false
+	hud.poner_pausa(false, era_tactil)
+	hud.visible = false
+	tactil.activar(false)
+	remove_child(juego)
+	galeria_abierta = Galeria.new()
+	add_child(galeria_abierta)
+	galeria_abierta.salio.connect(cerrar_galeria.bind(era_tactil))
+	galeria_abierta.iniciar(false)
+
+
+func cerrar_galeria(era_tactil := false) -> void:
+	if galeria_abierta == null:
+		return
+	galeria_abierta.queue_free()
+	galeria_abierta = null
+	add_child(juego)
+	move_child(juego, 0)
+	hud.visible = true
+	tactil.activar(era_tactil)
+	alternar_pausa()
+
+
 func _input(evento: InputEvent) -> void:
+	if galeria_abierta != null:
+		return
+	if get_tree().paused and evento.is_action_pressed("galeria"):
+		abrir_galeria()
+		get_viewport().set_input_as_handled()
+		return
 	if evento.is_action_pressed("estilo_animacion"):
 		alternar_estilo_animacion()
 		get_viewport().set_input_as_handled()

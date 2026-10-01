@@ -16,6 +16,7 @@ var texto_version := ""
 var tiempo_fps := 0.0
 var indicacion_pausa: Label
 var boton_animacion: Label            # en la pausa: cambia la animación anime / suave
+var boton_galeria: Label              # en la pausa: abre la galería de criaturas (prueba de rendimiento)
 var etiqueta_mensaje: Label
 var tiempo_mensaje := 0.0
 var en_tactil := false
@@ -203,6 +204,13 @@ func _crear_capa_pausa() -> void:
 	marco.set_border_width_all(2)
 	marco.set_corner_radius_all(8)
 	boton_animacion.add_theme_stylebox_override("normal", marco)
+	boton_galeria = _etiqueta(20, Datos.CREMA)
+	remove_child(boton_galeria)
+	capa_pausa.add_child(boton_galeria)
+	_colocar(boton_galeria, Control.PRESET_CENTER, Rect2(-300, 124, 600, 46))
+	boton_galeria.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	boton_galeria.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	boton_galeria.add_theme_stylebox_override("normal", marco)
 	capa_pausa.visible = false
 
 
@@ -291,6 +299,7 @@ func poner_pausa(activa: bool, tactil := false) -> void:
 	en_tactil = tactil
 	indicacion_pausa.text = "Toca la pantalla para continuar      «Atrás»: salir del juego" if tactil \
 		else "ESC o ENTER: continuar      Q: salir del juego"
+	boton_galeria.text = "Galería de criaturas (prueba) · " + ("toca aquí" if tactil else "G")
 	poner_estilo_animacion()
 	if activa and not capa_pausa.visible:
 		texto_antes_de_pausa = capa_texto.visible

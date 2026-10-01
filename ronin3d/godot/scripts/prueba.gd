@@ -8,6 +8,8 @@ extends Node
 
 const Datos := preload("res://scripts/datos.gd")
 const VisualModelo := preload("res://scripts/visual_modelo.gd")
+const Aspecto := preload("res://scripts/aspecto.gd")
+const Criatura := preload("res://scripts/criatura_modular.gd")
 const MOVIMIENTOS := ["mover_adelante", "mover_atras", "mover_izquierda", "mover_derecha"]
 
 var principal
@@ -46,8 +48,10 @@ func _ready() -> void:
 	carpeta = ProjectSettings.globalize_path("res://").path_join("../capturas/actual").simplify_path()
 	DirAccess.make_dir_recursive_absolute(carpeta)
 	pasos = [
+		[0.2, _comprobar_textos],
 		[1.2, _capturar.bind("intro")],
 		[1.3, _pulsar.bind("aceptar")],
+		[1.4, _capturar.bind("intro_completa")],
 		[1.5, _pulsar.bind("aceptar")],
 		[1.6, _empezar_medida],
 		[3.0, _empezar_a_caminar],
@@ -91,7 +95,12 @@ func _ready() -> void:
 		[27.7, _empezar_cuenta_anime],
 		[28.7, _cambiar_a_suave],
 		[29.7, _comprobar_animacion],
-		[29.9, _terminar],
+		[29.9, _abrir_galeria_prueba],
+		[30.6, _comprobar_galeria_abierta],
+		[31.2, _comprobar_galeria_cerrada],
+		[31.4, _comprobar_bestiario],
+		[31.5, _construir_todo_el_bestiario],
+		[31.7, _terminar],
 	]
 
 
@@ -495,6 +504,105 @@ func _comprobar_corte_luna() -> void:
 	_registrar("Corte de luna: con la barra llena derriba a los soldados cercanos",
 		objetivos_luna.size() >= 2 and caidos == objetivos_luna.size() and akira.espiritu == 0.0,
 		"derribados %d de %d, espíritu=%.1f" % [caidos, objetivos_luna.size(), akira.espiritu])
+
+
+# --- Textos aprobados y bestiario ---------------------------------------------------------------
+
+func _comprobar_textos() -> void:
+	var intro: String = " ".join(Datos.TEXTO_INTRO)
+	var cierre: String = " ".join(Datos.TEXTO_CIERRE)
+	_registrar("Los textos del capítulo 1 son los aprobados (shōgun Takeda, yōkai, luna roja)",
+		intro.contains("shōgun Takeda") and intro.contains("yōkai") and cierre.contains("luna brilla más roja"),
+		"intro: %d párrafos; cierre: %d" % [Datos.TEXTO_INTRO.size(), Datos.TEXTO_CIERRE.size()])
+
+
+func _abrir_galeria_prueba() -> void:
+	principal.alternar_pausa()            # la galería se abre desde la pausa
+	principal.abrir_galeria()
+
+
+func _comprobar_galeria_abierta() -> void:
+	var galeria = principal.galeria_abierta
+	var abierta: bool = galeria != null and not principal.juego.is_inside_tree() and not get_tree().paused
+	var paginas: int = galeria.paginas.size() if galeria else 0
+	var criaturas := 0
+	var piezas := 0
+	if galeria:
+		galeria._mostrar_pagina(2)            # la de las siete familias
+		criaturas = galeria.criaturas.size()
+		for c in galeria.criaturas:
+			piezas += c.piezas
+	_registrar("La galería de criaturas se abre desde la pausa y reparte páginas",
+		abierta and criaturas >= 7 and paginas >= 4 and piezas > 0,
+		"%d páginas; la tercera tiene %d criaturas y %d piezas" % [paginas, criaturas, piezas])
+	principal.cerrar_galeria(false)
+
+
+func _comprobar_galeria_cerrada() -> void:
+	var vuelta: bool = principal.galeria_abierta == null and principal.juego.is_inside_tree() and get_tree().paused
+	_registrar("Al cerrar la galería se vuelve a la pausa y el juego sigue entero",
+		vuelta and _juego().akira.vivo() and principal.hud.visible,
+		"en pausa=%s, juego en el árbol=%s" % [get_tree().paused, principal.juego.is_inside_tree()])
+	principal.alternar_pausa()            # reanuda
+
+
+func _leer_bestiario() -> Array:
+	var texto := FileAccess.get_file_as_string("res://datos/bestiario.json")
+	var datos = JSON.parse_string(texto)
+	return datos if datos is Array else []
+
+
+func _comprobar_bestiario() -> void:
+	var datos := _leer_bestiario()
+	var familias := ["bipedo", "cuadrupedo", "serpentino", "alado", "acuatico", "flotante", "artropodo"]
+	var tamanos := ["S", "M", "L", "XL"]
+	var mal := 0
+	var propios := 0
+	for e in datos:
+		if not (e.get("familia") in familias and e.get("tamano") in tamanos and int(e.get("sensibilidad", -1)) in [0, 1, 2]):
+			mal += 1
+		if e.get("modelado") == "propio":
+			propios += 1
+	_registrar("El catálogo del bestiario se carga y todos sus datos son válidos",
+		datos.size() >= 700 and mal == 0,
+		"%d criaturas (%d con modelo propio), %d con datos no válidos" % [datos.size(), propios, mal])
+
+
+# Construye cada criatura del catálogo (y sus rangos 2 y 3 en una de cada ocho) y mide el
+# presupuesto de piezas. Si alguna combinación de familia, tamaño y partes falla, se nota aquí.
+func _construir_todo_el_bestiario() -> void:
+	var datos := _leer_bestiario()
+	var aspecto = Aspecto.new()
+	var inicio := Time.get_ticks_msec()
+	var construidas := 0
+	var construcciones := 0
+	var piezas_rango1 := 0
+	var maximo_rango1 := 0
+	var maximo := 0
+	var sin_piezas := 0
+	for e in datos:
+		if e.get("tipo_entrada") == "no_criatura":
+			continue
+		var rangos := [1, 2, 3] if construidas % 8 == 0 else [1]
+		for rango in rangos:
+			var criatura = Criatura.new()
+			criatura.configurar(aspecto, {"familia": e.familia, "tamano": e.tamano, "elemento": e.elemento,
+				"rol": e.rol, "semilla": int(e.id), "rango": rango})
+			criatura.actualizar(0.1)
+			if criatura.piezas <= 0:
+				sin_piezas += 1
+			construcciones += 1
+			maximo = maxi(maximo, criatura.piezas)
+			if rango == 1:
+				piezas_rango1 += criatura.piezas
+				maximo_rango1 = maxi(maximo_rango1, criatura.piezas)
+			criatura.free()
+		construidas += 1
+	var media := float(piezas_rango1) / maxf(construidas, 1.0)
+	_registrar("Todas las criaturas del catálogo se construyen dentro del presupuesto de piezas",
+		construidas >= 700 and sin_piezas == 0 and maximo <= 80,
+		"%d criaturas (%d construcciones con los rangos 2 y 3 de 1 de cada 8) en %d ms; rango 1: media %.1f piezas, máximo %d; máximo con rangos: %d" % [
+			construidas, construcciones, Time.get_ticks_msec() - inicio, media, maximo_rango1, maximo])
 
 
 func _empezar_cuenta_anime() -> void:

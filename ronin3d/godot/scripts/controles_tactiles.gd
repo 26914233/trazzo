@@ -126,6 +126,8 @@ func _tocar(evento: InputEventScreenTouch) -> void:
 			if get_tree().paused:
 				if principal.hud.boton_animacion.get_global_rect().has_point(evento.position):
 					principal.alternar_estilo_animacion()
+				elif principal.hud.boton_galeria.get_global_rect().has_point(evento.position):
+					principal.abrir_galeria()
 				else:
 					principal.alternar_pausa()
 			else:
