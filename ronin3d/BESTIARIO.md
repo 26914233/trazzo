@@ -1,10 +1,13 @@
 # RONIN — Bestiario
 
-**Fecha:** 1 de octubre de 2026 · **Estado:** propuesta para revisar. Aplica tu DECISIÓN 4 del
-1-10-2026: los yōkai japoneses son el núcleo, con sus variantes; se añaden más criaturas, llegan
-criaturas de otras tierras y **Bahamut es el dragón**. Del bestiario, en el juego solo están los
-soldados de Genzo. Lo marcado **[propuesta]** lo decides tú. La historia que aparece aquí
-depende de la sinopsis (`HISTORIA.md`, DECISIÓN 8).
+**Fecha:** 1 de octubre de 2026 · **Estado:** DECISIÓN 4 y **DECISIÓN 10 (B) cerradas el 1-10-2026**:
+los yōkai japoneses son el núcleo, con sus variantes; las criaturas de otras tierras llegan a partir
+del capítulo 3 y **Bahamut es el dragón**. Del bestiario, en el juego solo están los soldados de
+Genzo. Lo marcado **[propuesta]** lo decides tú. La sinopsis (`HISTORIA.md`) está aprobada.
+
+**Para la escala grande** (el catálogo de 939 criaturas, con ángeles y demonios, la variante fuerte de
+cada una, el modelado y las imágenes en Colab) mira `BESTIARIO_UNIVERSAL.md`; los datos están en
+`bestiario/`. Este documento sigue siendo el de las fichas por capítulo.
 
 Etiquetas: **[Hecho]** leyenda o dato comprobado · **[Estimación]** cálculo con incertidumbre ·
 **[Opinión]** criterio del equipo · **[propuesta]** idea para el juego, por decidir.
@@ -228,7 +231,7 @@ capítulos.
 
 ## 9. Decisión que necesito de ti
 
-### DECISIÓN 10 — Cuándo llegan las criaturas de otras tierras
+### DECISIÓN 10 — Cuándo llegan las criaturas de otras tierras · **DECIDIDA el 1-10-2026: B**
 - **OPCIONES:**
   - A) desde el capítulo 1;
   - B) desde el capítulo 3, cuando despierta Bahamut;
@@ -245,3 +248,6 @@ capítulos.
 - **COSTE:** igual en las tres; cambia el orden, no el trabajo.
 - **RECOMENDACIÓN:** **B.**
 - **SIGUIENTE PASO:** fichas completas, como las del capítulo 1, de las criaturas del capítulo 2.
+- **Cómo quedó:** nada que no sea japonés aparece antes del capítulo 3. En el catálogo grande, el
+  capítulo 3 abre el continente y Oriente Próximo; el 4, Europa; el resto, tras el lanzamiento
+  (`BESTIARIO_UNIVERSAL.md` §7).

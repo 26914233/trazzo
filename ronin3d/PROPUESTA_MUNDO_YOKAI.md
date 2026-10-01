@@ -2,8 +2,9 @@
 
 **Fecha:** 1 de octubre de 2026 · **Estado:** propuesta del usuario analizada y **decisiones 2 a 7
 cerradas el mismo día** (resumen justo abajo). **Relación con el plan:** amplía
-`PLAN_PRODUCCION.md` (alcance C: núcleo + variaciones, lanzamiento por capítulos). **Siguen:**
-`HISTORIA.md` (sinopsis, DECISIONES 8 y 9) y `BESTIARIO.md` (DECISIÓN 10).
+`PLAN_PRODUCCION.md` (alcance C: núcleo + variaciones, lanzamiento por capítulos). **Cerradas
+después, el mismo día:** DECISIONES 8A y 9A (`HISTORIA.md`) y 10B (`BESTIARIO.md`). **Siguen
+abiertas:** 11 (el Silencio, en `HISTORIA.md`), 12, 13 y 14 (`BESTIARIO_UNIVERSAL.md`).
 
 Etiquetas: **[Hecho]** comprobado · **[Estimación]** cálculo con incertidumbre · **[Opinión]**
 criterio del equipo.
@@ -13,8 +14,8 @@ criterio del equipo.
 | Decisión | Resultado | Qué se hizo |
 | --- | --- | --- |
 | 2 · Combate | **B, precisión**, con el iaidō como forma visible | En el prototipo 0.3: iaidō (mantener y soltar al «!») y corte de luna |
-| 3 · Historia | **B**: Genzo pactó con el gran yōkai creyendo proteger Japón. Y **Takeda pasa a ser el shōgun** | Sinopsis para aprobar en `HISTORIA.md`; los textos del juego aún no cambian |
-| 4 · Bestiario | **B** (yōkai japoneses y sus variantes) **y además más criaturas**, con las de otras tierras y **Bahamut como el dragón** | `BESTIARIO.md` |
+| 3 · Historia | **B**: Genzo pactó con el gran yōkai creyendo proteger Japón. Y **Takeda pasa a ser el shōgun** | Sinopsis en `HISTORIA.md`, **aprobada** (8A); el gran yōkai es Tamamo-no-Mae (9A); los textos del capítulo 1 ya están cambiados en el juego |
+| 4 · Bestiario | **B** (yōkai japoneses y sus variantes) **y además más criaturas**, con las de otras tierras y **Bahamut como el dragón** | `BESTIARIO.md`; las de otras tierras llegan desde el capítulo 3 (10B). A escala grande: `BESTIARIO_UNIVERSAL.md` (939 criaturas) |
 | 5 · Escenas | **B**: ilustración 2D con tinta (pixel art solo para los recuerdos de Akira) | Herramienta encontrada: Higgsfield (0,15 créditos por imagen); conceptos en `arte/conceptos/` |
 | 6 · Animación | **C**, estilo anime limitado, a probar | Probado en el prototipo: 12 poses por segundo; **T** (o el botón de la pausa en el móvil) cambia a la suave para comparar. VRoid no se puede probar desde la nube: es un programa de escritorio para tu PC |
 | 7 · Farmeo automático | **C**: nada automático; la caza se juega | — |

@@ -419,8 +419,10 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
 
 - **Índice:** `ronin3d/LEEME.md` · **traspaso:** `ronin3d/HANDOFF_RONIN.md` · **plan:**
   `ronin3d/PLAN_PRODUCCION.md` · **especificación 3D:** `ronin3d/DISENO_3D.md` · **mundo
-  yōkai:** `ronin3d/PROPUESTA_MUNDO_YOKAI.md` · **sinopsis (por aprobar):** `ronin3d/HISTORIA.md`
-  · **bestiario:** `ronin3d/BESTIARIO.md`.
+  yōkai:** `ronin3d/PROPUESTA_MUNDO_YOKAI.md` · **sinopsis (aprobada):** `ronin3d/HISTORIA.md` ·
+  **bestiario por capítulos:** `ronin3d/BESTIARIO.md` · **bestiario universal (catálogo grande,
+  rangos, modelado y Colab):** `ronin3d/BESTIARIO_UNIVERSAL.md`, con los datos en
+  `ronin3d/bestiario/` y el cuaderno de Colab en `ronin3d/colab/`.
 - **Historia base (fija):**
   - Akira, guardia del shōgun Takeda, queda como ronin tras la traición; busca justicia por
     fuera y recuperar su honor por dentro.
@@ -428,9 +430,11 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
     pactar con el gran yōkai creyendo proteger Japón. No se ve como villano y parte del pueblo
     lo apoya.
   - Empieza y termina en el castillo de Hoshiyama.
-  - Que Takeda sea el shōgun y el pacto de Genzo los decidió el usuario el 01-10-2026. El resto
-    de la sinopsis (`HISTORIA.md`) está pendiente de su aprobación; hasta entonces los textos del
-    juego no cambian.
+  - Que Takeda sea el shōgun y el pacto de Genzo los decidió el usuario el 01-10-2026. Ese mismo
+    día aprobó la sinopsis completa (`HISTORIA.md`, DECISIÓN 8A) y que el gran yōkai es
+    **Tamamo-no-Mae** (9A); los textos del capítulo 1 ya la cuentan. Lo que sigue marcado
+    **[propuesta]** en `HISTORIA.md` (hoy, la capa del Silencio, DECISIÓN 11) no se aplica sin su
+    aprobación.
 - **Mapa:** castillo, aldea, templo, dojo, ruinas y la planicie que los une.
 - **Decisiones cerradas (27-09-2026):** motor **Godot 4.7** con el renderizador *Compatibility*;
   estética **cel-shading**; los textos de intro y cierre se quedan como están por ahora; alcance:
@@ -443,9 +447,25 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
     como dragón**;
   - escenas de historia en **ilustración 2D** (pixel art solo para recuerdos);
   - animación **estilo anime limitado** (en prueba);
-  - **sin farmeo automático**.
+  - **sin farmeo automático**;
+  - **8A** (sinopsis aprobada tal cual), **9A** (el gran yōkai es Tamamo-no-Mae) y **10B** (las
+    criaturas de otras tierras llegan desde el capítulo 3);
+  - **cada criatura tiene una variante más fuerte**, se añaden **ángeles y demonios** y el
+    gancho que el usuario quiere explorar es **la cantidad de monstruos** (el bestiario universal:
+    939 criaturas, 825 utilizables como enemigos). Cómo se presenta ese gancho es la DECISIÓN 12.
+- **Decisiones abiertas:** 11 (papel del Silencio, `HISTORIA.md` §8), 12 (gancho: cantidad frente a
+  precisión), 13 (cómo se modelan las criaturas icónicas) y 14 (cuántos rangos), más la regla de
+  respeto cultural (los dioses y seres sagrados de religiones vivas no son enemigos). Detalle y
+  recomendaciones en `ronin3d/BESTIARIO_UNIVERSAL.md`.
 - **Imágenes 2D:** Higgsfield por Composio, modelo `z_image`, a 0,15 créditos por imagen. Nunca
   se compran créditos ni planes sin que el usuario lo pida.
+- **Colab (imágenes del bestiario):** `ronin3d/colab/` (cuaderno y receta). Reglas del usuario: una
+  sesión de Claude aparte maneja Colab con colab-mcp; él elige la GPU T4 y acepta los permisos;
+  comprobar con `!ls` que `drive.mount` ve `Respaldos Claude/ronin` (si no, es la cuenta equivocada:
+  parar); a Drive solo salidas pequeñas (JPG de unos 250 KB, nunca pesos de modelos); sin Gradio, widgets
+  ni `files.upload()`; no actualizar paquetes por cuenta propia; no relanzar celdas largas; tokens
+  nunca en celdas ni en el chat; indicar duraciones y rutas. El catálogo se regenera con
+  `python3 ronin3d/herramientas/bestiario/unir_clasificacion.py ronin3d/bestiario/clasificacion ronin3d`.
 - **APK de prueba:** `ronin-<versión>-prueba.apk` en la raíz de la carpeta de Drive, como con
   Curtzz (la versión anterior pasa a «Versiones anteriores (RONIN)»). Cómo se genera:
   `ronin3d/godot/LEEME.md`, sección «Exportar». La clave de firma de prueba está en Drive ›

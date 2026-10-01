@@ -89,16 +89,47 @@ pulido será el primer capítulo (castillo + planicie + aldea).
   Está firmado con la misma clave, así que se instala encima de la 0.2, que pasó a
   «Versiones anteriores (RONIN)».
 
+**El 1-10-2026 (segunda parte):**
+
+- **Cerradas las decisiones 8A, 9A y 10B:** sinopsis aprobada tal cual (`HISTORIA.md`), el gran yōkai
+  es Tamamo-no-Mae y las criaturas de otras tierras llegan desde el capítulo 3. Los **textos del
+  capítulo 1** de `datos.gd` ya cuentan la historia nueva (prueba automática que los comprueba).
+- **Nueva entidad del Silencio** (nombre de trabajo *Shijima*): algo nacido de la oscuridad más callada,
+  donde ni los yōkai quieren entrar, que rompe el equilibrio. Ficha, avisos de diseño y concepto 2D en
+  `HISTORIA.md` §8 (`arte/conceptos/shijima.jpg`). **DECISIÓN 11 abierta** (recomendada B: gancho final y
+  rango «silenciado»).
+- **Catálogo de monstruos** (tus dos Excel, 998 filas): limpiado y clasificado a mano, criatura por
+  criatura, con la rúbrica de `bestiario/RUBRICA_CLASIFICACION.md`. Resultado: **808 criaturas distintas**
+  (no 1.000) + **132 añadidas** (17 huestes celestiales, 72 demonios del *Goetia* y 8 comunes, 35 yōkai y
+  aliados japoneses) = **939**, de ellas **825 utilizables como enemigos**. Datos en `bestiario/`
+  (`catalogo_limpio.csv/json`, `prompts_colab.csv`, `informe_calidad.md`); la fuente de verdad es
+  `bestiario/clasificacion/` + `herramientas/bestiario/criaturas_extra.py`, y todo se regenera con
+  `python3 ronin3d/herramientas/bestiario/unir_clasificacion.py ronin3d/bestiario/clasificacion ronin3d`.
+  Tus Excel originales están en Drive › `ronin/06-Bestiario/fuentes/` (no en GitHub).
+- **Análisis `BESTIARIO_UNIVERSAL.md`:** qué traía el catálogo, si la cantidad es un buen gancho, las tres
+  formas de modelar (propia 12 %, variante 72 %, reskin 16 %), la variante más fuerte (rangos), ángeles y
+  demonios, regla de respeto cultural, olas de contenido y trabajo estimado (≈ 4.200 h). **Decisiones
+  12, 13 y 14 abiertas.**
+- **Sistema modular de criaturas** `godot/scripts/criatura_modular.gd` y **galería** `galeria.gd` (pausa →
+  botón o **G**; `--galeria`). Las 929 criaturas construibles se construyen en 0,5 s, 20,5 piezas de
+  media.
+- **Cuaderno de Colab** `colab/bestiario_imagenes.ipynb` (+ receta `INSTRUCCIONES_COLAB_BESTIARIO.md`)
+  para dibujar las imágenes 2D con SDXL: el flujo está probado sin GPU, **la carga y difusión en una T4
+  no**. Las imágenes aún no están hechas.
+- **Prueba automática: 21 de 21.** **APK 0.4** (`ronin/ronin-0.4-prueba.apk`, 26,9 MB, SHA-256
+  `3e4d82c2…f4ec4633`, misma firma que la 0.2 y la 0.3).
+
 ## 3. En curso / pendiente del usuario
 
-1. **Probar el APK 0.3 en el móvil** y contar:
+1. **Probar el APK 0.4 en el móvil** y contar:
    - los FPS (meta ≥ 30);
    - si el iai (mantener y soltar) y el corte de luna se entienden;
-   - qué animación prefiere, anime o suave.
-2. **DECISIÓN 8** (aprobar la sinopsis de `HISTORIA.md` y los textos nuevos), **DECISIÓN 9**
-   (el gran yōkai) y **DECISIÓN 10** (cuándo llegan las criaturas de otras tierras, en
-   `BESTIARIO.md`).
-3. Si tiene el `samurai.py` original, subirlo.
+   - qué animación prefiere, anime o suave;
+   - **la galería de criaturas** (pausa → botón): FPS en la página 3 (7 criaturas) y en la 5 (24).
+2. **DECISIONES 11, 12, 13 y 14** (`HISTORIA.md` §8 y `BESTIARIO_UNIVERSAL.md`) y la regla de respeto
+   cultural (se aplica salvo veto).
+3. **Imágenes del bestiario en Colab:** ejecutar el cuaderno con la GPU T4 (o la sesión que maneja Colab).
+4. Si tiene el `samurai.py` original, subirlo.
 
 ## 4. Siguiente
 
@@ -111,8 +142,8 @@ pulido será el primer capítulo (castillo + planicie + aldea).
    - menú y guardado (en estatuas jizō);
    - música.
    El detalle (luces, sombras, enemigos) se ajusta a los FPS que dé su móvil.
-2. Si aprueba la DECISIÓN 8: cambiar los textos de `datos.gd` («señor» pasa a «shōgun», yōkai en
-   el patio).
+2. Medir 10 criaturas reales con el sistema (patrones de ataque, equilibrio y tiempo por criatura): es
+   la prueba que valida o tumba el gancho de la cantidad (`BESTIARIO_UNIVERSAL.md` §10).
 3. Personajes con esqueleto para la animación estilo anime (DECISIÓN 6). Probar VRoid Studio en
    su PC; desde la nube no se puede, porque es un programa de escritorio.
 4. Buscar nombre o subtítulo propio antes de cualquier página de tienda.
@@ -127,14 +158,16 @@ pulido será el primer capítulo (castillo + planicie + aldea).
 | El juego | `ronin3d/godot/` (LEEME con controles, combate, exportación y prueba) |
 | Plan | `ronin3d/PLAN_PRODUCCION.md` |
 | Mundo yōkai (decisiones 2-7) | `ronin3d/PROPUESTA_MUNDO_YOKAI.md` |
-| Sinopsis (por aprobar) | `ronin3d/HISTORIA.md` |
-| Bestiario | `ronin3d/BESTIARIO.md` |
+| Sinopsis (aprobada) y el Silencio | `ronin3d/HISTORIA.md` |
+| Bestiario por capítulos | `ronin3d/BESTIARIO.md` |
+| Bestiario universal (análisis y decisiones 12-14) | `ronin3d/BESTIARIO_UNIVERSAL.md` · datos en `ronin3d/bestiario/` · Drive `ronin/06-Bestiario/` |
+| Colab (imágenes del bestiario) | `ronin3d/colab/` · Drive `ronin/06-Bestiario/` y la carpeta de Colab del usuario |
 | Conceptos 2D | `ronin3d/arte/conceptos/` (JPG) · Drive `ronin/05-Arte/conceptos-2d/` (PNG originales) |
 | Comparativa | `ronin3d/COMPARATIVA.md` · página privada https://claude.ai/artifact/6urV5FCikt9CWAUV35gBCu |
 | Capturas de hoy | `ronin3d/capturas/actual/` |
 | Clave de firma de prueba | Drive `Respaldos Claude/ronin/03-Godot/firma-prueba/` (privada; nunca en GitHub) |
-| APK de prueba | Drive `Respaldos Claude/ronin/ronin-0.3-prueba.apk` (como con Curtzz: el nuevo va en la raíz con el nombre `ronin-<versión>-prueba.apk` y el anterior pasa a la carpeta «Versiones anteriores (RONIN)», dentro de `ronin/`) |
-| Respaldo | Google Drive `Respaldos Claude/ronin/` (01-Diseno, 02-Prototipo-2D, 03-Godot, 04-Otros-motores, 05-Arte, Versiones anteriores (RONIN)) |
+| APK de prueba | Drive `Respaldos Claude/ronin/ronin-0.4-prueba.apk` (como con Curtzz: el nuevo va en la raíz con el nombre `ronin-<versión>-prueba.apk` y el anterior pasa a la carpeta «Versiones anteriores (RONIN)», dentro de `ronin/`) |
+| Respaldo | Google Drive `Respaldos Claude/ronin/` (01-Diseno, 02-Prototipo-2D, 03-Godot, 04-Otros-motores, 05-Arte, 06-Bestiario, Versiones anteriores (RONIN)) |
 | Memoria | Vertiso Memory, handoff con ámbito `ronin-juego` |
 
 **Cómo pasar esto a un proyecto de Claude:** en claude.ai, abre el proyecto de RONIN y añade a
@@ -153,8 +186,9 @@ decisiones son: …». Si el chat tiene Vertiso Memory, el traspaso también est
     tras **pactar con el gran yōkai** creyendo proteger Japón. No se ve como villano y parte del
     pueblo lo apoya.
   - Empieza y termina en el castillo de Hoshiyama.
-  - La sinopsis completa (`HISTORIA.md`) está **pendiente de aprobación**. Los textos del juego
-    siguen diciendo «señor Takeda» hasta entonces.
+  - La sinopsis completa (`HISTORIA.md`) quedó **aprobada el 1-10-2026** (8A, y el gran yōkai es
+    Tamamo-no-Mae, 9A); los textos del capítulo 1 ya la cuentan. Lo único abierto es la capa del Silencio
+    (DECISIÓN 11).
 - **Riesgos del plan:** alcance (seis géneros), combate poco profundo, controles táctiles para
   combate 3D, personajes hechos de piezas, rendimiento en móvil, nombre poco distintivo.
 - **Reglas de trabajo:** todo en español, nombres de variables en español; el usuario marca la

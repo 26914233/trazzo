@@ -1,7 +1,7 @@
 # RONIN — Plan de producción
 
 **Fecha:** 27 de septiembre de 2026 (actualizado el 1 de octubre de 2026) · **Fase actual:**
-prototipo 0.3 (capítulo 1 jugable en Godot 4.7, cel-shading, iaidō y animación estilo anime) ·
+prototipo 0.4 (capítulo 1 jugable en Godot 4.7, cel-shading, iaidō, animación estilo anime y galería de criaturas) ·
 **Alcance:** núcleo + variaciones y lanzamiento por capítulos (decidido: opción C) · **Combate:**
 precisión con iaidō (decidido: opción B) · **Siguiente hito:** vertical slice, base del primer
 capítulo.
@@ -203,3 +203,38 @@ nada público sin tu permiso.
    onibi) en `arte/conceptos/`.
 7. **`HISTORIA.md`** (sinopsis para aprobar: DECISIONES 8 y 9) y **`BESTIARIO.md`** (más de 50
    criaturas por capítulos, fichas del capítulo 1 y DECISIÓN 10).
+
+## 12. Hecho el 1-10-2026 (segunda parte)
+
+1. **Cerradas las decisiones 8A, 9A y 10B:** sinopsis aprobada tal cual (`HISTORIA.md`), el gran yōkai es
+   Tamamo-no-Mae y las criaturas de otras tierras llegan desde el capítulo 3. Los **textos del capítulo
+   1** ya cuentan la historia nueva (shōgun Takeda, yōkai, luna roja); prueba automática nueva que los
+   comprueba.
+2. **Catálogo de monstruos:** los dos Excel que pasaste (998 filas) se limpiaron y se clasificaron
+   criatura por criatura: **808 distintas** (no 1.000), más **132 añadidas** (ángeles, los 72 demonios del
+   *Goetia*, yōkai que faltaban y aliados) = **939**, de las que **825 son utilizables como enemigos**.
+   Datos en `bestiario/`, análisis y decisiones 12-14 en `BESTIARIO_UNIVERSAL.md`.
+3. **Variante más fuerte de cada criatura** (alfa) y una tercera, la **silenciada**, ligada al Silencio
+   (`HISTORIA.md` §8, DECISIÓN 11): 825 enemigos, 1.650 con el alfa, 2.475 con los tres rangos.
+4. **Sistema modular de criaturas** (`godot/scripts/criatura_modular.gd`): 7 familias de cuerpo, 4
+   tamaños, 11 elementos y piezas. Las 929 criaturas se construyen (20,5 piezas de media). Se ven en la
+   **galería** del juego (pausa → botón, o **G**).
+5. **Entidad nueva del Silencio** (Shijima) propuesta con concepto 2D y avisos de diseño.
+6. **Cuaderno de Colab** para dibujar las 2D del bestiario (`colab/`): probado sin GPU, **sin probar en
+   una T4**.
+7. **Prueba automática: 21 de 21** (antes 16). **APK 0.4** (`ronin-0.4-prueba.apk`).
+
+### Decisiones pendientes de esta ronda
+
+| # | Decisión | Dónde | Recomendación |
+| --- | --- | --- | --- |
+| 11 | Qué papel tiene el Silencio | `HISTORIA.md` §8 | B: gancho final y rango silenciado |
+| 12 | El gancho del juego (cantidad frente a precisión) | `BESTIARIO_UNIVERSAL.md` §2 | B: precisión + cantidad |
+| 13 | Cómo se modelan las icónicas | `BESTIARIO_UNIVERSAL.md` §8 | C: híbrido, con prueba de 10 |
+| 14 | Cuántos rangos | `BESTIARIO_UNIVERSAL.md` §4 | B: base, alfa y silenciada |
+| — | Regla de respeto cultural | `BESTIARIO_UNIVERSAL.md` §6 | Aplicarla salvo veto |
+
+**Riesgo nuevo [Opinión]:** la cantidad de criaturas es un buen gancho de marketing, pero el cuello de
+botella no es el modelo sino el comportamiento y el equilibrio de cada una (más de un tercio de las horas
+estimadas). Por eso la recomendación es medir 10 criaturas reales antes de prometer cifras.
+
