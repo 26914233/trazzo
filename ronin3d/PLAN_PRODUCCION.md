@@ -215,7 +215,7 @@ nada público sin tu permiso.
    *Goetia*, yōkai que faltaban y aliados) = **939**, de las que **825 son utilizables como enemigos**.
    Datos en `bestiario/`, análisis y decisiones 12-14 en `BESTIARIO_UNIVERSAL.md`.
 3. **Variante más fuerte de cada criatura** (alfa) y una tercera, la **silenciada**, ligada al Silencio
-   (`HISTORIA.md` §8, DECISIÓN 11): 825 enemigos, 1.650 con el alfa, 2.475 con los tres rangos.
+   (`HISTORIA.md` §8, DECISIÓN 11): 825 criaturas; 1.650 enemigos con el alfa y 2.475 con los tres rangos (cuentan variantes, no criaturas distintas).
 4. **Sistema modular de criaturas** (`godot/scripts/criatura_modular.gd`): 7 familias de cuerpo, 4
    tamaños, 11 elementos y piezas. Las 929 criaturas se construyen (20,5 piezas de media). Se ven en la
    **galería** del juego (pausa → botón, o **G**).

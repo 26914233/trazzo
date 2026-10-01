@@ -192,7 +192,8 @@ def main():
         f"- Criaturas añadidas (ángeles, infierno, yōkai que faltaban, aliados): **{total - len(de_catalogo)}**.",
         f"- Total en el bestiario: **{total}**; de ellas, criaturas con identidad propia: **{len(criaturas)}**.",
         f"- Utilizables como enemigos (criatura o genérica, sensibilidad 0–1): **{len(utilizables)}**.",
-        f"- Con su variante fuerte (rango 2): **{2 * len(utilizables)}** enemigos; con la silenciada (rango 3): **{3 * len(utilizables)}**.",
+        f"- Con su variante fuerte (rango 2): **{2 * len(utilizables)}** enemigos; con la silenciada (rango 3): **{3 * len(utilizables)}**. "
+        "Cuentan variantes, no criaturas distintas: la cifra honesta es la de arriba.",
         "",
         tabla("Tipo de entrada", contar(filas, "tipo_entrada"), total),
         "",

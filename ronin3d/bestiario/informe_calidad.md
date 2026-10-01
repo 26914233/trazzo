@@ -4,7 +4,7 @@
 - Criaturas añadidas (ángeles, infierno, yōkai que faltaban, aliados): **132**.
 - Total en el bestiario: **939**; de ellas, criaturas con identidad propia: **699**.
 - Utilizables como enemigos (criatura o genérica, sensibilidad 0–1): **825**.
-- Con su variante fuerte (rango 2): **1650** enemigos; con la silenciada (rango 3): **2475**.
+- Con su variante fuerte (rango 2): **1650** enemigos; con la silenciada (rango 3): **2475**. Cuentan variantes, no criaturas distintas: la cifra honesta es la de arriba.
 
 | Tipo de entrada | Criaturas | % |
 | --- | ---: | ---: |

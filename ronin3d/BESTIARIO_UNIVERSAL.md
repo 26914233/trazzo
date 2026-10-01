@@ -44,8 +44,9 @@ mecánica. Y añadí **132 criaturas** que no estaban (ver §5).
 
 Dicho claro: tu catálogo tiene **808 criaturas distintas, no 1.000** (una, el *Oni*, es el mismo oni
 rojo que yo añadí como *Aka-oni*, así que se fundieron: el total es 939); con las añadidas, 825
-son utilizables como enemigos. Con la variante fuerte de cada una son **1.650** enemigos distintos
-y con la silenciada, **2.475**. Esas son las cifras que se pueden decir en público sin mentir.
+son utilizables como enemigos. Con la variante fuerte de cada una salen **1.650** enemigos y con la silenciada,
+**2.475**, pero esos dos números cuentan variantes, no criaturas. **La cifra honesta para decir en público es
+«825 criaturas, cada una con su variante fuerte»**; llamar «2.475 monstruos» a lo mismo con otro color sería inflar.
 
 ---
 
