@@ -1,6 +1,10 @@
 # Sensación de combate: pausa de impacto (el juego se congela un instante al golpear),
-# cámara lenta en las paradas, sacudida de cámara, chispas y sonidos.
+# cámara lenta en el iai perfecto, sacudida de cámara, chispas, sonidos, cuadros de
+# impacto en tinta y la secuencia del corte de luna.
 extends Node3D
+
+const Datos := preload("res://scripts/datos.gd")
+const Tinta := preload("res://scripts/tinta.gd")
 
 const SONIDOS := {
 	"tajo": preload("res://sonidos/tajo.wav"),
@@ -20,6 +24,11 @@ var azar := RandomNumberGenerator.new()
 var congelado := 0.0                  # segundos reales que quedan de pausa de impacto
 var lento := 0.0                      # segundos reales que quedan de cámara lenta
 var escala_lenta := 1.0
+var tinta
+var luna_restante := 0.0              # segundos reales que quedan del corte de luna
+var luna_al_cortar: Callable
+var luna_cortado := false
+var luna_cortes_sonados := 0
 
 
 func _ready() -> void:
@@ -31,6 +40,8 @@ func _ready() -> void:
 		voz.max_distance = 60.0
 		add_child(voz)
 		voces.append(voz)
+	tinta = Tinta.new()
+	add_child(tinta)
 
 
 func _exit_tree() -> void:
@@ -42,9 +53,12 @@ func _process(delta: float) -> void:
 	var real := delta / maxf(Engine.time_scale, 0.001)
 	congelado = maxf(0.0, congelado - real)
 	lento = maxf(0.0, lento - real)
+	tinta.actualizar(real)
 	if get_tree().paused:
 		return
-	if congelado > 0.0:
+	if luna_restante > 0.0:
+		_avanzar_luna(real)
+	elif congelado > 0.0:
 		Engine.time_scale = 0.05
 	elif lento > 0.0:
 		Engine.time_scale = escala_lenta
@@ -125,12 +139,72 @@ func golpe(punto: Vector3, mortal: bool) -> void:
 		sonar("caida", punto, -3.0)
 
 
-func parada(punto: Vector3) -> void:
-	pausa_de_impacto(0.09)
-	camara_lenta(0.35, 0.45)
-	sacudir(0.25)
-	chispas(punto, 34, Color(0.75, 0.85, 1.0), 6.5)
+func desenvaine(punto: Vector3) -> void:
+	sonar("tajo", punto, -2.0, 0.05)
+
+
+# Iai perfecto: la lanza rebota en la hoja y el rival cae de un corte.
+func iai_perfecto(punto: Vector3) -> void:
+	pausa_de_impacto(0.12)
+	camara_lenta(0.3, 0.55)
+	sacudir(0.5)
+	tinta.impacto(0.1)
+	chispas(punto, 40, Color(0.75, 0.85, 1.0), 7.0)
 	sonar("parada", punto, 2.0, 0.04)
+	sonar("golpe", punto)
+	sonar("caida", punto, -3.0)
+
+
+# Corte de luna: el mundo se congela en tinta, aparecen los cortes uno tras otro y, al
+# final, todo lo cortado cae a la vez. «al_cortar» aplica el daño en ese momento.
+func corte_de_luna(puntos: Array, al_cortar: Callable) -> void:
+	var pantalla: Array = []
+	var camara3d: Camera3D = camara.camara
+	for punto in puntos:
+		if not camara3d.is_position_behind(punto):
+			pantalla.append(camara3d.unproject_position(punto))
+	tinta.preparar_cortes(pantalla, azar)
+	luna_restante = Datos.DURACION_CORTE_LUNA
+	luna_al_cortar = al_cortar
+	luna_cortado = false
+	luna_cortes_sonados = 0
+	sonar("aviso", camara.global_position, 0.0, 0.0)
+
+
+func luna_progreso() -> float:
+	return 1.0 - luna_restante / Datos.DURACION_CORTE_LUNA if luna_restante > 0.0 else 0.0
+
+
+func _avanzar_luna(real: float) -> void:
+	luna_restante = maxf(0.0, luna_restante - real)
+	var t := 1.0 - luna_restante / Datos.DURACION_CORTE_LUNA
+	# 0-0,18: entra la tinta · 0,18-0,68: aparecen los cortes · 0,68: todo cae · luego se apaga.
+	var cortes := clampf((t - 0.18) / 0.5, 0.0, 1.0)
+	if t < 0.68:
+		tinta.fuerza = clampf(t / 0.18, 0.0, 1.0)
+		tinta.poner_cortes(cortes, 1.0)
+		var sonados := int(cortes * 6.0)
+		while luna_cortes_sonados < sonados:
+			luna_cortes_sonados += 1
+			sonar("tajo", camara.global_position, -4.0, 0.15)
+		Engine.time_scale = 0.02
+	else:
+		if not luna_cortado:
+			luna_cortado = true
+			tinta.impacto(0.12)
+			sacudir(0.8)
+			sonar("golpe", camara.global_position, 2.0)
+			sonar("caida", camara.global_position, 0.0)
+			if luna_al_cortar.is_valid():
+				luna_al_cortar.call()
+		var salida := clampf((t - 0.68) / 0.32, 0.0, 1.0)
+		tinta.fuerza = 1.0 - salida
+		tinta.poner_cortes(1.0, 1.0 - salida)
+		Engine.time_scale = 0.35
+	if luna_restante <= 0.0:
+		tinta.fuerza = 0.0
+		tinta.poner_cortes(1.0, 0.0)
+		Engine.time_scale = 1.0
 
 
 func herido(punto: Vector3) -> void:

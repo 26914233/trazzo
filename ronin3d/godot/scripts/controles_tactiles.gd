@@ -1,6 +1,6 @@
 # Controles táctiles para el móvil: joystick a la izquierda (en el borde, corre), botones
-# de atacar y saltar a la derecha, arrastrar por el resto de la pantalla para girar la
-# cámara, botón de pausa arriba y tocar para seguir en los textos.
+# de atacar, iai, corte de luna y saltar a la derecha, arrastrar por el resto de la
+# pantalla para girar la cámara, botón de pausa arriba y tocar para seguir en los textos.
 # Solo aparecen en pantallas táctiles (o con la opción --tactil para probarlos en el PC).
 extends CanvasLayer
 
@@ -29,6 +29,13 @@ class Dibujo extends Control:
 			var pulsado: bool = boton.dedo >= 0
 			draw_circle(boton.centro, boton.radio, Color(0.75, 0.2, 0.16, 0.7) if pulsado else fondo)
 			draw_arc(boton.centro, boton.radio, 0.0, TAU, 40, tinta, 3.0, true)
+			if nombre == "especial":
+				# El botón de la luna se llena con el espíritu; lleno, brilla en dorado.
+				var espiritu: float = mando.espiritu
+				var dorado := Color(0.89, 0.73, 0.38, 0.95)
+				if espiritu >= 1.0:
+					draw_circle(boton.centro, boton.radio - 4.0, Color(0.89, 0.73, 0.38, 0.45))
+				draw_arc(boton.centro, boton.radio + 5.0, -PI / 2.0, -PI / 2.0 + TAU * espiritu, 40, dorado, 6.0, true)
 			var ancho: float = mando.fuente.get_string_size(boton.texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x
 			draw_string(mando.fuente, boton.centro + Vector2(-ancho / 2.0, 8.0), boton.texto,
 				HORIZONTAL_ALIGNMENT_LEFT, -1, 22, tinta)
@@ -43,6 +50,7 @@ var dedo_joystick := -1
 var centro_joystick := Vector2.ZERO
 var vector := Vector2.ZERO
 var dedo_camara := -1
+var espiritu := 0.0
 
 
 func _ready() -> void:
@@ -78,10 +86,20 @@ func _colocar_botones() -> void:
 	var pantalla := get_viewport().get_visible_rect().size
 	botones = {
 		"atacar": {"centro": pantalla - Vector2(150, 150), "radio": 72.0, "texto": "Atacar", "accion": "atacar", "dedo": -1},
-		"parar": {"centro": pantalla - Vector2(150, 330), "radio": 56.0, "texto": "Parar", "accion": "parar", "dedo": -1},
+		"parar": {"centro": pantalla - Vector2(150, 330), "radio": 56.0, "texto": "Iai", "accion": "parar", "dedo": -1},
+		"especial": {"centro": pantalla - Vector2(310, 250), "radio": 50.0, "texto": "Luna", "accion": "especial", "dedo": -1},
 		"saltar": {"centro": pantalla - Vector2(300, 90), "radio": 56.0, "texto": "Saltar", "accion": "saltar", "dedo": -1},
 		"pausa": {"centro": Vector2(pantalla.x - 60, 110), "radio": 34.0, "texto": "II", "accion": "", "dedo": -1},
 	}
+
+
+func _process(_delta: float) -> void:
+	if not activo or principal == null or principal.juego == null:
+		return
+	var actual: float = principal.juego.akira.espiritu
+	if actual != espiritu:
+		espiritu = actual
+		dibujo.queue_redraw()
 
 
 func _jugando() -> bool:
@@ -102,10 +120,14 @@ func _input(evento: InputEvent) -> void:
 
 func _tocar(evento: InputEventScreenTouch) -> void:
 	if not _jugando():
-		# En los textos o en pausa, tocar la pantalla equivale a ENTER (o a continuar).
+		# En los textos o en pausa, tocar la pantalla equivale a ENTER (o a continuar). En la
+		# pausa, el botón de la animación la cambia entre anime y suave.
 		if not evento.pressed:
 			if get_tree().paused:
-				principal.alternar_pausa()
+				if principal.hud.boton_animacion.get_global_rect().has_point(evento.position):
+					principal.alternar_estilo_animacion()
+				else:
+					principal.alternar_pausa()
 			else:
 				principal.aceptar()
 		_soltar_todo()

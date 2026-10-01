@@ -418,16 +418,34 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
 # RONIN: estado y decisiones
 
 - **Índice:** `ronin3d/LEEME.md` · **traspaso:** `ronin3d/HANDOFF_RONIN.md` · **plan:**
-  `ronin3d/PLAN_PRODUCCION.md` · **especificación 3D:** `ronin3d/DISENO_3D.md`.
-- **Historia base (fija):** Akira, guardia del señor Takeda, queda como ronin tras la traición;
-  busca justicia por fuera y recuperar su honor por dentro. El general Genzo, mano derecha de
-  Takeda, lo asesinó creyéndolo demasiado blando; no se ve como villano y parte del pueblo lo
-  apoya. Empieza y termina en el castillo de Hoshiyama.
+  `ronin3d/PLAN_PRODUCCION.md` · **especificación 3D:** `ronin3d/DISENO_3D.md` · **mundo
+  yōkai:** `ronin3d/PROPUESTA_MUNDO_YOKAI.md` · **sinopsis (por aprobar):** `ronin3d/HISTORIA.md`
+  · **bestiario:** `ronin3d/BESTIARIO.md`.
+- **Historia base (fija):**
+  - Akira, guardia del shōgun Takeda, queda como ronin tras la traición; busca justicia por
+    fuera y recuperar su honor por dentro.
+  - El general Genzo, mano derecha de Takeda, lo asesinó creyéndolo demasiado blando, tras
+    pactar con el gran yōkai creyendo proteger Japón. No se ve como villano y parte del pueblo
+    lo apoya.
+  - Empieza y termina en el castillo de Hoshiyama.
+  - Que Takeda sea el shōgun y el pacto de Genzo los decidió el usuario el 01-10-2026. El resto
+    de la sinopsis (`HISTORIA.md`) está pendiente de su aprobación; hasta entonces los textos del
+    juego no cambian.
 - **Mapa:** castillo, aldea, templo, dojo, ruinas y la planicie que los une.
 - **Decisiones cerradas (27-09-2026):** motor **Godot 4.7** con el renderizador *Compatibility*;
   estética **cel-shading**; los textos de intro y cierre se quedan como están por ahora; alcance:
   **un núcleo (duelo + exploración) con cada lugar como variación y lanzamiento por capítulos**
   (opción C), empezando por castillo + planicie + aldea.
+- **Decisiones cerradas (01-10-2026):**
+  - combate de **precisión con iaidō**;
+  - Japón en la era de los **yōkai**;
+  - bestiario de yōkai japoneses con variantes, más criaturas, las de otras tierras y **Bahamut
+    como dragón**;
+  - escenas de historia en **ilustración 2D** (pixel art solo para recuerdos);
+  - animación **estilo anime limitado** (en prueba);
+  - **sin farmeo automático**.
+- **Imágenes 2D:** Higgsfield por Composio, modelo `z_image`, a 0,15 créditos por imagen. Nunca
+  se compran créditos ni planes sin que el usuario lo pida.
 - **APK de prueba:** `ronin-<versión>-prueba.apk` en la raíz de la carpeta de Drive, como con
   Curtzz (la versión anterior pasa a «Versiones anteriores (RONIN)»). Cómo se genera:
   `ronin3d/godot/LEEME.md`, sección «Exportar». La clave de firma de prueba está en Drive ›

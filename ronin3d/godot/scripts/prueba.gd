@@ -2,9 +2,12 @@
 # en ronin3d/capturas/actual/. Se lanza así (sin ventana, con Xvfb en Linux):
 #   godot --path ronin3d/godot --rendering-driver opengl3 --fixed-fps 30 -- --prueba
 # Sale con código 0 si todo fue bien y 1 si algo falló.
+# Con la variable de entorno RONIN_FOTOGRAMAS=<carpeta>, guarda además los fotogramas del
+# iai perfecto y del corte de luna (para hacer GIF).
 extends Node
 
 const Datos := preload("res://scripts/datos.gd")
+const VisualModelo := preload("res://scripts/visual_modelo.gd")
 const MOVIMIENTOS := ["mover_adelante", "mover_atras", "mover_izquierda", "mover_derecha"]
 
 var principal
@@ -28,8 +31,14 @@ var medida_inicio_cuadros := 0
 var fps_medidos := 0.0
 var rival_parada = null
 var parada_pulsada := false
-var parada_vista := false
+var parada_soltada := false
 var parada_temprana := false
+var iai_visto := false
+var objetivos_luna: Array = []
+var luna_lanzada := false
+var luna_capturada := false
+var cuenta_anime := 0
+var carpeta_fotogramas := OS.get_environment("RONIN_FOTOGRAMAS")
 
 
 func _ready() -> void:
@@ -74,10 +83,15 @@ func _ready() -> void:
 		[21.4, _terminar_mando],
 		[21.6, _preparar_parada],
 		[23.2, _comprobar_parada],
-		[23.8, _comprobar_contraataque],
-		[24.0, _preparar_parada_temprana],
-		[25.8, _comprobar_parada_temprana],
-		[26.0, _terminar],
+		[23.4, _preparar_parada_temprana],
+		[25.2, _comprobar_parada_temprana],
+		[25.4, _preparar_corte_luna],
+		[25.7, _lanzar_corte_luna],
+		[27.5, _comprobar_corte_luna],
+		[27.7, _empezar_cuenta_anime],
+		[28.7, _cambiar_a_suave],
+		[29.7, _comprobar_animacion],
+		[29.9, _terminar],
 	]
 
 
@@ -93,6 +107,9 @@ func _process(delta: float) -> void:
 		indice += 1
 	if rival_parada != null:
 		_paso_parada()
+	if luna_lanzada and not luna_capturada and _juego().efectos.luna_progreso() > 0.5:
+		luna_capturada = true
+		_capturar("corte_luna")
 	if combate_activo:
 		_paso_combate()
 	elif direccion_caminar != Vector3.ZERO:
@@ -168,6 +185,19 @@ func _capturar(nombre: String) -> void:
 	var ruta := carpeta.path_join(prefijo + nombre + ".png")
 	imagen.save_png(ruta)
 	print("Captura: ", ruta)
+
+
+# Guarda «cuadros» fotogramas seguidos a 640 × 360, solo si se pidió con RONIN_FOTOGRAMAS.
+func _grabar(nombre: String, cuadros: int) -> void:
+	if carpeta_fotogramas == "":
+		return
+	var destino := carpeta_fotogramas.path_join(nombre)
+	DirAccess.make_dir_recursive_absolute(destino)
+	for i in cuadros:
+		await RenderingServer.frame_post_draw
+		var imagen := get_viewport().get_texture().get_image()
+		imagen.resize(640, 360, Image.INTERPOLATE_BILINEAR)
+		imagen.save_png(destino.path_join("%03d.png" % i))
 
 
 # --- Pasos de la prueba ------------------------------------------------------------------
@@ -363,10 +393,14 @@ func _terminar_mando() -> void:
 	_registrar("El stick del mando mueve a Akira", recorrido > 2.0, "recorrió %.1f m" % recorrido)
 
 
-# --- Parada (combate de precisión) --------------------------------------------------------
+# --- Iaidō (combate de precisión) ---------------------------------------------------------
 
 func _preparar_parada() -> void:
-	# Un soldado se acerca a atacar; Akira para justo antes de la estocada y contraataca.
+	# Un soldado se acerca a atacar; Akira se pone en postura al ver el «!» y suelta justo
+	# antes de la estocada: iai perfecto.
+	_juego().akira.paro.connect(_al_iai)
+	principal.hud.tiempo_ayuda = -1.0              # sin texto de ayuda en las tomas del combate
+	principal.hud.etiqueta_ayuda.modulate.a = 0.0
 	_preparar_parada_con(_juego().soldados[2])
 
 
@@ -375,7 +409,8 @@ func _preparar_parada_con(soldado) -> void:
 	rival_parada = soldado
 	var akira = juego.akira
 	akira.vida = Datos.VIDA_MAXIMA
-	akira.invulnerable = 0.0          # si la parada falla, Akira pierde vida
+	akira.invulnerable = 0.0          # si el iai falla, Akira pierde vida
+	juego.camara.distancia = 7.5      # más cerca, para ver el corte en las capturas
 	var hacia: Vector3 = Vector3(1, 0, 0)
 	_teletransportar(rival_parada.global_position - hacia * 1.5, hacia)
 	rival_parada.process_mode = Node.PROCESS_MODE_INHERIT
@@ -386,27 +421,26 @@ func _paso_parada() -> void:
 		return
 	var info: Dictionary = rival_parada.info()
 	var momento := 0.45 if parada_temprana else 0.14    # a destiempo: nada más ver el «!»
-	if not parada_pulsada and info.aviso and rival_parada.temporizador <= momento:
-		_pulsar("parar")
+	if not parada_pulsada and info.aviso:
+		_enviar_accion("parar", true)                    # postura: mantener
 		parada_pulsada = true
-	if not parada_vista and rival_parada.sin_guardia:
-		parada_vista = true
-		_capturar("parada")
+		_grabar("iai_destiempo" if parada_temprana else "iai", 54)
+	if parada_pulsada and not parada_soltada and info.aviso and rival_parada.temporizador <= momento:
+		_enviar_accion("parar", false)                   # soltar: desenvaine
+		parada_soltada = true
+
+
+func _al_iai(_atacante) -> void:
+	iai_visto = true
+	_capturar("iai")
 
 
 func _comprobar_parada() -> void:
 	var akira = _juego().akira
-	_registrar("Parar justo al «!» desvía la lanza y deja al soldado sin guardia",
-		parada_vista and akira.vida == Datos.VIDA_MAXIMA,
-		"sin guardia=%s, vida de Akira=%d" % [parada_vista, akira.vida])
-	akira.mirando = (rival_parada.global_position - akira.global_position).normalized() if is_instance_valid(rival_parada) else akira.mirando
-	_pulsar("atacar")
-
-
-func _comprobar_contraataque() -> void:
 	var derribado: bool = not is_instance_valid(rival_parada) or not rival_parada.vivo()
-	_registrar("El contraataque tras la parada lo derriba de un golpe", derribado,
-		"derrotados=%d" % _juego().derrotados)
+	_registrar("Iai perfecto: soltar justo al «!» desvía la lanza y derriba al soldado de un corte",
+		iai_visto and derribado and akira.vida == Datos.VIDA_MAXIMA and akira.espiritu >= Datos.ESPIRITU_POR_IAI,
+		"derribado=%s, vida de Akira=%d, espíritu=%.1f" % [derribado, akira.vida, akira.espiritu])
 	rival_parada = null
 	_proteger(true)
 
@@ -414,17 +448,72 @@ func _comprobar_contraataque() -> void:
 func _preparar_parada_temprana() -> void:
 	parada_temprana = true
 	parada_pulsada = false
-	parada_vista = false
+	parada_soltada = false
+	iai_visto = false
 	_preparar_parada_con(_juego().soldados[3])
 
 
 func _comprobar_parada_temprana() -> void:
 	var akira = _juego().akira
 	var herido: bool = akira.vida < Datos.VIDA_MAXIMA
-	_registrar("Parar a destiempo no sirve: la lanza alcanza a Akira", herido and not parada_vista,
-		"vida de Akira=%d, sin guardia=%s" % [akira.vida, parada_vista])
+	var sigue: bool = is_instance_valid(rival_parada) and rival_parada.vivo()
+	_registrar("Soltar a destiempo no sirve: la lanza alcanza a Akira", herido and sigue and not iai_visto,
+		"vida de Akira=%d, soldado en pie=%s" % [akira.vida, sigue])
 	rival_parada = null
 	_proteger(true)
+
+
+# --- Corte de luna y animación ---------------------------------------------------------------
+
+func _preparar_corte_luna() -> void:
+	var juego = _juego()
+	var akira = juego.akira
+	_proteger(true)
+	juego.camara.distancia = 9.0
+	_teletransportar(Vector3(10, 0, 0), Vector3.RIGHT)
+	objetivos_luna = juego.soldados_vivos().slice(0, 2)
+	for i in objetivos_luna.size():
+		objetivos_luna[i].global_position = akira.global_position + Vector3(3.0, 0.0, -1.6 + 3.2 * i)
+	akira.ganar_espiritu(1.0)
+
+
+func _lanzar_corte_luna() -> void:
+	luna_lanzada = true
+	# Se despiertan todos los que alcanzará el corte (no solo los dos colocados), para que se
+	# vea cómo caen; si no, alguno moriría congelado de pie.
+	var akira = _juego().akira
+	for soldado in _juego().soldados_vivos():
+		if soldado.global_position.distance_to(akira.global_position) <= Datos.RADIO_CORTE_LUNA:
+			soldado.process_mode = Node.PROCESS_MODE_INHERIT
+	_pulsar("especial")
+	_grabar("corte_luna", 72)
+
+
+func _comprobar_corte_luna() -> void:
+	var akira = _juego().akira
+	var caidos := objetivos_luna.filter(func(s): return not is_instance_valid(s) or not s.vivo()).size()
+	_registrar("Corte de luna: con la barra llena derriba a los soldados cercanos",
+		objetivos_luna.size() >= 2 and caidos == objetivos_luna.size() and akira.espiritu == 0.0,
+		"derribados %d de %d, espíritu=%.1f" % [caidos, objetivos_luna.size(), akira.espiritu])
+
+
+func _empezar_cuenta_anime() -> void:
+	_juego().akira.visual.actualizaciones = 0
+
+
+func _cambiar_a_suave() -> void:
+	cuenta_anime = _juego().akira.visual.actualizaciones
+	_pulsar("estilo_animacion")
+	_juego().akira.visual.actualizaciones = 0
+
+
+func _comprobar_animacion() -> void:
+	var cuenta_suave: int = _juego().akira.visual.actualizaciones
+	var suave_activa := not VisualModelo.estilo_anime
+	_pulsar("estilo_animacion")       # vuelve a anime
+	_registrar("Animación anime: 12 poses por segundo; T cambia a suave (cada paso)",
+		cuenta_anime >= 10 and cuenta_anime <= 14 and cuenta_suave >= 50 and suave_activa,
+		"anime=%d, suave=%d poses en 1 s" % [cuenta_anime, cuenta_suave])
 
 
 # FPS reales mientras Akira camina por el patio (sin capturas de por medio). Con

@@ -37,13 +37,22 @@ const EMPUJE_GOLPE := 6.0
 const TIEMPO_EMPUJE := 0.25
 const ALTO_PERSONAJE := 1.7
 const RADIO_PERSONAJE := 0.35
-# Parada (prototipo de combate de precisión): con buen momento desvía la estocada y
-# deja al soldado sin guardia; el contraataque lo derriba de un golpe.
-const VENTANA_PARADA := 0.3           # segundos en los que la parada desvía el golpe
-const ENFRIAMIENTO_PARADA := 0.6      # no se puede repetir antes (si falla)
-const POSE_PARADA := 0.45             # cuánto se ve la guardia en pantalla
-const ALCANCE_AYUDA_PARADA := 4.0     # al parar, Akira se gira hacia el soldado más cercano
+# Iaidō (combate de precisión): mantener «parar» pone a Akira en postura con la espada
+# envainada; al soltar desenvaina. Si una estocada llega dentro de la ventana, la desvía
+# y derriba al rival de un solo corte (iai perfecto).
+const VENTANA_PARADA := 0.3           # segundos tras soltar en los que el iai desvía el golpe
+const ENFRIAMIENTO_PARADA := 0.6      # tras un iai fallido, no se puede repetir antes
+const DURACION_DESENVAINE := 0.28     # cuánto se ve el corte del desenvaine
+const POSE_REMATE := 0.45             # pose final tras un iai perfecto (zanshin)
+const ALCANCE_AYUDA_PARADA := 4.0     # en postura, Akira se gira hacia el soldado más cercano
 const CONO_PARADA := 110.0
+# Espíritu: se llena con iai perfectos y cortes; lleno permite el corte de luna.
+const ESPIRITU_POR_IAI := 0.5
+const ESPIRITU_POR_GOLPE := 0.1
+const RADIO_CORTE_LUNA := 7.0         # metros alrededor de Akira
+const DURACION_CORTE_LUNA := 1.4      # segundos reales de la secuencia
+# Animación limitada estilo anime: las poses cambian 12 veces por segundo («en dos»).
+const PASO_ANIME := 1.0 / 12.0
 
 # --- Soldados -----------------------------------------------------------------
 const VIDA_SOLDADO := 2
@@ -60,7 +69,6 @@ const ALCANCE_LANZA := 2.1
 const ANCHO_LANZA := 0.8
 const TIEMPO_RECUPERACION := 0.6
 const TIEMPO_ATURDIDO := 0.4
-const TIEMPO_SIN_GUARDIA := 1.6       # tras una parada de Akira
 const EMPUJE_SOLDADO := 5.0
 const TIEMPO_SIN_VER := 2.0
 const TIEMPO_DESAPARECER := 1.2

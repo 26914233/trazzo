@@ -1,8 +1,10 @@
 # RONIN — Plan de producción
 
-**Fecha:** 27 de septiembre de 2026 · **Fase actual:** prototipo (capítulo 1 jugable en Godot 4.7,
-cel-shading) · **Alcance:** núcleo + variaciones y lanzamiento por capítulos (decidido: opción C) ·
-**Siguiente hito:** vertical slice, base del primer capítulo.
+**Fecha:** 27 de septiembre de 2026 (actualizado el 1 de octubre de 2026) · **Fase actual:**
+prototipo 0.3 (capítulo 1 jugable en Godot 4.7, cel-shading, iaidō y animación estilo anime) ·
+**Alcance:** núcleo + variaciones y lanzamiento por capítulos (decidido: opción C) · **Combate:**
+precisión con iaidō (decidido: opción B) · **Siguiente hito:** vertical slice, base del primer
+capítulo.
 
 Cada afirmación va marcada cuando no es obvia: **[Hecho]** comprobado, **[Estimación]** cálculo
 con incertidumbre, **[Supuesto]** algo que damos por bueno sin comprobar, **[Hipótesis]** algo que
@@ -32,7 +34,8 @@ bien el diseño actual, pero también es su mayor riesgo (ver §3).
   más de 3,3 millones de copias vendidas hasta noviembre de 2025), *Rise of the Ronin* (PS5 2024, PC marzo de 2025),
   *Trek to Yomi* (2022) **[Hecho]**. Lo que nos puede diferenciar: el villano que no se cree
   villano, la estructura circular y una estética de grabado en tinta con cel-shading
-  **[Opinión]**.
+  **[Opinión]**. Desde el 1-10-2026 se suma lo que más nos separa de esos juegos: un Japón
+  invadido por yōkai y el combate de iaidō (ver `PROPUESTA_MUNDO_YOKAI.md`) **[Opinión]**.
 - **El nombre:** «RONIN» ya lo usan un juego de 2015 publicado por Devolver Digital y *Rise of
   the Ronin* **[Hecho]**. Es difícil de encontrar en tiendas y buscadores. No urge, pero hay que
   tener nombre propio (o subtítulo fuerte) antes de abrir una página de tienda **[Opinión]**.
@@ -91,13 +94,13 @@ pulido, es la base del primer capítulo que se lanza.
 
 | Prioridad | Contenido |
 | --- | --- |
-| **MVP** | Duelo con sensación: tajo, parada con buen momento, esquiva, aviso del rival, impacto (pausa, sacudida, sonido) |
-| **MVP** | Castillo pulido: soldados + un rival distinto (arquero o capitán como mini-jefe) |
+| **MVP** | Duelo con sensación: tajo, iaidō (mantener y soltar al aviso), corte de luna, esquiva, aviso del rival, impacto (pausa, sacudida, tinta, sonido) |
+| **MVP** | Castillo pulido: soldados de Genzo y los yōkai del capítulo 1 (kappa, oni, onibi), con el oni gigante como jefe en el portón (`BESTIARIO.md`) |
 | **MVP** | Salida a la planicie en 3D, camino a la aldea y un encuentro con dados |
 | **MVP** | Aldea mínima: 2-3 diálogos, descansar para curarse, un encargo corto |
-| **MVP** | Menú, guardado básico, teclado, mando y controles táctiles; efectos de sonido y un tema musical |
+| **MVP** | Menú, guardado básico (en las estatuas jizō de la planicie, idea tuya), teclado, mando y controles táctiles; efectos de sonido y un tema musical |
 | Must Have (Alpha) | Templo (2-3 puzzles), dojo (1 técnica), ruinas, Genzo como jefe, final en Hoshiyama |
-| Should Have | Más tipos de enemigo, tienda, más encuentros de dados, accesibilidad (remapeo, subtítulos, dificultad) |
+| Should Have | Más tipos de enemigo, bestiario dentro del juego, tienda, más encuentros de dados, accesibilidad (remapeo, subtítulos, dificultad) |
 | Nice to Have | Finales alternativos, modo de duelos, coleccionables, logros |
 
 **Fases:** Concepto (hecho) → Prototipo (hecho: capítulo 1) → **Vertical slice** → Alpha (todos
@@ -156,7 +159,7 @@ nada público sin tu permiso.
 - **RECOMENDACIÓN:** **C**. Es la manera más barata de saber si RONIN engancha.
 - **SIGUIENTE PASO:** construir el vertical slice de §5.
 
-### DECISIÓN 2 — Estilo de combate
+### DECISIÓN 2 — Estilo de combate · **DECIDIDA el 1-10-2026: B, con el iaidō como forma**
 
 - **OPCIONES:** A) acción: muchos enemigos y combos; B) precisión: pocos rivales, cada uno
   peligroso; parar en el momento justo abre un contraataque.
@@ -168,6 +171,9 @@ nada público sin tu permiso.
 - **RECOMENDACIÓN:** **B**. El prototipo ya está en el capítulo 1 para que lo pruebes antes de
   decidir: **K** (teclado), **LB** (mando) o el botón **Parar** (móvil) justo al «!».
 - **SIGUIENTE PASO:** probarlo y ajustar la ventana de parada (0,3 s) y el castigo por fallar.
+- **Cómo quedó (0.3):** la parada pasó a ser el iaidō. Se mantiene **K**, **LB** o el botón
+  **Iai** y se suelta justo al «!»: el desenvaine desvía la lanza y derriba al soldado de un
+  corte. Soltar a destiempo no para nada y hay que esperar 0,6 s para volver a intentarlo.
 
 ## 10. Hecho el 27-09-2026
 
@@ -181,3 +187,19 @@ nada público sin tu permiso.
 5. DECISIÓN 1 cerrada: opción C (núcleo + variaciones y lanzamiento por capítulos).
 6. **APK de prueba** generado en la nube y guardado en Google Drive (`ronin-0.2-prueba.apk`):
    muestra los FPS, «Atrás» pausa en vez de cerrar y la ayuda táctil tiene letra más grande.
+
+## 11. Hecho el 1-10-2026
+
+1. **Decisiones 2 a 7** de `PROPUESTA_MUNDO_YOKAI.md` cerradas (ver allí). La 2 cierra también la
+   DECISIÓN 2 de este plan: precisión con iaidō.
+2. **Iaidō** en el prototipo: mantener y soltar al «!». El iai perfecto derriba de un corte con
+   pausa de impacto, cámara lenta y un cuadro de tinta invertida.
+3. **Corte de luna:** con la barra de espíritu llena (se llena con iai y golpes), el tiempo se
+   congela, la pantalla se vuelve tinta, aparecen las líneas de corte y caen los enemigos cercanos.
+4. **Animación limitada estilo anime** (12 poses por segundo) con la opción de volver a la suave:
+   **T** en el PC, o el botón de la pausa en el móvil.
+5. Prueba automática: **16 de 16**.
+6. **Conceptos 2D** con Higgsfield (Akira, Genzo, Takeda, el gran yōkai, Bahamut, kappa, oni y
+   onibi) en `arte/conceptos/`.
+7. **`HISTORIA.md`** (sinopsis para aprobar: DECISIONES 8 y 9) y **`BESTIARIO.md`** (más de 50
+   criaturas por capítulos, fichas del capítulo 1 y DECISIÓN 10).

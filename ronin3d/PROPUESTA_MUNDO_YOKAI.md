@@ -1,11 +1,23 @@
 # RONIN — Propuesta: un Japón plagado de yōkai
 
-**Fecha:** 1 de octubre de 2026 · **Estado:** propuesta del usuario analizada; nada de esto está
-decidido hasta que respondas las decisiones del final. **Relación con el plan:** amplía
-`PLAN_PRODUCCION.md` (alcance C: núcleo + variaciones, lanzamiento por capítulos).
+**Fecha:** 1 de octubre de 2026 · **Estado:** propuesta del usuario analizada y **decisiones 2 a 7
+cerradas el mismo día** (resumen justo abajo). **Relación con el plan:** amplía
+`PLAN_PRODUCCION.md` (alcance C: núcleo + variaciones, lanzamiento por capítulos). **Siguen:**
+`HISTORIA.md` (sinopsis, DECISIONES 8 y 9) y `BESTIARIO.md` (DECISIÓN 10).
 
 Etiquetas: **[Hecho]** comprobado · **[Estimación]** cálculo con incertidumbre · **[Opinión]**
 criterio del equipo.
+
+## Decidido el 1-10-2026
+
+| Decisión | Resultado | Qué se hizo |
+| --- | --- | --- |
+| 2 · Combate | **B, precisión**, con el iaidō como forma visible | En el prototipo 0.3: iaidō (mantener y soltar al «!») y corte de luna |
+| 3 · Historia | **B**: Genzo pactó con el gran yōkai creyendo proteger Japón. Y **Takeda pasa a ser el shōgun** | Sinopsis para aprobar en `HISTORIA.md`; los textos del juego aún no cambian |
+| 4 · Bestiario | **B** (yōkai japoneses y sus variantes) **y además más criaturas**, con las de otras tierras y **Bahamut como el dragón** | `BESTIARIO.md` |
+| 5 · Escenas | **B**: ilustración 2D con tinta (pixel art solo para los recuerdos de Akira) | Herramienta encontrada: Higgsfield (0,15 créditos por imagen); conceptos en `arte/conceptos/` |
+| 6 · Animación | **C**, estilo anime limitado, a probar | Probado en el prototipo: 12 poses por segundo; **T** (o el botón de la pausa en el móvil) cambia a la suave para comparar. VRoid no se puede probar desde la nube: es un programa de escritorio para tu PC |
+| 7 · Farmeo automático | **C**: nada automático; la caza se juega | — |
 
 ---
 
@@ -89,7 +101,7 @@ que querías **[Opinión]**:
 | Asura | Ashura (ya está en el budismo japonés) | Jefe de varios brazos |
 | Robots de civilización antigua | **Dogū y haniwa que despiertan**: autómatas de una era olvidada | Sorpresa de mitad de juego |
 | La luna | **Tsukuyomi**, el dios de la luna, como amenaza final o aliado ambiguo | Jefe o giro de historia |
-| Bahamut | Sin equivalente directo; el nombre se asocia mucho a *Final Fantasy* | Mejor un dragón propio |
+| Bahamut | Sin equivalente directo; el nombre se asocia mucho a *Final Fantasy* | ~~Mejor un dragón propio~~ **Decidido: Bahamut es el dragón**, con diseño propio (`BESTIARIO.md` §6) |
 
 Lo que no tiene equivalente (vampiro europeo, elfo, Bahamut) puede entrar **como algo que llega
 desde el otro plano**: «criaturas de otras tierras» que el gran yōkai invoca. Así el extraño
@@ -133,10 +145,10 @@ de personaje del inicio **[Opinión; hay que probar que corra en tu PC]**.
 
 ## 8. Escenas de historia y personajes 2D
 
-- **Imágenes de los personajes:** no se pudieron generar hoy. Gemini no tiene cuota de imágenes
-  en el plan gratuito de tu clave (hace falta vincular facturación en aistudio.google.com, unos
-  0,07 USD por imagen) y PixAI rechazó la petición («Input validation failed»; falta configurar su
-  modelo) **[Hecho]**. Los prompts están en la §10, listos para cuando se resuelva.
+- **Imágenes de los personajes:** Gemini no tiene cuota de imágenes en el plan gratuito de tu
+  clave y PixAI rechazó la petición **[Hecho]**. **Resuelto el mismo día con Higgsfield** (modelo
+  Z Image, 0,15 créditos por imagen, con tu cuenta): los conceptos están en `arte/conceptos/` y
+  en Drive.
 - **Pixel art o ilustración:** el juego ya tiene 3D cel-shading. Sumar pixel art y además
   ilustraciones 2D anime son tres estilos a la vez. Propuesta: escenas en **ilustración 2D con
   tinta** (como los conceptos), y el **pixel art solo para los recuerdos de Akira**, como homenaje
@@ -171,11 +183,11 @@ feudal Japan dark fantasy, whole figure visible, no text, no watermark».
 
 ## 11. Decisiones que necesito de ti
 
-### DECISIÓN 2 (pendiente del plan) — Estilo de combate
+### DECISIÓN 2 (pendiente del plan) — Estilo de combate · **DECIDIDA: B**
 Pediste iaidō con precisión en los cortes. **Entiendo que eso la cierra en B (precisión)**, con el
 iaidō como forma visible. Confírmalo, idealmente después de probar la parada en el APK.
 
-### DECISIÓN 3 — Historia: el gran yōkai y Genzo
+### DECISIÓN 3 — Historia: el gran yōkai y Genzo · **DECIDIDA: B, y Takeda es el shōgun**
 - **OPCIONES:** A) Genzo es seguidor fiel del gran yōkai y lo mató por él (villano claro);
   B) Genzo hizo un **pacto** con el gran yōkai creyendo que era la única forma de proteger Japón
   (Takeda era «demasiado blando» con los yōkai), y el yōkai lo usa; desde el pacto los ataques
@@ -193,7 +205,7 @@ iaidō como forma visible. Confírmalo, idealmente después de probar la parada 
 - **Nota:** en la historia, Takeda es un señor feudal (daimyō), no el shōgun. ¿Lo dejamos así o
   quieres que sea el shōgun? Cambia la escala: el shōgun manda en todo Japón.
 
-### DECISIÓN 4 — Bestiario
+### DECISIÓN 4 — Bestiario · **DECIDIDA: B, con más criaturas y Bahamut**
 - **OPCIONES:** A) tu lista tal cual, mezclando mitos de todo el mundo; B) yōkai japoneses como
   núcleo, con equivalentes japoneses para casi todo (§4) y los extranjeros como «criaturas de otras
   tierras» que llegan desde el otro plano; C) solo yōkai japoneses.
@@ -205,7 +217,7 @@ iaidō como forma visible. Confírmalo, idealmente después de probar la parada 
 - **RECOMENDACIÓN:** **B.**
 - **SIGUIENTE PASO:** fichas de los 4 yōkai del capítulo 1 (kappa, oni, onibi, oni gigante).
 
-### DECISIÓN 5 — Escenas de historia
+### DECISIÓN 5 — Escenas de historia · **DECIDIDA: B**
 - **OPCIONES:** A) todas en pixel art; B) ilustración 2D con tinta, y pixel art solo para los
   recuerdos de Akira; C) escenas con los propios modelos 3D.
 - **VENTAJAS:** A es barato de hacer. B da a cada estilo una razón y luce mejor. C mantiene un solo
@@ -218,7 +230,7 @@ iaidō como forma visible. Confírmalo, idealmente después de probar la parada 
 - **SIGUIENTE PASO:** activar la generación de imágenes (facturación de Gemini o arreglar PixAI) y
   hacer los 4 conceptos de la §10.
 
-### DECISIÓN 6 — Estilo de animación
+### DECISIÓN 6 — Estilo de animación · **DECIDIDA: C, en prueba**
 - **OPCIONES:** B) esqueleto 3D suave; C) animación limitada estilo anime (§7).
 - **VENTAJAS:** B es el estándar. C diferencia el juego y hace lucir el iaidō.
 - **RIESGOS:** los dos necesitan modelos con esqueleto (hoy son piezas); C además pide ajustar
@@ -228,7 +240,7 @@ iaidō como forma visible. Confírmalo, idealmente después de probar la parada 
 - **SIGUIENTE PASO:** un personaje de prueba (Akira) con esqueleto y 3 animaciones (andar, postura
   de iaidō, desenvaine) dentro del prototipo.
 
-### DECISIÓN 7 — Farmeo automático
+### DECISIÓN 7 — Farmeo automático · **DECIDIDA: C**
 - **OPCIONES:** A) farmeo automático real (el juego caza solo); B) «expediciones»: contratas
   cazadores que traen materiales mientras juegas; C) nada automático, la caza es jugarla.
 - **VENTAJAS:** A atrae a quien juega en el móvil a ratos. B da recursos sin quitar el combate.

@@ -1,8 +1,9 @@
-# HUD: vida de Akira, soldados derrotados, ayuda de controles, versión,
-# textos de la historia (con efecto de máquina de escribir) y pausa.
+# HUD: vida y espíritu de Akira, soldados derrotados, ayuda de controles, versión, avisos
+# breves, textos de la historia (con efecto de máquina de escribir) y pausa.
 extends CanvasLayer
 
 const Datos := preload("res://scripts/datos.gd")
+const VisualModelo := preload("res://scripts/visual_modelo.gd")
 const VELOCIDAD_TEXTO := 45.0
 
 var fuente: SystemFont
@@ -14,6 +15,10 @@ var etiqueta_version: Label
 var texto_version := ""
 var tiempo_fps := 0.0
 var indicacion_pausa: Label
+var boton_animacion: Label            # en la pausa: cambia la animación anime / suave
+var etiqueta_mensaje: Label
+var tiempo_mensaje := 0.0
+var en_tactil := false
 var texto_antes_de_pausa := false
 var capa_texto: Control
 var titulo: Label
@@ -31,11 +36,25 @@ var escribiendo := false
 class MarcadorVida extends Control:
 	var vida := 5
 	var maximo := 5
+	var espiritu := 0.0
+	var latido := 0.0
 	var fuente: Font
 	var color_texto := Color.WHITE
 	var color_vida := Color.RED
 
 	func _draw() -> void:
+		# Barra de espíritu bajo los rombos: dorada; llena, late y anuncia el corte de luna.
+		var barra := Rect2(108 - 9, 34, 26 * maximo - 8, 7)
+		draw_rect(barra.grow(2.0), Color(0, 0, 0, 0.7))
+		draw_rect(barra, Color(0.16, 0.13, 0.1))
+		var lleno := Rect2(barra.position, Vector2(barra.size.x * espiritu, barra.size.y))
+		var dorado := Color(0.89, 0.73, 0.38)
+		if espiritu >= 1.0:
+			dorado = dorado.lerp(Color(1.0, 0.97, 0.85), 0.5 + 0.5 * sin(latido * 6.0))
+		draw_rect(lleno, dorado)
+		if espiritu >= 1.0:
+			draw_string_outline(fuente, Vector2(barra.end.x + 8, 42), "LUNA", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, 4, Color(0, 0, 0, 0.8))
+			draw_string(fuente, Vector2(barra.end.x + 8, 42), "LUNA", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, dorado)
 		draw_string_outline(fuente, Vector2(0, 24), "AKIRA", HORIZONTAL_ALIGNMENT_LEFT, -1, 24, 6, Color(0, 0, 0, 0.8))
 		draw_string(fuente, Vector2(0, 24), "AKIRA", HORIZONTAL_ALIGNMENT_LEFT, -1, 24, color_texto)
 		for i in maximo:
@@ -62,7 +81,7 @@ func _ready() -> void:
 	marcador.color_texto = Datos.CREMA
 	marcador.color_vida = Datos.ROJO_VIDA
 	marcador.position = Vector2(22, 16)
-	marcador.size = Vector2(260, 40)
+	marcador.size = Vector2(300, 48)
 	marcador.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(marcador)
 
@@ -80,6 +99,11 @@ func _ready() -> void:
 	etiqueta_version = _etiqueta(15, Color(0.85, 0.82, 0.72))
 	_colocar(etiqueta_version, Control.PRESET_BOTTOM_RIGHT, Rect2(-340, -34, 318, 24))
 	etiqueta_version.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+
+	etiqueta_mensaje = _etiqueta(20, Datos.DORADO)
+	_colocar(etiqueta_mensaje, Control.PRESET_CENTER_TOP, Rect2(-420, 136, 840, 32))
+	etiqueta_mensaje.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	etiqueta_mensaje.modulate.a = 0.0
 
 	_crear_capa_texto()
 	_crear_capa_pausa()
@@ -167,6 +191,18 @@ func _crear_capa_pausa() -> void:
 	capa_pausa.add_child(indicacion_pausa)
 	_colocar(indicacion_pausa, Control.PRESET_CENTER, Rect2(-400, 0, 800, 36))
 	indicacion_pausa.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	boton_animacion = _etiqueta(20, Datos.CREMA)
+	remove_child(boton_animacion)
+	capa_pausa.add_child(boton_animacion)
+	_colocar(boton_animacion, Control.PRESET_CENTER, Rect2(-300, 64, 600, 46))
+	boton_animacion.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	boton_animacion.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	var marco := StyleBoxFlat.new()
+	marco.bg_color = Color(0.08, 0.07, 0.12, 0.85)
+	marco.border_color = Datos.DORADO
+	marco.set_border_width_all(2)
+	marco.set_corner_radius_all(8)
+	boton_animacion.add_theme_stylebox_override("normal", marco)
 	capa_pausa.visible = false
 
 
@@ -185,6 +221,22 @@ func poner_derrotados(cantidad: int, total: int) -> void:
 func poner_version(texto: String) -> void:
 	texto_version = texto
 	etiqueta_version.text = texto
+
+
+func poner_espiritu(valor: float) -> void:
+	marcador.espiritu = valor
+	marcador.queue_redraw()
+
+
+func mostrar_mensaje(texto: String, segundos := 2.4) -> void:
+	etiqueta_mensaje.text = texto
+	tiempo_mensaje = segundos
+
+
+func poner_estilo_animacion() -> void:
+	var nombre := "anime (12 poses por segundo)" if VisualModelo.estilo_anime else "suave"
+	var como := "toca aquí para cambiar" if en_tactil else "T para cambiar"
+	boton_animacion.text = "Animación: %s · %s" % [nombre, como]
 
 
 func mostrar_texto(texto_titulo: String, texto_subtitulo: String, parrafos: Array, texto_pie: String) -> void:
@@ -217,8 +269,8 @@ func completar_texto() -> void:
 	cuerpo.visible_characters = -1
 
 
-const AYUDA_TECLADO := "WASD: moverse   SHIFT: correr   ESPACIO: saltar   J: atacar   K: parar (justo al «!»)   Q/E: girar cámara   rueda: zoom   ESC: pausa"
-const AYUDA_TACTIL := "Joystick: moverse (al borde, correr) · Parar justo al «!» y contraatacar\nArrastra el dedo por la pantalla: girar la cámara"
+const AYUDA_TECLADO := "WASD: moverse · SHIFT: correr · ESPACIO: saltar · J: atacar · K: iaidō (mantén y suelta al «!») · L: corte de luna · Q/E: cámara · T: animación · ESC: pausa"
+const AYUDA_TACTIL := "Joystick: moverse · Mantén «Iai» y suéltalo justo al «!»\nArrastra el dedo: girar la cámara · «Luna»: corte especial con la barra llena"
 
 
 func mostrar_ayuda(tactil := false) -> void:
@@ -236,8 +288,10 @@ func mostrar_ayuda(tactil := false) -> void:
 # En pausa se oculta el texto de la historia (si lo había) para que no se mezcle con el
 # menú de pausa, y el texto deja de escribirse hasta volver.
 func poner_pausa(activa: bool, tactil := false) -> void:
+	en_tactil = tactil
 	indicacion_pausa.text = "Toca la pantalla para continuar      «Atrás»: salir del juego" if tactil \
 		else "ESC o ENTER: continuar      Q: salir del juego"
+	poner_estilo_animacion()
 	if activa and not capa_pausa.visible:
 		texto_antes_de_pausa = capa_texto.visible
 		capa_texto.visible = false
@@ -250,6 +304,12 @@ func _process(delta: float) -> void:
 	if capa_pausa.visible:
 		return
 	tiempo += delta
+	if marcador.espiritu >= 1.0:
+		marcador.latido = tiempo
+		marcador.queue_redraw()
+	if tiempo_mensaje > 0.0:
+		tiempo_mensaje -= delta
+		etiqueta_mensaje.modulate.a = clampf(tiempo_mensaje / 0.5, 0.0, 1.0)
 	# FPS junto a la versión, para las pruebas en el móvil (meta: 30 o más).
 	tiempo_fps += delta
 	if tiempo_fps >= 0.5:

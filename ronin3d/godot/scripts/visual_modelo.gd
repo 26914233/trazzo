@@ -1,10 +1,14 @@
 # Personaje hecho con piezas 3D sencillas y cel-shading.
 # Mira hacia +Z local; el nodo «cuerpo» gira hacia donde mira el personaje y las
 # piernas, brazos y armas se animan por código.
+# Animación limitada estilo anime: con «estilo_anime», las poses cambian 12 veces por
+# segundo (y al instante cuando cambia la acción), aunque el personaje se desplaza suave.
 extends Node3D
 
 const Datos := preload("res://scripts/datos.gd")
 const TEXTURA_SOMBRA := preload("res://recursos/sombra.png")
+
+static var estilo_anime := true
 
 var aspecto
 var es_soldado := false
@@ -18,6 +22,8 @@ var espada_mano: Node3D
 var empunadura_cinto: Node3D
 var estela: MeshInstance3D
 var material_estela: StandardMaterial3D
+var estela_iai: MeshInstance3D
+var material_estela_iai: StandardMaterial3D
 var lanza: Node3D
 var cintas: Array = []
 var materiales: Array = []
@@ -25,6 +31,11 @@ var aviso: Label3D
 var fase := 0.0
 var tiempo := 0.0
 var angulo := 0.0
+var acumulado := 0.0
+var ultima_pose := ""
+var ultima_muerte := -1.0
+var ultimo_destello := 0.0
+var actualizaciones := 0              # poses aplicadas (lo usa la prueba automática)
 
 
 func configurar(aspecto_del_juego, soldado: bool) -> void:
@@ -143,37 +154,46 @@ func _construir_akira() -> void:
 	_caja(espada_mano, Vector3(0.04, 0.04, 0.22), Datos.TSUKA, Vector3(0, 0, 0.05))
 	_caja(espada_mano, Vector3(0.025, 0.05, 0.85), Datos.ACERO, Vector3(0, 0, 0.58))
 	espada_mano.visible = false
-	_crear_estela()
+	estela = _crear_estela(Vector3(-0.15, 1.25, 0.05), false)
+	material_estela = estela.material_override
+	estela_iai = _crear_estela(Vector3(-0.1, 1.2, 0.0), true)
+	material_estela_iai = estela_iai.material_override
 
 
-# Estela del corte: media luna blanca delante de Akira que aparece con el tajo y se apaga.
-func _crear_estela() -> void:
+# Estela del corte: media luna blanca que aparece con el tajo y se apaga. La del tajo es
+# vertical (de encima de la cabeza a delante y abajo); la del iai, horizontal (de la
+# cadera izquierda hacia la derecha, el desenvaine).
+func _crear_estela(centro: Vector3, horizontal: bool) -> MeshInstance3D:
 	var herramienta := SurfaceTool.new()
 	herramienta.begin(Mesh.PRIMITIVE_TRIANGLE_STRIP)
-	var centro := Vector3(-0.15, 1.25, 0.05)
-	for i in range(21):
-		var t := i / 20.0
-		var angulo := lerpf(1.45, -0.55, t)          # de encima de la cabeza a delante y abajo
-		var interior := lerpf(0.55, 0.75, sin(t * PI))
-		var exterior := lerpf(1.2, 1.75, sin(t * PI))
-		var direccion := Vector3(0.0, sin(angulo), cos(angulo))
+	var pasos := 24
+	for i in range(pasos + 1):
+		var t := float(i) / pasos
+		var angulo := lerpf(1.15, -1.35, t) if horizontal else lerpf(1.45, -0.55, t)
+		var interior := lerpf(0.55, 0.7, sin(t * PI)) if horizontal else lerpf(0.55, 0.75, sin(t * PI))
+		var exterior := lerpf(1.3, 1.85, sin(t * PI)) if horizontal else lerpf(1.2, 1.75, sin(t * PI))
+		var direccion := Vector3(sin(angulo), 0.0, cos(angulo)) if horizontal \
+			else Vector3(0.0, sin(angulo), cos(angulo))
 		var alfa := sin(t * PI)
 		herramienta.set_color(Color(1, 1, 1, alfa * 0.2))
 		herramienta.add_vertex(centro + direccion * interior)
 		herramienta.set_color(Color(1, 1, 1, alfa))
 		herramienta.add_vertex(centro + direccion * exterior)
-	estela = MeshInstance3D.new()
-	estela.mesh = herramienta.commit()
-	material_estela = StandardMaterial3D.new()
-	material_estela.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	material_estela.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	material_estela.vertex_color_use_as_albedo = true
-	material_estela.cull_mode = BaseMaterial3D.CULL_DISABLED
-	material_estela.albedo_color = Color(0.92, 0.96, 1.0, 0.0)
-	estela.material_override = material_estela
-	estela.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	estela.visible = false
-	cuerpo.add_child(estela)
+	var malla := MeshInstance3D.new()
+	malla.mesh = herramienta.commit()
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.vertex_color_use_as_albedo = true
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	material.albedo_color = Color(0.92, 0.96, 1.0, 0.0)
+	malla.material_override = material
+	malla.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	malla.visible = false
+	if horizontal:
+		malla.rotation.z = 0.12            # el iai sube un poco al cruzar
+	cuerpo.add_child(malla)
+	return malla
 
 
 # --- Soldado ---------------------------------------------------------------------------
@@ -234,7 +254,23 @@ func _crear_sombra_y_aviso() -> void:
 
 # --- Animación -----------------------------------------------------------------------------
 
+# En estilo anime la pose se aplica a pasos de 1/12 s; un cambio de acción, un golpe o la
+# caída se aplican al instante para que el control no se note retrasado.
 func actualizar(delta: float, info: Dictionary) -> void:
+	acumulado += delta
+	var cambio: bool = info.pose != ultima_pose or (info.muerte >= 0.0) != (ultima_muerte >= 0.0) \
+		or info.destello > ultimo_destello + 0.3
+	ultimo_destello = info.destello
+	if estilo_anime and acumulado < Datos.PASO_ANIME and not cambio:
+		return
+	ultima_pose = info.pose
+	ultima_muerte = info.muerte
+	actualizaciones += 1
+	_aplicar(acumulado, info)
+	acumulado = 0.0
+
+
+func _aplicar(delta: float, info: Dictionary) -> void:
 	tiempo += delta
 	var mirando: Vector3 = info.mirando
 	angulo = lerp_angle(angulo, atan2(mirando.x, mirando.z), minf(1.0, delta * 14.0))
@@ -272,28 +308,54 @@ func actualizar(delta: float, info: Dictionary) -> void:
 
 
 func _animar_espada(info: Dictionary) -> void:
-	var atacando: bool = info.pose == "ataque"
-	var guardia: bool = info.pose == "guardia"
-	espada_mano.visible = atacando or guardia
-	empunadura_cinto.visible = not espada_mano.visible
+	var pose: String = info.pose
+	var en_mano: bool = pose in ["ataque", "desenvaine", "remate"]
+	espada_mano.visible = en_mano
+	empunadura_cinto.visible = not en_mano
 	espada_mano.rotation = Vector3.ZERO
-	if atacando:
-		var giro := clampf(info.progreso / 0.55, 0.0, 1.0)
-		hombro_der.rotation.x = lerpf(-2.9, -0.5, ease(giro, 0.4))
-		hombro_izq.rotation.x = lerpf(-2.6, -0.8, ease(giro, 0.4))
-		torso.rotation.x = lerpf(-0.12, 0.2, giro)
-	elif guardia:
-		# Guardia: brazos al frente y la hoja cruzada hacia arriba para desviar la lanza.
-		hombro_der.rotation.x = -1.25
-		hombro_izq.rotation.x = -1.15
-		espada_mano.rotation = Vector3(-0.9, 0.0, 0.75)
-		torso.rotation.x = -0.08
-	# La estela se ve mientras corta y se apaga enseguida.
+	hombro_der.rotation = Vector3(hombro_der.rotation.x, 0.0, 0.0)
+	hombro_izq.rotation = Vector3(hombro_izq.rotation.x, 0.0, 0.0)
+	torso.rotation.y = 0.0
 	var brillo := 0.0
-	if atacando:
-		brillo = clampf(1.0 - absf(info.progreso - 0.35) / 0.35, 0.0, 1.0)
+	var brillo_iai := 0.0
+	match pose:
+		"ataque":
+			var giro := clampf(info.progreso / 0.55, 0.0, 1.0)
+			hombro_der.rotation.x = lerpf(-2.9, -0.5, ease(giro, 0.4))
+			hombro_izq.rotation.x = lerpf(-2.6, -0.8, ease(giro, 0.4))
+			torso.rotation.x = lerpf(-0.12, 0.2, giro)
+			brillo = _brillo(info.progreso, 0.35, 0.35)
+		"postura":
+			# Iaidō: la mano derecha en la empuñadura, a la izquierda; el cuerpo bajo y
+			# adelantado, la pierna izquierda delante.
+			hombro_der.rotation = Vector3(-0.32, 0.0, 0.86)
+			hombro_izq.rotation = Vector3(-0.35, 0.0, -0.3)
+			torso.rotation = Vector3(0.2, 0.3, 0.0)
+			cadera_izq.rotation.x = -0.4
+			cadera_der.rotation.x = 0.35
+			cuerpo.position.y = -0.04
+		"desenvaine":
+			# Corte horizontal al desenvainar, de la cadera izquierda hacia la derecha.
+			var barrido := clampf((info.progreso - 0.15) / 0.55, 0.0, 1.0)
+			hombro_der.rotation = Vector3(-PI / 2.0 + 0.15, lerpf(1.1, -1.25, ease(barrido, 0.35)), 0.0)
+			espada_mano.rotation = Vector3(PI / 2.0, 0.0, 0.0)
+			hombro_izq.rotation = Vector3(-0.4, 0.0, -0.3)
+			torso.rotation = Vector3(0.12, lerpf(0.35, -0.45, barrido), 0.0)
+			cadera_izq.rotation.x = -0.5
+			cadera_der.rotation.x = 0.4
+			brillo_iai = _brillo(info.progreso, 0.45, 0.32)
+		"remate":
+			# Zanshin tras el iai perfecto: brazo extendido a la derecha, hoja en línea.
+			hombro_der.rotation = Vector3(-PI / 2.0 + 0.3, -1.3, 0.0)
+			espada_mano.rotation = Vector3(PI / 2.0, 0.0, 0.0)
+			hombro_izq.rotation = Vector3(-0.2, 0.0, -0.2)
+			torso.rotation = Vector3(0.1, -0.5, 0.0)
+			cadera_izq.rotation.x = -0.55
+			cadera_der.rotation.x = 0.45
 	estela.visible = brillo > 0.01
 	material_estela.albedo_color.a = brillo * 0.9
+	estela_iai.visible = brillo_iai > 0.01
+	material_estela_iai.albedo_color.a = brillo_iai * 0.95
 	var reposo := -0.25 if info.moviendose else -1.15
 	for i in cintas.size():
 		cintas[i].rotation.x = reposo + sin(tiempo * 9.0 + i * 1.7) * 0.22
@@ -313,14 +375,16 @@ func _animar_lanza(pose: String) -> void:
 			hombro_der.rotation.x = -1.55
 			hombro_izq.rotation.x = -1.45
 			torso.rotation.x = 0.22
-		"sin_guardia":
-			# Lanza desviada hacia un lado y el cuerpo echado atrás: está abierto.
-			lanza.position = Vector3(-0.45, 1.0, 0.1)
-			lanza.rotation = Vector3(0.9, 0, -0.9)
-			hombro_der.rotation.x = -0.4
-			hombro_izq.rotation.x = 0.5
-			torso.rotation.x = -0.32
 		_:
 			lanza.position = Vector3(-0.36, 1.25, 0.12)
 			lanza.rotation = Vector3.ZERO
 			hombro_der.rotation.x = -0.3
+
+
+# Brillo de una estela según el avance del corte. En estilo anime es todo o nada: el
+# «borrón» ocupa uno o dos cuadros enteros, como en la animación limitada.
+func _brillo(progreso: float, centro: float, ancho: float) -> float:
+	var valor := clampf(1.0 - absf(progreso - centro) / ancho, 0.0, 1.0)
+	if estilo_anime:
+		return 1.0 if valor > 0.25 else 0.0
+	return valor

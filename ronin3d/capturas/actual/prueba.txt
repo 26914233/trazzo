@@ -11,8 +11,9 @@ OK     ESC pausa el juego y lo reanuda  pausado=true, después=false
 OK     Tocar la pantalla sigue los textos  fase=jugando
 OK     El joystick táctil mueve a Akira  recorrió 7.2 m
 OK     El stick del mando mueve a Akira  recorrió 3.5 m
-OK     Parar justo al «!» desvía la lanza y deja al soldado sin guardia  sin guardia=true, vida de Akira=5
-OK     El contraataque tras la parada lo derriba de un golpe  derrotados=1
-OK     Parar a destiempo no sirve: la lanza alcanza a Akira  vida de Akira=4, sin guardia=false
-Resultado: 15 de 15 comprobaciones correctas
-FPS al caminar por el patio: 13.3 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)
+OK     Iai perfecto: soltar justo al «!» desvía la lanza y derriba al soldado de un corte  derribado=true, vida de Akira=5, espíritu=0.5
+OK     Soltar a destiempo no sirve: la lanza alcanza a Akira  vida de Akira=4, soldado en pie=true
+OK     Corte de luna: con la barra llena derriba a los soldados cercanos  derribados 2 de 2, espíritu=0.0
+OK     Animación anime: 12 poses por segundo; T cambia a suave (cada paso)  anime=12, suave=60 poses en 1 s
+Resultado: 16 de 16 comprobaciones correctas
+FPS al caminar por el patio: 12.6 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)

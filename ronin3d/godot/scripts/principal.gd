@@ -11,7 +11,8 @@ const Juego := preload("res://scripts/juego.gd")
 const Hud := preload("res://scripts/hud.gd")
 const Prueba := preload("res://scripts/prueba.gd")
 const ControlesTactiles := preload("res://scripts/controles_tactiles.gd")
-const VERSION := "RONIN · prototipo 0.2"
+const VisualModelo := preload("res://scripts/visual_modelo.gd")
+const VERSION := "RONIN · prototipo 0.3"
 
 var hud
 var juego
@@ -52,6 +53,8 @@ func _registrar_acciones(clic_ataca: bool) -> void:
 		"saltar": [KEY_SPACE],
 		"atacar": [KEY_J],
 		"parar": [KEY_K],
+		"especial": [KEY_L],
+		"estilo_animacion": [KEY_T],
 		"girar_izquierda": [KEY_Q],
 		"girar_derecha": [KEY_E],
 		"acercar": [KEY_PLUS, KEY_KP_ADD, KEY_EQUAL],
@@ -88,7 +91,8 @@ func _registrar_acciones(clic_ataca: bool) -> void:
 		InputMap.action_set_deadzone(accion, 0.2)
 	var botones := {
 		"saltar": JOY_BUTTON_A, "aceptar": JOY_BUTTON_A, "atacar": JOY_BUTTON_X,
-		"parar": JOY_BUTTON_LEFT_SHOULDER,
+		"parar": JOY_BUTTON_LEFT_SHOULDER, "especial": JOY_BUTTON_Y,
+		"estilo_animacion": JOY_BUTTON_BACK,
 		"correr": JOY_BUTTON_RIGHT_SHOULDER, "pausa": JOY_BUTTON_START,
 		"acercar": JOY_BUTTON_DPAD_UP, "alejar": JOY_BUTTON_DPAD_DOWN,
 	}
@@ -107,6 +111,9 @@ func _iniciar_juego(con_intro: bool) -> void:
 	juego.fase_cambiada.connect(_al_cambiar_fase)
 	juego.vida_cambiada.connect(hud.poner_vida)
 	juego.derrotados_cambiados.connect(hud.poner_derrotados)
+	juego.espiritu_cambiado.connect(hud.poner_espiritu)
+	juego.mensaje.connect(hud.mostrar_mensaje)
+	hud.poner_espiritu(0.0)
 	juego.iniciar(con_intro)
 	hud.poner_vida(Datos.VIDA_MAXIMA)
 	hud.poner_derrotados(0, Datos.PATRULLAS.size())
@@ -150,7 +157,19 @@ func _notification(que: int) -> void:
 			alternar_pausa()
 
 
+# Animación limitada estilo anime (poses a 12 por segundo) o suave, para comparar.
+func alternar_estilo_animacion() -> void:
+	VisualModelo.estilo_anime = not VisualModelo.estilo_anime
+	hud.poner_estilo_animacion()
+	hud.mostrar_mensaje("Animación anime: 12 poses por segundo" if VisualModelo.estilo_anime
+		else "Animación suave")
+
+
 func _input(evento: InputEvent) -> void:
+	if evento.is_action_pressed("estilo_animacion"):
+		alternar_estilo_animacion()
+		get_viewport().set_input_as_handled()
+		return
 	if evento.is_action_pressed("pausa"):
 		alternar_pausa()
 		get_viewport().set_input_as_handled()

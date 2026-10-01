@@ -1,6 +1,6 @@
 # RONIN — Traspaso del proyecto (handoff)
 
-**Última actualización:** 27 de septiembre de 2026 · sesión de Claude Code en la nube
+**Última actualización:** 1 de octubre de 2026 · sesión de Claude Code en la nube
 **Leer entero antes de seguir.** Copia en Google Drive: `Respaldos Claude/ronin/01-Diseno/`.
 **Forma de trabajar:** las instrucciones del usuario (equipo multidisciplinario de videojuegos:
 Game Director, diseño, producción, marketing, negocio…) están en `CLAUDE.md`, en la raíz del
@@ -10,10 +10,12 @@ repositorio. Síguelas: fases, MVP/Must/Should/Nice, formato DECISIÓN y hablar 
 
 ## 1. Objetivo
 
-Convertir **RONIN** (samurái Akira, historia fija) en un juego real, divertido y viable. Tras
-comparar cinco versiones, el usuario eligió **Godot 4.7 + cel-shading** y, como alcance, **un
-núcleo con variaciones y lanzamiento por capítulos** (opción C; los dos, 27-09-2026). Ahora toca
-llegar al **vertical slice** «Una noche en Hoshiyama» (`ronin3d/PLAN_PRODUCCION.md`, §5), que
+Convertir **RONIN** (samurái Akira) en un juego real, divertido y viable. Tras comparar cinco
+versiones, el usuario eligió **Godot 4.7 + cel-shading** y, como alcance, **un núcleo con
+variaciones y lanzamiento por capítulos** (opción C; los dos, 27-09-2026). El **1-10-2026** amplió
+el mundo: un Japón invadido por yōkai, combate de **iaidō** (precisión), Takeda como **shōgun** y
+Genzo **pactando con el gran yōkai** (decisiones 2-7 de `ronin3d/PROPUESTA_MUNDO_YOKAI.md`). Ahora
+toca llegar al **vertical slice** «Una noche en Hoshiyama» (`ronin3d/PLAN_PRODUCCION.md`, §5), que
 pulido será el primer capítulo (castillo + planicie + aldea).
 
 ## 2. Hecho
@@ -28,12 +30,11 @@ pulido será el primer capítulo (castillo + planicie + aldea).
 - **Decisión:** Godot 4.7 (Compatibility) + cel-shading; textos de intro y cierre sin cambios.
 - **Godot solo con cel-shading** (`ronin3d/godot/`): HD-2D y pixel art 3D retirados (quedan en
   el commit `8ec4b1b`). Patio más legible de noche.
-- **Controles:** teclado/ratón, **mando** y **pantalla táctil** (joystick, Atacar, Parar,
+- **Controles:** teclado/ratón, **mando** y **pantalla táctil** (joystick, Atacar, Iai, Luna,
   Saltar, pausa, arrastrar para la cámara, tocar para seguir). `--tactil` los muestra en el PC.
-- **Combate de precisión (prototipo):** K / LB / botón «Parar» justo al aviso «!» desvía la
-  estocada, el soldado queda sin guardia 1,6 s y el contraataque lo derriba de un golpe; a
-  destiempo no sirve. **Sensación:** pausa de impacto, cámara lenta en la parada, sacudida,
-  chispas, estela de la espada y 7 sonidos generados (`sonidos/generar_sonidos.py`).
+- **Combate de precisión (0.2, ya sustituido):** parar al «!» y contraatacar. **Sensación:**
+  pausa de impacto, cámara lenta en la parada, sacudida, chispas, estela de la espada y 7 sonidos
+  generados (`sonidos/generar_sonidos.py`).
 - **Exportación** preparada: `export_presets.cfg` con Android (APK arm64) y Windows; icono
   provisional; compresión ETC2/ASTC activada.
 - **Prueba automática: 15 de 15** (flujo, HUD, cámara, espada, muros, portón, pausa, toques,
@@ -53,22 +54,68 @@ pulido será el primer capítulo (castillo + planicie + aldea).
   `ronin/03-Godot/firma-prueba/` (con un LEEME): las versiones siguientes se instalan encima de
   la 0.2 sin desinstalarla.
 
+**El 1-10-2026:**
+
+- **Propuesta del mundo yōkai** analizada (`PROPUESTA_MUNDO_YOKAI.md`) y **decisiones 2 a 7
+  cerradas**:
+  - 2: precisión con iaidō.
+  - 3: pacto de Genzo con el gran yōkai, y Takeda pasa a ser shōgun.
+  - 4: yōkai con variantes, más criaturas, las de otras tierras y Bahamut como dragón.
+  - 5: escenas en ilustración 2D.
+  - 6: animación estilo anime limitado, a probar.
+  - 7: sin farmeo automático.
+- **Iaidō** (sustituye a la parada): mantener K / LB / «Iai» y soltar justo al «!». El iai
+  perfecto desvía la lanza y derriba de un corte, con pausa, cámara lenta y un cuadro de tinta
+  invertida. A destiempo no para nada; hay que esperar 0,6 s para repetir.
+- **Corte de luna:** L / Y / «Luna» con la barra de espíritu llena (se llena con iai y golpes).
+  El tiempo se congela, la pantalla se vuelve tinta, aparecen las líneas de corte y caen los
+  enemigos a menos de 7 m. Sin enemigos cerca no gasta la barra.
+- **Animación limitada estilo anime:** poses a 12 por segundo. **T** (teclado), Select (mando) o
+  el botón de la pausa (móvil) cambia a la suave para comparar.
+- **Prueba automática: 16 de 16.** GIF del iai y del corte de luna en `capturas/actual/`, hechos
+  con `herramientas/hacer_gifs.py`.
+- **Conceptos 2D** con Higgsfield en `arte/conceptos/` (y los PNG originales en Drive):
+  - personajes: Akira, Genzo, Takeda y el gran yōkai;
+  - criaturas: Bahamut, kappa, oni y onibi.
+  - El oni gigante salió en negro tres veces (filtro de Higgsfield) y se dejó.
+  - Cada imagen cuesta 0,15 créditos; quedan 5,7.
+- **`HISTORIA.md`:** sinopsis para aprobar, con los textos nuevos de intro y cierre propuestos
+  (no aplicados). DECISIONES 8 (aprobarla) y 9 (quién es el gran yōkai; recomendada
+  Tamamo-no-Mae).
+- **`BESTIARIO.md`:** familias para que sea viable, fichas del capítulo 1 (kappa, oni, onibi y
+  oni gigante), más de 50 criaturas por capítulos, Bahamut y DECISIÓN 10 (las criaturas de
+  otras tierras llegan en el capítulo 3; recomendada).
+- **APK de prueba 0.3** (`ronin/ronin-0.3-prueba.apk`, 26,9 MB, SHA-256 `bfff4cb6…1f0cedc7`).
+  Está firmado con la misma clave, así que se instala encima de la 0.2, que pasó a
+  «Versiones anteriores (RONIN)».
+
 ## 3. En curso / pendiente del usuario
 
-1. **Probar el APK en el móvil** y contar: FPS (meta ≥ 30), si los controles táctiles se
-   entienden y qué tal se siente la parada.
-2. **DECISIÓN 2 — Combate:** recomendación B (precisión), después de probarla.
+1. **Probar el APK 0.3 en el móvil** y contar:
+   - los FPS (meta ≥ 30);
+   - si el iai (mantener y soltar) y el corte de luna se entienden;
+   - qué animación prefiere, anime o suave.
+2. **DECISIÓN 8** (aprobar la sinopsis de `HISTORIA.md` y los textos nuevos), **DECISIÓN 9**
+   (el gran yōkai) y **DECISIÓN 10** (cuándo llegan las criaturas de otras tierras, en
+   `BESTIARIO.md`).
 3. Si tiene el `samurai.py` original, subirlo.
 
 ## 4. Siguiente
 
-1. Vertical slice (§5 del plan), base del primer capítulo: ajustar la parada con lo que diga
-   el usuario, un rival distinto (arquero o capitán), salida a la planicie con un encuentro de
-   dados, aldea mínima, menú y guardado, música. El detalle (luces, sombras, soldados) se ajusta
-   a los FPS que dé su móvil.
-2. Mejorar personajes (siguen hechos de piezas simples) y la estela/efectos tras verlos en el
-   móvil.
-3. Buscar nombre o subtítulo propio antes de cualquier página de tienda.
+1. Vertical slice (§5 del plan), base del primer capítulo:
+   - ajustar el iai con lo que diga el usuario;
+   - los yōkai del capítulo 1 (kappa, oni, onibi y el oni gigante de jefe; fichas en
+     `BESTIARIO.md`);
+   - salida a la planicie con un encuentro de dados;
+   - aldea mínima;
+   - menú y guardado (en estatuas jizō);
+   - música.
+   El detalle (luces, sombras, enemigos) se ajusta a los FPS que dé su móvil.
+2. Si aprueba la DECISIÓN 8: cambiar los textos de `datos.gd` («señor» pasa a «shōgun», yōkai en
+   el patio).
+3. Personajes con esqueleto para la animación estilo anime (DECISIÓN 6). Probar VRoid Studio en
+   su PC; desde la nube no se puede, porque es un programa de escritorio.
+4. Buscar nombre o subtítulo propio antes de cualquier página de tienda.
 
 ## 5. Dónde está todo
 
@@ -79,11 +126,15 @@ pulido será el primer capítulo (castillo + planicie + aldea).
 | Índice del proyecto | `ronin3d/LEEME.md` |
 | El juego | `ronin3d/godot/` (LEEME con controles, combate, exportación y prueba) |
 | Plan | `ronin3d/PLAN_PRODUCCION.md` |
+| Mundo yōkai (decisiones 2-7) | `ronin3d/PROPUESTA_MUNDO_YOKAI.md` |
+| Sinopsis (por aprobar) | `ronin3d/HISTORIA.md` |
+| Bestiario | `ronin3d/BESTIARIO.md` |
+| Conceptos 2D | `ronin3d/arte/conceptos/` (JPG) · Drive `ronin/05-Arte/conceptos-2d/` (PNG originales) |
 | Comparativa | `ronin3d/COMPARATIVA.md` · página privada https://claude.ai/artifact/6urV5FCikt9CWAUV35gBCu |
 | Capturas de hoy | `ronin3d/capturas/actual/` |
 | Clave de firma de prueba | Drive `Respaldos Claude/ronin/03-Godot/firma-prueba/` (privada; nunca en GitHub) |
-| APK de prueba | Drive `Respaldos Claude/ronin/ronin-0.2-prueba.apk` (como con Curtzz: el nuevo va en la raíz con el nombre `ronin-<versión>-prueba.apk` y el anterior pasa a «Versiones anteriores (RONIN)») |
-| Respaldo | Google Drive `Respaldos Claude/ronin/` (01-Diseno, 02-Prototipo-2D, 03-Godot, 04-Otros-motores) |
+| APK de prueba | Drive `Respaldos Claude/ronin/ronin-0.3-prueba.apk` (como con Curtzz: el nuevo va en la raíz con el nombre `ronin-<versión>-prueba.apk` y el anterior pasa a la carpeta «Versiones anteriores (RONIN)», dentro de `ronin/`) |
+| Respaldo | Google Drive `Respaldos Claude/ronin/` (01-Diseno, 02-Prototipo-2D, 03-Godot, 04-Otros-motores, 05-Arte, Versiones anteriores (RONIN)) |
 | Memoria | Vertiso Memory, handoff con ámbito `ronin-juego` |
 
 **Cómo pasar esto a un proyecto de Claude:** en claude.ai, abre el proyecto de RONIN y añade a
@@ -95,11 +146,15 @@ decisiones son: …». Si el chat tiene Vertiso Memory, el traspaso también est
 
 ## 6. Riesgos y reglas
 
-- **Historia base (no cambiar sin consultar):** Akira, guardia del señor Takeda; tras la
-  traición queda como ronin; busca justicia por fuera y recuperar su honor por dentro.
-  Villano: el general Genzo, mano derecha de Takeda, lo asesinó creyéndolo demasiado blando;
-  no se ve como villano y parte del pueblo lo apoya. Empieza y termina en el castillo de
-  Hoshiyama.
+- **Historia base (no cambiar sin consultar):**
+  - Akira, guardia de Takeda, que **desde el 1-10-2026 es el shōgun**. Tras la traición queda
+    como ronin; busca justicia por fuera y recuperar su honor por dentro.
+  - Villano: el general Genzo, mano derecha de Takeda. Lo asesinó creyéndolo demasiado blando,
+    tras **pactar con el gran yōkai** creyendo proteger Japón. No se ve como villano y parte del
+    pueblo lo apoya.
+  - Empieza y termina en el castillo de Hoshiyama.
+  - La sinopsis completa (`HISTORIA.md`) está **pendiente de aprobación**. Los textos del juego
+    siguen diciendo «señor Takeda» hasta entonces.
 - **Riesgos del plan:** alcance (seis géneros), combate poco profundo, controles táctiles para
   combate 3D, personajes hechos de piezas, rendimiento en móvil, nombre poco distintivo.
 - **Reglas de trabajo:** todo en español, nombres de variables en español; el usuario marca la
@@ -115,6 +170,12 @@ decisiones son: …». Si el chat tiene Vertiso Memory, el traspaso también est
   usuario); nunca en GitHub.
 - **Pedir permiso para descargas grandes** y verificar sumas de comprobación. **No publicar en
   redes.** Las páginas de claude.ai son privadas; compartirlas lo decide el usuario.
+- **Imágenes:** Higgsfield por Composio, con `HIGGSFIELD_MCP_GENERATE_IMAGE_BATCH` y luego
+  `HIGGSFIELD_MCP_JOBS_WAIT`.
+  - Modelo `z_image` a 0,15 créditos por imagen; la cuenta es «basic».
+  - El estilo común de los prompts está en `PROPUESTA_MUNDO_YOKAI.md` §10.
+  - Nunca comprar créditos ni planes, ni usar el modo ilimitado, sin que el usuario lo pida.
+  - Si una imagen sale negra, la cobran igual: cambiar el prompt antes de repetir.
 - Notas técnicas de Godot: los scripts usan `preload()` en vez de `class_name`; la prueba se
   lanza con `godot --path ronin3d/godot --fixed-fps 30 -- --prueba` (en Linux sin pantalla, con
   `xvfb-run -a`). Con Compatibility, cada luz que toca un objeto lo vuelve a dibujar: el suelo y

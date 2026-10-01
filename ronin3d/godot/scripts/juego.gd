@@ -14,6 +14,8 @@ const Efectos := preload("res://scripts/efectos.gd")
 signal fase_cambiada(fase: String)
 signal vida_cambiada(vida: int)
 signal derrotados_cambiados(cantidad: int, total: int)
+signal espiritu_cambiado(valor: float)
+signal mensaje(texto: String)
 
 var aspecto
 var efectos
@@ -48,7 +50,10 @@ func iniciar(con_intro := true) -> void:
 	add_child(efectos)
 	akira.buscar_rival = soldado_mas_cercano
 	akira.ataco.connect(func(): efectos.tajo(akira.global_position + Vector3.UP * 1.2))
-	akira.paro.connect(func(atacante): efectos.parada(_punto_entre(akira, atacante)))
+	akira.desenvaino.connect(func(): efectos.desenvaine(akira.global_position + Vector3.UP * 1.2))
+	akira.paro.connect(_al_iai_perfecto)
+	akira.pidio_corte_de_luna.connect(_al_pedir_corte_de_luna)
+	akira.espiritu_cambiado.connect(func(valor): espiritu_cambiado.emit(valor))
 	akira.vida_cambiada.connect(func(_vida): efectos.herido(akira.global_position + Vector3.UP * 1.1))
 
 	for patrulla in Datos.PATRULLAS:
@@ -124,6 +129,27 @@ func _punto_entre(a: Node3D, b: Node3D) -> Vector3:
 	return (a.global_position + b.global_position) / 2.0 + Vector3.UP * 1.15
 
 
+# Iai perfecto: Akira desvía la estocada y derriba al soldado de un solo corte.
+func _al_iai_perfecto(atacante) -> void:
+	efectos.iai_perfecto(_punto_entre(akira, atacante))
+	atacante.recibir_golpe(akira.global_position, true)
+
+
+# Corte de luna: solo se gasta la barra si hay alguien a quien cortar.
+func _al_pedir_corte_de_luna() -> void:
+	var objetivos: Array = soldados_vivos().filter(func(s):
+		return s.global_position.distance_to(akira.global_position) <= Datos.RADIO_CORTE_LUNA)
+	if objetivos.is_empty():
+		mensaje.emit("No hay enemigos cerca para el corte de luna")
+		return
+	akira.lanzar_corte_de_luna()
+	var puntos: Array = objetivos.map(func(s): return s.global_position + Vector3.UP * 1.1)
+	efectos.corte_de_luna(puntos, func():
+		for soldado in objetivos:
+			if is_instance_valid(soldado) and soldado.vivo():
+				soldado.recibir_golpe(akira.global_position, true))
+
+
 func _physics_process(delta: float) -> void:
 	constructor.actualizar(delta)
 	if fase != "jugando":
@@ -134,6 +160,7 @@ func _physics_process(delta: float) -> void:
 				akira.golpeados.append(soldado)
 				var mortal: bool = soldado.recibir_golpe(akira.global_position)
 				efectos.golpe(_punto_entre(akira, soldado), mortal)
+				akira.ganar_espiritu(Datos.ESPIRITU_POR_GOLPE)
 	if akira.vivo() and akira.global_position.x > Datos.LIMITE_PORTON_X and absf(akira.global_position.z) < 3.0:
 		akira.controlable = false
 		_cambiar_fase("cierre")
