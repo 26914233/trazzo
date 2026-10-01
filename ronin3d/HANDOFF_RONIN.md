@@ -117,7 +117,7 @@ pulido será el primer capítulo (castillo + planicie + aldea).
   para dibujar las imágenes 2D con SDXL: el flujo está probado sin GPU, **la carga y difusión en una T4
   no**. Las imágenes aún no están hechas.
 - **Prueba automática: 21 de 21.** **APK 0.4** (`ronin/ronin-0.4-prueba.apk`, 26,9 MB, SHA-256
-  `3e4d82c2…f4ec4633`, misma firma que la 0.2 y la 0.3).
+  `3e4d82c2…39ec4633`, misma firma que la 0.2 y la 0.3).
 
 ## 3. En curso / pendiente del usuario
 
