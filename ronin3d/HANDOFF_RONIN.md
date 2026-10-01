@@ -98,8 +98,9 @@ pulido será el primer capítulo (castillo + planicie + aldea).
   donde ni los yōkai quieren entrar, que rompe el equilibrio. Ficha, avisos de diseño y concepto 2D en
   `HISTORIA.md` §8 (`arte/conceptos/shijima.jpg`). **DECISIÓN 11 abierta** (recomendada B: gancho final y
   rango «silenciado»).
-- **Catálogo de monstruos** (tus dos Excel, 998 filas): limpiado y clasificado a mano, criatura por
-  criatura, con la rúbrica de `bestiario/RUBRICA_CLASIFICACION.md`. Resultado: **808 criaturas distintas**
+- **Catálogo de monstruos** (tus dos Excel, 998 filas): limpiado y clasificado criatura por
+  criatura (agentes en paralelo, tandas de unas 80, con la rúbrica de `bestiario/RUBRICA_CLASIFICACION.md`; el equipo revisó
+  muestras y pasó comprobaciones automáticas, no leyó las 939). Resultado: **808 criaturas distintas**
   (no 1.000) + **132 añadidas** (17 huestes celestiales, 72 demonios del *Goetia* y 8 comunes, 35 yōkai y
   aliados japoneses) = **939**, de ellas **825 utilizables como enemigos**. Datos en `bestiario/`
   (`catalogo_limpio.csv/json`, `prompts_colab.csv`, `informe_calidad.md`); la fuente de verdad es

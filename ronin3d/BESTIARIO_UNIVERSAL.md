@@ -24,10 +24,14 @@ no, medido sobre los archivos:
 | Duplicados | **98 nombres idénticos** en los dos archivos y **69 grupos** que son la misma criatura con otro nombre («Cerbero» y «Cerbero grecorromano», «Mantícora» ×4, «Gallu»/«Gallû», ortografías…). De 998 filas quedan **808 criaturas distintas** |
 | Relleno | Entradas que el propio catálogo avisa que son «categoría», «nombre comparativo» o «requiere verificación» (*Water spirit of the Zambezi*, *Raven spirit*, *Sisiutl africano*, *Kikimora Pacifica*…), y otras que **no son criaturas**: *Kermes* es un insecto tintóreo, *Ras al-hanout spirit* parte de una mezcla de especias, *Babr-e Bayan* es la armadura de un héroe, *Pekapeka* es un murciélago real |
 
-**Lo que hice:** clasifiqué a mano cada criatura canónica por lo que es (no por las columnas
-erróneas) en 13 campos: cultura real, familia de cuerpo, tamaño, rol de combate, elemento, bioma,
-cómo se modela, sensibilidad cultural, descripción visual en inglés para las imágenes y una nota de
-mecánica. Y añadí **132 criaturas** que no estaban (ver §5).
+**Lo que hice:** clasifiqué cada criatura canónica una por una, por lo que es (no por las columnas
+erróneas ni por reglas automáticas), en 13 campos: cultura real, familia de cuerpo, tamaño, rol de combate,
+elemento, bioma, cómo se modela, sensibilidad cultural, descripción visual en inglés para las imágenes y una
+nota de mecánica. Lo hicieron agentes de Claude en paralelo, una tanda de unas 80 criaturas cada uno, con la rúbrica de
+`bestiario/RUBRICA_CLASIFICACION.md`; **yo revisé muestras y pasé comprobaciones automáticas** (formato,
+reskins con base, palabras de riesgo en los prompts, familia frente a descripción), pero **no leí las 939
+una por una**: espera algún error de detalle (por eso quedan 77 marcadas «Dudosa»). Y añadí **132
+criaturas** que no estaban (ver §5).
 
 **Cifras tras la limpieza** *(salen de `bestiario/informe_calidad.md`)*:
 

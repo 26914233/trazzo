@@ -48,4 +48,5 @@ Cifras actuales: 807 filas del catálogo + 132 añadidas = **939** (el *Oni* del
 Si se corrige una criatura, se corrige en su `clasif_NN.json` (o en `criaturas_extra.py`) y se vuelve a
 ejecutar esa orden. Para partir de los xlsx originales: `leer_catalogo.py` → `fusionar.py` →
 clasificar según `RUBRICA_CLASIFICACION.md` → `unir_clasificacion.py`. La clasificación es **trabajo
-manual de revisión**: no sale de reglas automáticas.
+manual de revisión**: no sale de reglas automáticas. La hicieron varios agentes de Claude con la rúbrica y
+se revisó por muestras y con comprobaciones automáticas; no se leyeron las 939 entradas una por una.
