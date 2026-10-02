@@ -474,6 +474,10 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   - 13: cómo se modelan las criaturas icónicas.
   - 14: cuántos rangos.
   - 15: cómo dar a todos los enemigos el detalle de un jefe (`BESTIARIO_UNIVERSAL.md` §8.2).
+  - 19: camino hacia el «2D lo más pulido» para los personajes que se ven de cerca
+    (`PLAN_PRODUCCION.md` §16). Recomendado: piezas con trucos de anime, más un piloto de modelo en
+    Blender solo con Akira (necesita permiso para descargar Blender) y un modo tinta opcional.
+    VRoid Studio pide 8 GB de RAM y no cabe en su PC.
   - La regla de respeto cultural: los dioses y seres sagrados de religiones vivas no son enemigos.
 
   Detalle y recomendaciones en `ronin3d/BESTIARIO_UNIVERSAL.md` y `ronin3d/PLAN_PRODUCCION.md`.
@@ -511,6 +515,13 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   `ronin3d/godot/LEEME.md`, sección «Exportar». La clave de firma de prueba está en Drive ›
   `ronin/03-Godot/firma-prueba/` (guardada con permiso del usuario el 27-09-2026); nunca en
   GitHub, que es público.
+- **Personajes de piezas con aire de anime (desde la 0.8):**
+  - pelo en mechones (conos unidos en una malla);
+  - **caras dibujadas**: `godot/recursos/caras/cara_<skin>.png`, que hace `generar_caras.py` y
+    proyecta `shaders/toon_cara.gdshader`;
+  - línea de grosor casi constante (`contorno.gdshader`, de 1,3 a 3,5 px a 720p). En el renderizador
+    Compatibility, `PROJECTION_MATRIX[1][1]` sale negativo: por eso lleva `abs()`.
+  - Revisión de cerca: `--script res://scripts/retrato.gd -- akira`.
 - **Proyecto principal:** `ronin3d/godot/`. Prueba automática:
   `godot --path ronin3d/godot --fixed-fps 30 -- --prueba` (en Linux sin pantalla, con
   `xvfb-run -a`). Las versiones Three.js y Ursina de `ronin3d/` quedan solo como referencia.

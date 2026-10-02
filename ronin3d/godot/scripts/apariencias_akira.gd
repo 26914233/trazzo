@@ -32,7 +32,7 @@ const APARIENCIAS := {
 		"kimono": Color("2a2a32"), "manga": Color("1c1c22"), "remiendo": Color("44444f"),
 		"hakama": Color("3a3442"), "obi": Color("5a2622"), "cinta": Color("5a2622"), "solapa": Color("8a8a90"),
 		"pelo": Color("6a6a72"), "piel": Color("c49c78"),
-		"ancho": 1.12, "escala": 1.02, "peinado": "moño", "barba": "corta",
+		"ancho": 1.12, "escala": 1.02, "peinado": "moño", "barba": "corta", "flequillo": false,
 		"vendas": false, "tasuki": false, "sombrero": true,
 	},
 	"mujer": {

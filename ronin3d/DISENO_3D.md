@@ -187,6 +187,17 @@ escala sin suavizado: parece pixel art pero la cámara gira libre.
 Los mismos modelos 3D con sombreado por bandas (2-3 tonos), brillo de borde y
 contorno negro, a resolución completa: aspecto de dibujo animado.
 
+Desde la 0.8, para que los personajes de piezas se parezcan más a un dibujo de anime:
+- **Cabezas sin forma de bola:** pelo en mechones (puntas, flequillo, patillas a los lados de la
+  cara, moño o coleta), mentón en punta y cuello. Los soldados llevan protector de cuello (shikoro)
+  y máscara (menpō).
+- **Cara dibujada:** ojos, cejas, nariz y boca son una imagen 2D proyectada sobre la cabeza
+  (`godot/recursos/caras/`), una por skin y otra para los soldados. A los soldados, la sombra del
+  sombrero les tapa los ojos y solo se ven dos rendijas claras.
+- **Piel con luz plana:** la sombra no parte la cara en dos.
+- **Línea de dibujo** de 1,3 a 3,5 píxeles a 720p, con el color de la línea en un tono muy oscuro del
+  propio color, no en negro puro.
+
 ## 9. Sprites y texturas compartidos (`recursos/`)
 
 Generados por `recursos/generar_recursos.py` (Python + pygame). Si se cambian, se

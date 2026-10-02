@@ -386,3 +386,110 @@ traición. Contado en la intro y el cierre (§5 de la historia).
   en unas 4-8.
 
 Si en el móvil se siente lento o regalado, se ajustan los precios en `godot/scripts/partida.gd`.
+
+## 16. Hecho el 2-10-2026 (noche): versión 0.8, cabezas que ya no son bolas
+
+1. **Pelo en mechones:** cada mechón es un cono, y todos se unen en una sola malla (una sola llamada
+   de dibujo, que el móvil agradece).
+   - Joven: puntas revueltas, flequillo sobre la cinta y patillas que tapan las mejillas.
+   - Curtido y veterano: moño de ronin hacia delante, puntas en la nuca y patillas hasta la
+     mandíbula. El veterano, con entradas: sin flequillo.
+   - Akira mujer: flequillo recto, patillas hasta la barbilla y coleta alta.
+2. **Cara dibujada:** los ojos, las cejas, la nariz y la boca son una imagen 2D que se proyecta
+   sobre la cabeza, la técnica de los juegos de anime en 3D. Cada skin tiene la suya:
+   - el curtido, con barba de pocos días;
+   - el veterano, con patas de gallo, surcos y bigote;
+   - Akira mujer, con pestañas.
+   Las imágenes salen de `godot/recursos/caras/generar_caras.py` y se pueden redibujar a mano.
+3. **Forma de la cabeza:** mentón en punta, cuello, la cabeza algo más estrecha y la piel con luz
+   plana, para que la sombra no parta la cara en dos.
+4. **Cinta (hachimaki) a medida:** va pegada a la frente y por encima del pelo, con el nudo y las
+   puntas detrás. Antes era un aro que flotaba como un halo oscuro.
+5. **Barba del veterano en mechones.** Antes era una bola gris que parecía un bozal.
+6. **Soldados:** protector de cuello (shikoro) y máscara (menpō). Además, la sombra del sombrero les
+   tapa los ojos y solo se ven dos rendijas claras.
+7. **Línea de dibujo de grosor casi constante** en todo el juego: entre 1,3 y 3,5 píxeles a 720p.
+   - De cerca ya no es un borrón y de lejos no desaparece.
+   - **[Hecho]** No cuesta rendimiento: 44 ms por cuadro frente a 43 ms antes, con 24 personajes en
+     el emulador de la nube (6 medidas alternas; la diferencia está dentro del ruido).
+8. **Arreglado:** en la galería se pisaban los nombres de las skins.
+9. **Prueba automática: 31 de 31.** FPS al caminar por el patio: entre 11,7 y 12,4 en dos pasadas
+   (antes 11,9), en el mismo emulador. Es decir, lo mismo.
+
+Antes y después: `capturas/comparativa_cabezas.jpg`.
+
+### Hasta dónde llegan las piezas [Opinión]
+- **Lo que sí se puede** (la vía de hoy):
+  - siluetas con identidad (pelo, sombreros, armas);
+  - caras dibujadas, y expresiones cambiando la imagen: dolor, concentración, ojos cerrados (aún sin
+    hacer);
+  - línea de dibujo y luz en bandas;
+  - animación limitada a 12 poses por segundo.
+- **El techo:**
+  - el cuerpo son cajas y cilindros, así que la ropa no cae ni hace pliegues;
+  - no hay esqueleto: las articulaciones se ven como piezas sueltas y nada se dobla;
+  - las manos no tienen dedos, y la cara no tiene volumen de nariz ni pómulos;
+  - de cerca nunca parecerá un dibujo a mano. A la distancia de la cámara del juego, en cambio, sí se
+    lee como anime.
+- **Los juegos que «parecen 2D» en 3D** (Guilty Gear Xrd, Genshin Impact, Hi-Fi Rush) usan otra cosa:
+  - modelos de una pieza hechos a mano y con esqueleto;
+  - normales retocadas para que la sombra caiga como en un dibujo;
+  - caras con expresiones;
+  - poses exageradas.
+  Eso es modelado de verdad, que es la opción B de abajo.
+
+### DECISIÓN 19 — Camino hacia el «2D lo más pulido» · **pendiente**
+- **DECISIÓN:** con qué hacemos los personajes que se ven de cerca (Akira, Shiro, Genzo, Takeda y los
+  jefes).
+- **OPCIONES:**
+  - A) **Seguir con piezas y trucos de anime** (lo de hoy), y añadir expresiones, mangas y hakama con
+    caída (formas en trapecio) y manos con forma.
+  - B) **Modelos hechos en Blender:**
+    - una malla suave por personaje, con esqueleto y pelo en mechones;
+    - la cara dibujada de hoy y sombreado anime;
+    - los haría yo por código, aquí en la nube, sin usar tu PC.
+  - C) **VRoid Studio** en tu PC: personajes anime de calidad con deslizadores. Exporta VRM y Godot
+    lo importa con el complemento godot-vrm.
+  - D) **Personajes 2D de verdad** (sprites dibujados) en el mundo 3D, al estilo «HD-2D» de Octopath
+    Traveler.
+  - E) **Modo tinta:** un filtro opcional que pone todo el juego en blanco y negro con tramas, como un
+    manga que se mueve. Se puede sumar a cualquiera de las otras.
+- **VENTAJAS:**
+  - A: gratis, rápida y sin riesgo técnico. A la distancia del juego ya se lee como anime.
+  - B: el mayor salto de calidad sin depender de tu PC ni de créditos. Cuerpos que se doblan y ropa
+    con forma.
+  - C: la mejor calidad por esfuerzo en personajes anime.
+  - D: el «2D» más literal, y el más bonito si se dibuja bien.
+  - E: identidad muy fuerte y barata. Casa con la 18A y con el pilar «grabado en tinta que se mueve».
+- **RIESGOS:**
+  - A: el techo de arriba: de cerca seguirá pareciendo hecho de piezas.
+  - B: modelar por código tiene un límite, y sin un artista no llegará al nivel de Genshin
+    [Opinión]. Además, hay que rehacer la animación: de girar piezas a mover huesos.
+  - C: **[Hecho]** según su ficha de Steam, pide 8 GB de RAM como mínimo (16 recomendados) y 10 GB de
+    disco. Con 0,5-1 GB libres no es viable hoy en tu PC. Y los personajes de VRoid se parecen entre
+    sí [Opinión].
+  - D: hay que dibujar cada personaje en 8 direcciones y para cada animación: cientos de dibujos
+    [Estimación]. Con IA, el problema es la coherencia entre dibujos, y quedan 0,01 créditos.
+  - E: hay que probar la legibilidad en combate (el rojo de acento tiene que marcar a los enemigos y
+    los golpes) y el coste en móviles modestos.
+- **COSTE** [Estimación]:
+  - A: bajo, unas horas por mejora.
+  - B: instalar Blender, una descarga grande que necesita tu permiso, y 1-2 sesiones por personaje
+    principal.
+  - C: gratis, pero necesita un PC con más memoria.
+  - D: el más caro: semanas de dibujo o un artista.
+  - E: bajo, una sesión para el prototipo.
+- **RECOMENDACIÓN [Opinión]:**
+  - **A**, que ya está hecha en lo principal.
+  - **Un piloto de B solo con Akira**, para decidir con él delante si B se queda en los personajes
+    principales. Soldados y criaturas seguirían con piezas: a la distancia del juego ya funcionan.
+  - **Un prototipo de E** como opción en la pausa.
+  - C, si algún día cambias de PC. D, descartada en esta fase por coste.
+- **SIGUIENTE PASO:**
+  - Si eliges B: me das permiso para descargar Blender (verifico la suma de comprobación) y hago a
+    Akira.
+  - Si eliges E: hago el modo tinta como opción en la pausa.
+
+| # | Decisión | Dónde | Estado |
+| --- | --- | --- | --- |
+| 19 | Camino hacia el «2D lo más pulido» | §16 | **Pendiente.** Recomendado: A + piloto de B con Akira + prototipo de E |

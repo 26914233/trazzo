@@ -136,7 +136,7 @@ func _retratar(id: int, carpeta: String) -> void:
 	quit()
 
 
-# Los cuatro aspectos de Akira y Shiro: en fila, cada cara de cerca y Shiro de cerca.
+# Los cuatro aspectos de Akira, un soldado y Shiro: en fila, cada cara de cerca y Shiro de cerca.
 func _retratar_personajes(carpeta: String) -> void:
 	var escena := _escena()
 	var raiz: Node3D = escena[0]
@@ -145,7 +145,7 @@ func _retratar_personajes(carpeta: String) -> void:
 	var info := {"mirando": Vector3.BACK, "moviendose": false, "corriendo": false, "en_aire": false,
 		"pose": "normal", "progreso": 0.0, "visible": true, "destello": 0.0, "muerte": -1.0, "aviso": false}
 	var figuras: Array = []
-	var x := -2.4
+	var x := -3.2
 	for id in Apariencias.ORDEN:
 		var akira = VisualModelo.new()
 		akira.configurar(aspecto, false, id)
@@ -154,14 +154,22 @@ func _retratar_personajes(carpeta: String) -> void:
 		akira.actualizar(0.1, info)
 		figuras.append(akira)
 		x += 1.6
+	var soldado = VisualModelo.new()
+	soldado.configurar(aspecto, true)
+	raiz.add_child(soldado)
+	soldado.position = Vector3(x, 0, 0)
+	soldado.actualizar(0.1, info)
+	figuras.append(soldado)
 	var shiro = VisualShiro.new()
 	shiro.configurar(aspecto)
 	raiz.add_child(shiro)
-	shiro.position = Vector3(-1.6, 0, 0.9)
-	var vistas := [["akira_fila", Vector3(0, 1.6, 7.6), Vector3(0, 0.95, 0)]]
-	for i in figuras.size():
+	shiro.position = Vector3(-2.4, 0, 0.9)
+	var vistas := [["akira_fila", Vector3(0, 1.6, 8.8), Vector3(0, 0.95, 0)]]
+	for i in Apariencias.ORDEN.size():
 		var p: Vector3 = figuras[i].position
 		vistas.append(["akira_cara_" + String(Apariencias.ORDEN[i]), p + Vector3(0.15, 1.75, 1.15), p + Vector3(0, 1.48, 0)])
+	vistas.append(["soldado_cara", soldado.position + Vector3(0.3, 1.62, 1.35), soldado.position + Vector3(0, 1.6, 0)])
+	vistas.append(["akira_tres_cuartos", figuras[0].position + Vector3(1.3, 1.9, 1.6), figuras[0].position + Vector3(0, 1.35, 0)])
 	vistas.append(["shiro_cerca", shiro.position + Vector3(0.9, 0.75, 1.5), shiro.position + Vector3(0, 0.33, 0)])
 	for vista in vistas:
 		camara.position = vista[1]

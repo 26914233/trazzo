@@ -5,6 +5,7 @@ extends RefCounted
 const Datos := preload("res://scripts/datos.gd")
 const SHADER_TOON := preload("res://shaders/toon.gdshader")
 const SHADER_CONTORNO := preload("res://shaders/contorno.gdshader")
+const SHADER_CARA := preload("res://shaders/toon_cara.gdshader")
 const SHADER_CIELO := preload("res://shaders/cielo.gdshader")
 
 # Color plano de cada superficie del escenario
@@ -57,8 +58,32 @@ func material_toon(color: Color, con_contorno := true, por_normal := true) -> Sh
 
 # --- Personajes (un material nuevo por pieza, para poder hacerla destellar) -------------------
 
-func material_personaje(color: Color, por_normal := true) -> Material:
-	return material_toon(color, true, por_normal)
+# Como en el anime: la línea es un tono muy oscuro del propio color (no negro puro), y la piel
+# puede ir con luz plana para que las caras no se partan en dos con la sombra.
+func material_personaje(color: Color, por_normal := true, plano := false) -> Material:
+	var material := material_toon(color, true, por_normal)
+	if plano:
+		material.set_shader_parameter("plano", 1.0)
+	material.next_pass.set_shader_parameter("color", Color(0.05, 0.04, 0.07).lerp(color.darkened(0.7), 0.45))
+	return material
+
+
+# Cara con los rasgos dibujados (recursos/caras/): la piel con luz plana y, encima, la imagen de
+# los ojos, las cejas y la boca. «a_cabeza» lleva la malla al espacio de la cabeza, que es donde
+# está medida la imagen. La línea de la cara es fina y del tono de la piel: gruesa y oscura
+# parecía barba.
+func material_cara(color: Color, rasgos: Texture2D, a_cabeza: Transform3D) -> Material:
+	var cara := ShaderMaterial.new()
+	cara.shader = SHADER_CARA
+	cara.set_shader_parameter("color", color)
+	cara.set_shader_parameter("rasgos", rasgos)
+	cara.set_shader_parameter("a_cabeza", Projection(a_cabeza))
+	var contorno := ShaderMaterial.new()
+	contorno.shader = SHADER_CONTORNO
+	contorno.set_shader_parameter("grosor", 0.011)
+	contorno.set_shader_parameter("color", color.darkened(0.55))
+	cara.next_pass = contorno
+	return cara
 
 
 func poner_destello(material: Material, cantidad: float) -> void:

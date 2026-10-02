@@ -693,27 +693,31 @@ func _comprobar_shiro_sigue() -> void:
 		"a %.1f m de Akira tras caminar" % distancia)
 
 
-func _contar_mallas(nodo: Node) -> int:
-	var cuenta := 1 if nodo is MeshInstance3D else 0
+# Triángulos de todas las mallas: cada aspecto tiene su peinado (y el veterano, barba), así que
+# salen distintos. (Contar piezas ya no sirve: el pelo se une en una sola malla.)
+func _contar_triangulos(nodo: Node) -> int:
+	var cuenta := 0
+	if nodo is MeshInstance3D and nodo.mesh != null:
+		cuenta = nodo.mesh.get_faces().size() / 3
 	for hijo in nodo.get_children():
-		cuenta += _contar_mallas(hijo)
+		cuenta += _contar_triangulos(hijo)
 	return cuenta
 
 
 func _comprobar_apariencias() -> void:
 	var aspecto = Aspecto.new()
-	var piezas := {}
+	var triangulos := {}
 	var con_cicatriz := 0
 	for id in Apariencias.ORDEN:
 		var modelo = VisualModelo.new()
 		modelo.configurar(aspecto, false, id)
-		piezas[id] = _contar_mallas(modelo)
+		triangulos[id] = _contar_triangulos(modelo)
 		if modelo.find_child("Cicatriz0", true, false) != null:
 			con_cicatriz += 1
 		modelo.free()
 	var distintas := {}
-	for id in piezas:
-		distintas[piezas[id]] = true
+	for id in triangulos:
+		distintas[triangulos[id]] = true
 	# En la pausa se cambia el aspecto en el momento; cuatro cambios devuelven el de antes.
 	var antes := Apariencias.elegida
 	var cambios_bien := true
@@ -723,8 +727,8 @@ func _comprobar_apariencias() -> void:
 		cambios_bien = cambios_bien and _juego().akira.visual.apariencia == Apariencias.mostrada
 	principal.alternar_pausa()
 	_registrar("Los cuatro aspectos de Akira llevan la cicatriz y el sastre los enseña en la pausa",
-		con_cicatriz == 4 and distintas.size() >= 3 and cambios_bien and Apariencias.elegida == antes,
-		"piezas: %s" % str(piezas))
+		con_cicatriz == 4 and distintas.size() == 4 and cambios_bien and Apariencias.elegida == antes,
+		"triángulos: %s" % str(triangulos))
 
 
 func _preparar_shiro() -> void:

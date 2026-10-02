@@ -6,6 +6,8 @@ uniform vec4 color : source_color = vec4(1.0);
 uniform float destello = 0.0;          // 1 = blanco (golpe recibido)
 uniform float emision = 0.0;           // para ventanas, fuego, etc.
 uniform float fuerza_borde = 0.18;
+// 1 = luz plana, sin la banda de sombra (las caras del anime no se parten en dos).
+uniform float plano = 0.0;
 
 void fragment() {
 	vec3 base = mix(color.rgb, vec3(1.0), destello);
@@ -19,5 +21,6 @@ void fragment() {
 void light() {
 	float intensidad = dot(NORMAL, LIGHT);
 	float banda = smoothstep(-0.05, 0.0, intensidad) * 0.45 + smoothstep(0.5, 0.55, intensidad) * 0.55;
+	banda = mix(banda, 0.8, plano);
 	DIFFUSE_LIGHT += ALBEDO * LIGHT_COLOR * ATTENUATION * banda;
 }

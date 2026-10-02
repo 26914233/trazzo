@@ -177,7 +177,8 @@ func _definir_paginas() -> Array:
 	# Akira (el joven endurecido y sus tres skins) y Shiro, desde la 0.6
 	var personajes: Array = []
 	for id in Apariencias.ORDEN:
-		var precio := "" if id == "joven" else " · %d mon" % Partida.precio(id)
+		# el precio, en otra línea: en una sola, los nombres se pisaban
+		var precio := "" if id == "joven" else "\n%d mon" % Partida.precio(id)
 		personajes.append({"personaje": "akira", "apariencia": id, "tamano": "M",
 			"nombre": String(Apariencias.APARIENCIAS[id].nombre) + precio})
 	personajes.insert(1, {"personaje": "shiro", "tamano": "S", "nombre": "Shiro"})

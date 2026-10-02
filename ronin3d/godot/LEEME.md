@@ -92,6 +92,25 @@ de probar.
 - **Textos (DECISIÓN 17A):** la intro cuenta la cicatriz y que Shiro, el perro del shōgun, huye con
   Akira; el cierre, que cruza la puerta con Shiro.
 
+## Cabezas y caras dibujadas (nuevo en la 0.8)
+
+Para que los personajes se parezcan más a un dibujo de anime y la cabeza no se vea como una bola:
+
+- **Pelo en mechones** (conos unidos en una sola malla): puntas, flequillo, patillas a los lados de la
+  cara, moño o coleta según la skin. La barba del veterano también va en mechones.
+- **Cara dibujada:** ojos, cejas, nariz y boca son una imagen 2D (`recursos/caras/cara_<skin>.png`) que
+  `shaders/toon_cara.gdshader` proyecta sobre la cabeza y el mentón, como en los juegos de anime en 3D.
+  - Las imágenes las dibuja `recursos/caras/generar_caras.py` (Python con PIL): `python3
+    recursos/caras/generar_caras.py`.
+  - También se pueden redibujar a mano: es un PNG de 256 × 256 con transparencia. Cubre de -0,12 a
+    0,12 m en horizontal y de -0,13 a 0,11 m en vertical, vista de frente.
+- **Cinta a medida:** pegada a la frente y por encima del pelo, con el nudo y las puntas detrás.
+- **Soldados:** protector de cuello (shikoro), máscara (menpō) y la sombra del sombrero sobre los ojos.
+- **Línea de grosor casi constante** (`shaders/contorno.gdshader`): entre 1,3 y 3,5 píxeles a 720p,
+  como el trazo de un dibujo. Los límites son `minimo_px` y `maximo_px`.
+- Para revisarlos de cerca: `godot --path ronin3d/godot --script res://scripts/retrato.gd -- akira`
+  (las cuatro skins, un soldado y Shiro; deja las imágenes en `../capturas/actual/`).
+
 ## Galería de criaturas (nueva en la 0.4)
 
 Sirve para ver y medir el sistema que construye criaturas con piezas (`../BESTIARIO_UNIVERSAL.md`):
@@ -117,20 +136,20 @@ Sirve para ver y medir el sistema que construye criaturas con piezas (`../BESTIA
 
 ## Exportar
 
-- **APK de prueba (ya hecho):** `ronin-0.7-prueba.apk` está en Google Drive, en
+- **APK de prueba (ya hecho):** `ronin-0.8-prueba.apk` está en Google Drive, en
   `Respaldos Claude/ronin/` (tamaño y SHA-256 en `../HANDOFF_RONIN.md`). Para instalarlo, ábrelo desde
   el móvil y acepta «instalar apps de origen desconocido» si Android lo pide. Pide Android 7.0 o
   superior y un móvil de 64 bits. Se instala encima de las anteriores (misma firma); están en
   «Versiones anteriores (RONIN)».
   - Trae a Akira endurecido, a Shiro, las monedas, el jizō, el sastre (skins bloqueadas) y la
-    partida guardada.
+    partida guardada. La 0.8 añade las cabezas nuevas: pelo en mechones y caras dibujadas.
   - **Peso de cada modelo dentro del APK:** Aka-oni 1,2 MB (malla 0,5 + textura 0,7), kappa 2,2 MB
     y Chōchin-obake 0,1 MB (SketchUp: colores planos).
 - **Desde tu PC:** Proyecto → Exportar → **Android** → Exportar proyecto (como con Curtzz). El
   APK sale en `ronin3d/godot/exportaciones/` (esa carpeta no se sube a git). Hace falta lo mismo
   que para Curtzz: plantillas de exportación de Godot 4.7.2 y el SDK de Android configurado.
   Paquete provisional: `com.thunderdarkness.ronin` (se puede cambiar antes de publicar).
-- **En la nube (así se hicieron de la 0.2 a la 0.7):**
+- **En la nube (así se hicieron de la 0.2 a la 0.8):**
   1. Plantillas `Godot_v4.7.2-stable_export_templates.tpz` (1.281 MB, SHA-512 comprobado con el
      `SHA512-SUMS.txt` del release). Solo hacen falta `android_release.apk`, `android_debug.apk` y
      `version.txt`, en `~/.local/share/godot/export_templates/4.7.2.stable/`.
@@ -177,9 +196,10 @@ godot/
 ├── principal.tscn         Escena raíz
 ├── icono.png              Icono provisional
 ├── recursos/sombra.png    Sombra bajo los personajes
+├── recursos/caras/        Caras dibujadas de cada personaje (PNG) y su generador
 ├── datos/bestiario.json   Las criaturas del catálogo (lo genera ronin3d/herramientas/bestiario/unir_clasificacion.py)
 ├── sonidos/               Efectos de sonido (.wav) y su generador
-├── shaders/               cielo, toon (cel-shading), toon_textura (modelos detallados), contorno y tinta
+├── shaders/               cielo, toon (cel-shading), toon_cara (caras dibujadas), toon_textura (modelos detallados), contorno y tinta
 ├── modelos/criaturas/     Modelos detallados (GLB) y su LEEME: cómo se hicieron, sumas y licencias
 └── scripts/
     ├── principal.gd       Controles, flujo intro → juego → cierre, pausa
@@ -224,7 +244,7 @@ guardada):
   criaturas se construyen** dentro del presupuesto de piezas;
 - los modelos detallados: se cargan con textura y cel-shading, y el Aka-oni mide lo que debe en sus tres
   rangos (sin contar el garrote, que va levantado);
-- los cuatro aspectos de Akira (todos con la cicatriz, y se cambian en la pausa);
+- los cuatro aspectos de Akira (todos con la cicatriz, distintos entre sí, y se cambian en la pausa);
 - Shiro: sigue a Akira, desentierra monedas y trae las que se quedan atrás; los soldados sueltan
   monedas y Akira las recoge (el HUD las cuenta);
 - el sastre (skins bloqueadas que se compran), el jizō (+1 de vida por monedas) y el guardado de la
@@ -240,6 +260,6 @@ Con `RONIN_FOTOGRAMAS=<carpeta>` guarda además los fotogramas del iai y del cor
 `python3 ronin3d/herramientas/hacer_gifs.py <carpeta> ronin3d/capturas/actual` los convierte en GIF.
 
 Resultado en la nube (Godot 4.7.2, OpenGL por software, sin tarjeta gráfica): **31 de 31** en la
-0.7 (28 de 28 en la 0.6), y unos 10-13 FPS al caminar por el patio a 1280 × 720. Las 929 criaturas del
+0.8 y en la 0.7 (28 de 28 en la 0.6), y unos 10-13 FPS al caminar por el patio a 1280 × 720. Las 929 criaturas del
 catálogo se construyen en medio segundo (20,5 piezas de media por criatura, 42 como máximo). Con tarjeta gráfica real va mucho
 más rápido. La 0.2 pasó también la prueba en una exportación *release* para Linux.

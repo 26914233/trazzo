@@ -5,7 +5,7 @@ ronin tras la traición del general Genzo, que pactó con el gran yōkai creyend
 Busca justicia por fuera y recuperar su honor por dentro. Empieza y termina en el castillo de
 Hoshiyama.
 
-**Estado:** prototipo 0.7 del capítulo 1 en **Godot 4.7 con cel-shading**, jugable con teclado,
+**Estado:** prototipo 0.8 del capítulo 1 en **Godot 4.7 con cel-shading**, jugable con teclado,
 mando y pantalla táctil.
 - Incluye una **galería de criaturas** (pausa → botón, o tecla G) para ver el sistema que permitiría
   construir cientos de monstruos.
@@ -16,11 +16,14 @@ mando y pantalla táctil.
   - le acompaña **Shiro**, su perro, que desentierra **monedas**.
 - Desde la 0.7, las monedas se gastan en una **estatua jizō** (+1 de vida) y en el **sastre** (las
   skins, bloqueadas hasta comprarlas), y la partida se guarda.
+- Desde la 0.8, **las cabezas ya no son bolas**: pelo en mechones, **caras dibujadas** (ojos, cejas y
+  boca son una imagen 2D, como en los juegos de anime en 3D) y línea de dibujo de grosor casi
+  constante. Antes y después: `capturas/comparativa_cabezas.jpg`.
 
 - **Combate:** iaidō. Se mantiene y se suelta justo al aviso; con la barra llena hay un corte de
   luna.
 - **Animación:** estilo anime limitado, que se puede cambiar a la suave para comparar.
-- **APK de prueba para Android:** `ronin-0.7-prueba.apk`, en la carpeta de Drive.
+- **APK de prueba para Android:** `ronin-0.8-prueba.apk`, en la carpeta de Drive.
 - **Bestiario universal:** 939 criaturas (tu catálogo limpio + ángeles, demonios y yōkai que faltaban), cada
   una con su variante fuerte; ver `BESTIARIO_UNIVERSAL.md`.
 - **Decidido:**
@@ -39,7 +42,7 @@ mando y pantalla táctil.
 ```
 ronin/                         (Google Drive: Respaldos Claude › ronin)
 ├── LEEME.md                   Este índice
-├── ronin-0.7-prueba.apk       APK de prueba para instalar en el móvil (Android 7.0 o superior)
+├── ronin-0.8-prueba.apk       APK de prueba para instalar en el móvil (Android 7.0 o superior)
 ├── RONIN_rama_completa.zip    Todo el código y las capturas (copia de la rama de GitHub)
 ├── 01-Diseno/                 Traspaso, plan, propuesta yōkai, historia, bestiario, especificación…
 ├── 06-Bestiario/              Catálogo limpio (CSV/JSON), prompts_colab.csv, cuaderno de Colab, imágenes
@@ -52,7 +55,7 @@ ronin/                         (Google Drive: Respaldos Claude › ronin)
 │                              las fichas anteriores (para 3D) en fichas/; el nuevo Akira en 4 estilos
 │                              en estilos/
 ├── 05-Arte/modelos3d/         Modelos 3D de enemigos (GLB, el .skp de SketchUp) y sus retratos
-└── Versiones anteriores (RONIN)/  APK anteriores (0.2 a 0.6) y capturas retiradas
+└── Versiones anteriores (RONIN)/  APK anteriores (0.2 a 0.7) y capturas retiradas
 ```
 
 En GitHub (`26914233/trazzo`, rama `claude/ronin-pygame-setup-szn3rn`):
@@ -118,12 +121,13 @@ ronin3d/
 | **Modelo de capítulos** | Primer capítulo gratis como demo y el resto de pago, o cada capítulo de pago | Con datos del vertical slice |
 | **Dados de la planicie** | Chō-han (par o impar con dos dados) | Al empezar la planicie en 3D |
 | **Nombre** | «RONIN» ya lo usan otros juegos: buscar nombre o subtítulo propio | Antes de abrir una página de tienda |
+| **Camino al «2D lo más pulido»** | Piezas con trucos de anime (hecho en la 0.8) + piloto de modelo en Blender solo con Akira + modo tinta opcional. VRoid no cabe en tu PC (pide 8 GB de RAM) | DECISIÓN 19 (`PLAN_PRODUCCION.md` §16) |
 
 ---
 
 ## Lo que bloquea avanzar
 
-1. **Tu prueba del APK 0.7 en el móvil:**
+1. **Tu prueba del APK 0.8 en el móvil:**
    - los FPS (abajo a la derecha; meta: 30 o más);
    - si el iai (mantener y soltar al «!») y el corte de luna se entienden;
    - qué animación prefieres, anime o suave (botón en la pausa);
@@ -132,8 +136,10 @@ ronin3d/
    - **la galería de criaturas** (pausa → «Galería de criaturas»): los FPS con los modelos detallados
      (página 2), con 7 y con 24 criaturas a la vez (páginas 5 y 7), y si las siluetas por familia te
      convencen.
-2. **DECISIONES 11 a 15** (`HISTORIA.md` §8 y `BESTIARIO_UNIVERSAL.md`). La 15 es cómo dar a todos los
-   enemigos el detalle que pediste. Las 16, 17 y 18 ya están decididas y en el juego.
+2. **DECISIONES 11 a 15 y 19** (`HISTORIA.md` §8, `BESTIARIO_UNIVERSAL.md` y `PLAN_PRODUCCION.md` §16).
+   - La 15 es cómo dar a todos los enemigos el detalle que pediste.
+   - La 19, el camino hacia el «2D lo más pulido».
+   - Las 16, 17 y 18 ya están decididas y en el juego.
 3. **Imágenes del bestiario en Colab:** el cuaderno está listo (`colab/`), falta ejecutarlo con la GPU T4.
 
 ## Próximo paso

@@ -10,6 +10,15 @@ const TEXTURA_SOMBRA := preload("res://recursos/sombra.png")
 const Apariencias := preload("res://scripts/apariencias_akira.gd")
 
 static var estilo_anime := true
+const CARA := Vector3(0.9, 1.0, 0.95)        # la cabeza de Akira, algo más estrecha que una bola
+# Rasgos dibujados de cada cara (ojos, cejas, nariz, boca): recursos/caras/generar_caras.py
+const CARAS := {
+	"joven": preload("res://recursos/caras/cara_joven.png"),
+	"curtido": preload("res://recursos/caras/cara_curtido.png"),
+	"veterano": preload("res://recursos/caras/cara_veterano.png"),
+	"mujer": preload("res://recursos/caras/cara_mujer.png"),
+	"soldado": preload("res://recursos/caras/cara_soldado.png"),
+}
 
 var aspecto
 var es_soldado := false
@@ -63,10 +72,10 @@ func _pivote(padre: Node3D, posicion: Vector3) -> Node3D:
 
 
 func _pieza(padre: Node3D, malla: Mesh, color: Color, posicion: Vector3, por_normal := true,
-		rotacion := Vector3.ZERO) -> MeshInstance3D:
+		rotacion := Vector3.ZERO, plano := false) -> MeshInstance3D:
 	var instancia := MeshInstance3D.new()
 	instancia.mesh = malla
-	var material: Material = aspecto.material_personaje(color, por_normal)
+	var material: Material = aspecto.material_personaje(color, por_normal, plano)
 	instancia.material_override = material
 	materiales.append(material)
 	instancia.position = posicion
@@ -75,8 +84,8 @@ func _pieza(padre: Node3D, malla: Mesh, color: Color, posicion: Vector3, por_nor
 	return instancia
 
 
-# Detalles pequeños de la cara (ojos, cejas, cicatriz, mechón): sin contorno, que en piezas tan
-# pequeñas lo convierte todo en manchas negras.
+# Detalles pequeños (la cicatriz, las solapas, el relieve de la máscara): sin contorno, que en piezas
+# tan pequeñas lo convierte todo en manchas negras. Los ojos y las cejas van dibujados en la cara.
 func _detalle(padre: Node3D, tamano: Vector3, color: Color, posicion: Vector3,
 		rotacion := Vector3.ZERO) -> MeshInstance3D:
 	var malla := BoxMesh.new()
@@ -100,24 +109,70 @@ func _caja(padre: Node3D, tamano: Vector3, color: Color, posicion: Vector3,
 
 
 func _cilindro(padre: Node3D, radio_abajo: float, radio_arriba: float, alto: float, color: Color,
-		posicion: Vector3, rotacion := Vector3.ZERO, lados := 12) -> MeshInstance3D:
+		posicion: Vector3, rotacion := Vector3.ZERO, lados := 12, plano := false) -> MeshInstance3D:
 	var malla := CylinderMesh.new()
 	malla.bottom_radius = radio_abajo
 	malla.top_radius = radio_arriba
 	malla.height = alto
 	malla.radial_segments = lados
 	malla.rings = 1
-	return _pieza(padre, malla, color, posicion, true, rotacion)
+	return _pieza(padre, malla, color, posicion, true, rotacion, plano)
 
 
-func _esfera(padre: Node3D, radio: float, color: Color, posicion: Vector3, hemisferio := false) -> MeshInstance3D:
+func _esfera(padre: Node3D, radio: float, color: Color, posicion: Vector3, hemisferio := false,
+		plano := false) -> MeshInstance3D:
 	var malla := SphereMesh.new()
 	malla.radius = radio
 	malla.height = radio if hemisferio else radio * 2.0
 	malla.is_hemisphere = hemisferio
 	malla.radial_segments = 16
 	malla.rings = 8
-	return _pieza(padre, malla, color, posicion)
+	return _pieza(padre, malla, color, posicion, true, Vector3.ZERO, plano)
+
+
+# Mechón de pelo: un cono con la base en «base» y la punta hacia «direccion». Es lo que rompe la
+# silueta de bola de la cabeza, como en el dibujo de anime.
+func _mechon(padre: Node3D, base: Vector3, direccion: Vector3, largo: float, grosor: float,
+		color: Color) -> MeshInstance3D:
+	var malla := CylinderMesh.new()
+	malla.top_radius = 0.0
+	malla.bottom_radius = grosor
+	malla.height = largo
+	malla.radial_segments = 5
+	malla.rings = 1
+	var sentido := direccion.normalized()
+	var mechon := _pieza(padre, malla, color, base + sentido * largo / 2.0)
+	mechon.basis = Basis(Quaternion(Vector3.UP, sentido))
+	return mechon
+
+
+# Une varias piezas del mismo color en una sola malla (una llamada de dibujo en vez de veinte):
+# el pelo tiene muchos mechones y el móvil lo agradece.
+func _fusionar(padre: Node3D, piezas: Array, color: Color, nombre := "Pelo") -> MeshInstance3D:
+	var herramienta := SurfaceTool.new()
+	for pieza in piezas:
+		herramienta.append_from(pieza.mesh, 0, pieza.transform)
+		materiales.erase(pieza.material_override)
+		pieza.free()
+	var instancia := MeshInstance3D.new()
+	instancia.mesh = herramienta.commit()
+	var material: Material = aspecto.material_personaje(color)
+	# línea fina: con la gruesa, las puntas de los mechones se redondeaban
+	material.next_pass.set_shader_parameter("grosor", 0.015)
+	instancia.material_override = material
+	materiales.append(material)
+	instancia.name = nombre
+	padre.add_child(instancia)
+	return instancia
+
+
+# La cara con los rasgos dibujados: cambia el material de la pieza (la cabeza o el mentón) por
+# el de la cara, medido en el espacio de la cabeza.
+func _poner_cara(pieza: MeshInstance3D, color: Color, rasgos: Texture2D) -> void:
+	materiales.erase(pieza.material_override)
+	var material: Material = aspecto.material_cara(color, rasgos, pieza.transform)
+	pieza.material_override = material
+	materiales.append(material)
 
 
 func _capsula(padre: Node3D, radio: float, alto: float, color: Color, posicion: Vector3) -> MeshInstance3D:
@@ -143,8 +198,9 @@ func _construir_akira() -> void:
 	torso = _pivote(cuerpo, Vector3(0, 0.8, 0))
 	_caja(torso, Vector3(0.44 * ancho, 0.52, 0.28), a.kimono, Vector3(0, 0.27, 0))
 	_caja(torso, Vector3(0.46 * ancho, 0.1, 0.3), a.obi, Vector3(0, 0.05, 0))
-	_caja(torso, Vector3(0.05, 0.24, 0.02), a.solapa, Vector3(0.06, 0.42, 0.142), Vector3(0, 0, 0.45))
-	_caja(torso, Vector3(0.05, 0.24, 0.02), a.solapa, Vector3(-0.06, 0.42, 0.142), Vector3(0, 0, -0.45))
+	# solapas del kimono, sin contorno (con él hacían una mancha negra bajo el cuello)
+	_detalle(torso, Vector3(0.05, 0.24, 0.02), a.solapa, Vector3(0.06, 0.42, 0.142), Vector3(0, 0, 0.45))
+	_detalle(torso, Vector3(0.05, 0.24, 0.02), a.solapa, Vector3(-0.06, 0.42, 0.142), Vector3(0, 0, -0.45))
 	# ropa gastada: un remiendo delante y otro detrás
 	_caja(torso, Vector3(0.11, 0.09, 0.012), a.remiendo, Vector3(0.13 * ancho, 0.33, 0.142), Vector3(0, 0, 0.12))
 	_caja(torso, Vector3(0.12, 0.1, 0.012), a.remiendo, Vector3(-0.09 * ancho, 0.22, -0.142), Vector3(0, 0, -0.2))
@@ -160,36 +216,41 @@ func _construir_akira() -> void:
 	hombro_der = _pivote(torso, Vector3(-0.29 * ancho, 0.48, 0))
 	for hombro in [hombro_izq, hombro_der]:
 		_capsula(hombro, 0.075, 0.5, a.manga, Vector3(0, -0.22, 0))
-		_esfera(hombro, 0.06, a.piel, Vector3(0, -0.47, 0))
+		_esfera(hombro, 0.06, a.piel, Vector3(0, -0.47, 0), false, true)
 		if a.vendas:
 			_cilindro(hombro, 0.079, 0.079, 0.13, Datos.VENDAS, Vector3(0, -0.37, 0))
+	# Cuello y cabeza. La cabeza ya no es una bola: algo más estrecha, con el mentón en punta, y el
+	# pelo (mechones de punta, flequillo y patillas a los lados de la cara) le rompe la silueta.
+	# (El cuello y el mentón van sin contorno: con él parecían una perilla negra.)
+	var cuello := _cilindro(torso, 0.055, 0.06, 0.14, a.piel, Vector3(0, 0.6, -0.01), Vector3.ZERO, 10, true)
+	cuello.material_override.next_pass = null
 	var cabeza := _pivote(torso, Vector3(0, 0.72, 0))
-	_esfera(cabeza, 0.16, a.piel, Vector3.ZERO)
-	_esfera(cabeza, 0.172, a.pelo, Vector3(0, 0.02, -0.025), true)
+	# La cara: ojos, cejas, nariz y boca van dibujados en una imagen (como en los juegos de anime en
+	# 3D) y la cabeza solo pone la forma. El mentón, sin contorno, que con él parecía una perilla.
+	var id: String = apariencia if apariencia != "" else Apariencias.elegida
+	var rasgos: Texture2D = CARAS.get(id, CARAS["joven"])
+	var craneo := _esfera(cabeza, 0.16, a.piel, Vector3.ZERO, false, true)
+	craneo.scale = CARA
+	_poner_cara(craneo, a.piel, rasgos)
+	var menton := _cilindro(cabeza, 0.03, 0.115, 0.1, a.piel, Vector3(0, -0.115, 0.035), Vector3(-0.3, 0, 0), 8, true)
+	menton.scale = Vector3(1.0, 1.0, 0.85)
+	_poner_cara(menton, a.piel, rasgos)
+	menton.material_override.next_pass = null
 	_peinado(cabeza, a)
-	if a.barba != "":
-		var barba := _esfera(cabeza, 0.13 if a.barba == "de_dias" else 0.136,
-			a.piel.lerp(a.pelo, 0.45) if a.barba == "de_dias" else a.pelo.lerp(a.piel, 0.15),
-			Vector3(0, -0.075, 0.045))
-		barba.scale = Vector3(1.0, 0.62, 0.85)
-		if a.barba == "corta":
-			_detalle(cabeza, Vector3(0.09, 0.02, 0.02), a.pelo, Vector3(0, -0.05, 0.153))
-	# Mirada dura: ojos rasgados y cejas en ceño
-	for lado in [-1.0, 1.0]:
-		_detalle(cabeza, Vector3(0.036, 0.014, 0.02), Datos.PELO, Vector3(0.055 * lado, -0.005, 0.15))
-		_detalle(cabeza, Vector3(0.05, 0.014, 0.02), a.pelo.darkened(0.3), Vector3(0.055 * lado, 0.035, 0.147),
-			Vector3(0, 0, 0.38 * lado))
 	_cicatriz(cabeza)
-	# Cinta (hachimaki) deshilachada, con las puntas al viento
-	var anillo := TorusMesh.new()
-	anillo.inner_radius = 0.158
-	anillo.outer_radius = 0.19
-	anillo.rings = 16
-	anillo.ring_segments = 6
-	_pieza(cabeza, anillo, a.cinta, Vector3(0, 0.05, 0))
+	# Cinta (hachimaki) deshilachada: pegada a la frente, por encima del pelo a los lados y anudada
+	# detrás, con las puntas al viento
+	var banda := _pieza(cabeza, _malla_cinta(), a.cinta, Vector3.ZERO)
+	banda.material_override.next_pass.set_shader_parameter("grosor", 0.008)
+	banda.name = "Cinta"
+	var punto_nudo: Array = _punto_cinta(PI - 0.5, 0.0)
+	var posicion_nudo: Vector3 = punto_nudo[0] + punto_nudo[1] * 0.012
+	var nudo := _esfera(cabeza, 0.022, a.cinta, posicion_nudo)
+	nudo.scale = Vector3(1.0, 0.8, 0.75)
 	for lado in [-1, 1]:
-		var cinta := _pivote(cabeza, Vector3(0.035 * lado, 0.05, -0.17))
-		_caja(cinta, Vector3(0.035, 0.02, 0.32), a.cinta, Vector3(0, 0, -0.16))
+		var cinta := _pivote(cabeza, posicion_nudo + Vector3(0.012 * lado, 0, -0.008))
+		cinta.rotation.y = 0.35
+		_caja(cinta, Vector3(0.035, 0.012, 0.3), a.cinta, Vector3(0, 0, -0.15))
 		cintas.append(cinta)
 	# katana envainada a la izquierda (vaina hacia atrás y abajo, empuñadura delante)
 	var cinto := _pivote(torso, Vector3(0.25, 0.05, 0.03))
@@ -208,45 +269,144 @@ func _construir_akira() -> void:
 	material_estela_iai = estela_iai.material_override
 
 
-# Peinados: coleta revuelta (el Akira joven), moño (curtido y veterano) y coleta larga (mujer).
+# Cinta de la frente: un óvalo que va pegado a la frente y, a los lados y detrás, por encima del
+# pelo, algo más bajo en la nuca (como se ata un hachimaki). Un aro redondo (TorusMesh) no se
+# ajustaba a la cabeza y flotaba como un halo oscuro. Devuelve [posición, normal hacia fuera] del
+# borde de la cinta en el ángulo dado (0 = delante, hacia +x = el lado izquierdo del personaje);
+# «altura» va de -1 (borde de abajo) a 1 (borde de arriba).
+func _punto_cinta(angulo: float, altura: float) -> Array:
+	var s := sin(angulo)
+	var c := cos(angulo)
+	var semi_x := 0.168
+	var semi_z := 0.149 if c >= 0.0 else 0.2
+	var radio := 1.0 / sqrt(pow(s / semi_x, 2.0) + pow(c / semi_z, 2.0))
+	var alto := lerpf(0.03, 0.036, (c + 1.0) / 2.0)
+	var y := 0.026 + 0.026 * c + altura * alto / 2.0
+	var normal := Vector3(s / (semi_x * semi_x), 0.0, c / (semi_z * semi_z)).normalized()
+	return [Vector3(s * radio, y, c * radio), normal]
+
+
+func _malla_cinta() -> ArrayMesh:
+	var herramienta := SurfaceTool.new()
+	herramienta.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var tramos := 32
+	for i in tramos:
+		var angulo_a := TAU * i / tramos
+		var angulo_b := TAU * (i + 1) / tramos
+		var arriba_a: Array = _punto_cinta(angulo_a, 1.0)
+		var arriba_b: Array = _punto_cinta(angulo_b, 1.0)
+		var abajo_a: Array = _punto_cinta(angulo_a, -1.0)
+		var abajo_b: Array = _punto_cinta(angulo_b, -1.0)
+		# dos triángulos por tramo, en el orden de las agujas del reloj visto desde fuera
+		for punto in [arriba_a, arriba_b, abajo_b, arriba_a, abajo_b, abajo_a]:
+			herramienta.set_normal(punto[1])
+			herramienta.add_vertex(punto[0])
+	return herramienta.commit()
+
+
+# Peinados, hechos de mechones de punta sobre un casquete que deja la frente libre: coleta revuelta
+# (el Akira joven), moño de samurái (curtido y veterano) y coleta larga (Akira mujer). Al final se
+# unen en una sola malla.
 func _peinado(cabeza: Node3D, a: Dictionary) -> void:
+	var pelo: Color = a.pelo
+	var piezas: Array = []
+	var casquete := _esfera(cabeza, 0.172, pelo, Vector3(0, 0.03, -0.03), true)
+	casquete.scale = Vector3(0.95, 1.05, 1.0)
+	casquete.rotation.x = -0.15              # algo inclinado hacia atrás: tapa más la nuca que la frente
+	piezas.append(casquete)
 	match a.peinado:
 		"coleta_revuelta":
-			_esfera(cabeza, 0.06, a.pelo, Vector3(0, 0.1, -0.16))
-			var coleta := _capsula(cabeza, 0.04, 0.28, a.pelo, Vector3(0, -0.04, -0.21))
-			coleta.rotation.x = 0.35
-			for punto in [Vector3(0.07, 0.15, 0.07), Vector3(-0.05, 0.17, 0.06)]:
-				_cilindro(cabeza, 0.045, 0.0, 0.11, a.pelo, punto, Vector3(0.7, 0, -punto.x * 3.0), 5)
-			# un mechón suelto junto a la cara
-			_detalle(cabeza, Vector3(0.022, 0.13, 0.02), a.pelo, Vector3(0.125, 0.0, 0.1), Vector3(0, 0, -0.12))
-		"coleta_larga":
-			_esfera(cabeza, 0.062, a.pelo, Vector3(0, 0.15, -0.13))
-			var coleta := _capsula(cabeza, 0.045, 0.52, a.pelo, Vector3(0, -0.12, -0.21))
-			coleta.rotation.x = 0.12
-			_caja(cabeza, Vector3(0.24, 0.05, 0.05), a.pelo, Vector3(0, 0.11, 0.12), Vector3(-0.35, 0, 0))
+			# puntas revueltas en la coronilla y la nuca
+			for m in [[Vector3(0, 0.15, -0.04), Vector3(0, 0.7, -0.7), 0.15],
+					[Vector3(0.08, 0.13, -0.03), Vector3(0.6, 0.6, -0.5), 0.14],
+					[Vector3(-0.08, 0.13, -0.03), Vector3(-0.6, 0.6, -0.5), 0.14],
+					[Vector3(0.11, 0.05, -0.09), Vector3(0.8, 0.1, -0.6), 0.12],
+					[Vector3(-0.11, 0.05, -0.09), Vector3(-0.8, 0.1, -0.6), 0.12],
+					[Vector3(0.02, 0.14, 0.07), Vector3(0.1, 0.9, 0.45), 0.11]]:
+				piezas.append(_mechon(cabeza, m[0], m[1], m[2], 0.055, pelo))
+			# flequillo (deja libre la ceja de la cicatriz)
+			for m in [[Vector3(-0.07, 0.13, 0.1), Vector3(-0.2, -0.8, 0.55)],
+					[Vector3(-0.02, 0.14, 0.11), Vector3(0.05, -0.85, 0.5)],
+					[Vector3(0.03, 0.135, 0.11), Vector3(0.25, -0.85, 0.45)]]:
+				piezas.append(_mechon(cabeza, m[0], m[1], 0.11, 0.04, pelo))
+			# patillas largas a los lados de la cara: tapan la redondez de las mejillas
 			for lado in [-1.0, 1.0]:
-				_caja(cabeza, Vector3(0.03, 0.18, 0.03), a.pelo, Vector3(0.125 * lado, -0.01, 0.08))
+				piezas.append(_mechon(cabeza, Vector3(0.135 * lado, 0.07, 0.04), Vector3(0.12 * lado, -1.0, 0.12), 0.18, 0.045, pelo))
+			# coleta: el nudo y tres mechones que caen hacia atrás
+			piezas.append(_esfera(cabeza, 0.05, pelo, Vector3(0, 0.08, -0.17)))
+			for x in [-0.25, 0.0, 0.25]:
+				piezas.append(_mechon(cabeza, Vector3(0, 0.07, -0.19), Vector3(x, -0.55, -0.8), 0.24, 0.05, pelo))
+		"coleta_larga":
+			# flequillo recto, patillas hasta la barbilla y una coleta alta y larga
+			for x in [-0.08, -0.04, 0.0, 0.04]:
+				piezas.append(_mechon(cabeza, Vector3(x, 0.135, 0.1), Vector3(x * 1.5, -0.9, 0.45), 0.12, 0.035, pelo))
+			for lado in [-1.0, 1.0]:
+				piezas.append(_mechon(cabeza, Vector3(0.13 * lado, 0.08, 0.05), Vector3(0.08 * lado, -1.0, 0.1), 0.24, 0.045, pelo))
+			piezas.append(_esfera(cabeza, 0.055, pelo, Vector3(0, 0.16, -0.13)))
+			for x in [-0.2, 0.0, 0.2]:
+				piezas.append(_mechon(cabeza, Vector3(0, 0.15, -0.16), Vector3(x, -0.85, -0.5), 0.46, 0.055, pelo))
 		_:
-			_esfera(cabeza, 0.066, a.pelo, Vector3(0, 0.2, -0.05))
+			# Moño de ronin: sin la coronilla afeitada, el pelo recogido en un moño (chonmage) que
+			# apunta hacia delante, mechones sueltos sobre la frente, patillas hasta la mandíbula y
+			# puntas en la nuca. Con el casquete solo, parecía un casco.
+			piezas.append(_esfera(cabeza, 0.042, pelo, Vector3(0, 0.175, -0.07)))
+			piezas.append(_mechon(cabeza, Vector3(0, 0.185, -0.06), Vector3(0, 0.3, 0.95), 0.14, 0.032, pelo))
+			for m in [[Vector3(0.08, 0.12, -0.04), Vector3(0.5, 0.35, -0.8)],
+					[Vector3(-0.08, 0.12, -0.04), Vector3(-0.5, 0.35, -0.8)],
+					[Vector3(0.1, 0.07, -0.1), Vector3(0.6, 0.1, -0.8)],
+					[Vector3(-0.1, 0.07, -0.1), Vector3(-0.6, 0.1, -0.8)]]:
+				piezas.append(_mechon(cabeza, m[0], m[1], 0.08, 0.045, pelo))
+			# mechones sueltos: sobre la frente (el veterano, con entradas, no los tiene) y en las sienes
+			if a.get("flequillo", true):
+				for m in [[Vector3(0.035, 0.13, 0.11), Vector3(0.3, -0.9, 0.35)],
+						[Vector3(-0.045, 0.125, 0.11), Vector3(-0.2, -0.92, 0.35)]]:
+					piezas.append(_mechon(cabeza, m[0], m[1], 0.1, 0.022, pelo))
+			for lado in [-1.0, 1.0]:
+				piezas.append(_mechon(cabeza, Vector3(0.115 * lado, 0.1, 0.0), Vector3(0.65 * lado, 0.6, -0.35), 0.065, 0.035, pelo))
+			for lado in [-1.0, 1.0]:
+				piezas.append(_mechon(cabeza, Vector3(0.138 * lado, 0.07, 0.03), Vector3(0.12 * lado, -1.0, 0.08), 0.16, 0.045, pelo))
+			for lado in [-1.0, 0.0, 1.0]:
+				piezas.append(_mechon(cabeza, Vector3(0.07 * lado, 0.01, -0.15), Vector3(0.35 * lado, -0.55, -0.75), 0.12, 0.05, pelo))
+	_fusionar(cabeza, piezas, pelo)
+	if a.barba == "corta":
+		# Barba corta del veterano: mechones que bajan por la mandíbula hasta la barbilla. (La de
+		# pocos días del curtido va dibujada en su cara, y el bigote del veterano también.)
+		var barba: Array = []
+		for m in [[Vector3(0, -0.13, 0.055), Vector3(0, -0.8, 0.6), 0.065, 0.05],
+				[Vector3(0.045, -0.125, 0.045), Vector3(0.25, -0.9, 0.4), 0.055, 0.042],
+				[Vector3(-0.045, -0.125, 0.045), Vector3(-0.25, -0.9, 0.4), 0.055, 0.042],
+				[Vector3(0.085, -0.105, 0.03), Vector3(0.4, -0.88, 0.25), 0.05, 0.04],
+				[Vector3(-0.085, -0.105, 0.03), Vector3(-0.4, -0.88, 0.25), 0.05, 0.04],
+				[Vector3(0.115, -0.07, 0.01), Vector3(0.5, -0.85, 0.1), 0.045, 0.035],
+				[Vector3(-0.115, -0.07, 0.01), Vector3(-0.5, -0.85, 0.1), 0.045, 0.035]]:
+			barba.append(_mechon(cabeza, m[0], m[1], m[2], m[3], pelo))
+		_fusionar(cabeza, barba, pelo, "Barba")
 
 
 # Cicatriz: dos tramos finos pegados a la cara (la cabeza es una esfera de 0,16 m), de la ceja
 # izquierda, por encima de la nariz, a la mejilla derecha.
 func _cicatriz(cabeza: Node3D) -> void:
-	var puntos := [Vector2(0.075, 0.062), Vector2(0.0, 0.006), Vector2(-0.07, -0.07)]
+	var puntos := [Vector2(0.064, 0.032), Vector2(0.0, 0.004), Vector2(-0.062, -0.07)]
 	var radio := 0.168
 	for i in 2:
 		var a: Vector2 = puntos[i]
 		var b: Vector2 = puntos[i + 1]
-		var a3 := Vector3(a.x, a.y, sqrt(radio * radio - a.length_squared()))
-		var b3 := Vector3(b.x, b.y, sqrt(radio * radio - b.length_squared()))
+		var a3 := _sobre_la_cara(a, radio)
+		var b3 := _sobre_la_cara(b, radio)
 		var normal := ((a3 + b3) / 2.0).normalized()
 		var eje_y := (b3 - a3).normalized()
 		var eje_x := eje_y.cross(normal).normalized()
 		var eje_z := eje_x.cross(eje_y).normalized()
-		var tramo := _detalle(cabeza, Vector3(0.017, a3.distance_to(b3) + 0.012, 0.012), Datos.CICATRIZ, (a3 + b3) / 2.0)
+		var tramo := _detalle(cabeza, Vector3(0.011, a3.distance_to(b3) + 0.008, 0.01), Datos.CICATRIZ, (a3 + b3) / 2.0)
 		tramo.basis = Basis(eje_x, eje_y, eje_z)
 		tramo.name = "Cicatriz%d" % i
+
+
+# Punto de la cara (que es una esfera aplastada por CARA) a la altura y anchura dadas.
+func _sobre_la_cara(punto: Vector2, radio: float) -> Vector3:
+	var x := punto.x / CARA.x
+	var y := punto.y / CARA.y
+	return Vector3(punto.x, punto.y, CARA.z * sqrt(maxf(0.0, radio * radio - x * x - y * y)))
 
 
 # Estela del corte: media luna blanca que aparece con el tajo y se apaga. La del tajo es
@@ -308,9 +468,21 @@ func _construir_soldado() -> void:
 		_capsula(hombro, 0.065, 0.46, Datos.PANTALON, Vector3(0, -0.22, 0))
 		_esfera(hombro, 0.055, Datos.PIEL, Vector3(0, -0.45, 0))
 	var cabeza := _pivote(torso, Vector3(0, 0.86, 0))
-	_esfera(cabeza, 0.15, Datos.PIEL, Vector3.ZERO)
-	_caja(cabeza, Vector3(0.03, 0.03, 0.02), Datos.PELO, Vector3(0.05, -0.01, 0.142))
-	_caja(cabeza, Vector3(0.03, 0.03, 0.02), Datos.PELO, Vector3(-0.05, -0.01, 0.142))
+	# La cara, dibujada: la sombra del sombrero le tapa los ojos y solo se ven dos rendijas claras
+	_poner_cara(_esfera(cabeza, 0.15, Datos.PIEL, Vector3.ZERO, false, true), Datos.PIEL, CARAS["soldado"])
+	# Protector de cuello (shikoro) bajo el sombrero, abierto por delante, y máscara (menpō) en la
+	# mitad de abajo de la cara: la cabeza deja de verse como una bola y el soldado da más miedo.
+	var protector := CylinderMesh.new()
+	protector.top_radius = 0.15
+	protector.bottom_radius = 0.2
+	protector.height = 0.17
+	protector.radial_segments = 12
+	protector.rings = 1
+	protector.cap_top = false
+	protector.cap_bottom = false
+	_pieza(cabeza, protector, Datos.ARMADURA_OSCURA, Vector3(0, -0.01, -0.085))
+	_caja(cabeza, Vector3(0.21, 0.09, 0.07), Datos.ARMADURA_OSCURA, Vector3(0, -0.08, 0.11))
+	_detalle(cabeza, Vector3(0.12, 0.014, 0.012), Datos.ARMADURA_CLARA, Vector3(0, -0.065, 0.149))
 	_cilindro(cabeza, 0.44, 0.02, 0.22, Datos.SOMBRERO, Vector3(0, 0.15, 0))
 	_cilindro(cabeza, 0.45, 0.45, 0.025, Datos.SOMBRERO.darkened(0.3), Vector3(0, 0.045, 0))
 	lanza = _pivote(cuerpo, Vector3(-0.36, 1.25, 0.12))
