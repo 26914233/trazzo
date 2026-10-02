@@ -433,8 +433,10 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   - Que Takeda sea el shōgun y el pacto de Genzo los decidió el usuario el 01-10-2026. Ese mismo
     día aprobó la sinopsis completa (`HISTORIA.md`, DECISIÓN 8A) y que el gran yōkai es
     **Tamamo-no-Mae** (9A); los textos del capítulo 1 ya la cuentan. Lo que sigue marcado
-    **[propuesta]** en `HISTORIA.md` (hoy, la capa del Silencio, DECISIÓN 11, y el origen de Shiro y
-    de la cicatriz, DECISIÓN 17) no se aplica sin su aprobación.
+    **[propuesta]** en `HISTORIA.md` (hoy, la capa del Silencio, DECISIÓN 11) no se aplica sin su
+    aprobación.
+  - El 02-10-2026 aprobó la **17A**: Shiro era el perro del shōgun y huye con Akira; la cicatriz se
+    la hizo Genzo la noche de la traición. Ya lo cuentan la intro y el cierre (`HISTORIA.md` §5 y §9).
 - **Mapa:** castillo, aldea, templo, dojo, ruinas y la planicie que los une.
 - **Decisiones cerradas (27-09-2026):** motor **Godot 4.7** con el renderizador *Compatibility*;
   estética **cel-shading**; los textos de intro y cierre se quedan como están por ahora; alcance:
@@ -459,15 +461,19 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
     40) y Akira mujer. En el juego desde la 0.6 (`apariencias_akira.gd`).
   - **Compañero: Shiro, un perro japonés blanco** que camina con Akira y de vez en cuando desentierra
     monedas («mon»). Solo mientras se juega, para respetar «sin farmeo automático».
+  - **16 A + C:** las monedas se gastan en las **estatuas jizō** (+1 de vida máxima, 40 y 80 mon) y
+    en el **sastre** (skins bloqueadas hasta comprarlas: curtido 30, mujer 40 y veterano 60). El
+    sastre está en la pausa hasta que exista la aldea. Nunca se venden monedas por dinero real. La
+    partida se guarda en `user://partida.cfg` (`partida.gd`).
+  - **17A:** origen de Shiro y de la cicatriz (arriba, en la historia).
+  - **18A:** las ilustraciones de la historia y de los personajes van en **manga de tinta** (blanco y
+    negro con un acento rojo); las fichas del bestiario siguen **en color** (estilo del Bahamut).
 - **Decisiones abiertas:**
   - 11: papel del Silencio (`HISTORIA.md` §8).
   - 12: gancho, cantidad frente a precisión.
   - 13: cómo se modelan las criaturas icónicas.
   - 14: cuántos rangos.
   - 15: cómo dar a todos los enemigos el detalle de un jefe (`BESTIARIO_UNIVERSAL.md` §8.2).
-  - 16: para qué sirven las monedas (`PLAN_PRODUCCION.md` §14).
-  - 17: de dónde vienen Shiro y la cicatriz (`HISTORIA.md` §9).
-  - 18: estilo de las ilustraciones 2D (`PLAN_PRODUCCION.md` §14).
   - La regla de respeto cultural: los dioses y seres sagrados de religiones vivas no son enemigos.
 
   Detalle y recomendaciones en `ronin3d/BESTIARIO_UNIVERSAL.md` y `ronin3d/PLAN_PRODUCCION.md`.
@@ -483,9 +489,12 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   coste se mira con `get_cost: true`.
 - **Imágenes 2D:** Higgsfield por Composio, modelo `z_image`, a 0,15 créditos por imagen (quedan
   0,01 créditos el 02-10-2026 por la tarde). Nunca se compran créditos ni planes sin que el usuario lo
-  pida. **Estilo de referencia: el del Bahamut**, que el usuario pidió para todas: escena con niebla de
-  tinta y un samurái para la escala. Luego pidió probar 4 estilos para el nuevo Akira (tinta,
-  realista, anime de los 90 y ukiyo-e, en `arte/conceptos/estilos/`); cuál se queda es la DECISIÓN 18.
+  pida. **Estilos (DECISIÓN 18A):**
+  - **historia y personajes, en manga de tinta**: el bloque de estilo de `arte/conceptos/estilos/`;
+    el Akira oficial es `arte/conceptos/akira.jpg`;
+  - **criaturas, en el estilo del Bahamut** (en color): escena con niebla de tinta y un samurái para
+    la escala.
+
   Receta y prompts en `ronin3d/arte/conceptos/LEEME.md`. Hay dos filtros de Higgsfield que conocer:
   - rechaza a los oni con el torso desnudo: hay que ponerles armadura;
   - rechaza **una persona con un animal en la misma imagen** (Akira con Shiro falló 12 veces): se

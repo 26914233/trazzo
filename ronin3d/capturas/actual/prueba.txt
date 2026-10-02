@@ -1,5 +1,5 @@
 Prueba automática de RONIN 3D (Godot, cel-shading)
-OK     Los textos del capítulo 1 son los aprobados (shōgun Takeda, yōkai, luna roja)  intro: 3 párrafos; cierre: 3
+OK     Los textos del capítulo 1 son los aprobados (shōgun Takeda, yōkai, cicatriz, Shiro, luna roja)  intro: 3 párrafos; cierre: 3
 OK     La intro da paso al juego  fase=jugando
 OK     Akira camina  recorrió 8.0 m
 OK     El HUD se ve entero en pantalla  vida, soldados y versión
@@ -21,11 +21,14 @@ OK     Animación anime: 12 poses por segundo; T cambia a suave (cada paso)  ani
 OK     La galería de criaturas se abre desde la pausa y reparte páginas  10 páginas; la tercera tiene 7 criaturas y 125 piezas
 OK     Al cerrar la galería se vuelve a la pausa y el juego sigue entero  en pausa=true, juego en el árbol=true
 OK     El catálogo del bestiario se carga y todos sus datos son válidos  929 criaturas (123 con modelo propio), 0 con datos no válidos
-OK     Todas las criaturas del catálogo se construyen dentro del presupuesto de piezas  929 criaturas (1163 construcciones con los rangos 2 y 3 de 1 de cada 8) en 547 ms; rango 1: media 20.5 piezas, máximo 42; máximo con rangos: 42
+OK     Todas las criaturas del catálogo se construyen dentro del presupuesto de piezas  929 criaturas (1163 construcciones con los rangos 2 y 3 de 1 de cada 8) en 499 ms; rango 1: media 20.5 piezas, máximo 42; máximo con rangos: 42
 OK     Los modelos detallados se cargan con textura y cel-shading (el Aka-oni, con sus tres rangos)  rango 1: 14024 triángulos, 1.91 m; rango 2: 14024 triángulos, 2.29 m; rango 3: 14024 triángulos, 1.91 m; modelo 353: 41471 triángulos; modelo 680: 2588 triángulos
-OK     Los cuatro aspectos de Akira llevan la cicatriz y se cambian en la pausa  piezas: { "joven": 38, "curtido": 39, "veterano": 35, "mujer": 38 }
+OK     Los cuatro aspectos de Akira llevan la cicatriz y el sastre los enseña en la pausa  piezas: { "joven": 38, "curtido": 39, "veterano": 35, "mujer": 38 }
 OK     Shiro olfatea, escarba y desentierra monedas  3 monedas desenterradas
 OK     Akira recoge las monedas al pasar y el HUD las cuenta  7 → 8
 OK     Shiro trae las monedas que Akira deja atrás  entregó 3 · monedas 9 → 12
-Resultado: 28 de 28 comprobaciones correctas
-FPS al caminar por el patio: 12.3 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)
+OK     Las skins están bloqueadas y se compran al sastre con monedas  bloqueada=true, comprada=true (quedan 70 mon), al salir=true
+OK     El jizō da +1 de vida máxima a cambio de monedas  aviso=true, vida máxima 6, monedas 70 → 30
+OK     La partida se guarda y se carga (monedas, skins y bendiciones)  [30, ["joven", "curtido"], 1] → [30, ["joven", "curtido"], 1]
+Resultado: 31 de 31 comprobaciones correctas
+FPS al caminar por el patio: 11.7 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)

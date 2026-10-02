@@ -289,7 +289,7 @@ que camine con él y recoja monedas de vez en cuando, y probar estilos de dibujo
    rechaza una persona con un perro en la misma imagen: se hacen por separado.
 6. **Prueba automática: 28 de 28** (antes 22).
 
-### DECISIÓN 16 — Para qué sirven las monedas
+### DECISIÓN 16 — Para qué sirven las monedas · **DECIDIDA el 2-10-2026: A + C**
 - **OPCIONES:**
   - A) **Estatuas jizō:** rezar y mejorar un poco a Akira (vida o espíritu). Ya estaba en el plan.
   - B) **Tienda de la aldea:** vendas para curarse o amuletos.
@@ -317,11 +317,11 @@ que camine con él y recoja monedas de vez en cuando, y probar estilos de dibujo
 - **SIGUIENTE PASO:** una estatua jizō y un sastre en la aldea del vertical slice, con 2 o 3 precios,
   para medir cuántas monedas junta un jugador en una partida.
 
-### DECISIÓN 17 — De dónde vienen Shiro y la cicatriz
-En `HISTORIA.md` §9. Recomendación: **A**, Shiro era el perro del shōgun y la cicatriz se la hizo
-Genzo la noche de la traición.
+### DECISIÓN 17 — De dónde vienen Shiro y la cicatriz · **DECIDIDA el 2-10-2026: A**
+En `HISTORIA.md` §9: Shiro era el perro del shōgun y la cicatriz se la hizo Genzo la noche de la
+traición. Contado en la intro y el cierre (§5 de la historia).
 
-### DECISIÓN 18 — Estilo de las ilustraciones 2D
+### DECISIÓN 18 — Estilo de las ilustraciones 2D · **DECIDIDA el 2-10-2026: A** (tinta para la historia y los personajes; el bestiario sigue en color)
 - **OPCIONES** (`arte/conceptos/estilos/`):
   - A) Manga de tinta (blanco y negro con rojo de acento).
   - B) Realista pintado.
@@ -351,8 +351,38 @@ Genzo la noche de la traición.
 - **SIGUIENTE PASO:** cuando elijas, poner ese bloque de estilo en el cuaderno de Colab y rehacer allí
   a Genzo, a Takeda y la escena de la traición.
 
-| # | Decisión | Dónde | Recomendación |
+| # | Decisión | Dónde | Decidido (2-10-2026) |
 | --- | --- | --- | --- |
-| 16 | Para qué sirven las monedas | §14 | A + C: estatuas jizō y sastre |
-| 17 | De dónde vienen Shiro y la cicatriz | `HISTORIA.md` §9 | A: el perro del shōgun; la cicatriz, de Genzo |
-| 18 | Estilo de las ilustraciones 2D | §14 | A (tinta) para la historia; color para el bestiario |
+| 16 | Para qué sirven las monedas | §14 | **A + C:** estatuas jizō y sastre (skins bloqueadas hasta comprarlas) |
+| 17 | De dónde vienen Shiro y la cicatriz | `HISTORIA.md` §9 | **A:** el perro del shōgun; la cicatriz, de Genzo (en la intro y el cierre) |
+| 18 | Estilo de las ilustraciones 2D | §14 | **A:** tinta para la historia y los personajes; el bestiario sigue en color |
+
+## 15. Hecho el 2-10-2026 (noche): versión 0.7 con las decisiones 16, 17 y 18
+
+1. **17A en el juego:** la intro cuenta que la espada de Genzo le cruzó la cara a Akira y que solo
+   Shiro, el perro del shōgun, va con él; el cierre, que cruza la puerta con Shiro a su lado.
+2. **16A, estatua jizō** en el patio (junto al muro oeste, cerca del inicio):
+   - Al acercarse sale un aviso con el precio. Se reza con ENTER, con B en el mando o tocando el
+     aviso.
+   - Rezar da +1 de vida máxima y cura del todo. Cuesta 40 mon la primera vez y 80 la segunda;
+     no hay más.
+   - Es el primer sumidero de monedas; más adelante será también donde se guarda la partida.
+3. **16C, el sastre:** las skins empiezan bloqueadas (lo elegiste así para el APK de prueba).
+   - Precios: curtido 30, mujer 40 y veterano 60.
+   - **Mientras no exista la aldea, el sastre está en la pausa:** V enseña el siguiente aspecto, B
+     (o el botón) lo compra. Lo que no se compra no se queda puesto al salir.
+   - En la galería se siguen viendo todas, con su precio.
+4. **Partida guardada** (`user://partida.cfg`): monedas, skins compradas y bendiciones. Se guarda
+   sola poco después de cada cambio, al salir y al mandar el juego a segundo plano. Hasta ahora las
+   monedas se perdían al cerrar el juego.
+5. **18A:** el concepto oficial de Akira es el de tinta (`arte/conceptos/akira.jpg`). Genzo y Takeda
+   se rehacen en tinta cuando haya créditos (quedan 0,01) o con Colab.
+6. **Prueba automática: 31 de 31.** Se añaden el sastre, el jizō y el guardado.
+
+**Supuestos que hay que medir [Supuesto]:**
+- Una partida al patio da unas 15-40 monedas: 6 soldados × 2-4, más 3-6 por cada hallazgo de
+  Shiro (1-3 por partida, según el tiempo en calma).
+- Con esos números, la primera skin (30) llega en 1-2 partidas y las dos bendiciones (120 en total),
+  en unas 4-8.
+
+Si en el móvil se siente lento o regalado, se ajustan los precios en `godot/scripts/partida.gd`.

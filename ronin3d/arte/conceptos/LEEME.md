@@ -1,7 +1,14 @@
 # Conceptos 2D de RONIN
 
-**Estilo de referencia: el del Bahamut** (`bahamut.jpg`). El 02-10-2026 el usuario pidió que las
-demás imágenes tuvieran su nivel de detalle y su estilo, y se rehicieron así:
+**Estilos (DECISIÓN 18A, 02-10-2026):**
+- **La historia y los personajes van en manga de tinta**: blanco y negro, trazo de pincel seco y un
+  solo acento rojo. El concepto oficial de Akira es `akira.jpg` (copia de `estilos/akira_tinta.jpg`).
+  Genzo y Takeda se rehacen en tinta cuando haya créditos o con Colab.
+- **Las criaturas del bestiario siguen en color**, con el estilo del Bahamut, que se explica a
+  continuación. Comparten el trazo negro con la tinta.
+
+**Estilo del Bahamut** (`bahamut.jpg`). El 02-10-2026 el usuario pidió que las demás imágenes
+tuvieran su nivel de detalle y su estilo, y se rehicieron así:
 
 - **Una escena, no una ficha:** cada imagen enseña la criatura o el personaje en su sitio (patio
   del castillo, río, bosque de bambú, portón, gran salón), con niebla de tinta y detalles del
@@ -26,12 +33,12 @@ demás imágenes tuvieran su nivel de detalle y su estilo, y se rehicieron así:
 | `onibi.jpg` | Enjambre de onibi en un sendero de bambú; un samurái con farol | `fichas/onibi.jpg` |
 | `oni_gigante.jpg` | **Jefe del capítulo 1** ante el portón, con grietas de brasa | (no había) |
 | `tamamo_zorro.jpg` | Tamamo-no-Mae en su forma final: la zorra de nueve colas sobre el castillo, luna roja | Su forma de dama con máscara sigue en `gran_yokai.jpg` |
-| `akira.jpg` | Akira ante el castillo bajo la luna roja | `fichas/akira.jpg` |
+| `akira.jpg` | **Akira oficial** desde la DECISIÓN 18A: el joven endurecido en tinta (copia de `estilos/akira_tinta.jpg`) | La versión del Bahamut pasa a `estilos/akira_anterior_bahamut.jpg`; la primera, a `fichas/akira.jpg` |
 | `genzo.jpg` | Genzo en el gran salón; la sombra de la zorra en los biombos (su pacto) | `fichas/genzo.jpg` |
 | `takeda.jpg` | El shōgun Takeda en el gran salón, con el joven Akira de guardia | `fichas/takeda.jpg` |
 | `gran_yokai.jpg`, `shijima.jpg` | Sin cambios: otra forma de Tamamo, y una propuesta (DECISIÓN 11) | — |
 | `shiro.jpg` | **Shiro**, el perro de Akira, junto a las monedas que acaba de desenterrar | (nuevo, 02-10) |
-| `estilos/akira_*.jpg` | **El nuevo Akira** (joven endurecido, con cicatriz) en 4 estilos de dibujo, para elegir (DECISIÓN 18) | `akira.jpg` queda como el Akira anterior |
+| `estilos/akira_*.jpg` | **El nuevo Akira** (joven endurecido, con cicatriz) en 4 estilos de dibujo. Ganó la tinta (DECISIÓN 18A) | (nuevo, 02-10) |
 
 En el repositorio van en JPG de 1024 px. Los PNG originales, de 2048 × 1536 o 1536 × 2048, están en
 Drive › `ronin/05-Arte/conceptos-2d/` (los de la prueba de estilos, en `estilos/`).
@@ -137,7 +144,7 @@ ceremonial cord around its neck, looming over the curved roofs and towers of a J
 a blood-red moon, violet foxfire orbs floating around it, a tiny samurai standing on the castle wall
 before it for scale. Anatomically coherent.
 
-**akira.jpg:** …Akira, a young ronin swordsman, former bodyguard of the shogun: lean and determined,
+**akira.jpg** (la del estilo del Bahamut, hoy `estilos/akira_anterior_bahamut.jpg`): …Akira, a young ronin swordsman, former bodyguard of the shogun: lean and determined,
 long black hair in a high ponytail, a white headband, dark indigo kimono and hakama with a red sash,
 straw sandals, his hand resting on the hilt of a sheathed katana in a calm iaido stance, standing
 alone on the stone steps of a Japanese castle at night under a blood-red moon, torn banners and

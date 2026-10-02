@@ -2,8 +2,12 @@
 # endurecido, con una cicatriz que le cruza la cara, la mirada dura, la cinta deshilachada y
 # la ropa gastada. Los otros tres son skins que pidió el usuario ese mismo día: curtido
 # (unos 30), veterano (unos 40) y Akira mujer. Todos llevan la cicatriz.
-# El elegido se guarda en user://ajustes.cfg.
+# Las skins se compran con monedas al sastre (DECISIÓN 16C, precios en partida.gd); de momento el
+# sastre está en la pausa, hasta que exista la aldea. El aspecto puesto se guarda en
+# user://ajustes.cfg.
 extends RefCounted
+
+const Partida := preload("res://scripts/partida.gd")
 
 const ORDEN := ["joven", "curtido", "veterano", "mujer"]
 const APARIENCIAS := {
@@ -42,7 +46,8 @@ const APARIENCIAS := {
 }
 const ARCHIVO := "user://ajustes.cfg"
 
-static var elegida := "joven"
+static var elegida := "joven"                 # la que lleva puesta (siempre una comprada)
+static var mostrada := "joven"                # la que se ve en el sastre (puede no estar comprada)
 static var cargada := false
 
 
@@ -59,12 +64,43 @@ static func cargar() -> void:
 		var id: String = ajustes.get_value("akira", "apariencia", "joven")
 		if APARIENCIAS.has(id):
 			elegida = id
+	# Si la elegida no está comprada (en la 0.6 eran libres), vuelve a la de la historia.
+	if not Partida.tiene(elegida):
+		elegida = "joven"
+	mostrada = elegida
 
 
-static func siguiente() -> String:
-	elegida = ORDEN[(ORDEN.find(elegida) + 1) % ORDEN.size()]
+static func _guardar() -> void:
+	if Partida.modo_prueba:
+		return
 	var ajustes := ConfigFile.new()
 	ajustes.load(ARCHIVO)
 	ajustes.set_value("akira", "apariencia", elegida)
 	ajustes.save(ARCHIVO)
-	return elegida
+
+
+# El sastre enseña la siguiente. Si ya es suya, Akira se la pone en el momento.
+static func siguiente() -> String:
+	mostrada = ORDEN[(ORDEN.find(mostrada) + 1) % ORDEN.size()]
+	if Partida.tiene(mostrada) and mostrada != elegida:
+		elegida = mostrada
+		_guardar()
+	return mostrada
+
+
+static func mostrada_bloqueada() -> bool:
+	return not Partida.tiene(mostrada)
+
+
+# Comprar la que enseña el sastre: si llegan las monedas, es suya y se la pone.
+static func comprar_mostrada() -> bool:
+	if not Partida.comprar(mostrada):
+		return false
+	elegida = mostrada
+	_guardar()
+	return true
+
+
+# Al cerrar el sastre (salir de la pausa) se vuelve a ver la que lleva puesta.
+static func cerrar_sastre() -> void:
+	mostrada = elegida

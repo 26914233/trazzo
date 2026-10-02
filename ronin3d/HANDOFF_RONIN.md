@@ -163,23 +163,40 @@ pulido será el primer capítulo (castillo + planicie + aldea).
       separado. Quedan 0,01 créditos.
   - **Decisiones nuevas:** 16 (para qué sirven las monedas), 17 (de dónde vienen Shiro y la cicatriz,
     `HISTORIA.md` §9) y 18 (estilo de las ilustraciones). Las tres están en `PLAN_PRODUCCION.md` §14.
-- **Prueba automática: 28 de 28.** **APK 0.6** (`ronin/ronin-0.6-prueba.apk`, 30,5 MB, SHA-256
-  `8e1676f5…30f8986d41`, misma firma `CN=RONIN prueba`, versionCode 6). La prueba sobre la
-  exportación de Linux no se pasó (el usuario la había parado en la 0.5).
+- **Prueba automática: 28 de 28.** **APK 0.6** (30,5 MB, SHA-256 `8e1676f5…30f8986d41`, misma firma
+  `CN=RONIN prueba`, versionCode 6; ya en «Versiones anteriores (RONIN)»).
+- **Decisiones 16 A + C, 17A y 18A aprobadas (02-10-2026, noche) y aplicadas en la 0.7.** Detalles que
+  el usuario eligió con preguntas de opciones:
+  - la intro y el cierre lo cuentan todo: la cicatriz (la espada de Genzo) y Shiro (el perro del
+    shōgun);
+  - el bestiario sigue en color;
+  - las skins, bloqueadas hasta comprarlas.
+
+  Hecho:
+  - **Textos** del capítulo 1 con Shiro y la cicatriz (`HISTORIA.md` §5).
+  - **Estatua jizō** en el patio: +1 de vida máxima por 40 y 80 mon.
+  - **Sastre** en la pausa (hasta que haya aldea): curtido 30, mujer 40, veterano 60.
+  - **Partida guardada** (`user://partida.cfg`: monedas, skins, bendiciones).
+  - **Akira oficial en tinta** (`arte/conceptos/akira.jpg`).
+  - Resumen y supuestos de precios a medir: `PLAN_PRODUCCION.md` §15.
+- **Prueba automática: 31 de 31.** **APK 0.7** (`ronin/ronin-0.7-prueba.apk`, 30,5 MB, SHA-256
+  `88c62b7c…74c87594`, misma firma `CN=RONIN prueba`, versionCode 7). La prueba sobre la exportación
+  de Linux sigue sin pasarse (el usuario la paró en la 0.5).
 
 ## 3. En curso / pendiente del usuario
 
-1. **Probar el APK 0.6 en el móvil** y contar:
+1. **Probar el APK 0.7 en el móvil** y contar:
    - los FPS (meta ≥ 30);
    - si el iai (mantener y soltar) y el corte de luna se entienden;
    - qué animación prefiere, anime o suave;
-   - qué tal Shiro y las monedas, y qué skin le gusta;
+   - qué tal Shiro y las monedas, y si los precios del jizō y del sastre se sienten justos (cuántas
+     partidas tarda en la primera skin);
    - **la galería de criaturas** (pausa → botón): FPS en la página 2 (modelos detallados), en la 5
      (7 criaturas) y en la 7 (24). En la 0.5 eran las páginas 1, 4 y 6.
-2. **DECISIONES 11 a 18** (`HISTORIA.md` §8-9, `BESTIARIO_UNIVERSAL.md` y `PLAN_PRODUCCION.md` §14) y
-   la regla de respeto cultural (se aplica salvo veto). La 15 (modelos detallados) necesita créditos
-   para el piloto de esqueleto (unos 5-10 $); la 18 (estilo), para rehacer imágenes, créditos o Colab.
-   Créditos solo los compra el usuario.
+2. **DECISIONES 11 a 15** (`HISTORIA.md` §8 y `BESTIARIO_UNIVERSAL.md`) y la regla de respeto
+   cultural (se aplica salvo veto). La 15 (modelos detallados) necesita créditos para el piloto de
+   esqueleto (unos 5-10 $). Rehacer a Genzo y Takeda en tinta (18A) necesita créditos (quedan 0,01) o
+   Colab. Créditos solo los compra el usuario.
 3. **Imágenes del bestiario en Colab:** ejecutar el cuaderno con la GPU T4 (o la sesión que maneja Colab).
 4. Si tiene el `samurai.py` original, subirlo.
 
@@ -190,9 +207,8 @@ pulido será el primer capítulo (castillo + planicie + aldea).
    - los yōkai del capítulo 1 (kappa, oni, onibi y el oni gigante de jefe; fichas en
      `BESTIARIO.md`);
    - salida a la planicie con un encuentro de dados;
-   - aldea mínima, con una estatua jizō y un sastre si se aprueba la DECISIÓN 16 (para qué sirven las
-     monedas);
-   - menú y guardado (en estatuas jizō), que guarde también las monedas y la skin;
+   - aldea mínima, donde se mudará el sastre (hoy en la pausa) y con otra estatua jizō;
+   - menú y guardado en las estatuas jizō (las monedas, las skins y las bendiciones ya se guardan);
    - música.
    El detalle (luces, sombras, enemigos) se ajusta a los FPS que dé su móvil.
 2. Medir 10 criaturas reales con el sistema (patrones de ataque, equilibrio y tiempo por criatura): es
@@ -220,7 +236,7 @@ pulido será el primer capítulo (castillo + planicie + aldea).
 | Comparativa | `ronin3d/COMPARATIVA.md` · página privada https://claude.ai/artifact/6urV5FCikt9CWAUV35gBCu |
 | Capturas de hoy | `ronin3d/capturas/actual/` |
 | Clave de firma de prueba | Drive `Respaldos Claude/ronin/03-Godot/firma-prueba/` (privada; nunca en GitHub) |
-| APK de prueba | Drive `Respaldos Claude/ronin/ronin-0.6-prueba.apk` (como con Curtzz: el nuevo va en la raíz con el nombre `ronin-<versión>-prueba.apk` y el anterior pasa a la carpeta «Versiones anteriores (RONIN)», dentro de `ronin/`) |
+| APK de prueba | Drive `Respaldos Claude/ronin/ronin-0.7-prueba.apk` (como con Curtzz: el nuevo va en la raíz con el nombre `ronin-<versión>-prueba.apk` y el anterior pasa a la carpeta «Versiones anteriores (RONIN)», dentro de `ronin/`) |
 | Respaldo | Google Drive `Respaldos Claude/ronin/` (01-Diseno, 02-Prototipo-2D, 03-Godot, 04-Otros-motores, 05-Arte, 06-Bestiario, Versiones anteriores (RONIN)) |
 | Memoria | Vertiso Memory, handoff con ámbito `ronin-juego` |
 

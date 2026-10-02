@@ -2,18 +2,20 @@
 # Todo sale de ronin3d/DISENO_3D.md; si cambia allí, se cambia aquí.
 extends RefCounted
 
-# --- Historia (textos aprobados el 1-10-2026, DECISIÓN 8A de ronin3d/HISTORIA.md) --
+# --- Historia ------------------------------------------------------------------
+# Textos aprobados el 1-10-2026 (DECISIÓN 8A de ronin3d/HISTORIA.md), con Shiro y la cicatriz de
+# Akira añadidos el 2-10-2026 (DECISIÓN 17A).
 # El prototipo 2D (samurai.py) conserva los textos anteriores.
 const TITULO := "RONIN"
 const SUBTITULO := "Capítulo 1 · El castillo de Hoshiyama"
 const TEXTO_INTRO := [
 	"Castillo de Hoshiyama. Akira sirve como guardia del shōgun Takeda, el señor de Japón.",
-	"Esta noche, el general Genzo, su mano derecha, lo ha asesinado. Para Genzo, el shōgun era demasiado blando con los yōkai.",
-	"Con el shōgun cae la barrera que separaba los mundos. Los soldados ya obedecen a Genzo y algo se mueve en las sombras del patio. Akira debe abrirse paso hasta la puerta y escapar.",
+	"Esta noche, el general Genzo, su mano derecha, lo ha asesinado. Akira intentó detenerlo y la espada de Genzo le cruzó la cara. Para Genzo, el shōgun era demasiado blando con los yōkai.",
+	"Con el shōgun cae la barrera que separaba los mundos. Los soldados ya obedecen a Genzo y algo se mueve en las sombras del patio. Akira debe abrirse paso hasta la puerta y escapar. Solo Shiro, el perro del shōgun, va con él.",
 ]
 const TITULO_CIERRE := "Fin del capítulo 1"
 const TEXTO_CIERRE := [
-	"Akira cruza la última puerta. El castillo de Hoshiyama queda a su espalda.",
+	"Akira cruza la última puerta, con Shiro a su lado. El castillo de Hoshiyama queda a su espalda.",
 	"Sin señor al que servir, desde esta noche es un ronin.",
 	"Fuera buscará justicia. Dentro, intentará recuperar su honor. Y sobre Japón, la luna brilla más roja que nunca.",
 ]
@@ -105,6 +107,10 @@ const SHIRO_CREMA := Color("dcc8a2")
 const SHIRO_NARIZ := Color("1a1416")
 const SHIRO_COLLAR := Color("b3282a")
 const COBRE := Color("d4954f")
+# Estatua jizō (DECISIÓN 16A): junto al muro oeste, mirando al patio. Rezarle cuesta monedas y da
+# +1 de vida máxima (precios en partida.gd).
+const JIZO_POSICION := Vector3(-22.3, 0, -3.0)
+const RADIO_JIZO := 1.8
 
 # --- Cámara ---------------------------------------------------------------------
 const CAMARA_DISTANCIA := 12.0

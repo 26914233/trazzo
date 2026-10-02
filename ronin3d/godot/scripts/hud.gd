@@ -5,6 +5,7 @@ extends CanvasLayer
 const Datos := preload("res://scripts/datos.gd")
 const VisualModelo := preload("res://scripts/visual_modelo.gd")
 const Apariencias := preload("res://scripts/apariencias_akira.gd")
+const Partida := preload("res://scripts/partida.gd")
 const VELOCIDAD_TEXTO := 45.0
 
 var fuente: SystemFont
@@ -18,7 +19,10 @@ var tiempo_fps := 0.0
 var indicacion_pausa: Label
 var boton_animacion: Label            # en la pausa: cambia la animación anime / suave
 var boton_galeria: Label              # en la pausa: abre la galería de criaturas (prueba de rendimiento)
-var boton_apariencia: Label           # en la pausa: cambia el aspecto de Akira
+var boton_apariencia: Label           # en la pausa: el sastre enseña el siguiente aspecto de Akira
+var boton_comprar: Label              # en la pausa: compra el aspecto que enseña el sastre
+var aviso_interaccion: Label          # junto al jizō: qué hacer (en el móvil, se toca)
+var texto_interaccion := ""
 var etiqueta_mensaje: Label
 var tiempo_mensaje := 0.0
 var en_tactil := false
@@ -117,6 +121,18 @@ func _ready() -> void:
 	etiqueta_version = _etiqueta(15, Color(0.85, 0.82, 0.72))
 	_colocar(etiqueta_version, Control.PRESET_BOTTOM_RIGHT, Rect2(-340, -34, 318, 24))
 	etiqueta_version.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+
+	aviso_interaccion = _etiqueta(20, Datos.CREMA)
+	_colocar(aviso_interaccion, Control.PRESET_CENTER_BOTTOM, Rect2(-330, -132, 660, 44))
+	aviso_interaccion.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	aviso_interaccion.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	var marco_aviso := StyleBoxFlat.new()
+	marco_aviso.bg_color = Color(0.08, 0.07, 0.12, 0.8)
+	marco_aviso.border_color = Datos.DORADO
+	marco_aviso.set_border_width_all(2)
+	marco_aviso.set_corner_radius_all(8)
+	aviso_interaccion.add_theme_stylebox_override("normal", marco_aviso)
+	aviso_interaccion.visible = false
 
 	etiqueta_mensaje = _etiqueta(20, Datos.DORADO)
 	_colocar(etiqueta_mensaje, Control.PRESET_CENTER_TOP, Rect2(-420, 136, 840, 32))
@@ -235,6 +251,14 @@ func _crear_capa_pausa() -> void:
 	boton_apariencia.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	boton_apariencia.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	boton_apariencia.add_theme_stylebox_override("normal", marco)
+	boton_comprar = _etiqueta(20, Datos.DORADO)
+	remove_child(boton_comprar)
+	capa_pausa.add_child(boton_comprar)
+	_colocar(boton_comprar, Control.PRESET_CENTER, Rect2(-300, 244, 600, 46))
+	boton_comprar.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	boton_comprar.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	boton_comprar.add_theme_stylebox_override("normal", marco)
+	boton_comprar.visible = false
 	capa_pausa.visible = false
 
 
@@ -257,9 +281,35 @@ func poner_monedas(total: int, con_destello := true) -> void:
 	marcador.queue_redraw()
 
 
+func poner_vida_maxima(maxima: int) -> void:
+	marcador.maximo = maxima
+	marcador.queue_redraw()
+
+
+# Junto al jizō: el aviso dice qué cuesta y cómo rezar (ENTER, B en el mando o tocarlo).
+func poner_aviso_interaccion(texto: String) -> void:
+	texto_interaccion = texto
+	aviso_interaccion.visible = texto != ""
+	if texto != "":
+		aviso_interaccion.text = ("Toca aquí · " if en_tactil else "ENTER · ") + texto
+
+
+# El sastre en la pausa: qué aspecto enseña, si es suyo o cuánto cuesta, y el botón de comprar.
 func poner_apariencia() -> void:
-	var como := "toca aquí para cambiar" if en_tactil else "V para cambiar"
-	boton_apariencia.text = "Akira: %s · %s" % [Apariencias.datos().nombre, como]
+	var id: String = Apariencias.mostrada
+	var nombre: String = Apariencias.datos(id).nombre
+	var como := "toca aquí: siguiente" if en_tactil else "V: siguiente"
+	if Apariencias.mostrada_bloqueada():
+		var precio := Partida.precio(id)
+		boton_apariencia.text = "Sastre · %s: %d mon · %s" % [nombre, precio, como]
+		boton_comprar.visible = true
+		if Partida.monedas >= precio:
+			boton_comprar.text = "Comprar por %d mon (tienes %d) · %s" % [precio, Partida.monedas, "toca aquí" if en_tactil else "B"]
+		else:
+			boton_comprar.text = "Te faltan %d mon (tienes %d)" % [precio - Partida.monedas, Partida.monedas]
+	else:
+		boton_apariencia.text = "Sastre · %s: puesto · %s" % [nombre, como]
+		boton_comprar.visible = false
 
 
 func poner_version(texto: String) -> void:
@@ -318,6 +368,9 @@ const AYUDA_TACTIL := "Joystick: moverse · Mantén «Iai» y suéltalo justo al
 
 
 func mostrar_ayuda(tactil := false) -> void:
+	en_tactil = tactil
+	if texto_interaccion != "":
+		poner_aviso_interaccion(texto_interaccion)
 	# En el móvil la ayuda va arriba: abajo están el joystick y los botones.
 	# En el móvil, además, con letra más grande: la pantalla es pequeña.
 	if tactil:

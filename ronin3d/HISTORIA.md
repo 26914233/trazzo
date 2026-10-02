@@ -3,8 +3,8 @@
 **Estado:** **aprobada el 1-10-2026** (DECISIÓN 8A: tal cual, con los textos nuevos del capítulo 1;
 DECISIÓN 9A: el gran yōkai es Tamamo-no-Mae). Los textos del capítulo 1 ya están cambiados en
 `godot/scripts/datos.gd`; llegarán al APK con la próxima versión. Lo marcado como **[propuesta]**
-sigue sin decidir; hoy son la capa del Silencio (§8, DECISIÓN 11) y el origen de Shiro y de la
-cicatriz de Akira (§9, DECISIÓN 17).
+sigue sin decidir; hoy es la capa del Silencio (§8, DECISIÓN 11). El origen de Shiro y de la
+cicatriz de Akira se aprobó el 02-10-2026 (§9, DECISIÓN 17A) y ya está en los textos del capítulo 1.
 
 Etiquetas: **[Hecho]** comprobado · **[propuesta]** idea para decidir · **[Opinión]** criterio del
 equipo.
@@ -57,19 +57,20 @@ yōkai más antiguo de Japón… mientras medio pueblo le da la razón al genera
 a su señor por creerlo demasiado blando; Genzo no se ve como villano y parte del pueblo lo apoya;
 justicia por fuera y honor por dentro; empieza y termina en Hoshiyama.
 
-## 5. Textos del capítulo 1 (aplicados en `datos.gd` el 1-10-2026)
+## 5. Textos del capítulo 1 (aplicados en `datos.gd` el 1-10-2026; Shiro y la cicatriz, el 2-10-2026)
 
 **Intro:**
 
 1. «Castillo de Hoshiyama. Akira sirve como guardia del shōgun Takeda, el señor de Japón.»
-2. «Esta noche, el general Genzo, su mano derecha, lo ha asesinado. Para Genzo, el shōgun era
-   demasiado blando con los yōkai.»
+2. «Esta noche, el general Genzo, su mano derecha, lo ha asesinado. **Akira intentó detenerlo y la
+   espada de Genzo le cruzó la cara.** Para Genzo, el shōgun era demasiado blando con los yōkai.»
 3. «Con el shōgun cae la barrera que separaba los mundos. Los soldados ya obedecen a Genzo y algo se
-   mueve en las sombras del patio. Akira debe abrirse paso hasta la puerta y escapar.»
+   mueve en las sombras del patio. Akira debe abrirse paso hasta la puerta y escapar. **Solo Shiro,
+   el perro del shōgun, va con él.**»
 
 **Cierre:**
 
-1. «Akira cruza la última puerta. El castillo de Hoshiyama queda a su espalda.»
+1. «Akira cruza la última puerta, **con Shiro a su lado**. El castillo de Hoshiyama queda a su espalda.»
 2. «Sin señor al que servir, desde esta noche es un ronin.»
 3. «Fuera buscará justicia. Dentro, intentará recuperar su honor. Y sobre Japón, la luna brilla más
    roja que nunca.»
@@ -178,17 +179,18 @@ que no se confunda con ninguno de los dos.
   Yami* (間の闇, «la oscuridad del intervalo»).
 
 
-## 9. Shiro y la cicatriz de Akira [propuesta]
+## 9. Shiro y la cicatriz de Akira (DECISIÓN 17: **DECIDIDA A** el 02-10-2026)
 
 **Decidido el 02-10-2026 [Hecho]:** Akira pasa a ser un joven endurecido con una cicatriz en la cara
 (los aspectos curtido, veterano y mujer quedan como skins), y le acompaña un perro, **Shiro**, que
 camina con él y de vez en cuando desentierra monedas. En el juego ya están los dos (prototipo 0.6).
 
-**Lo que falta decidir es cómo entran en la historia.** El nombre viene del cuento popular
+**Cómo entran en la historia (aprobado: opción A, contándolo todo en la intro y el cierre).** Los
+textos están en §5. El nombre viene del cuento popular
 *Hanasaka Jiisan*: el perro blanco Shiro escarba y su dueño encuentra oro. Encaja con su mecánica sin
 explicarla.
 
-### DECISIÓN 17 — De dónde vienen Shiro y la cicatriz
+### DECISIÓN 17 — De dónde vienen Shiro y la cicatriz · **DECIDIDA: A**
 - **OPCIONES:**
   - A) **Shiro era el perro del shōgun Takeda.** La noche de la traición huye con Akira: es lo último
     que le queda de su señor. **La cicatriz se la hizo Genzo** esa misma noche.
@@ -211,6 +213,10 @@ explicarla.
   - C: un arco en los capítulos 2-3.
 - **RECOMENDACIÓN:** **A.** Es la que más da por menos: une al perro y la cicatriz con la traición,
   que es el corazón de la historia.
-- **SIGUIENTE PASO:** si eliges A, te propongo la frase exacta para la intro antes de cambiar
-  `datos.gd`. Por ejemplo, tras el segundo párrafo: «Solo Shiro, el perro del shōgun, sigue a Akira
-  en la huida».
+- **SIGUIENTE PASO:** hecho. El usuario eligió la versión que lo cuenta todo:
+  - la cicatriz, en el párrafo 2 de la intro;
+  - Shiro, al final de la intro y en el cierre.
+
+  Textos en §5 y en `datos.gd`.
+- **Nota:** los textos llaman «él» a Akira. Con la skin de Akira mujer no cambian: las skins son
+  solo de aspecto.

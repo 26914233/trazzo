@@ -15,17 +15,24 @@ const ControlesTactiles := preload("res://scripts/controles_tactiles.gd")
 const VisualModelo := preload("res://scripts/visual_modelo.gd")
 const Galeria := preload("res://scripts/galeria.gd")
 const Apariencias := preload("res://scripts/apariencias_akira.gd")
-const VERSION := "RONIN · prototipo 0.6"
+const Partida := preload("res://scripts/partida.gd")
+const VERSION := "RONIN · prototipo 0.7"
 
 var hud
 var juego
 var tactil
 var galeria_abierta: Node
-var monedas := 0                      # se conservan al reintentar (aún no hay partida guardada)
+var tiempo_guardado := 0.0            # la partida se guarda un poco después de cada cambio
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	# La prueba automática juega una partida nueva y no toca la guardada.
+	if "--prueba" in OS.get_cmdline_user_args():
+		Partida.modo_prueba = true
+		Partida.reiniciar()
+	else:
+		Partida.cargar()
 	Apariencias.cargar()
 	# Android: «atrás» pausa en vez de cerrar el juego (ver _notification).
 	get_tree().quit_on_go_back = false
@@ -68,6 +75,8 @@ func _registrar_acciones(clic_ataca: bool) -> void:
 		"estilo_animacion": [KEY_T],
 		"galeria": [KEY_G],
 		"apariencia": [KEY_V],
+		"comprar": [KEY_B],
+		"interactuar": [KEY_ENTER, KEY_KP_ENTER],
 		"girar_izquierda": [KEY_Q],
 		"girar_derecha": [KEY_E],
 		"acercar": [KEY_PLUS, KEY_KP_ADD, KEY_EQUAL],
@@ -103,7 +112,7 @@ func _registrar_acciones(clic_ataca: bool) -> void:
 		InputMap.action_add_event(accion, eje)
 		InputMap.action_set_deadzone(accion, 0.2)
 	var botones := {
-		"saltar": JOY_BUTTON_A, "aceptar": JOY_BUTTON_A, "atacar": JOY_BUTTON_X,
+		"saltar": JOY_BUTTON_A, "aceptar": JOY_BUTTON_A, "atacar": JOY_BUTTON_X, "interactuar": JOY_BUTTON_B,
 		"parar": JOY_BUTTON_LEFT_SHOULDER, "especial": JOY_BUTTON_Y,
 		"estilo_animacion": JOY_BUTTON_BACK,
 		"correr": JOY_BUTTON_RIGHT_SHOULDER, "pausa": JOY_BUTTON_START,
@@ -130,17 +139,33 @@ func _iniciar_juego(con_intro: bool) -> void:
 	juego.espiritu_cambiado.connect(hud.poner_espiritu)
 	juego.mensaje.connect(hud.mostrar_mensaje)
 	juego.monedas_cambiadas.connect(_al_cambiar_monedas)
+	juego.vida_maxima_cambiada.connect(hud.poner_vida_maxima)
+	juego.aviso_interaccion.connect(hud.poner_aviso_interaccion)
 	hud.poner_espiritu(0.0)
-	juego.iniciar(con_intro, monedas)
-	hud.poner_monedas(monedas, false)
-	hud.poner_vida(Datos.VIDA_MAXIMA)
+	hud.poner_aviso_interaccion("")
+	juego.iniciar(con_intro)
+	hud.poner_monedas(Partida.monedas, false)
+	hud.poner_vida_maxima(juego.akira.vida_maxima)
+	hud.poner_vida(juego.akira.vida)
 	hud.poner_derrotados(0, Datos.PATRULLAS.size())
 	_al_cambiar_fase(juego.fase)
 
 
 func _al_cambiar_monedas(total: int) -> void:
-	monedas = total
 	hud.poner_monedas(total)
+
+
+func _process(delta: float) -> void:
+	if Partida.pendiente:
+		tiempo_guardado += delta
+		if tiempo_guardado > 2.0:
+			tiempo_guardado = 0.0
+			Partida.guardar()
+
+
+func salir() -> void:
+	Partida.guardar()
+	get_tree().quit()
 
 
 func _al_cambiar_fase(fase: String) -> void:
@@ -164,6 +189,11 @@ func _pie(para: String) -> String:
 func alternar_pausa() -> void:
 	var pausado := not get_tree().paused
 	get_tree().paused = pausado
+	# Al salir del sastre, Akira vuelve a llevar lo que tiene puesto (lo que no se compró no se queda).
+	if not pausado and Apariencias.mostrada != Apariencias.elegida:
+		Apariencias.cerrar_sastre()
+		if juego:
+			juego.cambiar_apariencia_akira(Apariencias.elegida)
 	hud.poner_pausa(pausado, tactil.activo)
 
 
@@ -172,12 +202,15 @@ func alternar_pausa() -> void:
 func _notification(que: int) -> void:
 	if que == NOTIFICATION_WM_GO_BACK_REQUEST:
 		if get_tree().paused:
-			get_tree().quit()
+			salir()
 		else:
 			alternar_pausa()
 	elif que == NOTIFICATION_APPLICATION_PAUSED:
+		Partida.guardar()
 		if juego and juego.fase == "jugando" and not get_tree().paused:
 			alternar_pausa()
+	elif que == NOTIFICATION_WM_CLOSE_REQUEST:
+		Partida.guardar()
 
 
 # Animación limitada estilo anime (poses a 12 por segundo) o suave, para comparar.
@@ -188,11 +221,20 @@ func alternar_estilo_animacion() -> void:
 		else "Animación suave")
 
 
-# Aspecto de Akira (el joven endurecido o una de las tres skins). Se guarda para la próxima vez.
+# El sastre (en la pausa mientras no hay aldea): enseña el siguiente aspecto de Akira. Si ya es
+# suyo se lo pone; si no, enseña el precio y se puede comprar (B o el botón).
 func cambiar_apariencia() -> void:
 	Apariencias.siguiente()
 	if juego:
-		juego.cambiar_apariencia_akira()
+		juego.cambiar_apariencia_akira(Apariencias.mostrada)
+	hud.poner_apariencia()
+
+
+func comprar_apariencia() -> void:
+	if Apariencias.mostrada_bloqueada() and Apariencias.comprar_mostrada():
+		if juego:
+			juego.monedas = Partida.monedas
+		hud.poner_monedas(Partida.monedas, false)
 	hud.poner_apariencia()
 
 
@@ -236,6 +278,10 @@ func _input(evento: InputEvent) -> void:
 		cambiar_apariencia()
 		get_viewport().set_input_as_handled()
 		return
+	if get_tree().paused and evento.is_action_pressed("comprar"):
+		comprar_apariencia()
+		get_viewport().set_input_as_handled()
+		return
 	if evento.is_action_pressed("estilo_animacion"):
 		alternar_estilo_animacion()
 		get_viewport().set_input_as_handled()
@@ -248,7 +294,11 @@ func _input(evento: InputEvent) -> void:
 		if evento.is_action_pressed("aceptar"):
 			alternar_pausa()
 		elif evento is InputEventKey and evento.pressed and evento.keycode == KEY_Q:
-			get_tree().quit()
+			salir()
+		get_viewport().set_input_as_handled()
+		return
+	if juego.fase == "jugando" and evento.is_action_pressed("interactuar"):
+		juego.interactuar()
 		get_viewport().set_input_as_handled()
 		return
 	if evento.is_action_pressed("aceptar"):

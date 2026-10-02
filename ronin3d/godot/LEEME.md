@@ -23,7 +23,8 @@ ligero, para PC modestos y Android.
 | **Corte de luna** (barra llena) | **L** | **Y** | Botón «Luna» |
 | Animación anime / suave | T | Select | En la pausa, tocar «Animación» |
 | Galería de criaturas (prueba) | G en la pausa | — | En la pausa, tocar «Galería de criaturas» |
-| Aspecto de Akira (y skins) | V en la pausa | — | En la pausa, tocar «Akira: …» |
+| Sastre: ver el siguiente aspecto / comprarlo | V / B en la pausa | — | En la pausa, tocar «Sastre · …» / «Comprar…» |
+| Rezar al jizō (estando cerca) | ENTER | B | Tocar el aviso |
 | Girar la cámara | Q / E, botón derecho + arrastrar | Stick derecho | Arrastrar el dedo |
 | Zoom | Rueda, + / − | Cruceta arriba / abajo | — |
 | Inclinar la cámara | R / F | Stick derecho | Arrastrar el dedo |
@@ -72,8 +73,24 @@ de probar.
   - en calma, olfatea, ladra, escarba y desentierra monedas, y trae las que se quedan atrás;
   - no pelea y nadie le ataca. Reglas y números en `../DISENO_3D.md` y `scripts/datos.gd`.
 - **Monedas «mon»:** las sueltan los soldados y las desentierra Shiro. Akira las recoge al pasar y el
-  contador sale bajo la vida. Para qué sirven es la DECISIÓN 16 (`../PLAN_PRODUCCION.md` §14).
+  contador sale bajo la vida.
 - **Arreglo:** la pausa ahora para el juego de verdad (antes los soldados seguían moviéndose).
+
+### En qué se gastan las monedas (nuevo en la 0.7, DECISIÓN 16 A + C)
+
+- **Estatua jizō** (junto al muro oeste, cerca del inicio):
+  - al acercarse sale un aviso con el precio;
+  - rezar (ENTER, B en el mando o tocar el aviso) da +1 de vida máxima y cura del todo;
+  - cuesta 40 mon la primera vez y 80 la segunda.
+- **Sastre** (en la pausa mientras no exista la aldea):
+  - las skins empiezan bloqueadas: curtido 30, mujer 40 y veterano 60;
+  - V enseña la siguiente y B la compra;
+  - lo que no se compra no se queda puesto.
+- **La partida se guarda** (`user://partida.cfg`): monedas, skins compradas y bendiciones. Se guarda
+  sola poco después de cada cambio, al salir y al pasar a segundo plano. Los precios, en
+  `scripts/partida.gd`.
+- **Textos (DECISIÓN 17A):** la intro cuenta la cicatriz y que Shiro, el perro del shōgun, huye con
+  Akira; el cierre, que cruza la puerta con Shiro.
 
 ## Galería de criaturas (nueva en la 0.4)
 
@@ -100,18 +117,20 @@ Sirve para ver y medir el sistema que construye criaturas con piezas (`../BESTIA
 
 ## Exportar
 
-- **APK de prueba (ya hecho):** `ronin-0.6-prueba.apk` está en Google Drive, en
+- **APK de prueba (ya hecho):** `ronin-0.7-prueba.apk` está en Google Drive, en
   `Respaldos Claude/ronin/` (tamaño y SHA-256 en `../HANDOFF_RONIN.md`). Para instalarlo, ábrelo desde
   el móvil y acepta «instalar apps de origen desconocido» si Android lo pide. Pide Android 7.0 o
   superior y un móvil de 64 bits. Se instala encima de las anteriores (misma firma); están en
-  «Versiones anteriores (RONIN)». Trae a Akira endurecido con sus skins, a Shiro y las monedas.
+  «Versiones anteriores (RONIN)».
+  - Trae a Akira endurecido, a Shiro, las monedas, el jizō, el sastre (skins bloqueadas) y la
+    partida guardada.
   - **Peso de cada modelo dentro del APK:** Aka-oni 1,2 MB (malla 0,5 + textura 0,7), kappa 2,2 MB
     y Chōchin-obake 0,1 MB (SketchUp: colores planos).
 - **Desde tu PC:** Proyecto → Exportar → **Android** → Exportar proyecto (como con Curtzz). El
   APK sale en `ronin3d/godot/exportaciones/` (esa carpeta no se sube a git). Hace falta lo mismo
   que para Curtzz: plantillas de exportación de Godot 4.7.2 y el SDK de Android configurado.
   Paquete provisional: `com.thunderdarkness.ronin` (se puede cambiar antes de publicar).
-- **En la nube (así se hicieron de la 0.2 a la 0.6):**
+- **En la nube (así se hicieron de la 0.2 a la 0.7):**
   1. Plantillas `Godot_v4.7.2-stable_export_templates.tpz` (1.281 MB, SHA-512 comprobado con el
      `SHA512-SUMS.txt` del release). Solo hacen falta `android_release.apk`, `android_debug.apk` y
      `version.txt`, en `~/.local/share/godot/export_templates/4.7.2.stable/`.
@@ -140,7 +159,8 @@ Sirve para ver y medir el sistema que construye criaturas con piezas (`../BESTIA
 - Akira: correr, saltar, atacar, iai y corte de luna; 5 de vida, barra de espíritu, retroceso e
   invulnerabilidad tras un golpe. Cuatro aspectos (el joven endurecido y tres skins).
 - Shiro, el perro: le sigue, escarba y desentierra monedas, y trae las que se quedan atrás.
-- Monedas: las sueltan los soldados y las desentierra Shiro; contador en el HUD.
+- Monedas: las sueltan los soldados y las desentierra Shiro; contador en el HUD. Se gastan en el jizō
+  (+1 de vida) y en el sastre (skins), y se guardan entre partidas.
 - 6 soldados con lanza: patrullan, te ven en un cono, persiguen sin alejarse de su puesto,
   avisan y atacan.
 - Capa de tinta (`shaders/tinta.gdshader`): cuadros de impacto y líneas del corte de luna.
@@ -177,6 +197,8 @@ godot/
     ├── shiro.gd           El perro de Akira: seguirle, escarbar y traer monedas
     ├── visual_shiro.gd    Shiro hecho con piezas y sus poses
     ├── monedas.gd         Monedas «mon»: saltan, giran, se recogen; su malla con agujero cuadrado
+    ├── partida.gd         Lo que se guarda (monedas, skins compradas, bendiciones) y los precios
+    ├── jizo.gd            La estatua jizō del patio
     ├── hud.gd             Interfaz
     ├── criatura_modular.gd  Construye una criatura a partir de una receta (familia, tamaño, elemento, rol, rango)
     ├── modelo_criatura.gd   La misma interfaz con un modelo detallado (GLB): cel-shading, rangos, garrote, agua
@@ -189,7 +211,8 @@ godot/
 
 ## Prueba automática
 
-Juega sola unos 42 segundos y comprueba 28 cosas:
+Juega sola unos 43 segundos y comprueba 31 cosas (con una partida nueva en memoria: no toca la
+guardada):
 
 - los textos del capítulo 1 (shōgun Takeda, yōkai, luna roja), intro, caminar, HUD dentro de la pantalla y cámara;
 - espada, defensa del soldado, muros y portón;
@@ -203,7 +226,9 @@ Juega sola unos 42 segundos y comprueba 28 cosas:
   rangos (sin contar el garrote, que va levantado);
 - los cuatro aspectos de Akira (todos con la cicatriz, y se cambian en la pausa);
 - Shiro: sigue a Akira, desentierra monedas y trae las que se quedan atrás; los soldados sueltan
-  monedas y Akira las recoge (el HUD las cuenta).
+  monedas y Akira las recoge (el HUD las cuenta);
+- el sastre (skins bloqueadas que se compran), el jizō (+1 de vida por monedas) y el guardado de la
+  partida.
 
 Mide los FPS y guarda capturas en `../capturas/actual/`.
 
@@ -214,7 +239,7 @@ godot --path ronin3d/godot --fixed-fps 30 -- --prueba
 Con `RONIN_FOTOGRAMAS=<carpeta>` guarda además los fotogramas del iai y del corte de luna, y
 `python3 ronin3d/herramientas/hacer_gifs.py <carpeta> ronin3d/capturas/actual` los convierte en GIF.
 
-Resultado en la nube (Godot 4.7.2, OpenGL por software, sin tarjeta gráfica): **28 de 28** en la
-0.6 (22 de 22 en la 0.5), y unos 10-13 FPS al caminar por el patio a 1280 × 720. Las 929 criaturas del
+Resultado en la nube (Godot 4.7.2, OpenGL por software, sin tarjeta gráfica): **31 de 31** en la
+0.7 (28 de 28 en la 0.6), y unos 10-13 FPS al caminar por el patio a 1280 × 720. Las 929 criaturas del
 catálogo se construyen en medio segundo (20,5 piezas de media por criatura, 42 como máximo). Con tarjeta gráfica real va mucho
 más rápido. La 0.2 pasó también la prueba en una exportación *release* para Linux.

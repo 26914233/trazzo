@@ -121,8 +121,8 @@ func _input(evento: InputEvent) -> void:
 func _tocar(evento: InputEventScreenTouch) -> void:
 	if not _jugando():
 		# En los textos o en pausa, tocar la pantalla equivale a ENTER (o a continuar). En la
-		# pausa, los botones cambian la animación (anime o suave) y el aspecto de Akira, y
-		# abren la galería.
+		# pausa, los botones cambian la animación (anime o suave), abren la galería y llevan
+		# al sastre (ver el siguiente aspecto de Akira y comprarlo).
 		if not evento.pressed:
 			if get_tree().paused:
 				if principal.hud.boton_animacion.get_global_rect().has_point(evento.position):
@@ -131,6 +131,9 @@ func _tocar(evento: InputEventScreenTouch) -> void:
 					principal.abrir_galeria()
 				elif principal.hud.boton_apariencia.get_global_rect().has_point(evento.position):
 					principal.cambiar_apariencia()
+				elif principal.hud.boton_comprar.visible \
+						and principal.hud.boton_comprar.get_global_rect().has_point(evento.position):
+					principal.comprar_apariencia()
 				else:
 					principal.alternar_pausa()
 			else:
@@ -138,6 +141,11 @@ func _tocar(evento: InputEventScreenTouch) -> void:
 		_soltar_todo()
 		return
 	if evento.pressed:
+		# Junto al jizō, tocar el aviso es rezar.
+		var aviso: Label = principal.hud.aviso_interaccion
+		if aviso.visible and aviso.get_global_rect().has_point(evento.position):
+			principal.juego.interactuar()
+			return
 		for nombre in botones:
 			var boton: Dictionary = botones[nombre]
 			if evento.position.distance_to(boton.centro) <= boton.radio * 1.15:

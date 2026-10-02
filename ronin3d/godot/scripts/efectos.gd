@@ -282,6 +282,12 @@ func desenterrar(punto: Vector3) -> void:
 	chispas(punto + Vector3.UP * 0.2, 10, Datos.COBRE.lightened(0.5), 2.5, 0.35, -3.0, 0.05)
 
 
+# El jizō bendice a Akira: destello dorado y un toque de campana.
+func bendicion(punto: Vector3) -> void:
+	chispas(punto, 30, Datos.DORADO.lightened(0.3), 3.0, 0.8, -2.0, 0.08)
+	sonar("parada", punto, -8.0, 0.0)
+
+
 # Polvo cuando Shiro aparece junto a Akira (tras quedarse lejos o atascado).
 func polvo(punto: Vector3) -> void:
 	chispas(punto + Vector3.UP * 0.2, 12, Color(0.75, 0.72, 0.68), 1.5, 0.45, -1.0, 0.12)

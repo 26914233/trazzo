@@ -15,6 +15,7 @@ const Criatura := preload("res://scripts/criatura_modular.gd")
 const ModeloCriatura := preload("res://scripts/modelo_criatura.gd")
 
 const Apariencias := preload("res://scripts/apariencias_akira.gd")
+const Partida := preload("res://scripts/partida.gd")
 
 const CATALOGO := "res://datos/bestiario.json"
 const FAMILIAS := ["bipedo", "cuadrupedo", "serpentino", "alado", "acuatico", "flotante", "artropodo"]
@@ -176,10 +177,12 @@ func _definir_paginas() -> Array:
 	# Akira (el joven endurecido y sus tres skins) y Shiro, desde la 0.6
 	var personajes: Array = []
 	for id in Apariencias.ORDEN:
+		var precio := "" if id == "joven" else " · %d mon" % Partida.precio(id)
 		personajes.append({"personaje": "akira", "apariencia": id, "tamano": "M",
-			"nombre": String(Apariencias.APARIENCIAS[id].nombre)})
+			"nombre": String(Apariencias.APARIENCIAS[id].nombre) + precio})
 	personajes.insert(1, {"personaje": "shiro", "tamano": "S", "nombre": "Shiro"})
-	lista.append({"titulo": "Akira (el joven endurecido y sus tres skins) y Shiro", "filas": [personajes]})
+	lista.append({"titulo": "Akira (el joven endurecido y sus tres skins, con su precio en el sastre) y Shiro",
+		"filas": [personajes]})
 	if ModeloCriatura.tiene_modelo(2315):
 		var detallado := {"detallado": true, "id": 2315}
 		var oni_modelo := _receta("bipedo", "M", "fuego", "poderoso", 2315, detallado.merged({"nombre": "Aka-oni (modelo)"}))

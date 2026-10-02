@@ -113,7 +113,18 @@ para que se vea al bajar la cámara). Luz de luna direccional azulada
 ### Monedas «mon»
 - Cobre con agujero cuadrado (periodo Edo). Los soldados derrotados sueltan 2-4.
 - Saltan al salir, giran de canto en el suelo, Akira las atrae desde 2,2 m y las recoge a 0,8 m.
-- Hoy solo se cuentan: para qué sirven es la DECISIÓN 16 (`PLAN_PRODUCCION.md` §14).
+- Se gastan en el jizō y en el sastre (DECISIÓN 16, A + C). Se guardan en `user://partida.cfg`.
+
+### Estatua jizō (desde la 0.7)
+- En (−22,3, 0, −3), junto al muro oeste y mirando al patio. Es sólida: no se atraviesa.
+- A menos de 1,8 m sale un aviso con el precio. ENTER, B en el mando o tocar el aviso: rezar.
+- Rezar da +1 de vida máxima y cura del todo. Cuesta 40 mon la primera vez y 80 la segunda; no hay
+  más.
+
+### Sastre (desde la 0.7; en la pausa mientras no exista la aldea)
+- Las skins empiezan bloqueadas: curtido 30 mon, mujer 40 y veterano 60.
+- V enseña el siguiente aspecto (Akira se lo pone para verlo) y B o el botón lo compra.
+- Al salir de la pausa, Akira vuelve a llevar el último aspecto comprado que eligió.
 
 ## 5. Cámara
 
@@ -142,7 +153,8 @@ para que se vea al bajar la cámara). Luz de luna direccional azulada
 | R / F | Inclinar la cámara (−5° a 60°) |
 | ENTER | Continuar en los textos |
 | ESC | Pausa (Q en pausa: salir) |
-| V (en pausa) | Cambiar el aspecto de Akira: joven endurecido y tres skins (solo Godot) |
+| V / B (en pausa) | Sastre: ver el siguiente aspecto de Akira / comprarlo (solo Godot) |
+| ENTER junto al jizō | Rezar (B en el mando) (solo Godot) |
 | 1 / 2 / 3 | Cambiar de estética (solo Godot) |
 
 ## 7. HUD

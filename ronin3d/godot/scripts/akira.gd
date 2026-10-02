@@ -16,6 +16,7 @@ signal pidio_corte_de_luna
 
 var visual: Node3D
 var camara
+var vida_maxima := Datos.VIDA_MAXIMA   # sube con las bendiciones del jizō
 var vida := Datos.VIDA_MAXIMA
 var mirando := Vector3.RIGHT
 var controlable := false

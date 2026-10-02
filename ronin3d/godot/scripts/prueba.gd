@@ -12,6 +12,7 @@ const Aspecto := preload("res://scripts/aspecto.gd")
 const Criatura := preload("res://scripts/criatura_modular.gd")
 const ModeloCriatura := preload("res://scripts/modelo_criatura.gd")
 const Apariencias := preload("res://scripts/apariencias_akira.gd")
+const Partida := preload("res://scripts/partida.gd")
 const MOVIMIENTOS := ["mover_adelante", "mover_atras", "mover_izquierda", "mover_derecha"]
 
 var principal
@@ -117,7 +118,14 @@ func _ready() -> void:
 		[36.5, _preparar_traer],
 		[41.5, _comprobar_traer],
 		[41.6, _capturar.bind("monedas")],
-		[41.8, _terminar],
+		[41.7, _abrir_sastre],
+		[41.8, _capturar.bind("sastre")],
+		[41.9, _comprobar_sastre],
+		[42.0, _preparar_jizo],
+		[42.3, _comprobar_jizo],
+		[42.5, _capturar.bind("jizo")],
+		[42.6, _comprobar_guardado],
+		[42.8, _terminar],
 	]
 
 
@@ -533,8 +541,9 @@ func _comprobar_corte_luna() -> void:
 func _comprobar_textos() -> void:
 	var intro: String = " ".join(Datos.TEXTO_INTRO)
 	var cierre: String = " ".join(Datos.TEXTO_CIERRE)
-	_registrar("Los textos del capítulo 1 son los aprobados (shōgun Takeda, yōkai, luna roja)",
-		intro.contains("shōgun Takeda") and intro.contains("yōkai") and cierre.contains("luna brilla más roja"),
+	_registrar("Los textos del capítulo 1 son los aprobados (shōgun Takeda, yōkai, cicatriz, Shiro, luna roja)",
+		intro.contains("shōgun Takeda") and intro.contains("yōkai") and intro.contains("le cruzó la cara")
+		and intro.contains("Solo Shiro") and cierre.contains("con Shiro a su lado") and cierre.contains("luna brilla más roja"),
 		"intro: %d párrafos; cierre: %d" % [Datos.TEXTO_INTRO.size(), Datos.TEXTO_CIERRE.size()])
 
 
@@ -711,9 +720,9 @@ func _comprobar_apariencias() -> void:
 	principal.alternar_pausa()
 	for i in Apariencias.ORDEN.size():
 		principal.cambiar_apariencia()
-		cambios_bien = cambios_bien and _juego().akira.visual.apariencia == Apariencias.elegida
+		cambios_bien = cambios_bien and _juego().akira.visual.apariencia == Apariencias.mostrada
 	principal.alternar_pausa()
-	_registrar("Los cuatro aspectos de Akira llevan la cicatriz y se cambian en la pausa",
+	_registrar("Los cuatro aspectos de Akira llevan la cicatriz y el sastre los enseña en la pausa",
 		con_cicatriz == 4 and distintas.size() >= 3 and cambios_bien and Apariencias.elegida == antes,
 		"piezas: %s" % str(piezas))
 
@@ -767,6 +776,63 @@ func _comprobar_traer() -> void:
 			juego.shiro.entregadas - entregadas_antes, monedas_antes, juego.monedas])
 	juego.shiro.en_calma = juego.en_calma
 	juego.camara.distancia = Datos.CAMARA_DISTANCIA
+
+
+# Sastre (DECISIÓN 16C): las skins empiezan bloqueadas y se compran con monedas en la pausa; lo
+# que no se compra no se queda puesto al salir.
+func _abrir_sastre() -> void:
+	Partida.monedas = 100
+	principal.alternar_pausa()
+	principal.cambiar_apariencia()                     # curtido, aún bloqueada
+
+
+func _comprobar_sastre() -> void:
+	var bloqueada: bool = Apariencias.mostrada == "curtido" and Apariencias.mostrada_bloqueada() \
+		and Apariencias.elegida == "joven" and principal.hud.boton_comprar.visible
+	principal.comprar_apariencia()
+	var comprada: bool = Partida.tiene("curtido") and Apariencias.elegida == "curtido" \
+		and Partida.monedas == 100 - Partida.precio("curtido") and principal.hud.marcador.monedas == Partida.monedas
+	principal.cambiar_apariencia()                     # veterano: se ve, pero no se compra
+	var viendo_otra: bool = _juego().akira.visual.apariencia == "veterano"
+	principal.alternar_pausa()                         # al salir, vuelve la comprada
+	var vuelve: bool = _juego().akira.visual.apariencia == "curtido" and Apariencias.mostrada == "curtido"
+	_registrar("Las skins están bloqueadas y se compran al sastre con monedas",
+		bloqueada and comprada and viendo_otra and vuelve,
+		"bloqueada=%s, comprada=%s (quedan %d mon), al salir=%s" % [bloqueada, comprada, Partida.monedas, vuelve])
+
+
+func _preparar_jizo() -> void:
+	_proteger(true)
+	_teletransportar(Datos.JIZO_POSICION + Vector3(1.2, 0, 0.3), Vector3.LEFT)
+	Partida.monedas = maxi(Partida.monedas, 50)
+	monedas_antes = Partida.monedas
+
+
+# Jizō (DECISIÓN 16A): junto a él sale el aviso; rezar cuesta monedas y da +1 de vida máxima.
+func _comprobar_jizo() -> void:
+	var juego = _juego()
+	var aviso_visto: bool = juego.cerca_del_jizo and principal.hud.aviso_interaccion.visible
+	var precio := Partida.precio_bendicion()
+	juego.interactuar()
+	var akira = juego.akira
+	var bien: bool = aviso_visto and precio == Partida.PRECIOS_BENDICION[0] \
+		and akira.vida_maxima == Datos.VIDA_MAXIMA + 1 and akira.vida == akira.vida_maxima \
+		and Partida.monedas == monedas_antes - precio and principal.hud.marcador.maximo == akira.vida_maxima
+	_registrar("El jizō da +1 de vida máxima a cambio de monedas", bien,
+		"aviso=%s, vida máxima %d, monedas %d → %d" % [aviso_visto, akira.vida_maxima, monedas_antes, Partida.monedas])
+
+
+# La partida (monedas, skins y bendiciones) se guarda y se vuelve a cargar igual.
+func _comprobar_guardado() -> void:
+	var ruta := "user://prueba_partida.cfg"
+	var antes := [Partida.monedas, Partida.compradas.duplicate(), Partida.bendiciones]
+	Partida.guardar(ruta)
+	Partida.reiniciar()
+	Partida.cargar(ruta)
+	var despues := [Partida.monedas, Partida.compradas.duplicate(), Partida.bendiciones]
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(ruta))
+	_registrar("La partida se guarda y se carga (monedas, skins y bendiciones)", antes == despues,
+		"%s → %s" % [str(antes), str(despues)])
 
 
 func _empezar_cuenta_anime() -> void:

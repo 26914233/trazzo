@@ -5,24 +5,29 @@ ronin tras la traición del general Genzo, que pactó con el gran yōkai creyend
 Busca justicia por fuera y recuperar su honor por dentro. Empieza y termina en el castillo de
 Hoshiyama.
 
-**Estado:** prototipo 0.6 del capítulo 1 en **Godot 4.7 con cel-shading**, jugable con teclado,
+**Estado:** prototipo 0.7 del capítulo 1 en **Godot 4.7 con cel-shading**, jugable con teclado,
 mando y pantalla táctil.
 - Incluye una **galería de criaturas** (pausa → botón, o tecla G) para ver el sistema que permitiría
   construir cientos de monstruos.
 - Desde la 0.5 trae los **tres primeros enemigos con modelo detallado** (Aka-oni, kappa y
   Chōchin-obake, página 2 de la galería).
 - Desde la 0.6:
-  - **Akira es un joven endurecido con una cicatriz en la cara**, con tres skins (pausa → V);
+  - **Akira es un joven endurecido con una cicatriz en la cara**, con tres skins;
   - le acompaña **Shiro**, su perro, que desentierra **monedas**.
+- Desde la 0.7, las monedas se gastan en una **estatua jizō** (+1 de vida) y en el **sastre** (las
+  skins, bloqueadas hasta comprarlas), y la partida se guarda.
 
 - **Combate:** iaidō. Se mantiene y se suelta justo al aviso; con la barra llena hay un corte de
   luna.
 - **Animación:** estilo anime limitado, que se puede cambiar a la suave para comparar.
-- **APK de prueba para Android:** `ronin-0.6-prueba.apk`, en la carpeta de Drive.
+- **APK de prueba para Android:** `ronin-0.7-prueba.apk`, en la carpeta de Drive.
 - **Bestiario universal:** 939 criaturas (tu catálogo limpio + ángeles, demonios y yōkai que faltaban), cada
   una con su variante fuerte; ver `BESTIARIO_UNIVERSAL.md`.
-- **Decidido:** núcleo + variaciones y lanzamiento por capítulos (opción C), y combate de
-  precisión con iaidō.
+- **Decidido:**
+  - núcleo + variaciones y lanzamiento por capítulos (opción C), y combate de precisión con iaidō;
+  - desde el 02-10-2026, el Akira joven endurecido, el perro Shiro, las monedas para el jizō y el
+    sastre (16 A + C), el origen de Shiro y de la cicatriz (17A) y la tinta para las ilustraciones de
+    la historia (18A).
 - **Siguiente hito:** **vertical slice**, base del primer capítulo (ver `PLAN_PRODUCCION.md`).
 
 **Última actualización:** 2 de octubre de 2026
@@ -34,7 +39,7 @@ mando y pantalla táctil.
 ```
 ronin/                         (Google Drive: Respaldos Claude › ronin)
 ├── LEEME.md                   Este índice
-├── ronin-0.6-prueba.apk       APK de prueba para instalar en el móvil (Android 7.0 o superior)
+├── ronin-0.7-prueba.apk       APK de prueba para instalar en el móvil (Android 7.0 o superior)
 ├── RONIN_rama_completa.zip    Todo el código y las capturas (copia de la rama de GitHub)
 ├── 01-Diseno/                 Traspaso, plan, propuesta yōkai, historia, bestiario, especificación…
 ├── 06-Bestiario/              Catálogo limpio (CSV/JSON), prompts_colab.csv, cuaderno de Colab, imágenes
@@ -47,7 +52,7 @@ ronin/                         (Google Drive: Respaldos Claude › ronin)
 │                              las fichas anteriores (para 3D) en fichas/; el nuevo Akira en 4 estilos
 │                              en estilos/
 ├── 05-Arte/modelos3d/         Modelos 3D de enemigos (GLB, el .skp de SketchUp) y sus retratos
-└── Versiones anteriores (RONIN)/  APK anteriores (0.2 a 0.5) y capturas retiradas
+└── Versiones anteriores (RONIN)/  APK anteriores (0.2 a 0.6) y capturas retiradas
 ```
 
 En GitHub (`26914233/trazzo`, rama `claude/ronin-pygame-setup-szn3rn`):
@@ -107,9 +112,6 @@ ronin3d/
 | **Cómo se modelan las icónicas** | Híbrido: piezas para variantes y reskins; prueba de 10 criaturas con imagen → 3D antes de decidir (ahora dentro de la 15) | DECISIÓN 13 |
 | **Enemigos con el detalle de un jefe** | Por niveles: modelo propio con esqueleto para jefes e icónicas, unas 100-150 bases detalladas compartidas para el resto y SketchUp para criaturas-objeto y armas; antes, un piloto de esqueleto con el Aka-oni | DECISIÓN 15 (`BESTIARIO_UNIVERSAL.md` §8.2) |
 | **Rangos de cada criatura** | Tres: base, alfa (la variante fuerte) y silenciada | DECISIÓN 14 |
-| **Para qué sirven las monedas** | Estatuas jizō (mejoras pequeñas) y un sastre que vende las skins; nada de pagar con dinero real por monedas | DECISIÓN 16 (`PLAN_PRODUCCION.md` §14) |
-| **De dónde vienen Shiro y la cicatriz** | Shiro era el perro del shōgun; la cicatriz se la hizo Genzo la noche de la traición | DECISIÓN 17 (`HISTORIA.md` §9) |
-| **Estilo de las ilustraciones 2D** | Manga de tinta para la historia y los personajes; color para las fichas del bestiario | DECISIÓN 18 (`PLAN_PRODUCCION.md` §14) |
 | **Regla de respeto cultural** | Los dioses y seres sagrados de religiones vivas no son enemigos (50 entradas) | Salvo que la vetes |
 | **Qué hace cada lugar** | Aldea: diálogos y encargos · templo: puzzles de entorno · dojo: técnicas con ritmo · ruinas: exploración y jefe · planicie: viaje y dados | Al construir cada lugar |
 | **Bestiario dentro del juego** | Fichas con ilustración y leyenda real al vencer a cada criatura | Al planificar el vertical slice |
@@ -121,16 +123,17 @@ ronin3d/
 
 ## Lo que bloquea avanzar
 
-1. **Tu prueba del APK 0.6 en el móvil:**
+1. **Tu prueba del APK 0.7 en el móvil:**
    - los FPS (abajo a la derecha; meta: 30 o más);
    - si el iai (mantener y soltar al «!») y el corte de luna se entienden;
    - qué animación prefieres, anime o suave (botón en la pausa);
-   - **Shiro y las monedas**, y qué skin de Akira te gusta (pausa → «Akira: …»);
+   - **Shiro y las monedas**, y si los precios del jizō y del sastre (pausa → «Sastre») se sienten
+     justos;
    - **la galería de criaturas** (pausa → «Galería de criaturas»): los FPS con los modelos detallados
      (página 2), con 7 y con 24 criaturas a la vez (páginas 5 y 7), y si las siluetas por familia te
      convencen.
-2. **DECISIONES 11 a 18** (`HISTORIA.md` §8-9, `BESTIARIO_UNIVERSAL.md` y `PLAN_PRODUCCION.md` §14). La
-   15 es cómo dar a todos los enemigos el detalle que pediste; la 18, el estilo de dibujo.
+2. **DECISIONES 11 a 15** (`HISTORIA.md` §8 y `BESTIARIO_UNIVERSAL.md`). La 15 es cómo dar a todos los
+   enemigos el detalle que pediste. Las 16, 17 y 18 ya están decididas y en el juego.
 3. **Imágenes del bestiario en Colab:** el cuaderno está listo (`colab/`), falta ejecutarlo con la GPU T4.
 
 ## Próximo paso
