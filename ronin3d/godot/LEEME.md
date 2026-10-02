@@ -92,6 +92,30 @@ de probar.
 - **Textos (DECISIÓN 17A):** la intro cuenta la cicatriz y que Shiro, el perro del shōgun, huye con
   Akira; el cierre, que cruza la puerta con Shiro.
 
+## Personajes en pixel art (nuevo en la 0.9, DECISIÓN 20E)
+
+Akira (con sus 4 skins), los soldados y Shiro son **sprites de píxeles** dentro del mundo 3D, como en
+la referencia que eligió el usuario.
+- **Cómo se hacen:** se hornean desde los modelos de piezas, con todas sus poses y desde 8 direcciones:
+  1. `godot --path ronin3d/godot --script res://scripts/hornear_sprites.gd [id …]` dibuja cada pose
+     con una cámara ortográfica a 26 píxeles por metro. Deja las hojas en crudo en
+     `../herramientas/sprites_crudos/`, que no va a git.
+  2. `python3 ronin3d/herramientas/pulir_sprites.py` deja la transparencia en todo o nada, aclara los
+     oscuros, reduce la paleta a 40 colores y pone un contorno de 1 px. Las hojas finales y su
+     descripción van a `recursos/sprites/`.
+  3. Si Godot las importa de nuevo, en sus `.import` va `detect_3d/compress_to=0` (sin compresión de
+     vídeo) y `mipmaps/generate=false`.
+- **En el juego:** `scripts/visual_sprite.gd` con `shaders/sprite_pixel.gdshader`.
+  - Cada personaje es un cartel que siempre mira a la cámara.
+  - La fila de la hoja la decide desde dónde lo ve la cámara (8 direcciones) y el cuadro, la pose, a 12
+    por segundo.
+  - Recibe la luz de las antorchas y de la luna.
+  - Las estelas del corte, el «!» y la moneda de Shiro siguen en 3D.
+- `-- --modelos3d` enseña los modelos de piezas de antes (los que se hornean).
+- **El mundo:** sin la línea negra del cel-shading, y con un desenfoque de profundidad al estilo HD-2D
+  (`shaders/profundidad.gdshader`, por la altura en pantalla, porque Compatibility no tiene profundidad
+  de campo).
+
 ## Cabezas y caras dibujadas (nuevo en la 0.8)
 
 Para que los personajes se parezcan más a un dibujo de anime y la cabeza no se vea como una bola:
@@ -148,20 +172,20 @@ Sirve para ver y medir el sistema que construye criaturas con piezas (`../BESTIA
 
 ## Exportar
 
-- **APK de prueba (ya hecho):** `ronin-0.8-prueba.apk` está en Google Drive, en
+- **APK de prueba (ya hecho):** `ronin-0.9-prueba.apk` está en Google Drive, en
   `Respaldos Claude/ronin/` (tamaño y SHA-256 en `../HANDOFF_RONIN.md`). Para instalarlo, ábrelo desde
   el móvil y acepta «instalar apps de origen desconocido» si Android lo pide. Pide Android 7.0 o
   superior y un móvil de 64 bits. Se instala encima de las anteriores (misma firma); están en
   «Versiones anteriores (RONIN)».
   - Trae a Akira endurecido, a Shiro, las monedas, el jizō, el sastre (skins bloqueadas) y la
-    partida guardada. La 0.8 añade las cabezas nuevas: pelo en mechones y caras dibujadas.
+    partida guardada. La 0.8 añadió las cabezas nuevas y la 0.9, los personajes en pixel art.
   - **Peso de cada modelo dentro del APK:** Aka-oni 1,2 MB (malla 0,5 + textura 0,7), kappa 2,2 MB
     y Chōchin-obake 0,1 MB (SketchUp: colores planos).
 - **Desde tu PC:** Proyecto → Exportar → **Android** → Exportar proyecto (como con Curtzz). El
   APK sale en `ronin3d/godot/exportaciones/` (esa carpeta no se sube a git). Hace falta lo mismo
   que para Curtzz: plantillas de exportación de Godot 4.7.2 y el SDK de Android configurado.
   Paquete provisional: `com.thunderdarkness.ronin` (se puede cambiar antes de publicar).
-- **En la nube (así se hicieron de la 0.2 a la 0.8):**
+- **En la nube (así se hicieron de la 0.2 a la 0.9):**
   1. Plantillas `Godot_v4.7.2-stable_export_templates.tpz` (1.281 MB, SHA-512 comprobado con el
      `SHA512-SUMS.txt` del release). Solo hacen falta `android_release.apk`, `android_debug.apk` y
      `version.txt`, en `~/.local/share/godot/export_templates/4.7.2.stable/`.
@@ -209,9 +233,12 @@ godot/
 ├── icono.png              Icono provisional
 ├── recursos/sombra.png    Sombra bajo los personajes
 ├── recursos/caras/        Caras dibujadas de cada personaje (PNG) y su generador
+├── recursos/sprites/      Hojas de sprites pixel art (PNG) y su descripción (JSON)
 ├── datos/bestiario.json   Las criaturas del catálogo (lo genera ronin3d/herramientas/bestiario/unir_clasificacion.py)
 ├── sonidos/               Efectos de sonido (.wav) y su generador
 ├── shaders/               cielo, toon (cel-shading), toon_cara (caras dibujadas), toon_textura (modelos detallados), contorno y tinta
+│   ├── sprite_pixel        Los personajes en pixel art (cartel que mira a la cámara)
+│   ├── profundidad         Desenfoque de profundidad al estilo HD-2D
 │   └── estilos/           Filtros de la prueba de estilos: tinta_manga, sumie, ukiyoe, pixel y cara_realista
 ├── modelos/criaturas/     Modelos detallados (GLB) y su LEEME: cómo se hicieron, sumas y licencias
 └── scripts/
@@ -225,7 +252,9 @@ godot/
     ├── efectos.gd         Pausa de impacto, cámara lenta, chispas, sonidos y corte de luna
     ├── tinta.gd           Capa de tinta: cuadros de impacto y líneas de corte
     ├── controles_tactiles.gd  Joystick y botones para el móvil
-    ├── visual_modelo.gd   Personajes hechos con piezas 3D y sus poses (anime o suave)
+    ├── visual_sprite.gd   Personajes en pixel art: dirección y cuadro de su hoja según la pose
+    ├── hornear_sprites.gd Hornea las hojas de sprites desde los modelos de piezas
+    ├── visual_modelo.gd   Personajes hechos con piezas 3D y sus poses (de ellos salen los sprites)
     ├── apariencias_akira.gd  Los cuatro aspectos de Akira (el joven endurecido y tres skins)
     ├── shiro.gd           El perro de Akira: seguirle, escarbar y traer monedas
     ├── visual_shiro.gd    Shiro hecho con piezas y sus poses
@@ -245,7 +274,7 @@ godot/
 
 ## Prueba automática
 
-Juega sola unos 43 segundos y comprueba 31 cosas (con una partida nueva en memoria: no toca la
+Juega sola unos 43 segundos y comprueba 32 cosas (con una partida nueva en memoria: no toca la
 guardada):
 
 - los textos del capítulo 1 (shōgun Takeda, yōkai, luna roja), intro, caminar, HUD dentro de la pantalla y cámara;
@@ -259,6 +288,7 @@ guardada):
 - los modelos detallados: se cargan con textura y cel-shading, y el Aka-oni mide lo que debe en sus tres
   rangos (sin contar el garrote, que va levantado);
 - los cuatro aspectos de Akira (todos con la cicatriz, distintos entre sí, y se cambian en la pausa);
+- los sprites pixel art: las 6 hojas con todas sus poses, y la dirección cambia al girar la cámara;
 - Shiro: sigue a Akira, desentierra monedas y trae las que se quedan atrás; los soldados sueltan
   monedas y Akira las recoge (el HUD las cuenta);
 - el sastre (skins bloqueadas que se compran), el jizō (+1 de vida por monedas) y el guardado de la
@@ -274,6 +304,6 @@ Con `RONIN_FOTOGRAMAS=<carpeta>` guarda además los fotogramas del iai y del cor
 `python3 ronin3d/herramientas/hacer_gifs.py <carpeta> ronin3d/capturas/actual` los convierte en GIF.
 
 Resultado en la nube (Godot 4.7.2, OpenGL por software, sin tarjeta gráfica): **31 de 31** en la
-0.8 y en la 0.7 (28 de 28 en la 0.6), y unos 10-13 FPS al caminar por el patio a 1280 × 720. Las 929 criaturas del
+0.8 y en la 0.7, 32 de 32 en la 0.9 (28 de 28 en la 0.6), y unos 10-13 FPS al caminar por el patio a 1280 × 720. Las 929 criaturas del
 catálogo se construyen en medio segundo (20,5 piezas de media por criatura, 42 como máximo). Con tarjeta gráfica real va mucho
 más rápido. La 0.2 pasó también la prueba en una exportación *release* para Linux.

@@ -13,10 +13,12 @@ const VisualModelo := preload("res://scripts/visual_modelo.gd")
 const Efectos := preload("res://scripts/efectos.gd")
 const Shiro := preload("res://scripts/shiro.gd")
 const VisualShiro := preload("res://scripts/visual_shiro.gd")
+const VisualSprite := preload("res://scripts/visual_sprite.gd")
 const Monedas := preload("res://scripts/monedas.gd")
 const Apariencias := preload("res://scripts/apariencias_akira.gd")
 const Partida := preload("res://scripts/partida.gd")
 const Jizo := preload("res://scripts/jizo.gd")
+const SHADER_PROFUNDIDAD := preload("res://shaders/profundidad.gdshader")
 
 signal fase_cambiada(fase: String)
 signal vida_cambiada(vida: int)
@@ -69,6 +71,7 @@ func iniciar(con_intro := true) -> void:
 	efectos = Efectos.new()
 	efectos.camara = camara
 	add_child(efectos)
+	_crear_profundidad()
 	akira.buscar_rival = soldado_mas_cercano
 	akira.ataco.connect(func(): efectos.tajo(akira.global_position + Vector3.UP * 1.2))
 	akira.desenvaino.connect(func(): efectos.desenvaine(akira.global_position + Vector3.UP * 1.2))
@@ -108,10 +111,32 @@ func iniciar(con_intro := true) -> void:
 		comenzar()
 
 
+# Los personajes son sprites pixel art (DECISIÓN 20E); con --modelos3d, los modelos de piezas de
+# antes (de ellos se hornean los sprites).
+# Desenfoque de profundidad (tilt-shift) del aire HD-2D: en la capa 1, por debajo de los controles
+# táctiles (8), la tinta (9) y el HUD (10).
+func _crear_profundidad() -> void:
+	var capa := CanvasLayer.new()
+	capa.layer = 1
+	var filtro := ColorRect.new()
+	filtro.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	filtro.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var material := ShaderMaterial.new()
+	material.shader = SHADER_PROFUNDIDAD
+	filtro.material = material
+	capa.add_child(filtro)
+	capa.name = "Profundidad"
+	add_child(capa)
+
+
 func _crear_visual(soldado: bool, apariencia := "") -> Node3D:
-	var modelo = VisualModelo.new()
 	if apariencia == "":
 		apariencia = Apariencias.elegida
+	if VisualSprite.activo:
+		var sprite = VisualSprite.new()
+		sprite.configurar(aspecto, "soldado" if soldado else "akira", "" if soldado else apariencia)
+		return sprite
+	var modelo = VisualModelo.new()
 	modelo.configurar(aspecto, soldado, "" if soldado else apariencia)
 	return modelo
 
@@ -124,8 +149,12 @@ func _crear_shiro() -> void:
 	shiro.akira = akira
 	shiro.monedas = monedas_suelo
 	shiro.en_calma = en_calma
-	shiro.visual = VisualShiro.new()
-	shiro.visual.configurar(aspecto)
+	if VisualSprite.activo:
+		shiro.visual = VisualSprite.new()
+		shiro.visual.configurar(aspecto, "shiro")
+	else:
+		shiro.visual = VisualShiro.new()
+		shiro.visual.configurar(aspecto)
 	shiro.add_child(shiro.visual)
 	shiro.ladro.connect(func(punto): efectos.ladrido(punto))
 	shiro.empezo_a_escarbar.connect(func(punto): efectos.escarbar(punto, Datos.SHIRO_ESCARBADO))

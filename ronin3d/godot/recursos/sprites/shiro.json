@@ -1,0 +1,59 @@
+{
+	"animaciones": {
+		"alerta": {
+			"cuadros": 1,
+			"fps": 0.0,
+			"inicio": 26
+		},
+		"andar": {
+			"cuadros": 6,
+			"fps": 0.0,
+			"inicio": 8
+		},
+		"correr": {
+			"cuadros": 4,
+			"fps": 0.0,
+			"inicio": 14
+		},
+		"escarbar": {
+			"cuadros": 4,
+			"fps": 12.0,
+			"inicio": 22
+		},
+		"olfatear": {
+			"cuadros": 4,
+			"fps": 4.4,
+			"inicio": 18
+		},
+		"quieto": {
+			"cuadros": 4,
+			"fps": 3.2,
+			"inicio": 0
+		},
+		"salto": {
+			"cuadros": 1,
+			"fps": 0.0,
+			"inicio": 27
+		},
+		"sentado": {
+			"cuadros": 4,
+			"fps": 1.9,
+			"inicio": 4
+		}
+	},
+	"columnas": 42,
+	"cuadros_por_direccion": 28,
+	"direcciones": 8,
+	"elevacion": 20.0,
+	"id": "shiro",
+	"margen": 2,
+	"pies": [
+		22,
+		32
+	],
+	"px_por_metro": 26.0,
+	"tam": [
+		44,
+		36
+	]
+}

@@ -25,6 +25,9 @@ const COLORES := {
 }
 # Superficies grandes y planas: sin contorno (se vería como una raya en el suelo)
 const SIN_CONTORNO := ["losa", "tierra", "agua"]
+# Con los personajes en pixel art (DECISIÓN 20E), el escenario va sin la línea negra del cel-shading,
+# como los decorados HD-2D: así destacan los sprites, que llevan su propio contorno de un píxel.
+static var contorno_escenario := false
 
 var _cache := {}
 
@@ -33,7 +36,7 @@ var _cache := {}
 
 func material_superficie(nombre: String) -> Material:
 	if not _cache.has(nombre):
-		_cache[nombre] = material_toon(COLORES[nombre], not nombre in SIN_CONTORNO, false)
+		_cache[nombre] = material_toon(COLORES[nombre], contorno_escenario and not nombre in SIN_CONTORNO, false)
 	return _cache[nombre]
 
 

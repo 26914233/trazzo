@@ -5,8 +5,8 @@ ronin tras la traición del general Genzo, que pactó con el gran yōkai creyend
 Busca justicia por fuera y recuperar su honor por dentro. Empieza y termina en el castillo de
 Hoshiyama.
 
-**Estado:** prototipo 0.8 del capítulo 1 en **Godot 4.7 con cel-shading**, jugable con teclado,
-mando y pantalla táctil.
+**Estado:** prototipo 0.9 del capítulo 1 en **Godot 4.7, con los personajes en pixel art** dentro de
+un mundo 3D (desde la 0.9; antes, cel-shading). Jugable con teclado, mando y pantalla táctil.
 - Incluye una **galería de criaturas** (pausa → botón, o tecla G) para ver el sistema que permitiría
   construir cientos de monstruos.
 - Desde la 0.5 trae los **tres primeros enemigos con modelo detallado** (Aka-oni, kappa y
@@ -19,18 +19,22 @@ mando y pantalla táctil.
 - Desde la 0.8, **las cabezas ya no son bolas**: pelo en mechones, **caras dibujadas** (ojos, cejas y
   boca son una imagen 2D, como en los juegos de anime en 3D) y línea de dibujo de grosor casi
   constante. Antes y después: `capturas/comparativa_cabezas.jpg`.
+- Desde la 0.9, **los personajes son pixel art** (DECISIÓN 20E, tu referencia: Ethra):
+  - sprites en 8 direcciones horneados desde los modelos, con todas sus poses y las 4 skins;
+  - el mundo sigue en 3D, sin línea negra y con un desenfoque de profundidad al estilo HD-2D;
+  - en `capturas/sprites_pixel_art.png` y `capturas/comparativa_pixel_art.jpg`.
 
 - **Combate:** iaidō. Se mantiene y se suelta justo al aviso; con la barra llena hay un corte de
   luna.
 - **Animación:** estilo anime limitado, que se puede cambiar a la suave para comparar.
-- **APK de prueba para Android:** `ronin-0.8-prueba.apk`, en la carpeta de Drive.
+- **APK de prueba para Android:** `ronin-0.9-prueba.apk`, en la carpeta de Drive.
 - **Bestiario universal:** 939 criaturas (tu catálogo limpio + ángeles, demonios y yōkai que faltaban), cada
   una con su variante fuerte; ver `BESTIARIO_UNIVERSAL.md`.
 - **Decidido:**
   - núcleo + variaciones y lanzamiento por capítulos (opción C), y combate de precisión con iaidō;
   - desde el 02-10-2026, el Akira joven endurecido, el perro Shiro, las monedas para el jizō y el
-    sastre (16 A + C), el origen de Shiro y de la cicatriz (17A) y la tinta para las ilustraciones de
-    la historia (18A).
+    sastre (16 A + C), el origen de Shiro y de la cicatriz (17A), la tinta para las ilustraciones de
+    la historia (18A) y **el pixel art para los personajes (20E)**.
 - **Siguiente hito:** **vertical slice**, base del primer capítulo (ver `PLAN_PRODUCCION.md`).
 
 **Última actualización:** 2 de octubre de 2026
@@ -42,7 +46,7 @@ mando y pantalla táctil.
 ```
 ronin/                         (Google Drive: Respaldos Claude › ronin)
 ├── LEEME.md                   Este índice
-├── ronin-0.8-prueba.apk       APK de prueba para instalar en el móvil (Android 7.0 o superior)
+├── ronin-0.9-prueba.apk       APK de prueba para instalar en el móvil (Android 7.0 o superior)
 ├── RONIN_rama_completa.zip    Todo el código y las capturas (copia de la rama de GitHub)
 ├── 01-Diseno/                 Traspaso, plan, propuesta yōkai, historia, bestiario, especificación…
 ├── 06-Bestiario/              Catálogo limpio (CSV/JSON), prompts_colab.csv, cuaderno de Colab, imágenes
@@ -55,7 +59,7 @@ ronin/                         (Google Drive: Respaldos Claude › ronin)
 │                              las fichas anteriores (para 3D) en fichas/; el nuevo Akira en 4 estilos
 │                              en estilos/
 ├── 05-Arte/modelos3d/         Modelos 3D de enemigos (GLB, el .skp de SketchUp) y sus retratos
-└── Versiones anteriores (RONIN)/  APK anteriores (0.2 a 0.7) y capturas retiradas
+└── Versiones anteriores (RONIN)/  APK anteriores (0.2 a 0.8) y capturas retiradas
 ```
 
 En GitHub (`26914233/trazzo`, rama `claude/ronin-pygame-setup-szn3rn`):
@@ -121,14 +125,14 @@ ronin3d/
 | **Modelo de capítulos** | Primer capítulo gratis como demo y el resto de pago, o cada capítulo de pago | Con datos del vertical slice |
 | **Dados de la planicie** | Chō-han (par o impar con dos dados) | Al empezar la planicie en 3D |
 | **Nombre** | «RONIN» ya lo usan otros juegos: buscar nombre o subtítulo propio | Antes de abrir una página de tienda |
-| **Camino al «2D lo más pulido»** | Piezas con trucos de anime (hecho en la 0.8) + piloto de modelo en Blender solo con Akira + modo tinta opcional. VRoid no cabe en tu PC (pide 8 GB de RAM) | DECISIÓN 19 (`PLAN_PRODUCCION.md` §16) |
-| **Estilo de render** | Seguir con cel-shading de base y probar en la pausa la tinta (identidad) y el pixel art (modo ligero). Los seis estilos, en `capturas/comparativa_estilos_personajes.jpg` | DECISIÓN 20 (`PLAN_PRODUCCION.md` §17) |
+| **Camino al «2D lo más pulido»** | En pausa: con el pixel art (20E) los personajes ya son 2D. Se retoma si se quiere más detalle en los sprites (repaso a mano o mejores modelos para hornear) | DECISIÓN 19 (`PLAN_PRODUCCION.md` §16) |
+| **El mundo con los personajes en pixel art** | Texturas de pixel art en los decorados (como Octopath), con la niebla y el desenfoque de la 0.9. Un mundo como el de Ethra pide otro renderizador y mucho arte | DECISIÓN 21 (`PLAN_PRODUCCION.md` §18) |
 
 ---
 
 ## Lo que bloquea avanzar
 
-1. **Tu prueba del APK 0.8 en el móvil:**
+1. **Tu prueba del APK 0.9 en el móvil**, ahora con los personajes en pixel art:
    - los FPS (abajo a la derecha; meta: 30 o más);
    - si el iai (mantener y soltar al «!») y el corte de luna se entienden;
    - qué animación prefieres, anime o suave (botón en la pausa);
@@ -137,12 +141,11 @@ ronin3d/
    - **la galería de criaturas** (pausa → «Galería de criaturas»): los FPS con los modelos detallados
      (página 2), con 7 y con 24 criaturas a la vez (páginas 5 y 7), y si las siluetas por familia te
      convencen.
-2. **DECISIONES 11 a 15, 19 y 20** (`HISTORIA.md` §8, `BESTIARIO_UNIVERSAL.md` y `PLAN_PRODUCCION.md` §16-17).
-   - La 15 es cómo dar a todos los enemigos el detalle que pediste.
-   - La 19, el camino hacia el «2D lo más pulido».
-   - La 20, si seguimos con el cel-shading u otro estilo de render (tinta, sumi-e, ukiyo-e, pixel art o
-     3D realista).
-   - Las 16, 17 y 18 ya están decididas y en el juego.
+2. **DECISIONES 11 a 15 y 21** (`HISTORIA.md` §8, `BESTIARIO_UNIVERSAL.md` y `PLAN_PRODUCCION.md` §18).
+   - La 15 es cómo dar a todos los enemigos el detalle que pediste (con el pixel art, las criaturas
+     también se hornean en sprites).
+   - La 21, cómo es el mundo ahora que los personajes son pixel art.
+   - Las 16, 17, 18 y 20 ya están decididas y en el juego; la 19 queda en pausa.
 3. **Imágenes del bestiario en Colab:** el cuaderno está listo (`colab/`), falta ejecutarlo con la GPU T4.
 
 ## Próximo paso

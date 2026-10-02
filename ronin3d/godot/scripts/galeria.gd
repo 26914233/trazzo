@@ -42,6 +42,7 @@ var texto_datos := ""
 class Figura extends Node3D:
 	const VisualModelo := preload("res://scripts/visual_modelo.gd")
 	const VisualShiro := preload("res://scripts/visual_shiro.gd")
+	const VisualSprite := preload("res://scripts/visual_sprite.gd")
 	var visual
 	var cuerpo: Node3D
 	var piezas := 0
@@ -50,7 +51,11 @@ class Figura extends Node3D:
 
 	func configurar(aspecto, receta: Dictionary) -> void:
 		es_shiro = receta.get("personaje") == "shiro"
-		if es_shiro:
+		if VisualSprite.activo:
+			visual = VisualSprite.new()
+			visual.configurar(aspecto, "shiro" if es_shiro else "akira",
+				"" if es_shiro else String(receta.get("apariencia", "joven")))
+		elif es_shiro:
 			visual = VisualShiro.new()
 			visual.configurar(aspecto)
 		else:

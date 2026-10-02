@@ -468,20 +468,22 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   - **17A:** origen de Shiro y de la cicatriz (arriba, en la historia).
   - **18A:** las ilustraciones de la historia y de los personajes van en **manga de tinta** (blanco y
     negro con un acento rojo); las fichas del bestiario siguen **en color** (estilo del Bahamut).
+- **Decisión cerrada (02-10-2026, noche): 20E, pixel art.**
+  - Los personajes son sprites de píxeles dentro del mundo 3D, como en sus referencias: Ethra, y
+    Drakantos para el pixel art.
+  - Sustituye al cel-shading de los personajes. En el juego desde la 0.9.
 - **Decisiones abiertas:**
   - 11: papel del Silencio (`HISTORIA.md` §8).
   - 12: gancho, cantidad frente a precisión.
   - 13: cómo se modelan las criaturas icónicas.
   - 14: cuántos rangos.
   - 15: cómo dar a todos los enemigos el detalle de un jefe (`BESTIARIO_UNIVERSAL.md` §8.2).
-  - 19: camino hacia el «2D lo más pulido» para los personajes que se ven de cerca
-    (`PLAN_PRODUCCION.md` §16). Recomendado: piezas con trucos de anime, más un piloto de modelo en
-    Blender solo con Akira (necesita permiso para descargar Blender) y un modo tinta opcional.
-    VRoid Studio pide 8 GB de RAM y no cabe en su PC.
-  - 20: estilo de render (`PLAN_PRODUCCION.md` §17): seguir con cel-shading o pasar a tinta, sumi-e,
-    ukiyo-e, pixel art o 3D realista. Se dibujaron los seis con `godot/scripts/estilos_render.gd`
-    (hoja en `capturas/comparativa_estilos_personajes.jpg`). Recomendado: cel de base y tinta y pixel
-    art opcionales en la pausa. Cambiar de motor no cambia el estilo: todos salen de Godot.
+  - 19: «2D lo más pulido» (`PLAN_PRODUCCION.md` §16). **En pausa:** con la 20E los personajes ya son
+    2D; se retoma para dar más detalle a los sprites.
+  - 21: cómo es el mundo con los personajes en pixel art (`PLAN_PRODUCCION.md` §18). Recomendado:
+    texturas de pixel art tipo Octopath, las del 27-09 que están en el historial de git, con niebla y
+    desenfoque. Un mundo como el de Ethra pide Forward+ o Mobile (Compatibility no tiene niebla
+    volumétrica ni profundidad de campo) y mucho arte.
   - La regla de respeto cultural: los dioses y seres sagrados de religiones vivas no son enemigos.
 
   Detalle y recomendaciones en `ronin3d/BESTIARIO_UNIVERSAL.md` y `ronin3d/PLAN_PRODUCCION.md`.
@@ -526,6 +528,15 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   - línea de grosor casi constante (`contorno.gdshader`, de 1,3 a 3,5 px a 720p). En el renderizador
     Compatibility, `PROJECTION_MATRIX[1][1]` sale negativo: por eso lleva `abs()`.
   - Revisión de cerca: `--script res://scripts/retrato.gd -- akira`.
+- **Pixel art (desde la 0.9):**
+  - Los sprites se **hornean desde los modelos de piezas**:
+    `godot --path ronin3d/godot --script res://scripts/hornear_sprites.gd` (8 direcciones, 26 px/m), y
+    luego `python3 ronin3d/herramientas/pulir_sprites.py` (paleta de 40 colores y contorno de 1 px).
+    Salen en `godot/recursos/sprites/`.
+  - Al reimportar, poner en sus `.import` `detect_3d/compress_to=0` y sin mipmaps.
+  - En el juego los muestra `visual_sprite.gd` (un cartel que mira a la cámara; dirección y cuadro
+    según la pose). Con `--modelos3d` se ven los modelos.
+  - Si cambia un modelo o una skin, se vuelve a hornear.
 - **Proyecto principal:** `ronin3d/godot/`. Prueba automática:
   `godot --path ronin3d/godot --fixed-fps 30 -- --prueba` (en Linux sin pantalla, con
   `xvfb-run -a`). Las versiones Three.js y Ursina de `ronin3d/` quedan solo como referencia.

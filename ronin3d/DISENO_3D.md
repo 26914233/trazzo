@@ -198,6 +198,17 @@ Desde la 0.8, para que los personajes de piezas se parezcan más a un dibujo de 
 - **Línea de dibujo** de 1,3 a 3,5 píxeles a 720p, con el color de la línea en un tono muy oscuro del
   propio color, no en negro puro.
 
+### Pixel art (desde la 0.9, DECISIÓN 20E)
+- **Personajes:** sprites de píxeles horneados desde los modelos de piezas.
+  - Hay 8 direcciones a 26 píxeles por metro, así que Akira mide unos 44 píxeles.
+  - Llevan una paleta de 40 colores por hoja y un contorno de un píxel.
+  - Cada sprite es un cartel que mira a la cámara y gira sobre los pies.
+  - Reciben la luz del patio como una tarjeta plana, con un poco de luz propia para que se lean de
+    noche.
+- **Mundo:** sigue en 3D, sin la línea negra del cel-shading, con niebla y con un desenfoque de
+  profundidad al estilo HD-2D: arriba y, algo menos, abajo de la pantalla.
+- Cómo será el resto del mundo (texturas de pixel art u otro acabado) es la DECISIÓN 21.
+
 ## 9. Sprites y texturas compartidos (`recursos/`)
 
 Generados por `recursos/generar_recursos.py` (Python + pygame). Si se cambian, se

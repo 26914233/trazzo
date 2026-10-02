@@ -544,7 +544,7 @@ cuestan casi lo mismo que el cel-shading. En un móvil, los filtros de pantalla 
 aquí [Estimación], sobre todo el sumi-e, que lee unas 40 veces la imagen por cada píxel. Hay que
 medirlo en tu móvil.
 
-### DECISIÓN 20 — Estilo de render · **pendiente**
+### DECISIÓN 20 — Estilo de render · **DECIDIDA el 02-10-2026: E, pixel art** (personajes en sprites dentro de un mundo 3D, como en la referencia del usuario; ver §18)
 - **DECISIÓN:** seguir con el cel-shading (decidido el 27-09-2026) o cambiar el estilo de render.
 - **OPCIONES:**
   - A) Seguir con cel-shading.
@@ -586,4 +586,91 @@ medirlo en tu móvil.
 
 | # | Decisión | Dónde | Estado |
 | --- | --- | --- | --- |
-| 20 | Estilo de render | §17 | **Pendiente.** Recomendado: G (cel de base; tinta y pixel art opcionales en la pausa) |
+| 20 | Estilo de render | §17 | **Decidido el 02-10-2026: E, pixel art** (en el juego desde la 0.9, §18) |
+
+## 18. Hecho el 2-10-2026 (noche): versión 0.9, los personajes en pixel art
+
+El usuario eligió el **pixel art** (DECISIÓN 20, opción E) y mandó sus referencias:
+- Ethra: personajes en sprites de píxeles dentro de un mundo 3D con niebla y desenfoque.
+- Drakantos: pixel art 2D.
+
+1. **Sprites horneados desde los modelos de piezas.**
+   - `godot/scripts/hornear_sprites.gd` pone cada modelo en cada pose y lo dibuja desde 8 direcciones,
+     con una cámara ortográfica a 26 píxeles por metro (Akira mide unos 44 píxeles).
+   - `herramientas/pulir_sprites.py` deja la transparencia en todo o nada, aclara los oscuros, reduce
+     la paleta a 40 colores y pone un contorno de un píxel.
+   - Resultado, en `godot/recursos/sprites/`:
+     - Akira con sus 4 skins: 33 cuadros por dirección (quieto, andar, correr, salto, ataque, postura,
+       desenvaine, remate y caída);
+     - el soldado: 22 cuadros;
+     - Shiro: 28 cuadros.
+   - **Por qué así:** no hace falta dibujar a mano cientos de cuadros, que era el gran coste de la
+     opción D de la DECISIÓN 19. Si cambia un modelo o llega una skin nueva, se vuelve a hornear en
+     segundos. Y a esta resolución las piezas ya no se notan: lo que se ve es pixel art.
+2. **En el juego** (`scripts/visual_sprite.gd` y `shaders/sprite_pixel.gdshader`):
+   - cada personaje es un cartel que siempre mira a la cámara;
+   - elige la dirección según desde dónde se le ve, y el cuadro según la pose, a 12 por segundo como la
+     animación anime;
+   - recibe la luz de las antorchas y de la luna;
+   - las estelas del corte, el «!» y la moneda en la boca de Shiro siguen en 3D;
+   - con `--modelos3d` se ven los modelos de antes.
+3. **El mundo, con aire HD-2D:**
+   - Desenfoque de profundidad según la altura en la pantalla (`shaders/profundidad.gdshader`). Hay
+     que hacerlo así porque **[Hecho]** el renderizador Compatibility no tiene profundidad de campo
+     (documentación de Godot).
+   - El escenario va sin la línea negra del cel-shading, para que destaquen los sprites.
+4. **La galería** enseña los sprites.
+5. **Prueba automática: 32 de 32.** La nueva comprueba que las 6 hojas tienen todas sus poses y que
+   la dirección cambia al girar la cámara. FPS al caminar por el patio: 11,6 (antes, entre 11,9 y
+   12,4) en el mismo emulador.
+
+Las hojas de sprites están en `capturas/sprites_pixel_art.png`, y el antes y después, en
+`capturas/comparativa_pixel_art.jpg`.
+
+**Lo que aún no está como en tu referencia [Opinión]:**
+- **El mundo.** Ethra tiene un bosque detallado, con vegetación, niebla volumétrica y profundidad de
+  campo de verdad. Nuestro patio son formas sencillas de colores planos. Es la DECISIÓN 21.
+- **Las criaturas del bestiario** siguen en 3D de piezas. Hay que hornearlas igual, empezando por las
+  del capítulo 1: kappa, oni, onibi y el oni gigante.
+- **El acabado de los sprites.** Salen de los modelos, así que tienen la proporción y el detalle que
+  dan las piezas. Para que luzcan como un pixel art dibujado a mano (Drakantos), un artista o una IA de
+  pixel art tendría que repasar los cuadros clave, por ejemplo Akira quieto y atacando
+  [Estimación: es el paso más caro].
+- **La DECISIÓN 19** («2D lo más pulido») queda en pausa: los personajes ya son 2D. Se retomaría para
+  dar más detalle a los sprites, con un repaso a mano o con mejores modelos para hornear.
+
+### DECISIÓN 21 — Cómo es el mundo con los personajes en pixel art · **pendiente**
+- **DECISIÓN:** el aspecto de los escenarios.
+- **OPCIONES:**
+  - A) El patio de ahora: colores planos con luz en bandas, niebla y el desenfoque HD-2D (lo de la
+    0.9).
+  - B) Decorados HD-2D con texturas de pixel art, como Octopath Traveler: losas, muros, madera y tejas
+    con textura de píxeles. Ya se hicieron en la primera prueba del 27-09 y están en el historial de
+    git.
+  - C) Un mundo detallado como el de Ethra: vegetación, niebla volumétrica, profundidad de campo real y
+    luz realista.
+- **VENTAJAS:**
+  - A: está hecho y es ligero.
+  - B: coherente con los personajes, barato y probado; se lee como HD-2D.
+  - C: el más espectacular, el de tu referencia.
+- **RIESGOS:**
+  - A: se ve sencillo al lado de los sprites.
+  - B: se parece a Octopath, y hay que cuidar que el píxel de las texturas y el de los personajes
+    tengan el mismo tamaño.
+  - C: **[Hecho]** la niebla volumétrica y la profundidad de campo no existen en el renderizador
+    Compatibility (documentación de Godot). Habría que pasar a Forward+ o Mobile (Vulkan), que piden
+    más a tu móvil y a tu PC. Además, hacen falta muchos modelos y texturas detallados, lo más caro del
+    juego [Estimación].
+- **COSTE** [Estimación]:
+  - A: nada.
+  - B: una o dos sesiones.
+  - C: meses de arte o un artista, y un equipo más potente.
+- **RECOMENDACIÓN [Opinión]:** **B, con la niebla y el desenfoque de la A.** Es el camino viable al
+  «pixel en un mundo 3D» con tu equipo. La C, solo si algún día el juego va a PC o consola con
+  presupuesto.
+- **SIGUIENTE PASO:** si eliges B, recuperar las texturas de píxel del 27-09, ajustarlas a 26 píxeles
+  por metro y probarlas en el patio.
+
+| # | Decisión | Dónde | Estado |
+| --- | --- | --- | --- |
+| 21 | Cómo es el mundo con los personajes en pixel art | §18 | **Pendiente.** Recomendado: B (texturas de píxel, con niebla y desenfoque) |

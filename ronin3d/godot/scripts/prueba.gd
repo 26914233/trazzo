@@ -13,6 +13,7 @@ const Criatura := preload("res://scripts/criatura_modular.gd")
 const ModeloCriatura := preload("res://scripts/modelo_criatura.gd")
 const Apariencias := preload("res://scripts/apariencias_akira.gd")
 const Partida := preload("res://scripts/partida.gd")
+const VisualSprite := preload("res://scripts/visual_sprite.gd")
 const MOVIMIENTOS := ["mover_adelante", "mover_atras", "mover_izquierda", "mover_derecha"]
 
 var principal
@@ -111,6 +112,7 @@ func _ready() -> void:
 		[31.5, _construir_todo_el_bestiario],
 		[31.6, _comprobar_modelo_detallado],
 		[31.7, _comprobar_apariencias],
+		[31.75, _comprobar_sprites],
 		[31.8, _preparar_shiro],
 		[34.0, _capturar.bind("shiro_escarba")],
 		[35.6, _comprobar_hallazgo],
@@ -729,6 +731,40 @@ func _comprobar_apariencias() -> void:
 	_registrar("Los cuatro aspectos de Akira llevan la cicatriz y el sastre los enseña en la pausa",
 		con_cicatriz == 4 and distintas.size() == 4 and cambios_bien and Apariencias.elegida == antes,
 		"triángulos: %s" % str(triangulos))
+
+
+# Pixel art (DECISIÓN 20E): las seis hojas cargan con todas sus poses y caben en una textura de
+# móvil (2048 como mucho); en el juego, Akira, los soldados y Shiro son sprites, y si la cámara da
+# media vuelta alrededor de Akira, lo ve desde el otro lado.
+func _comprobar_sprites() -> void:
+	var necesarias := {
+		"akira": ["normal", "andar", "correr", "salto", "muerte", "ataque", "postura", "desenvaine", "remate"],
+		"soldado": ["normal", "andar", "correr", "salto", "muerte", "preparando", "estocada"],
+		"shiro": ["quieto", "sentado", "andar", "correr", "olfatear", "escarbar", "alerta", "salto"],
+	}
+	var hojas_bien := 0
+	for id in ["akira_joven", "akira_curtido", "akira_veterano", "akira_mujer", "soldado", "shiro"]:
+		var datos = JSON.parse_string(FileAccess.get_file_as_string("res://recursos/sprites/%s.json" % id))
+		var textura: Texture2D = load("res://recursos/sprites/%s.png" % id)
+		var tipo: String = "akira" if id.begins_with("akira") else id
+		var bien: bool = datos is Dictionary and textura != null and int(datos.direcciones) == 8 \
+			and textura.get_width() <= 2048 and textura.get_height() <= 2048
+		if bien:
+			for nombre in necesarias[tipo]:
+				bien = bien and datos.animaciones.has(nombre)
+		hojas_bien += 1 if bien else 0
+	var juego = _juego()
+	var son_sprites: bool = juego.akira.visual is VisualSprite and juego.shiro.visual is VisualSprite \
+		and juego.soldados.all(func(soldado): return not is_instance_valid(soldado) or soldado.visual is VisualSprite)
+	var antes: int = juego.akira.visual._direccion()
+	juego.camara.giro += 180.0
+	juego.camara.colocar_de_golpe()
+	var despues: int = juego.akira.visual._direccion()
+	juego.camara.giro -= 180.0
+	juego.camara.colocar_de_golpe()
+	_registrar("Los personajes son sprites pixel art: 6 hojas con todas sus poses y 8 direcciones",
+		hojas_bien == 6 and son_sprites and posmod(despues - antes, 8) == 4,
+		"hojas bien: %d de 6 · dirección %d → %d al girar la cámara 180°" % [hojas_bien, antes, despues])
 
 
 func _preparar_shiro() -> void:

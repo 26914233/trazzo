@@ -4,6 +4,7 @@
 # Opciones (después de «--» en la línea de órdenes):
 #   --prueba   juega sola, comprueba lo básico y guarda capturas
 #   --tactil   muestra los controles táctiles en el PC (el ratón hace de dedo)
+#   --modelos3d  los personajes con los modelos de piezas en vez de los sprites pixel art
 #   --galeria  abre la galería de criaturas del bestiario (con --capturas guarda imágenes y sale)
 extends Node
 
@@ -13,10 +14,11 @@ const Hud := preload("res://scripts/hud.gd")
 const Prueba := preload("res://scripts/prueba.gd")
 const ControlesTactiles := preload("res://scripts/controles_tactiles.gd")
 const VisualModelo := preload("res://scripts/visual_modelo.gd")
+const VisualSprite := preload("res://scripts/visual_sprite.gd")
 const Galeria := preload("res://scripts/galeria.gd")
 const Apariencias := preload("res://scripts/apariencias_akira.gd")
 const Partida := preload("res://scripts/partida.gd")
-const VERSION := "RONIN · prototipo 0.8"
+const VERSION := "RONIN · prototipo 0.9"
 
 var hud
 var juego
@@ -37,6 +39,7 @@ func _ready() -> void:
 	# Android: «atrás» pausa en vez de cerrar el juego (ver _notification).
 	get_tree().quit_on_go_back = false
 	var argumentos := OS.get_cmdline_user_args()
+	VisualSprite.activo = not "--modelos3d" in argumentos
 	if "--galeria" in argumentos:
 		var galeria = Galeria.new()
 		add_child(galeria)

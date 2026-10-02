@@ -263,9 +263,9 @@ func _construir_akira() -> void:
 	_caja(espada_mano, Vector3(0.04, 0.04, 0.22), Datos.TSUKA, Vector3(0, 0, 0.05))
 	_caja(espada_mano, Vector3(0.025, 0.05, 0.85), Datos.ACERO, Vector3(0, 0, 0.58))
 	espada_mano.visible = false
-	estela = _crear_estela(Vector3(-0.15, 1.25, 0.05), false)
+	estela = crear_estela(cuerpo, Vector3(-0.15, 1.25, 0.05), false)
 	material_estela = estela.material_override
-	estela_iai = _crear_estela(Vector3(-0.1, 1.2, 0.0), true)
+	estela_iai = crear_estela(cuerpo, Vector3(-0.1, 1.2, 0.0), true)
 	material_estela_iai = estela_iai.material_override
 
 
@@ -412,7 +412,7 @@ func _sobre_la_cara(punto: Vector2, radio: float) -> Vector3:
 # Estela del corte: media luna blanca que aparece con el tajo y se apaga. La del tajo es
 # vertical (de encima de la cabeza a delante y abajo); la del iai, horizontal (de la
 # cadera izquierda hacia la derecha, el desenvaine).
-func _crear_estela(centro: Vector3, horizontal: bool) -> MeshInstance3D:
+static func crear_estela(cuerpo: Node3D, centro: Vector3, horizontal: bool) -> MeshInstance3D:
 	var herramienta := SurfaceTool.new()
 	herramienta.begin(Mesh.PRIMITIVE_TRIANGLE_STRIP)
 	var pasos := 24
@@ -585,7 +585,7 @@ func _animar_espada(info: Dictionary) -> void:
 			hombro_der.rotation.x = lerpf(-2.9, -0.5, ease(giro, 0.4))
 			hombro_izq.rotation.x = lerpf(-2.6, -0.8, ease(giro, 0.4))
 			torso.rotation.x = lerpf(-0.12, 0.2, giro)
-			brillo = _brillo(info.progreso, 0.35, 0.35)
+			brillo = brillo_estela(info.progreso, 0.35, 0.35)
 		"postura":
 			# Iaidō: la mano derecha en la empuñadura, a la izquierda; el cuerpo bajo y
 			# adelantado, la pierna izquierda delante.
@@ -604,7 +604,7 @@ func _animar_espada(info: Dictionary) -> void:
 			torso.rotation = Vector3(0.12, lerpf(0.35, -0.45, barrido), 0.0)
 			cadera_izq.rotation.x = -0.5
 			cadera_der.rotation.x = 0.4
-			brillo_iai = _brillo(info.progreso, 0.45, 0.32)
+			brillo_iai = brillo_estela(info.progreso, 0.45, 0.32)
 		"remate":
 			# Zanshin tras el iai perfecto: brazo extendido a la derecha, hoja en línea.
 			hombro_der.rotation = Vector3(-PI / 2.0 + 0.3, -1.3, 0.0)
@@ -644,7 +644,7 @@ func _animar_lanza(pose: String) -> void:
 
 # Brillo de una estela según el avance del corte. En estilo anime es todo o nada: el
 # «borrón» ocupa uno o dos cuadros enteros, como en la animación limitada.
-func _brillo(progreso: float, centro: float, ancho: float) -> float:
+static func brillo_estela(progreso: float, centro: float, ancho: float) -> float:
 	var valor := clampf(1.0 - absf(progreso - centro) / ancho, 0.0, 1.0)
 	if estilo_anime:
 		return 1.0 if valor > 0.25 else 0.0

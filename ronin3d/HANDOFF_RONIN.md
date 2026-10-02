@@ -210,26 +210,43 @@ pulido será el primer capítulo (castillo + planicie + aldea).
     (documentación de Epic).
   - **DECISIÓN 20** en `PLAN_PRODUCCION.md` §17. Recomendado: G, es decir, cel de base y tinta y pixel
     art opcionales en la pausa del APK 0.9 para medirlos en el móvil.
-- **Prueba automática: 31 de 31.** **APK 0.8** (`ronin/ronin-0.8-prueba.apk`, 30,6 MB, SHA-256
-  `cdb208aa…96e97d56`, misma firma `CN=RONIN prueba`, versionCode 8). La prueba sobre la exportación
+- **Prueba automática: 31 de 31.** **APK 0.8** (30,6 MB, SHA-256 `cdb208aa…96e97d56`, misma firma
+  `CN=RONIN prueba`, versionCode 8; ya en «Versiones anteriores (RONIN)»).
+- **Pixel art (02-10-2026, noche; versión 0.9).** El usuario eligió el pixel art (**DECISIÓN 20E**) con
+  dos referencias: Ethra (sprites de píxeles en un mundo 3D con niebla y desenfoque) y Drakantos (pixel
+  art 2D). Hecho:
+  - **Sprites horneados desde los modelos de piezas.** `godot/scripts/hornear_sprites.gd` hornea 8
+    direcciones a 26 px/m y `herramientas/pulir_sprites.py` deja la paleta en 40 colores con contorno
+    de 1 px. Hay hojas en `godot/recursos/sprites/` para Akira con sus 4 skins (33 cuadros por
+    dirección), el soldado (22) y Shiro (28).
+  - **En el juego,** `scripts/visual_sprite.gd` y `shaders/sprite_pixel.gdshader`: un cartel que mira a
+    la cámara y elige dirección y cuadro. Las estelas, el «!» y la moneda siguen en 3D. Con
+    `--modelos3d` se ven los modelos de antes.
+  - **El mundo:** desenfoque HD-2D por altura en pantalla (`shaders/profundidad.gdshader`;
+    Compatibility no tiene profundidad de campo) y escenario sin línea negra.
+  - La galería enseña los sprites.
+  - Pendiente: las criaturas del bestiario siguen en 3D (hornearlas igual), y la **DECISIÓN 21**
+    (`PLAN_PRODUCCION.md` §18): cómo es el mundo. Recomendado: texturas de pixel art tipo Octopath,
+    las del 27-09 que están en el historial de git. La **19** queda en pausa.
+- **Prueba automática: 32 de 32.** **APK 0.9** (`ronin/ronin-0.9-prueba.apk`, 31,0 MB, SHA-256
+  `d5cce444…3e53e6d16`, misma firma `CN=RONIN prueba`, versionCode 9). La prueba sobre la exportación
   de Linux sigue sin pasarse (el usuario la paró en la 0.5).
 
 ## 3. En curso / pendiente del usuario
 
-1. **Probar el APK 0.8 en el móvil** y contar:
+1. **Probar el APK 0.9 en el móvil** (personajes en pixel art) y contar:
    - los FPS (meta ≥ 30);
    - si el iai (mantener y soltar) y el corte de luna se entienden;
    - qué animación prefiere, anime o suave;
    - qué tal Shiro y las monedas, y si los precios del jizō y del sastre se sienten justos (cuántas
      partidas tarda en la primera skin);
-   - si las cabezas nuevas (pelo y caras dibujadas) se leen bien en la pantalla del móvil;
+   - si los sprites pixel art se leen bien en la pantalla del móvil y gustan con el desenfoque;
    - **la galería de criaturas** (pausa → botón): FPS en la página 2 (modelos detallados), en la 5
      (7 criaturas) y en la 7 (24). En la 0.5 eran las páginas 1, 4 y 6.
-2. **DECISIONES 11 a 15, 19 y 20** (`HISTORIA.md` §8, `BESTIARIO_UNIVERSAL.md` y `PLAN_PRODUCCION.md`
-   §16-17) y la regla de respeto cultural (se aplica salvo veto).
-   - La 19 decide si se hace un piloto de Akira en Blender (descarga grande: pedir permiso) y un modo
-     tinta.
-   - La 20, el estilo de render; si sale G, el APK 0.9 lleva un ajuste «Estilo» en la pausa. La 15 (modelos detallados) necesita créditos para el piloto de
+2. **DECISIONES 11 a 15 y 21** (`HISTORIA.md` §8, `BESTIARIO_UNIVERSAL.md` y `PLAN_PRODUCCION.md`
+   §18) y la regla de respeto cultural (se aplica salvo veto).
+   - La 21 es cómo es el mundo con los personajes en pixel art.
+   - La 20 ya está decidida (E, pixel art) y la 19 queda en pausa. La 15 (modelos detallados) necesita créditos para el piloto de
    esqueleto (unos 5-10 $). Rehacer a Genzo y Takeda en tinta (18A) necesita créditos (quedan 0,01) o
    Colab. Créditos solo los compra el usuario.
 3. **Imágenes del bestiario en Colab:** ejecutar el cuaderno con la GPU T4 (o la sesión que maneja Colab).
@@ -248,9 +265,11 @@ pulido será el primer capítulo (castillo + planicie + aldea).
    El detalle (luces, sombras, enemigos) se ajusta a los FPS que dé su móvil.
 2. Medir 10 criaturas reales con el sistema (patrones de ataque, equilibrio y tiempo por criatura): es
    la prueba que valida o tumba el gancho de la cantidad (`BESTIARIO_UNIVERSAL.md` §10).
-3. Personajes con esqueleto para la animación estilo anime (DECISIÓN 6), según la DECISIÓN 19:
-   - VRoid Studio pide 8 GB de RAM como mínimo, así que no cabe en su PC;
-   - la vía propuesta es un modelo hecho en Blender por código desde la nube, primero solo Akira.
+3. **Pixel art en todo:**
+   - hornear en sprites las criaturas del capítulo 1 (kappa, oni, onibi, oni gigante), con el mismo
+     `hornear_sprites.gd`;
+   - aplicar la DECISIÓN 21 al mundo;
+   - si se quiere más acabado, repasar a mano (o con IA de pixel art) los cuadros clave de Akira.
 4. Buscar nombre o subtítulo propio antes de cualquier página de tienda.
 
 ## 5. Dónde está todo
@@ -272,9 +291,10 @@ pulido será el primer capítulo (castillo + planicie + aldea).
 | Comparativa | `ronin3d/COMPARATIVA.md` · página privada https://claude.ai/artifact/6urV5FCikt9CWAUV35gBCu |
 | Capturas de hoy | `ronin3d/capturas/actual/` (antes y después de las cabezas: `ronin3d/capturas/comparativa_cabezas.jpg`) |
 | Caras dibujadas | `ronin3d/godot/recursos/caras/` (PNG y `generar_caras.py`) |
+| Sprites pixel art | `ronin3d/godot/recursos/sprites/` (hojas y su descripción) · se hacen con `godot/scripts/hornear_sprites.gd` y `ronin3d/herramientas/pulir_sprites.py` · vista: `ronin3d/capturas/sprites_pixel_art.png` |
 | Prueba de estilos de render | `ronin3d/capturas/comparativa_estilos_personajes.jpg` y `ronin3d/capturas/estilos_render/` · script `godot/scripts/estilos_render.gd` · filtros en `godot/shaders/estilos/` |
 | Clave de firma de prueba | Drive `Respaldos Claude/ronin/03-Godot/firma-prueba/` (privada; nunca en GitHub) |
-| APK de prueba | Drive `Respaldos Claude/ronin/ronin-0.8-prueba.apk` (como con Curtzz: el nuevo va en la raíz con el nombre `ronin-<versión>-prueba.apk` y el anterior pasa a la carpeta «Versiones anteriores (RONIN)», dentro de `ronin/`) |
+| APK de prueba | Drive `Respaldos Claude/ronin/ronin-0.9-prueba.apk` (como con Curtzz: el nuevo va en la raíz con el nombre `ronin-<versión>-prueba.apk` y el anterior pasa a la carpeta «Versiones anteriores (RONIN)», dentro de `ronin/`) |
 | Respaldo | Google Drive `Respaldos Claude/ronin/` (01-Diseno, 02-Prototipo-2D, 03-Godot, 04-Otros-motores, 05-Arte, 06-Bestiario, Versiones anteriores (RONIN)) |
 | Memoria | Vertiso Memory, handoff con ámbito `ronin-juego` |
 
