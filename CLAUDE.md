@@ -454,11 +454,22 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
     gancho que el usuario quiere explorar es **la cantidad de monstruos** (el bestiario universal:
     939 criaturas, 825 utilizables como enemigos). Cómo se presenta ese gancho es la DECISIÓN 12.
 - **Decisiones abiertas:** 11 (papel del Silencio, `HISTORIA.md` §8), 12 (gancho: cantidad frente a
-  precisión), 13 (cómo se modelan las criaturas icónicas) y 14 (cuántos rangos), más la regla de
-  respeto cultural (los dioses y seres sagrados de religiones vivas no son enemigos). Detalle y
-  recomendaciones en `ronin3d/BESTIARIO_UNIVERSAL.md`.
-- **Imágenes 2D:** Higgsfield por Composio, modelo `z_image`, a 0,15 créditos por imagen. Nunca
-  se compran créditos ni planes sin que el usuario lo pida.
+  precisión), 13 (cómo se modelan las criaturas icónicas), 14 (cuántos rangos) y 15 (cómo dar a todos
+  los enemigos el detalle de un jefe, `BESTIARIO_UNIVERSAL.md` §8.2), más la regla de respeto cultural
+  (los dioses y seres sagrados de religiones vivas no son enemigos). Detalle y recomendaciones en
+  `ronin3d/BESTIARIO_UNIVERSAL.md`.
+- **Modelos 3D detallados (desde el 02-10-2026):** van en `ronin3d/godot/modelos/criaturas/` (su LEEME
+  tiene origen, sumas y licencias) y los carga `modelo_criatura.gd`. Herramientas en
+  `ronin3d/herramientas/modelos3d/`. Hay tres vías probadas:
+  - **SAM 3D en Higgsfield** (imagen → 3D, 1 crédito, sin esqueleto).
+  - **Trimble SketchUp** (por código; plan gratis de 30 guardados). Godot no abre `.skp`: se sacan los
+    triángulos y `sketchup_a_glb.py` los pasa a GLB.
+  - **Visor de Three.js** (solo para enseñar, dentro del chat).
+
+  Tripo y Meshy (esqueleto y animaciones) necesitan créditos que hoy no hay. Antes de generar, el
+  coste se mira con `get_cost: true`.
+- **Imágenes 2D:** Higgsfield por Composio, modelo `z_image`, a 0,15 créditos por imagen (quedan
+  1,96 créditos el 02-10-2026). Nunca se compran créditos ni planes sin que el usuario lo pida.
 - **Colab (imágenes del bestiario):** `ronin3d/colab/` (cuaderno y receta). Reglas del usuario: una
   sesión de Claude aparte maneja Colab con colab-mcp; él elige la GPU T4 y acepta los permisos;
   comprobar con `!ls` que `drive.mount` ve `Respaldos Claude/ronin` (si no, es la cuenta equivocada:

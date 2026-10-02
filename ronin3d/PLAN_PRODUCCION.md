@@ -131,6 +131,7 @@ nada público sin tu permiso.
 | Rendimiento en PC modesto y móvil | Medio | Renderizador Compatibility; medir en el APK |
 | Nombre poco distintivo | Medio | Nombre o subtítulo propio antes de la página de tienda |
 | Sonido y música | Medio | Efectos generados; música con licencia libre o encargada |
+| Detalle de jefe en cientos de enemigos (2-10-2026) | Alto | Por niveles: modelo propio para jefes, bases compartidas para el resto; vigilar peso del APK y FPS (DECISIÓN 15) |
 
 ## 8. Negocio (supuestos, no certezas)
 
@@ -238,3 +239,22 @@ nada público sin tu permiso.
 botella no es el modelo sino el comportamiento y el equilibrio de cada una (más de un tercio de las horas
 estimadas). Por eso la recomendación es medir 10 criaturas reales antes de prometer cifras.
 
+## 13. Hecho el 2-10-2026
+
+1. **Tres enemigos con modelo detallado en el juego** (`godot/modelos/criaturas/`), con el mismo
+   cel-shading, contorno y rangos que el resto:
+   - **Aka-oni y kappa:** imagen → 3D con SAM 3D en Higgsfield, 1 crédito cada uno.
+   - **Chōchin-obake:** modelada por código en Trimble SketchUp y pasada a GLB.
+2. **Conectores revisados:**
+   - Higgsfield: SAM 3D, Tripo, Hunyuan y Meshy, con sus costes medidos sin gastar.
+   - Tripo y Meshy directos: precios verificados.
+   - Visor de Three.js y Trimble SketchUp, probados.
+   - Lo que vale cada uno: `BESTIARIO_UNIVERSAL.md` §8.1.
+3. **DECISIÓN 15:** cómo llevar a todos los enemigos al nivel de detalle que pediste (§8.2). La
+   recomendación es por niveles, con un piloto de esqueleto antes de pagar nada.
+4. **Prueba automática: 22 de 22.** **APK 0.5** (`ronin-0.5-prueba.apk`, 30,4 MB). Cada modelo de IA
+   pesa unos 1,2 MB en el APK; el de SketchUp, 0,1 MB.
+
+| # | Decisión | Dónde | Recomendación |
+| --- | --- | --- | --- |
+| 15 | Cómo dar a todos los enemigos el detalle que pediste | `BESTIARIO_UNIVERSAL.md` §8.2 | D: por niveles, tras un piloto de esqueleto |

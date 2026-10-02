@@ -14,7 +14,7 @@ const Prueba := preload("res://scripts/prueba.gd")
 const ControlesTactiles := preload("res://scripts/controles_tactiles.gd")
 const VisualModelo := preload("res://scripts/visual_modelo.gd")
 const Galeria := preload("res://scripts/galeria.gd")
-const VERSION := "RONIN · prototipo 0.4"
+const VERSION := "RONIN · prototipo 0.5"
 
 var hud
 var juego

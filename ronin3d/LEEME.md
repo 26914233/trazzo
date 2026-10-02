@@ -5,21 +5,22 @@ ronin tras la traición del general Genzo, que pactó con el gran yōkai creyend
 Busca justicia por fuera y recuperar su honor por dentro. Empieza y termina en el castillo de
 Hoshiyama.
 
-**Estado:** prototipo 0.4 del capítulo 1 en **Godot 4.7 con cel-shading**, jugable con teclado,
+**Estado:** prototipo 0.5 del capítulo 1 en **Godot 4.7 con cel-shading**, jugable con teclado,
 mando y pantalla táctil. Incluye una **galería de criaturas** (pausa → botón, o tecla G) para ver el sistema
-que permitiría construir cientos de monstruos.
+que permitiría construir cientos de monstruos. Desde la 0.5 trae los **tres primeros enemigos con modelo
+detallado** (Aka-oni, kappa y Chōchin-obake, página 1 de la galería).
 
 - **Combate:** iaidō. Se mantiene y se suelta justo al aviso; con la barra llena hay un corte de
   luna.
 - **Animación:** estilo anime limitado, que se puede cambiar a la suave para comparar.
-- **APK de prueba para Android:** `ronin-0.4-prueba.apk`, en la carpeta de Drive.
+- **APK de prueba para Android:** `ronin-0.5-prueba.apk`, en la carpeta de Drive.
 - **Bestiario universal:** 939 criaturas (tu catálogo limpio + ángeles, demonios y yōkai que faltaban), cada
   una con su variante fuerte; ver `BESTIARIO_UNIVERSAL.md`.
 - **Decidido:** núcleo + variaciones y lanzamiento por capítulos (opción C), y combate de
   precisión con iaidō.
 - **Siguiente hito:** **vertical slice**, base del primer capítulo (ver `PLAN_PRODUCCION.md`).
 
-**Última actualización:** 1 de octubre de 2026
+**Última actualización:** 2 de octubre de 2026
 
 ---
 
@@ -28,7 +29,7 @@ que permitiría construir cientos de monstruos.
 ```
 ronin/                         (Google Drive: Respaldos Claude › ronin)
 ├── LEEME.md                   Este índice
-├── ronin-0.4-prueba.apk       APK de prueba para instalar en el móvil (Android 7.0 o superior)
+├── ronin-0.5-prueba.apk       APK de prueba para instalar en el móvil (Android 7.0 o superior)
 ├── RONIN_rama_completa.zip    Todo el código y las capturas (copia de la rama de GitHub)
 ├── 01-Diseno/                 Traspaso, plan, propuesta yōkai, historia, bestiario, especificación…
 ├── 06-Bestiario/              Catálogo limpio (CSV/JSON), prompts_colab.csv, cuaderno de Colab, imágenes
@@ -38,7 +39,8 @@ ronin/                         (Google Drive: Respaldos Claude › ronin)
 │                              firma-prueba/ (clave de los APK de prueba; privada)
 ├── 04-Otros-motores/          Three.js y Ursina (solo como referencia)
 ├── 05-Arte/conceptos-2d/      Conceptos 2D en PNG a tamaño completo (Higgsfield)
-└── Versiones anteriores (RONIN)/  APK anteriores (0.2 y 0.3) y capturas retiradas
+├── 05-Arte/modelos3d/         Modelos 3D de enemigos (GLB, el .skp de SketchUp) y sus retratos
+└── Versiones anteriores (RONIN)/  APK anteriores (0.2, 0.3 y 0.4) y capturas retiradas
 ```
 
 En GitHub (`26914233/trazzo`, rama `claude/ronin-pygame-setup-szn3rn`):
@@ -86,7 +88,7 @@ ronin3d/
 | **Escenas de historia** | Ilustración 2D con tinta; pixel art solo para los recuerdos de Akira (1-10-2026) |
 | **Animación** | Estilo anime limitado, en prueba (1-10-2026) |
 | **Farmeo automático** | No: la caza se juega (1-10-2026) |
-| **Textos de intro y cierre** | Cambiados el 1-10-2026 (sinopsis aprobada): shōgun Takeda, yōkai y luna roja. Ya están en el juego 0.4 |
+| **Textos de intro y cierre** | Cambiados el 1-10-2026 (sinopsis aprobada): shōgun Takeda, yōkai y luna roja. Están en el juego desde la 0.4 |
 | **Reglas** | Todo en español, nombres de variables en español |
 
 ## Propuestas abiertas (no son decisiones)
@@ -95,7 +97,8 @@ ronin3d/
 | --- | --- | --- |
 | **El Silencio (Shijima)** | Una entidad nacida de la oscuridad más callada, que ni los yōkai quieren pisar y rompe el equilibrio. Recomendada: gancho final + rango «silenciado» de cada enemigo | DECISIÓN 11 (`HISTORIA.md` §8) |
 | **El gancho del juego** | Precisión de iaidō + el bestiario más grande (la cantidad apoya, no lidera) | DECISIÓN 12 (`BESTIARIO_UNIVERSAL.md`) |
-| **Cómo se modelan las icónicas** | Híbrido: piezas para variantes y reskins; prueba de 10 criaturas con imagen → 3D antes de decidir | DECISIÓN 13 |
+| **Cómo se modelan las icónicas** | Híbrido: piezas para variantes y reskins; prueba de 10 criaturas con imagen → 3D antes de decidir (ahora dentro de la 15) | DECISIÓN 13 |
+| **Enemigos con el detalle de un jefe** | Por niveles: modelo propio con esqueleto para jefes e icónicas, unas 100-150 bases detalladas compartidas para el resto y SketchUp para criaturas-objeto y armas; antes, un piloto de esqueleto con el Aka-oni | DECISIÓN 15 (`BESTIARIO_UNIVERSAL.md` §8.2) |
 | **Rangos de cada criatura** | Tres: base, alfa (la variante fuerte) y silenciada | DECISIÓN 14 |
 | **Regla de respeto cultural** | Los dioses y seres sagrados de religiones vivas no son enemigos (50 entradas) | Salvo que la vetes |
 | **Qué hace cada lugar** | Aldea: diálogos y encargos · templo: puzzles de entorno · dojo: técnicas con ritmo · ruinas: exploración y jefe · planicie: viaje y dados | Al construir cada lugar |
@@ -108,13 +111,15 @@ ronin3d/
 
 ## Lo que bloquea avanzar
 
-1. **Tu prueba del APK 0.4 en el móvil:**
+1. **Tu prueba del APK 0.5 en el móvil:**
    - los FPS (abajo a la derecha; meta: 30 o más);
    - si el iai (mantener y soltar al «!») y el corte de luna se entienden;
    - qué animación prefieres, anime o suave (botón en la pausa);
-   - **la galería de criaturas** (pausa → «Galería de criaturas»): los FPS con 8 y con 24 criaturas a la
-     vez, y si las siluetas por familia te convencen.
-2. **DECISIONES 11, 12, 13 y 14** (`HISTORIA.md` §8 y `BESTIARIO_UNIVERSAL.md`).
+   - **la galería de criaturas** (pausa → «Galería de criaturas»): los FPS con los modelos detallados
+     (página 1), con 8 y con 24 criaturas a la vez (páginas 4 y 6), y si las siluetas por familia te
+     convencen.
+2. **DECISIONES 11, 12, 13, 14 y 15** (`HISTORIA.md` §8 y `BESTIARIO_UNIVERSAL.md`). La 15 es cómo dar a
+   todos los enemigos el detalle que pediste.
 3. **Imágenes del bestiario en Colab:** el cuaderno está listo (`colab/`), falta ejecutarlo con la GPU T4.
 
 ## Próximo paso

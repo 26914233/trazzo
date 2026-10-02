@@ -1,6 +1,6 @@
 # RONIN — Traspaso del proyecto (handoff)
 
-**Última actualización:** 1 de octubre de 2026 · sesión de Claude Code en la nube
+**Última actualización:** 2 de octubre de 2026 · sesión de Claude Code en la nube
 **Leer entero antes de seguir.** Copia en Google Drive: `Respaldos Claude/ronin/01-Diseno/`.
 **Forma de trabajar:** las instrucciones del usuario (equipo multidisciplinario de videojuegos:
 Game Director, diseño, producción, marketing, negocio…) están en `CLAUDE.md`, en la raíz del
@@ -117,18 +117,32 @@ pulido será el primer capítulo (castillo + planicie + aldea).
 - **Cuaderno de Colab** `colab/bestiario_imagenes.ipynb` (+ receta `INSTRUCCIONES_COLAB_BESTIARIO.md`)
   para dibujar las imágenes 2D con SDXL: el flujo está probado sin GPU, **la carga y difusión en una T4
   no**. Las imágenes aún no están hechas.
-- **Prueba automática: 21 de 21.** **APK 0.4** (`ronin/ronin-0.4-prueba.apk`, 26,9 MB, SHA-256
-  `3e4d82c2…39ec4633`, misma firma que la 0.2 y la 0.3).
+- **Enemigos con modelo detallado (2-10-2026).** El usuario pidió que todos los enemigos tengan el
+  detalle de un arte de jefe en pixel art que envió. Hay tres en el juego, en `godot/modelos/criaturas/`
+  (con su LEEME), con el mismo cel-shading, contorno y rangos que el resto:
+  - **Aka-oni y kappa:** hechos con **SAM 3D en Higgsfield** a partir de sus conceptos, a 1 crédito
+    cada uno. Retoques: el garrote del oni va aparte, y el plato del kappa se repintó y lleva agua.
+  - **Chōchin-obake:** modelado por código con el conector de **Trimble SketchUp** y pasado a GLB
+    (`herramientas/modelos3d/`).
+  - **Visor de Three.js:** se probó con la Karakasa-obake en movimiento. Sirve para enseñar, no
+    para fabricar.
+  - **Análisis, precios verificados y DECISIÓN 15** (cómo llevar a todos los enemigos a ese nivel):
+    `BESTIARIO_UNIVERSAL.md` §8.1-8.2.
+- **Prueba automática: 22 de 22.** **APK 0.5** (`ronin/ronin-0.5-prueba.apk`, 30,4 MB, SHA-256
+  `2f3dc0ec…1a993ed1`, misma firma que la 0.2-0.4). La prueba sobre la exportación de Linux no se
+  pasó en la 0.5: el usuario la paró para enseñar los conectores nuevos.
 
 ## 3. En curso / pendiente del usuario
 
-1. **Probar el APK 0.4 en el móvil** y contar:
+1. **Probar el APK 0.5 en el móvil** y contar:
    - los FPS (meta ≥ 30);
    - si el iai (mantener y soltar) y el corte de luna se entienden;
    - qué animación prefiere, anime o suave;
-   - **la galería de criaturas** (pausa → botón): FPS en la página 3 (7 criaturas) y en la 5 (24).
-2. **DECISIONES 11, 12, 13 y 14** (`HISTORIA.md` §8 y `BESTIARIO_UNIVERSAL.md`) y la regla de respeto
-   cultural (se aplica salvo veto).
+   - **la galería de criaturas** (pausa → botón): FPS en la página 1 (modelos detallados), en la 4
+     (7 criaturas) y en la 6 (24).
+2. **DECISIONES 11, 12, 13, 14 y 15** (`HISTORIA.md` §8 y `BESTIARIO_UNIVERSAL.md`) y la regla de
+   respeto cultural (se aplica salvo veto). La 15 (modelos detallados) necesita créditos para el piloto
+   de esqueleto (unos 5-10 $): solo los compra el usuario.
 3. **Imágenes del bestiario en Colab:** ejecutar el cuaderno con la GPU T4 (o la sesión que maneja Colab).
 4. Si tiene el `samurai.py` original, subirlo.
 
@@ -161,13 +175,14 @@ pulido será el primer capítulo (castillo + planicie + aldea).
 | Mundo yōkai (decisiones 2-7) | `ronin3d/PROPUESTA_MUNDO_YOKAI.md` |
 | Sinopsis (aprobada) y el Silencio | `ronin3d/HISTORIA.md` |
 | Bestiario por capítulos | `ronin3d/BESTIARIO.md` |
-| Bestiario universal (análisis y decisiones 12-14) | `ronin3d/BESTIARIO_UNIVERSAL.md` · datos en `ronin3d/bestiario/` · Drive `ronin/06-Bestiario/` |
+| Bestiario universal (análisis y decisiones 12-15) | `ronin3d/BESTIARIO_UNIVERSAL.md` · datos en `ronin3d/bestiario/` · Drive `ronin/06-Bestiario/` |
 | Colab (imágenes del bestiario) | `ronin3d/colab/` · Drive `ronin/06-Bestiario/` y la carpeta de Colab del usuario |
 | Conceptos 2D | `ronin3d/arte/conceptos/` (JPG) · Drive `ronin/05-Arte/conceptos-2d/` (PNG originales) |
+| Modelos 3D detallados | `ronin3d/godot/modelos/criaturas/` (GLB y LEEME) · herramientas en `ronin3d/herramientas/modelos3d/` · Drive `ronin/05-Arte/modelos3d/` (GLB, .skp y retratos) |
 | Comparativa | `ronin3d/COMPARATIVA.md` · página privada https://claude.ai/artifact/6urV5FCikt9CWAUV35gBCu |
 | Capturas de hoy | `ronin3d/capturas/actual/` |
 | Clave de firma de prueba | Drive `Respaldos Claude/ronin/03-Godot/firma-prueba/` (privada; nunca en GitHub) |
-| APK de prueba | Drive `Respaldos Claude/ronin/ronin-0.4-prueba.apk` (como con Curtzz: el nuevo va en la raíz con el nombre `ronin-<versión>-prueba.apk` y el anterior pasa a la carpeta «Versiones anteriores (RONIN)», dentro de `ronin/`) |
+| APK de prueba | Drive `Respaldos Claude/ronin/ronin-0.5-prueba.apk` (como con Curtzz: el nuevo va en la raíz con el nombre `ronin-<versión>-prueba.apk` y el anterior pasa a la carpeta «Versiones anteriores (RONIN)», dentro de `ronin/`) |
 | Respaldo | Google Drive `Respaldos Claude/ronin/` (01-Diseno, 02-Prototipo-2D, 03-Godot, 04-Otros-motores, 05-Arte, 06-Bestiario, Versiones anteriores (RONIN)) |
 | Memoria | Vertiso Memory, handoff con ámbito `ronin-juego` |
 

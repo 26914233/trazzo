@@ -7,6 +7,9 @@ de que cada monstruo tenga una **variante más fuerte** y tu pedido de **añadir
 Etiquetas: **[Hecho]** comprobado · **[Estimación]** cálculo con incertidumbre · **[Supuesto]** algo que
 damos por bueno sin comprobar · **[Hipótesis]** hay que validarlo · **[Opinión]** criterio del equipo.
 
+**Actualización del 2 de octubre de 2026:** primeros dos enemigos con **modelo detallado** (Aka-oni y
+kappa) y la **DECISIÓN 15** sobre cómo llevar a todos los enemigos a ese nivel (§8.1 y §8.2).
+
 ---
 
 ## 1. Qué me pasaste y qué encontré
@@ -171,7 +174,8 @@ misma criatura. Se anima por código (patas, alas, colas, tentáculos), a 12 pos
 - Resultado visual **[Opinión]**: las familias dan siluetas reconocibles y consistentes (un lobo es un
   lobo, una serpiente es una serpiente), pero **parecen juguetes**. Sirve para las variantes, no para
   las criaturas icónicas: el «Bahamut» hecho solo con piezas de familia es un pájaro de palitos
-  (página 4 de la galería). Por eso existe la forma «propia».
+  (página 5 de la galería). Por eso existe la forma «propia». Cómo queda una criatura con modelo
+  propio: página 1 de la galería y §8.1.
 
 ### 3.3 Patrones de ataque: dónde está la variedad real
 
@@ -217,7 +221,8 @@ prueba que necesito que hagas en el móvil (pausa → «Galería de criaturas»)
 | 3 | **Silenciada** | Blanca y gris con ojos huecos, **sin sonido de aviso** (hay que parar mirando), apaga el sonido a su alrededor, vida ×3, daño ×2 | Un shader y una regla de audio. Solo tras el capítulo 4 (DECISIÓN 11) |
 
 Los jefes no tienen rangos: son únicos. Los números son **[Hipótesis]** que se ajustan jugando. La
-galería enseña los tres rangos de cuatro criaturas (página 2).
+galería enseña los tres rangos de tres criaturas de piezas (página 3) y de los dos modelos detallados
+(página 1).
 
 ### DECISIÓN 14 — Cuántos rangos
 - **OPCIONES:** A) dos (base y alfa); B) tres (base, alfa y silenciada); C) tres más modificadores
@@ -325,6 +330,126 @@ milisegundo).
 - **SIGUIENTE PASO:** cuando decidas, escribo la receta de Colab C14 (imagen → malla) para las 10 de la
   prueba: Bahamut, Jorōgumo, Yamata no Orochi, Nue, Gashadokuro, Kraken, Tiamat, Quimera, Ouroboros y
   Tamamo-no-Mae.
+- **Actualización (2 de octubre):** el piloto de §8.1 se hizo con SAM 3D en vez de TripoSR y salió
+  mejor de lo esperado. Esta decisión queda dentro de la DECISIÓN 15 (§8.2).
+
+### 8.1 Piloto: dos enemigos con modelo detallado (2 de octubre de 2026)
+
+Pediste que todos los enemigos tengan el detalle de la imagen que enviaste: un dragón de lava en pixel
+art, arte promocional de un jefe. Busqué en los conectores y probé lo más barato que funcionó.
+
+**Herramienta [Hecho].** SAM 3D (Meta) dentro de **Higgsfield**, el conector que ya usas. Convierte un
+concepto 2D en un modelo 3D con textura en 1-2 minutos por **1 crédito**. Los demás generadores del
+mismo conector cuestan más. Los medí con su consulta de coste, que no gasta nada:
+
+| Generador (en Higgsfield) | Créditos por modelo | Esqueleto |
+| --- | ---: | --- |
+| SAM 3D (Meta) | 1 | No |
+| Hunyuan 3D v3 (solo forma / poco detalle) | 7 / 14 | No |
+| Tripo H3.1 (normal / detallado) | 9 / 18 | No |
+| Meshy (`image_to_3d`), sin textura / con textura | 20 / 30 | No |
+| Meshy con textura, esqueleto humanoide y 1 animación | 38 | Sí |
+
+**Precio del crédito de Higgsfield [Hecho, leído hoy en el conector; no compré nada].** Entre 0,033 y
+0,052 dólares, según el plan o el paquete:
+- Plus: 49 $/mes por 1.000 créditos.
+- Ultra: 129 $/mes por 3.000 créditos.
+- Paquetes sueltos: de 500 a 4.000 créditos por 26-190 $. Caducan a los 90 días.
+
+**Lo que salió [Hecho]:**
+- **Modelos:** el Aka-oni (13.686 triángulos) y el kappa (41.327) ya están en Godot con el mismo
+  cel-shading, contorno y rangos que las criaturas de piezas:
+  - el alfa, con grietas que laten del color de su elemento (y brasas si es de fuego);
+  - la silenciada, en blanco y gris.
+
+  Se ven en la página 1 de la galería y en los retratos de `capturas/actual/modelo_*.png`.
+- **Retoques que hicieron falta:**
+  - el oni salió sin garrote: se le puso uno hecho por código;
+  - el plato del kappa salió hueco y negro: se repintó de acero y se le puso agua aparte;
+  - el contorno manchaba la piel de los modelos con mucho detalle: se arregló en el shader.
+
+  Todo está en `godot/modelos/criaturas/LEEME.md`.
+- **Lo que el piloto no resuelve: no tienen esqueleto.** Respiran y se balancean, pero no andan ni
+  golpean. En un duelo de iaidō el jugador lee el aviso del golpe; sin animación, el detalle no sirve
+  en combate **[Opinión]**.
+- **Peso:** dentro del juego el oni ocupa unos 1,2 MB (malla 0,5 MB y textura de 1024² comprimida
+  0,7 MB). El kappa ocupa 2,2 MB.
+- **Licencias (comprobadas hoy):**
+  - SAM 3D usa la licencia SAM de Meta, que permite el uso comercial.
+  - Higgsfield no reclama lo que generas, pero puede usarlo para entrenar sus modelos si no lo borras.
+- **Tiempo:** el piloto sugiere que el modelo en sí baja de las 16 horas de §7 a 1-2 horas por
+  criatura **[Hipótesis]**. El esqueleto, las animaciones y el comportamiento siguen siendo el grueso.
+
+**Los dos conectores que conectaste después (Three.js y Trimble SketchUp) [Hecho, probados hoy]:**
+- **Visor de Three.js:** dibuja una escena 3D que se gira con el dedo dentro del chat.
+  - No crea modelos ni los mete en Godot. Lo más probable es que no pueda descargar archivos, y
+    meterle un modelo detallado a mano obliga a copiar unos 70.000 caracteres de datos.
+  - Sirve para ver en movimiento el patrón de ataque de un enemigo antes de fabricarlo. Lo probé
+    con la Karakasa-obake (paraguas yōkai): salta a una pierna y se cierra como escudo, en sus tres
+    rangos, hecha solo con código.
+- **Trimble SketchUp:** modela por código, con piezas limpias y medidas exactas.
+  - Lo probé con la **Chōchin-obake** (farolillo yōkai, id 680): ojo enorme, boca rasgada que brilla
+    por dentro, lengua, pierna y geta. Son 2.588 triángulos.
+  - Ya está en el juego con sus tres rangos (galería, página 1).
+  - Godot no abre `.skp`, así que se sacan los triángulos desde SketchUp y se convierten en GLB
+    (`herramientas/modelos3d/sketchup_a_glb.py`). Ese paso ya funciona.
+  - Plan gratis: 30 guardados (usado 1).
+  - Vale para **criaturas-objeto** (tsukumogami: paraguas, farolillos, sandalias…), **armas,
+    armaduras y escenarios** (castillo, aldea, templo). **No vale para cuerpos orgánicos** (un oni,
+    un kappa, un dragón): para eso sigue haciendo falta la IA de imagen a 3D.
+
+### 8.2 DECISIÓN 15 — Cómo llevar a todos los enemigos al nivel de detalle que pediste
+
+Antes de las opciones, dos cosas que tengo que decirte claro **[Opinión]**:
+1. **Tu imagen es arte de un jefe.** Lo normal es que los jefes tengan el máximo detalle y los enemigos
+   comunes menos: se ven más pequeños, salen muchos a la vez y hay que fabricarlos por cientos. El nivel
+   de jefe para los 825 multiplica el coste sin que el jugador lo note en los comunes.
+2. **825 modelos únicos no caben bien en un móvil.** Al ritmo del oni serían unos 1.000 MB solo de
+   criaturas **[Estimación: 825 × 1,2 MB]**. Con bases compartidas serían 250-300 MB para todo el juego
+   y 40-60 MB por capítulo **[Estimación]**.
+
+- **OPCIONES:**
+  - A) **Un modelo propio por criatura, sin esqueleto** (SAM 3D): 825 modelos.
+  - B) **Un modelo propio por criatura, con esqueleto y animaciones** (Tripo o Meshy): 825 modelos.
+  - C) **Gratis:** TRELLIS (Microsoft, licencia MIT) en Colab, sin esqueleto.
+  - D) **Por niveles:**
+    - **Jefes e icónicas** (las 102 «propias»): modelo propio con esqueleto y animaciones, de 30.000 a
+      50.000 triángulos. Es el nivel de tu imagen.
+    - **Comunes** (595 variantes y 128 reskins): unas **100-150 bases detalladas** compartidas (un oni,
+      un kappa, un lobo, una serpiente…), con esqueleto por familia y de 8.000 a 12.000 triángulos.
+      Sobre su base, cada criatura cambia de color, de accesorios (como el garrote), de tamaño y de
+      efectos de rango, igual que hoy con las piezas.
+    - **Criaturas-objeto, armas y escenarios:** por código en SketchUp, sin coste por modelo.
+- **VENTAJAS:**
+  - A: el más barato por modelo, y cada criatura es única.
+  - B: todas únicas y animadas.
+  - C: no cuesta dinero.
+  - D: pone el detalle donde el jugador mira y da animaciones de verdad a todas, con un tercio de los
+    modelos y un peso razonable. Encaja con el gancho de la cantidad (DECISIÓN 12): 825 enemigos
+    distintos sobre unas 250 mallas.
+- **RIESGOS:**
+  - A: sin animación no sirven para el combate de precisión, y pesan unos 1.000 MB.
+  - B: es caro y también pesa unos 1.000 MB. Las animaciones de biblioteca son genéricas, así que los
+    14 patrones de ataque habría que hacerlos igual. Además, los esqueletos automáticos fallan en
+    anatomías raras.
+  - C: sin probar en una T4 **[Hipótesis]**, con un cupo de GPU gratis sin verificar y sin esqueleto.
+  - D: son dos líneas de producción, y hay que diseñar bien las bases para que las variantes no se vean
+    repetidas **[Hipótesis]**.
+- **COSTE** (solo herramientas; **[Estimación]** con precios verificados hoy):
+  - A: unos 825 créditos de Higgsfield (30-50 $, según plan o paquete). Hay que sumar los conceptos limpios (gratis en Colab
+    o unos 6 $ con Z Image) y mi tiempo de retoque, de minutos a una hora por modelo.
+  - B: con Tripo directo, unos **0,85 $ por criatura** (modelo 0,30 + esqueleto 0,25 + tres animaciones
+    0,30, según su web), unos **700 $** en total. Con Meshy dentro de Higgsfield, 38 créditos (1,3-2 $)
+    por criatura, unos 1.000-1.600 $.
+  - C: 0 $, pero mucho tiempo de GPU y de limpieza.
+  - D: unos 250 modelos × 0,85 $, unos **210 $**, repartidos por capítulos. El capítulo 1 (12
+    criaturas, §7) costaría unos 10 $.
+- **RECOMENDACIÓN:** **D**, pero antes un **piloto de esqueleto**: ponerle esqueleto y tres
+  animaciones al Aka-oni que ya tenemos y verlo en un duelo.
+  - Si se lee el golpe y no parece un muñeco, seguimos con las 12 criaturas del capítulo 1.
+  - Si no, el detalle se queda para jefes y retratos, y los comunes siguen con piezas mejoradas.
+- **SIGUIENTE PASO:** el piloto necesita créditos que hoy no hay (Higgsfield 1,96; Tripo 0). Bastarían
+  unos 5-10 $ **[Estimación]**. Tú decides si los compras y dónde; yo no compro nada.
 
 ---
 
@@ -356,9 +481,11 @@ milisegundo).
 | Prueba | Cómo | Pasa si | Decide |
 | --- | --- | --- | --- |
 | Velocidad de producción | Hacer 10 criaturas nuevas con el sistema y cronometrar | ≤ 4 h por criatura | Si el gancho de la cantidad se sostiene (DECISIÓN 12) |
-| Rendimiento en móvil | Pausa → «Galería de criaturas» en tu teléfono, páginas 3 (7 criaturas) y 5 (24 criaturas) | ≥ 30 FPS con 8 criaturas y ≥ 20 con 24 | El presupuesto de piezas (§3.4) |
+| Rendimiento en móvil | Pausa → «Galería de criaturas» en tu teléfono, páginas 4 (7 criaturas) y 6 (24 criaturas) | ≥ 30 FPS con 8 criaturas y ≥ 20 con 24 | El presupuesto de piezas (§3.4) |
+| Modelos detallados en móvil | La misma galería, página 1 (8 criaturas, 6 de ellas con modelo detallado) | ≥ 30 FPS | Cuántos triángulos por enemigo (DECISIÓN 15) |
 | Variedad percibida | Enseñar 10 criaturas a 5-10 personas | Recuerdan ≥ 6 y dicen que ≥ 7 se sienten distintas de vencer | Si la cantidad es un gancho o un defecto |
 | Look de las propias | 10 mallas de la prueba de la DECISIÓN 13 | ≥ 7 de 10 puntúan ≥ 3 de 5 | Cómo se modelan las icónicas |
+| Animación de un modelo con esqueleto | Ponerle esqueleto y 3 animaciones (quieto, andar, golpe) al Aka-oni piloto y verlo en un duelo | Se lee el aviso del golpe y no parece un muñeco | Si vale la pena pagar esqueletos (DECISIÓN 15) |
 
 ---
 
@@ -370,4 +497,5 @@ milisegundo).
 | 12 | El gancho del juego | B: precisión + cantidad |
 | 13 | Cómo se modelan las icónicas | C: híbrido, tras la prueba de 10 |
 | 14 | Cuántos rangos | B: base, alfa y silenciada |
+| 15 | Cómo llevar a todos los enemigos al nivel de detalle que pediste (§8.2) | D: por niveles, con ~250 modelos (bases compartidas + jefes), tras un piloto de esqueleto |
 | — | Regla de respeto cultural (§6) | Aplicarla, salvo que la vetes |

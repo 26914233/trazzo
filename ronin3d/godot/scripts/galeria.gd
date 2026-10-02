@@ -12,6 +12,7 @@ signal salio
 
 const Aspecto := preload("res://scripts/aspecto.gd")
 const Criatura := preload("res://scripts/criatura_modular.gd")
+const ModeloCriatura := preload("res://scripts/modelo_criatura.gd")
 
 const CATALOGO := "res://datos/bestiario.json"
 const FAMILIAS := ["bipedo", "cuadrupedo", "serpentino", "alado", "acuatico", "flotante", "artropodo"]
@@ -131,6 +132,29 @@ func _definir_paginas() -> Array:
 	var oni_gigante := _receta("bipedo", "XL", "fuego", "gigante", 2326, {"nombre": "Oni gigante",
 		"partes": ["cuernos", "garrote", "ojos"], "paleta": [Color("8e2a1c"), Color("2a1a14"), Color("ffb347")]})
 	var lista: Array = []
+	if ModeloCriatura.tiene_modelo(2315):
+		var detallado := {"detallado": true, "id": 2315}
+		var oni_modelo := _receta("bipedo", "M", "fuego", "poderoso", 2315, detallado.merged({"nombre": "Aka-oni (modelo)"}))
+		var oni_piezas := oni.duplicate(true)
+		oni_piezas["nombre"] = "Aka-oni (piezas)"
+		# Rótulos cortos en los rangos para que no se pisen: «Alfa (rango 2)», «Silenciada (rango 3)»
+		var filas_modelo: Array = [[oni_piezas, oni_modelo, _con_rango(oni_modelo, 2).merged({"nombre": "Alfa"}, true),
+			_con_rango(oni_modelo, 3).merged({"nombre": "Silenciada"}, true)]]
+		if ModeloCriatura.tiene_modelo(353):
+			var kappa_modelo := _receta("bipedo", "S", "agua", "veloz", 353, {"detallado": true, "id": 353, "nombre": "Kappa (modelo)"})
+			var kappa_piezas := kappa.duplicate(true)
+			kappa_piezas["nombre"] = "Kappa (piezas)"
+			# Los kappa (pequeños) van delante para que no los tapen los oni
+			filas_modelo.push_front([kappa_piezas, kappa_modelo, _con_rango(kappa_modelo, 2).merged({"nombre": "Alfa"}, true),
+				_con_rango(kappa_modelo, 3).merged({"nombre": "Silenciada"}, true)])
+		if ModeloCriatura.tiene_modelo(680):
+			var chochin_modelo := _receta("flotante", "S", "fuego", "enjambre", 680, {"detallado": true, "id": 680, "nombre": "Chōchin (SketchUp)"})
+			var chochin_piezas := _receta("flotante", "S", "fuego", "enjambre", 680, {"nombre": "Chōchin (piezas)",
+				"partes": ["ojos", "llamas"], "paleta": [Color("eecd96"), Color("231c1e"), Color("ff9632")]})
+			filas_modelo.push_front([chochin_piezas, chochin_modelo, _con_rango(chochin_modelo, 2).merged({"nombre": "Alfa"}, true),
+				_con_rango(chochin_modelo, 3).merged({"nombre": "Silenciada"}, true)])
+		lista.append({"titulo": "Modelos detallados (prueba): piezas frente a modelo propio, con sus tres rangos",
+			"filas": filas_modelo})
 	lista.append({"titulo": "Capítulo 1 (hechas a mano, un día de trabajo cada una)",
 		"filas": [[kappa, oni, onibi, oni_gigante]]})
 	lista.append({"titulo": "Tres rangos de cada criatura: base · alfa (variante fuerte) · silenciada",
@@ -231,7 +255,7 @@ func _mostrar_pagina(numero: int) -> void:
 		var x := -ancho_fila / 2.0
 		for receta in fila:
 			var ancho := _separacion(receta)
-			var criatura := Criatura.new()
+			var criatura = ModeloCriatura.new() if receta.get("detallado", false) else Criatura.new()
 			add_child(criatura)
 			criatura.configurar(aspecto, receta)
 			criatura.position = Vector3(x + ancho / 2.0, 0.0, z)

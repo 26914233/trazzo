@@ -68,26 +68,34 @@ Sirve para ver y medir el sistema que construye criaturas con piezas (`../BESTIA
   por página en `../capturas/actual/` y sale).
 - **Cómo se usa:** ← → o tocar el tercio izquierdo/derecho de la pantalla cambia de página; **ESC** o tocar
   arriba a la derecha vuelve a la pausa. Arriba salen los **FPS**, las criaturas y las piezas de la página.
-- **Qué enseña (8 páginas):** las 4 criaturas del capítulo 1 hechas a mano · los tres rangos (base, alfa,
-  silenciada) · las 7 familias de cuerpo · criaturas icónicas hechas solo con piezas (para ver por qué
-  necesitan modelo propio) · y, del catálogo, una **prueba de carga con 24 criaturas medianas**, y muestras
-  de pequeñas, grandes y gigantes.
-- **Lo que hay que mirar en el móvil:** que las páginas de 7 criaturas (página 3) y de 24 (página 5) vayan a
-  **30 FPS o más**. Es la medida que decide el presupuesto de piezas.
+- **Qué enseña (9 páginas):**
+  1. **Modelos detallados (nueva en la 0.5):** Chōchin-obake (SketchUp), kappa y Aka-oni (SAM 3D), cada
+     uno junto a su versión de piezas y con sus tres rangos.
+  2. Las 4 criaturas del capítulo 1 hechas a mano.
+  3. Los tres rangos (base, alfa, silenciada).
+  4. Las 7 familias de cuerpo.
+  5. Criaturas icónicas hechas solo con piezas (para ver por qué necesitan modelo propio).
+  6. Del catálogo, una **prueba de carga con 24 criaturas medianas**.
+  7. a 9. Muestras de pequeñas, grandes y gigantes.
+- **Lo que hay que mirar en el móvil:** que vayan a **30 FPS o más** la página 1 (modelos detallados),
+  la 4 (7 criaturas) y la 6 (24 criaturas). Es la medida que decide el presupuesto de piezas y de
+  triángulos.
 
 ## Exportar
 
-- **APK de prueba (ya hecho):** `ronin-0.4-prueba.apk` (26,9 MB) está en Google Drive, en
+- **APK de prueba (ya hecho):** `ronin-0.5-prueba.apk` (30,4 MB) está en Google Drive, en
   `Respaldos Claude/ronin/`. Para instalarlo, ábrelo desde el móvil y acepta «instalar apps de
   origen desconocido» si Android lo pide. Pide Android 7.0 o superior y un móvil de 64 bits.
-  SHA-256 `3e4d82c2cd6a9ec6fe4b01127866cdc28467007876831c5a15fd0f0339ec4633`. Se instala encima de
-  la 0.2 y la 0.3 (misma firma); están en «Versiones anteriores (RONIN)». Trae la galería de
-  criaturas y los textos nuevos del capítulo 1.
+  SHA-256 `2f3dc0ecd2e4f0f03cee1372bb30e4e3aa46f3593983bc71e06526de1a993ed1`. Se instala encima de
+  la 0.2, la 0.3 y la 0.4 (misma firma); están en «Versiones anteriores (RONIN)». Trae los tres
+  enemigos con modelo detallado (página 1 de la galería).
+  - **Peso de cada modelo dentro del APK:** Aka-oni 1,2 MB (malla 0,5 + textura 0,7), kappa 2,2 MB
+    y Chōchin-obake 0,1 MB (SketchUp: colores planos).
 - **Desde tu PC:** Proyecto → Exportar → **Android** → Exportar proyecto (como con Curtzz). El
   APK sale en `ronin3d/godot/exportaciones/` (esa carpeta no se sube a git). Hace falta lo mismo
   que para Curtzz: plantillas de exportación de Godot 4.7.2 y el SDK de Android configurado.
   Paquete provisional: `com.thunderdarkness.ronin` (se puede cambiar antes de publicar).
-- **En la nube (así se hicieron la 0.2, la 0.3 y la 0.4):**
+- **En la nube (así se hicieron de la 0.2 a la 0.5):**
   1. Plantillas `Godot_v4.7.2-stable_export_templates.tpz` (1.281 MB, SHA-512 comprobado con el
      `SHA512-SUMS.txt` del release). Solo hacen falta `android_release.apk`, `android_debug.apk` y
      `version.txt`, en `~/.local/share/godot/export_templates/4.7.2.stable/`.
@@ -133,7 +141,8 @@ godot/
 ├── recursos/sombra.png    Sombra bajo los personajes
 ├── datos/bestiario.json   Las criaturas del catálogo (lo genera ronin3d/herramientas/bestiario/unir_clasificacion.py)
 ├── sonidos/               Efectos de sonido (.wav) y su generador
-├── shaders/               cielo, toon (cel-shading), contorno y tinta
+├── shaders/               cielo, toon (cel-shading), toon_textura (modelos detallados), contorno y tinta
+├── modelos/criaturas/     Modelos detallados (GLB) y su LEEME: cómo se hicieron, sumas y licencias
 └── scripts/
     ├── principal.gd       Controles, flujo intro → juego → cierre, pausa
     ├── juego.gd           Monta el capítulo y resuelve los golpes
@@ -148,6 +157,9 @@ godot/
     ├── visual_modelo.gd   Personajes hechos con piezas 3D y sus poses (anime o suave)
     ├── hud.gd             Interfaz
     ├── criatura_modular.gd  Construye una criatura a partir de una receta (familia, tamaño, elemento, rol, rango)
+    ├── modelo_criatura.gd   La misma interfaz con un modelo detallado (GLB): cel-shading, rangos, garrote, agua
+    ├── retrato.gd         Retratos de cerca de un modelo detallado (--script res://scripts/retrato.gd -- <id>)
+    ├── extraer_lod.gd     Saca un LOD de un modelo importado a un archivo (visor 3D del chat)
     ├── galeria.gd         Galería de criaturas: páginas, FPS y capturas
     ├── datos.gd           Medidas, reglas del combate, textos y colores
     └── prueba.gd          Prueba automática
@@ -155,7 +167,7 @@ godot/
 
 ## Prueba automática
 
-Juega sola unos 30 segundos y comprueba 21 cosas:
+Juega sola unos 30 segundos y comprueba 22 cosas:
 
 - los textos del capítulo 1 (shōgun Takeda, yōkai, luna roja), intro, caminar, HUD dentro de la pantalla y cámara;
 - espada, defensa del soldado, muros y portón;
@@ -164,7 +176,9 @@ Juega sola unos 30 segundos y comprueba 21 cosas:
 - animación anime (12 poses por segundo) frente a la suave;
 - la galería de criaturas: se abre desde la pausa, reparte páginas y al cerrarla el juego sigue entero;
 - el catálogo del bestiario (`datos/bestiario.json`): se carga con todos sus datos válidos y **todas sus
-  criaturas se construyen** dentro del presupuesto de piezas.
+  criaturas se construyen** dentro del presupuesto de piezas;
+- los modelos detallados: se cargan con textura y cel-shading, y el Aka-oni mide lo que debe en sus tres
+  rangos (sin contar el garrote, que va levantado).
 
 Mide los FPS y guarda capturas en `../capturas/actual/`.
 
@@ -175,7 +189,7 @@ godot --path ronin3d/godot --fixed-fps 30 -- --prueba
 Con `RONIN_FOTOGRAMAS=<carpeta>` guarda además los fotogramas del iai y del corte de luna, y
 `python3 ronin3d/herramientas/hacer_gifs.py <carpeta> ronin3d/capturas/actual` los convierte en GIF.
 
-Resultado en la nube (Godot 4.7.2, OpenGL por software, sin tarjeta gráfica): **21 de 21** en la
-0.4 (16 de 16 en la 0.3), y unos 11-13 FPS al caminar por el patio a 1280 × 720. Las 929 criaturas del
+Resultado en la nube (Godot 4.7.2, OpenGL por software, sin tarjeta gráfica): **22 de 22** en la
+0.5 (21 de 21 en la 0.4), y unos 11-13 FPS al caminar por el patio a 1280 × 720. Las 929 criaturas del
 catálogo se construyen en medio segundo (20,5 piezas de media por criatura, 42 como máximo). Con tarjeta gráfica real va mucho
 más rápido. La 0.2 pasó también la prueba en una exportación *release* para Linux.

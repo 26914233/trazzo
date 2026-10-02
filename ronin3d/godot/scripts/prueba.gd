@@ -10,6 +10,7 @@ const Datos := preload("res://scripts/datos.gd")
 const VisualModelo := preload("res://scripts/visual_modelo.gd")
 const Aspecto := preload("res://scripts/aspecto.gd")
 const Criatura := preload("res://scripts/criatura_modular.gd")
+const ModeloCriatura := preload("res://scripts/modelo_criatura.gd")
 const MOVIMIENTOS := ["mover_adelante", "mover_atras", "mover_izquierda", "mover_derecha"]
 
 var principal
@@ -100,6 +101,7 @@ func _ready() -> void:
 		[31.2, _comprobar_galeria_cerrada],
 		[31.4, _comprobar_bestiario],
 		[31.5, _construir_todo_el_bestiario],
+		[31.6, _comprobar_modelo_detallado],
 		[31.7, _terminar],
 	]
 
@@ -528,7 +530,7 @@ func _comprobar_galeria_abierta() -> void:
 	var criaturas := 0
 	var piezas := 0
 	if galeria:
-		galeria._mostrar_pagina(2)            # la de las siete familias
+		galeria._mostrar_pagina(3)            # la de las siete familias
 		criaturas = galeria.criaturas.size()
 		for c in galeria.criaturas:
 			piezas += c.piezas
@@ -603,6 +605,52 @@ func _construir_todo_el_bestiario() -> void:
 		construidas >= 700 and sin_piezas == 0 and maximo <= 80,
 		"%d criaturas (%d construcciones con los rangos 2 y 3 de 1 de cada 8) en %d ms; rango 1: media %.1f piezas, máximo %d; máximo con rangos: %d" % [
 			construidas, construcciones, Time.get_ticks_msec() - inicio, media, maximo_rango1, maximo])
+
+
+func _comprobar_modelo_detallado() -> void:
+	var resultados: Array = []
+	var bien := true
+	for rango in [1, 2, 3]:
+		var criatura = ModeloCriatura.new()
+		add_child(criatura)
+		criatura.configurar(null, {"familia": "bipedo", "tamano": "M", "elemento": "fuego", "rol": "poderoso",
+			"id": 2315, "rango": rango})
+		criatura.actualizar(0.1)
+		var con_textura := false
+		for material in criatura.materiales:
+			con_textura = con_textura or material.get_shader_parameter("textura") != null
+		# Se mide el cuerpo sin el garrote (va levantado y sobresale por encima de la cabeza)
+		var caja := AABB()
+		var primera := true
+		var con_garrote := false
+		for malla in criatura._mallas(criatura.modelo):
+			if malla.name == "Garrote":
+				con_garrote = true
+				continue
+			var c: AABB = malla.global_transform * malla.get_aabb()
+			caja = c if primera else caja.merge(c)
+			primera = false
+		var alto_esperado: float = 1.9 * (1.2 if rango == 2 else 1.0)
+		bien = bien and con_textura and con_garrote and criatura.triangulos > 1000 and criatura.triangulos <= 40000 \
+			and absf(caja.size.y - alto_esperado) < 0.25 and absf(caja.position.y) < 0.15
+		resultados.append("rango %d: %d triángulos, %.2f m%s%s" % [rango, criatura.triangulos, caja.size.y,
+			"" if con_textura else ", SIN TEXTURA", "" if con_garrote else ", SIN GARROTE"])
+		criatura.queue_free()
+	# Los demás modelos propios (kappa de SAM 3D, chōchin de SketchUp) se cargan con su textura
+	for id in ModeloCriatura.MODELOS:
+		if id == 2315:
+			continue
+		var otra = ModeloCriatura.new()
+		add_child(otra)
+		otra.configurar(null, {"familia": "bipedo", "tamano": "S", "elemento": "fuego", "id": id, "rango": 1})
+		var textura_ok := false
+		for material in otra.materiales:
+			textura_ok = textura_ok or material.get_shader_parameter("textura") != null
+		bien = bien and textura_ok and otra.triangulos > 500 and otra.triangulos <= 50000
+		resultados.append("modelo %d: %d triángulos%s" % [id, otra.triangulos, "" if textura_ok else ", SIN TEXTURA"])
+		otra.queue_free()
+	_registrar("Los modelos detallados se cargan con textura y cel-shading (el Aka-oni, con sus tres rangos)",
+		bien, "; ".join(resultados))
 
 
 func _empezar_cuenta_anime() -> void:
