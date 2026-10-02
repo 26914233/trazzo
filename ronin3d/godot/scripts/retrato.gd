@@ -1,21 +1,28 @@
-# Retratos de cerca de un modelo detallado, para revisarlo: varias vistas y sus tres rangos.
-# Uso: godot --path ronin3d/godot --script res://scripts/retrato.gd -- <id> [carpeta_salida]
+# Retratos de cerca para revisar modelos: varias vistas de un modelo detallado y sus tres
+# rangos, o los aspectos de Akira y Shiro.
+# Uso: godot --path ronin3d/godot --script res://scripts/retrato.gd -- <id | akira> [carpeta_salida]
 extends SceneTree
 
 const ModeloCriatura := preload("res://scripts/modelo_criatura.gd")
 const Criatura := preload("res://scripts/criatura_modular.gd")
 const Aspecto := preload("res://scripts/aspecto.gd")
+const VisualModelo := preload("res://scripts/visual_modelo.gd")
+const VisualShiro := preload("res://scripts/visual_shiro.gd")
+const Apariencias := preload("res://scripts/apariencias_akira.gd")
 
 
 func _initialize() -> void:
 	var argumentos := OS.get_cmdline_user_args()
-	var id := int(argumentos[0]) if argumentos.size() > 0 else 2315
 	var carpeta := argumentos[1] if argumentos.size() > 1 else ProjectSettings.globalize_path("res://").path_join("../capturas/actual")
 	DirAccess.make_dir_recursive_absolute(carpeta)
-	_retratar.call_deferred(id, carpeta)
+	if argumentos.size() > 0 and argumentos[0] == "akira":
+		_retratar_personajes.call_deferred(carpeta)
+	else:
+		_retratar.call_deferred(int(argumentos[0]) if argumentos.size() > 0 else 2315, carpeta)
 
 
-func _retratar(id: int, carpeta: String) -> void:
+# Escena común: fondo oscuro, luz cálida, suelo y cámara. Devuelve [raíz, cámara, aspecto].
+func _escena() -> Array:
 	var raiz := Node3D.new()
 	root.add_child(raiz)
 	root.size = Vector2i(1280, 720)
@@ -48,6 +55,14 @@ func _retratar(id: int, carpeta: String) -> void:
 	camara.fov = 32.0
 	raiz.add_child(camara)
 	camara.current = true
+	return [raiz, camara, aspecto]
+
+
+func _retratar(id: int, carpeta: String) -> void:
+	var escena := _escena()
+	var raiz: Node3D = escena[0]
+	var camara: Camera3D = escena[1]
+	var aspecto = escena[2]
 	# Receta de cada criatura con modelo (la de piezas sale de la misma, para comparar)
 	var recetas := {
 		2315: {"familia": "bipedo", "tamano": "M", "elemento": "fuego", "rol": "poderoso",
@@ -118,4 +133,46 @@ func _retratar(id: int, carpeta: String) -> void:
 	for c in criaturas:
 		if c.has_method("get") and c.get("triangulos") != null:
 			print("triángulos: ", c.triangulos)
+	quit()
+
+
+# Los cuatro aspectos de Akira y Shiro: en fila, cada cara de cerca y Shiro de cerca.
+func _retratar_personajes(carpeta: String) -> void:
+	var escena := _escena()
+	var raiz: Node3D = escena[0]
+	var camara: Camera3D = escena[1]
+	var aspecto = escena[2]
+	var info := {"mirando": Vector3.BACK, "moviendose": false, "corriendo": false, "en_aire": false,
+		"pose": "normal", "progreso": 0.0, "visible": true, "destello": 0.0, "muerte": -1.0, "aviso": false}
+	var figuras: Array = []
+	var x := -2.4
+	for id in Apariencias.ORDEN:
+		var akira = VisualModelo.new()
+		akira.configurar(aspecto, false, id)
+		raiz.add_child(akira)
+		akira.position = Vector3(x, 0, 0)
+		akira.actualizar(0.1, info)
+		figuras.append(akira)
+		x += 1.6
+	var shiro = VisualShiro.new()
+	shiro.configurar(aspecto)
+	raiz.add_child(shiro)
+	shiro.position = Vector3(-1.6, 0, 0.9)
+	var vistas := [["akira_fila", Vector3(0, 1.6, 7.6), Vector3(0, 0.95, 0)]]
+	for i in figuras.size():
+		var p: Vector3 = figuras[i].position
+		vistas.append(["akira_cara_" + String(Apariencias.ORDEN[i]), p + Vector3(0.15, 1.75, 1.15), p + Vector3(0, 1.48, 0)])
+	vistas.append(["shiro_cerca", shiro.position + Vector3(0.9, 0.75, 1.5), shiro.position + Vector3(0, 0.33, 0)])
+	for vista in vistas:
+		camara.position = vista[1]
+		camara.look_at(vista[2], Vector3.UP)
+		for cuadro in 12:
+			for figura in figuras:
+				figura.actualizar(1.0 / 30.0, info)
+			shiro.actualizar(1.0 / 30.0, {"mirando": Vector3(0.5, 0, 1).normalized(), "pose": "sentado", "en_boca": false})
+			await process_frame
+		await RenderingServer.frame_post_draw
+		var ruta := carpeta.path_join(vista[0] + ".png")
+		root.get_texture().get_image().save_png(ruta)
+		print("Retrato: ", ruta)
 	quit()

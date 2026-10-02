@@ -55,6 +55,11 @@ func vivo() -> bool:
 	return estado != Estado.MUERTO
 
 
+# Va a por Akira (lo usa Shiro para saber si hay pelea cerca).
+func persigue() -> bool:
+	return estado in [Estado.ALERTA, Estado.PREPARANDO, Estado.ATACANDO, Estado.RECUPERANDO, Estado.ATURDIDO]
+
+
 func _plano(vector: Vector3) -> Vector3:
 	return Vector3(vector.x, 0.0, vector.z)
 

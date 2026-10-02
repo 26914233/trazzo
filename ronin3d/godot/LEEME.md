@@ -23,6 +23,7 @@ ligero, para PC modestos y Android.
 | **Corte de luna** (barra llena) | **L** | **Y** | Botón «Luna» |
 | Animación anime / suave | T | Select | En la pausa, tocar «Animación» |
 | Galería de criaturas (prueba) | G en la pausa | — | En la pausa, tocar «Galería de criaturas» |
+| Aspecto de Akira (y skins) | V en la pausa | — | En la pausa, tocar «Akira: …» |
 | Girar la cámara | Q / E, botón derecho + arrastrar | Stick derecho | Arrastrar el dedo |
 | Zoom | Rueda, + / − | Cruceta arriba / abajo | — |
 | Inclinar la cámara | R / F | Stick derecho | Arrastrar el dedo |
@@ -59,6 +60,21 @@ Los números están en `scripts/datos.gd`, en la sección Akira: `VENTANA_PARADA
 `ENFRIAMIENTO_PARADA`, `ESPIRITU_POR_IAI`, `RADIO_CORTE_LUNA`, `PASO_ANIME`… Se ajustan después
 de probar.
 
+## Akira, Shiro y las monedas (nuevo en la 0.6)
+
+- **Akira, el joven endurecido** (elegido el 02-10-2026):
+  - cicatriz en diagonal por la cara, mirada dura, cinta roja deshilachada, ropa remendada y vendas;
+  - **tres skins**: curtido (unos 30), veterano (unos 40) y Akira mujer;
+  - se cambian en la pausa (**V** o tocando «Akira: …») y el juego recuerda la elegida (`user://ajustes.cfg`);
+  - datos de cada aspecto en `scripts/apariencias_akira.gd`.
+- **Shiro**, su perro blanco:
+  - le sigue, se sienta cuando Akira se para y se agacha detrás si hay soldados alerta;
+  - en calma, olfatea, ladra, escarba y desentierra monedas, y trae las que se quedan atrás;
+  - no pelea y nadie le ataca. Reglas y números en `../DISENO_3D.md` y `scripts/datos.gd`.
+- **Monedas «mon»:** las sueltan los soldados y las desentierra Shiro. Akira las recoge al pasar y el
+  contador sale bajo la vida. Para qué sirven es la DECISIÓN 16 (`../PLAN_PRODUCCION.md` §14).
+- **Arreglo:** la pausa ahora para el juego de verdad (antes los soldados seguían moviéndose).
+
 ## Galería de criaturas (nueva en la 0.4)
 
 Sirve para ver y medir el sistema que construye criaturas con piezas (`../BESTIARIO_UNIVERSAL.md`):
@@ -68,34 +84,34 @@ Sirve para ver y medir el sistema que construye criaturas con piezas (`../BESTIA
   por página en `../capturas/actual/` y sale).
 - **Cómo se usa:** ← → o tocar el tercio izquierdo/derecho de la pantalla cambia de página; **ESC** o tocar
   arriba a la derecha vuelve a la pausa. Arriba salen los **FPS**, las criaturas y las piezas de la página.
-- **Qué enseña (9 páginas):**
-  1. **Modelos detallados (nueva en la 0.5):** Chōchin-obake (SketchUp), kappa y Aka-oni (SAM 3D), cada
-     uno junto a su versión de piezas y con sus tres rangos.
-  2. Las 4 criaturas del capítulo 1 hechas a mano.
-  3. Los tres rangos (base, alfa, silenciada).
-  4. Las 7 familias de cuerpo.
-  5. Criaturas icónicas hechas solo con piezas (para ver por qué necesitan modelo propio).
-  6. Del catálogo, una **prueba de carga con 24 criaturas medianas**.
-  7. a 9. Muestras de pequeñas, grandes y gigantes.
-- **Lo que hay que mirar en el móvil:** que vayan a **30 FPS o más** la página 1 (modelos detallados),
-  la 4 (7 criaturas) y la 6 (24 criaturas). Es la medida que decide el presupuesto de piezas y de
-  triángulos.
+- **Qué enseña (10 páginas):**
+  1. **Akira y Shiro (nueva en la 0.6):** el joven endurecido, sus tres skins y Shiro.
+  2. **Modelos detallados (0.5):** Chōchin-obake (SketchUp), kappa y Aka-oni (SAM 3D), cada uno junto a
+     su versión de piezas y con sus tres rangos.
+  3. Las 4 criaturas del capítulo 1 hechas a mano.
+  4. Los tres rangos (base, alfa, silenciada).
+  5. Las 7 familias de cuerpo.
+  6. Criaturas icónicas hechas solo con piezas (para ver por qué necesitan modelo propio).
+  7. Del catálogo, una **prueba de carga con 24 criaturas medianas**.
+  8. a 10. Muestras de pequeñas, grandes y gigantes.
+- **Lo que hay que mirar en el móvil:** que vayan a **30 FPS o más** la página 2 (modelos detallados),
+  la 5 (7 criaturas) y la 7 (24 criaturas). Es la medida que decide el presupuesto de piezas y de
+  triángulos. (En la 0.5 eran las páginas 1, 4 y 6.)
 
 ## Exportar
 
-- **APK de prueba (ya hecho):** `ronin-0.5-prueba.apk` (30,4 MB) está en Google Drive, en
-  `Respaldos Claude/ronin/`. Para instalarlo, ábrelo desde el móvil y acepta «instalar apps de
-  origen desconocido» si Android lo pide. Pide Android 7.0 o superior y un móvil de 64 bits.
-  SHA-256 `2f3dc0ecd2e4f0f03cee1372bb30e4e3aa46f3593983bc71e06526de1a993ed1`. Se instala encima de
-  la 0.2, la 0.3 y la 0.4 (misma firma); están en «Versiones anteriores (RONIN)». Trae los tres
-  enemigos con modelo detallado (página 1 de la galería).
+- **APK de prueba (ya hecho):** `ronin-0.6-prueba.apk` está en Google Drive, en
+  `Respaldos Claude/ronin/` (tamaño y SHA-256 en `../HANDOFF_RONIN.md`). Para instalarlo, ábrelo desde
+  el móvil y acepta «instalar apps de origen desconocido» si Android lo pide. Pide Android 7.0 o
+  superior y un móvil de 64 bits. Se instala encima de las anteriores (misma firma); están en
+  «Versiones anteriores (RONIN)». Trae a Akira endurecido con sus skins, a Shiro y las monedas.
   - **Peso de cada modelo dentro del APK:** Aka-oni 1,2 MB (malla 0,5 + textura 0,7), kappa 2,2 MB
     y Chōchin-obake 0,1 MB (SketchUp: colores planos).
 - **Desde tu PC:** Proyecto → Exportar → **Android** → Exportar proyecto (como con Curtzz). El
   APK sale en `ronin3d/godot/exportaciones/` (esa carpeta no se sube a git). Hace falta lo mismo
   que para Curtzz: plantillas de exportación de Godot 4.7.2 y el SDK de Android configurado.
   Paquete provisional: `com.thunderdarkness.ronin` (se puede cambiar antes de publicar).
-- **En la nube (así se hicieron de la 0.2 a la 0.5):**
+- **En la nube (así se hicieron de la 0.2 a la 0.6):**
   1. Plantillas `Godot_v4.7.2-stable_export_templates.tpz` (1.281 MB, SHA-512 comprobado con el
      `SHA512-SUMS.txt` del release). Solo hacen falta `android_release.apk`, `android_debug.apk` y
      `version.txt`, en `~/.local/share/godot/export_templates/4.7.2.stable/`.
@@ -122,7 +138,9 @@ Sirve para ver y medir el sistema que construye criaturas con piezas (`../BESTIA
 - Patio con las medidas de `../DISENO_3D.md`: muros, portón, torreón, pasarela, muro bajo,
   bloques, linternas, pozo, cajas, barriles y 8 antorchas con luz que parpadea.
 - Akira: correr, saltar, atacar, iai y corte de luna; 5 de vida, barra de espíritu, retroceso e
-  invulnerabilidad tras un golpe.
+  invulnerabilidad tras un golpe. Cuatro aspectos (el joven endurecido y tres skins).
+- Shiro, el perro: le sigue, escarba y desentierra monedas, y trae las que se quedan atrás.
+- Monedas: las sueltan los soldados y las desentierra Shiro; contador en el HUD.
 - 6 soldados con lanza: patrullan, te ven en un cono, persiguen sin alejarse de su puesto,
   avisan y atacan.
 - Capa de tinta (`shaders/tinta.gdshader`): cuadros de impacto y líneas del corte de luna.
@@ -155,10 +173,14 @@ godot/
     ├── tinta.gd           Capa de tinta: cuadros de impacto y líneas de corte
     ├── controles_tactiles.gd  Joystick y botones para el móvil
     ├── visual_modelo.gd   Personajes hechos con piezas 3D y sus poses (anime o suave)
+    ├── apariencias_akira.gd  Los cuatro aspectos de Akira (el joven endurecido y tres skins)
+    ├── shiro.gd           El perro de Akira: seguirle, escarbar y traer monedas
+    ├── visual_shiro.gd    Shiro hecho con piezas y sus poses
+    ├── monedas.gd         Monedas «mon»: saltan, giran, se recogen; su malla con agujero cuadrado
     ├── hud.gd             Interfaz
     ├── criatura_modular.gd  Construye una criatura a partir de una receta (familia, tamaño, elemento, rol, rango)
     ├── modelo_criatura.gd   La misma interfaz con un modelo detallado (GLB): cel-shading, rangos, garrote, agua
-    ├── retrato.gd         Retratos de cerca de un modelo detallado (--script res://scripts/retrato.gd -- <id>)
+    ├── retrato.gd         Retratos de cerca (--script res://scripts/retrato.gd -- <id | akira>)
     ├── extraer_lod.gd     Saca un LOD de un modelo importado a un archivo (visor 3D del chat)
     ├── galeria.gd         Galería de criaturas: páginas, FPS y capturas
     ├── datos.gd           Medidas, reglas del combate, textos y colores
@@ -167,18 +189,21 @@ godot/
 
 ## Prueba automática
 
-Juega sola unos 30 segundos y comprueba 22 cosas:
+Juega sola unos 42 segundos y comprueba 28 cosas:
 
 - los textos del capítulo 1 (shōgun Takeda, yōkai, luna roja), intro, caminar, HUD dentro de la pantalla y cámara;
 - espada, defensa del soldado, muros y portón;
-- pausa, toques en la pantalla, joystick táctil y stick del mando;
+- que la pausa para el juego de verdad, toques en la pantalla, joystick táctil y stick del mando;
 - iai perfecto, iai a destiempo y corte de luna;
 - animación anime (12 poses por segundo) frente a la suave;
 - la galería de criaturas: se abre desde la pausa, reparte páginas y al cerrarla el juego sigue entero;
 - el catálogo del bestiario (`datos/bestiario.json`): se carga con todos sus datos válidos y **todas sus
   criaturas se construyen** dentro del presupuesto de piezas;
 - los modelos detallados: se cargan con textura y cel-shading, y el Aka-oni mide lo que debe en sus tres
-  rangos (sin contar el garrote, que va levantado).
+  rangos (sin contar el garrote, que va levantado);
+- los cuatro aspectos de Akira (todos con la cicatriz, y se cambian en la pausa);
+- Shiro: sigue a Akira, desentierra monedas y trae las que se quedan atrás; los soldados sueltan
+  monedas y Akira las recoge (el HUD las cuenta).
 
 Mide los FPS y guarda capturas en `../capturas/actual/`.
 
@@ -189,7 +214,7 @@ godot --path ronin3d/godot --fixed-fps 30 -- --prueba
 Con `RONIN_FOTOGRAMAS=<carpeta>` guarda además los fotogramas del iai y del corte de luna, y
 `python3 ronin3d/herramientas/hacer_gifs.py <carpeta> ronin3d/capturas/actual` los convierte en GIF.
 
-Resultado en la nube (Godot 4.7.2, OpenGL por software, sin tarjeta gráfica): **22 de 22** en la
-0.5 (21 de 21 en la 0.4), y unos 11-13 FPS al caminar por el patio a 1280 × 720. Las 929 criaturas del
+Resultado en la nube (Godot 4.7.2, OpenGL por software, sin tarjeta gráfica): **28 de 28** en la
+0.6 (22 de 22 en la 0.5), y unos 10-13 FPS al caminar por el patio a 1280 × 720. Las 929 criaturas del
 catálogo se construyen en medio segundo (20,5 piezas de media por criatura, 42 como máximo). Con tarjeta gráfica real va mucho
 más rápido. La 0.2 pasó también la prueba en una exportación *release* para Linux.

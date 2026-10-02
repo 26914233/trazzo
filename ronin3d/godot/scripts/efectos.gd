@@ -14,6 +14,9 @@ const SONIDOS := {
 	"herido": preload("res://sonidos/herido.wav"),
 	"aviso": preload("res://sonidos/aviso.wav"),
 	"caida": preload("res://sonidos/caida.wav"),
+	"moneda": preload("res://sonidos/moneda.wav"),
+	"escarbar": preload("res://sonidos/escarbar.wav"),
+	"ladrido": preload("res://sonidos/ladrido.wav"),
 }
 const VOCES := 8                      # sonidos que pueden sonar a la vez
 
@@ -29,6 +32,8 @@ var luna_restante := 0.0              # segundos reales que quedan del corte de 
 var luna_al_cortar: Callable
 var luna_cortado := false
 var luna_cortes_sonados := 0
+var racha_monedas := 0                # monedas seguidas: cada una suena un poco más aguda
+var tiempo_racha := 0.0
 
 
 func _ready() -> void:
@@ -53,6 +58,9 @@ func _process(delta: float) -> void:
 	var real := delta / maxf(Engine.time_scale, 0.001)
 	congelado = maxf(0.0, congelado - real)
 	lento = maxf(0.0, lento - real)
+	tiempo_racha = maxf(0.0, tiempo_racha - real)
+	if tiempo_racha <= 0.0:
+		racha_monedas = 0
 	tinta.actualizar(real)
 	if get_tree().paused:
 		return
@@ -92,17 +100,18 @@ func sacudir(fuerza: float) -> void:
 		camara.sacudir(fuerza)
 
 
-func chispas(punto: Vector3, cantidad: int, color: Color, rapidez := 5.0) -> void:
+func chispas(punto: Vector3, cantidad: int, color: Color, rapidez := 5.0, vida := 0.4, gravedad := -12.0,
+		tamano := 0.07) -> void:
 	var chispas := CPUParticles3D.new()
 	chispas.one_shot = true
 	chispas.explosiveness = 1.0
 	chispas.amount = cantidad
-	chispas.lifetime = 0.4
+	chispas.lifetime = vida
 	chispas.direction = Vector3.UP
 	chispas.spread = 180.0
 	chispas.initial_velocity_min = rapidez * 0.5
 	chispas.initial_velocity_max = rapidez
-	chispas.gravity = Vector3(0, -12.0, 0)
+	chispas.gravity = Vector3(0, gravedad, 0)
 	chispas.scale_amount_min = 0.6
 	chispas.scale_amount_max = 1.2
 	var degradado := Gradient.new()
@@ -110,7 +119,7 @@ func chispas(punto: Vector3, cantidad: int, color: Color, rapidez := 5.0) -> voi
 	degradado.set_color(1, Color(color.r, color.g, color.b, 0.0))
 	chispas.color_ramp = degradado
 	var punto_malla := QuadMesh.new()
-	punto_malla.size = Vector2(0.07, 0.07)
+	punto_malla.size = Vector2(tamano, tamano)
 	var material := StandardMaterial3D.new()
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	material.vertex_color_use_as_albedo = true
@@ -220,3 +229,59 @@ func aviso(punto: Vector3) -> void:
 
 func estocada(punto: Vector3) -> void:
 	sonar("estocada", punto, -3.0)
+
+
+# --- Shiro y las monedas ----------------------------------------------------------------------
+
+# Cada moneda de una racha suena un poco más aguda (hasta una quinta), como un tintineo que sube.
+func moneda(punto: Vector3) -> void:
+	var voz: AudioStreamPlayer3D = voces[siguiente_voz]
+	sonar("moneda", punto, -6.0, 0.0)
+	voz.pitch_scale = 1.0 + minf(racha_monedas, 8) * 0.06
+	racha_monedas += 1
+	tiempo_racha = 0.6
+	chispas(punto, 6, Datos.COBRE.lightened(0.4), 2.0, 0.3, -4.0, 0.05)
+
+
+func ladrido(punto: Vector3) -> void:
+	sonar("ladrido", punto, -5.0, 0.06)
+
+
+# Shiro escarba: tierra que salta durante el escarbado y su sonido.
+func escarbar(punto: Vector3, segundos: float) -> void:
+	sonar("escarbar", punto, -7.0, 0.05)
+	var tierra := CPUParticles3D.new()
+	tierra.amount = 18
+	tierra.lifetime = 0.5
+	tierra.direction = Vector3.UP
+	tierra.spread = 50.0
+	tierra.initial_velocity_min = 1.5
+	tierra.initial_velocity_max = 3.0
+	tierra.gravity = Vector3(0, -12.0, 0)
+	tierra.scale_amount_min = 0.7
+	tierra.scale_amount_max = 1.3
+	tierra.color = Color("5a4630")
+	var grano := QuadMesh.new()
+	grano.size = Vector2(0.06, 0.06)
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.vertex_color_use_as_albedo = true
+	material.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	grano.material = material
+	tierra.mesh = grano
+	tierra.position = punto
+	add_child(tierra)
+	tierra.emitting = true
+	get_tree().create_timer(segundos, false).timeout.connect(func(): tierra.emitting = false)
+	get_tree().create_timer(segundos + 1.0, false).timeout.connect(tierra.queue_free)
+
+
+# Las monedas salen de la tierra: un puñado de tierra y un destello.
+func desenterrar(punto: Vector3) -> void:
+	chispas(punto, 14, Color("6a5236"), 3.0, 0.5, -12.0, 0.07)
+	chispas(punto + Vector3.UP * 0.2, 10, Datos.COBRE.lightened(0.5), 2.5, 0.35, -3.0, 0.05)
+
+
+# Polvo cuando Shiro aparece junto a Akira (tras quedarse lejos o atascado).
+func polvo(punto: Vector3) -> void:
+	chispas(punto + Vector3.UP * 0.2, 12, Color(0.75, 0.72, 0.68), 1.5, 0.45, -1.0, 0.12)

@@ -99,6 +99,22 @@ para que se vea al bajar la cámara). Luz de luna direccional azulada
 | 5 | (8, 0, 2) | (16, 0, 8) |
 | 6 | (19, 0, −2) | (19, 0, 2) — guarda el portón |
 
+### Shiro, el perro de Akira (solo Godot, desde la 0.6)
+- Empieza junto a Akira. Le sigue detrás y a su derecha (a 5,6 m/s; corriendo, a 9 m/s) y se
+  sienta cuando Akira se para. Choca solo con el escenario: no estorba ni recibe golpes.
+- Si hay un soldado persiguiendo a Akira a menos de 11 m, se queda 2,4 m detrás, agachado.
+- En calma, a los 9 s y luego cada 22-40 s (al azar): olfatea 1,1 s, ladra, corre a un sitio libre
+  2-4 m por delante de Akira, escarba 1,5 s y desentierra 3-6 monedas.
+- Trae las monedas que quedan a más de 3,2 m de Akira (y a menos de 10 m), llenando la boca con las
+  que estén juntas.
+- Si se queda a más de 14 m o atascado 2,5 s, aparece detrás de Akira entre polvo.
+- Datos en `godot/scripts/datos.gd`; comportamiento en `shiro.gd` y piezas en `visual_shiro.gd`.
+
+### Monedas «mon»
+- Cobre con agujero cuadrado (periodo Edo). Los soldados derrotados sueltan 2-4.
+- Saltan al salir, giran de canto en el suelo, Akira las atrae desde 2,2 m y las recoge a 0,8 m.
+- Hoy solo se cuentan: para qué sirven es la DECISIÓN 16 (`PLAN_PRODUCCION.md` §14).
+
 ## 5. Cámara
 
 Órbita alrededor de Akira (sigue su posición con suavizado).
@@ -126,11 +142,13 @@ para que se vea al bajar la cámara). Luz de luna direccional azulada
 | R / F | Inclinar la cámara (−5° a 60°) |
 | ENTER | Continuar en los textos |
 | ESC | Pausa (Q en pausa: salir) |
+| V (en pausa) | Cambiar el aspecto de Akira: joven endurecido y tres skins (solo Godot) |
 | 1 / 2 / 3 | Cambiar de estética (solo Godot) |
 
 ## 7. HUD
 
-- Arriba a la izquierda: «AKIRA» y 5 rombos rojos (vida).
+- Arriba a la izquierda: «AKIRA» y 5 rombos rojos (vida); debajo, la barra de espíritu y el
+  contador de monedas (solo Godot).
 - Arriba a la derecha: «Soldados derrotados: n/6».
 - Abajo: ayuda de controles durante los primeros 10 s.
 - «!» rojo sobre el soldado que va a atacar.

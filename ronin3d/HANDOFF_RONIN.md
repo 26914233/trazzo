@@ -137,21 +137,49 @@ pulido será el primer capítulo (castillo + planicie + aldea).
     **ficha** (para 3D). `prompts_colab.csv` lleva la columna `bioma`.
   - **Análisis, precios verificados y DECISIÓN 15** (cómo llevar a todos los enemigos a ese nivel):
     `BESTIARIO_UNIVERSAL.md` §8.1-8.2.
-- **Prueba automática: 22 de 22.** **APK 0.5** (`ronin/ronin-0.5-prueba.apk`, 30,4 MB, SHA-256
-  `2f3dc0ec…1a993ed1`, misma firma que la 0.2-0.4). La prueba sobre la exportación de Linux no se
+- **Prueba automática: 22 de 22.** **APK 0.5** (30,4 MB, SHA-256 `2f3dc0ec…1a993ed1`, misma firma que
+  la 0.2-0.4; ya en «Versiones anteriores (RONIN)»). La prueba sobre la exportación de Linux no se
   pasó en la 0.5: el usuario la paró para enseñar los conectores nuevos.
+- **Akira endurecido, skins, Shiro y monedas (02-10-2026, tarde).** El usuario pidió un Akira con
+  más aire de samurái (más rudo, con una cicatriz en la cara), un compañero que camine con él y
+  recoja monedas de vez en cuando, y ver el dibujo en otros estilos. Eligió (con AskUserQuestion):
+  - **Akira «joven endurecido»** por defecto. Las otras opciones son **skins**: curtido (unos 30),
+    veterano (unos 40) y Akira mujer.
+  - **El perro Shiro** como compañero.
+  - Ver **4 estilos** de dibujo.
+  Hecho:
+  - **En el juego (0.6):**
+    - Akira con cicatriz, mirada dura, cinta deshilachada, remiendos y vendas.
+    - Las 3 skins, que se cambian en la pausa (V o botón) y se recuerdan.
+    - Shiro: le sigue, se sienta, se agacha si hay pelea, olfatea/escarba/desentierra 3-6 monedas en
+      calma y trae las que quedan atrás.
+    - Monedas «mon» que sueltan los soldados, con contador en el HUD.
+    - Página 1 nueva en la galería.
+  - **Arreglado:** la pausa no paraba el juego (los soldados seguían moviéndose); ahora sí.
+  - **Imágenes:**
+    - Shiro y Akira en 4 estilos (tinta, realista, anime de los 90, ukiyo-e) en
+      `arte/conceptos/estilos/`, 0,75 créditos.
+    - **Higgsfield rechaza persona + perro en la misma imagen** (12 fallos devueltos): se hacen por
+      separado. Quedan 0,01 créditos.
+  - **Decisiones nuevas:** 16 (para qué sirven las monedas), 17 (de dónde vienen Shiro y la cicatriz,
+    `HISTORIA.md` §9) y 18 (estilo de las ilustraciones). Las tres están en `PLAN_PRODUCCION.md` §14.
+- **Prueba automática: 28 de 28.** **APK 0.6** (`ronin/ronin-0.6-prueba.apk`, 30,5 MB, SHA-256
+  `8e1676f5…30f8986d41`, misma firma `CN=RONIN prueba`, versionCode 6). La prueba sobre la
+  exportación de Linux no se pasó (el usuario la había parado en la 0.5).
 
 ## 3. En curso / pendiente del usuario
 
-1. **Probar el APK 0.5 en el móvil** y contar:
+1. **Probar el APK 0.6 en el móvil** y contar:
    - los FPS (meta ≥ 30);
    - si el iai (mantener y soltar) y el corte de luna se entienden;
    - qué animación prefiere, anime o suave;
-   - **la galería de criaturas** (pausa → botón): FPS en la página 1 (modelos detallados), en la 4
-     (7 criaturas) y en la 6 (24).
-2. **DECISIONES 11, 12, 13, 14 y 15** (`HISTORIA.md` §8 y `BESTIARIO_UNIVERSAL.md`) y la regla de
-   respeto cultural (se aplica salvo veto). La 15 (modelos detallados) necesita créditos para el piloto
-   de esqueleto (unos 5-10 $): solo los compra el usuario.
+   - qué tal Shiro y las monedas, y qué skin le gusta;
+   - **la galería de criaturas** (pausa → botón): FPS en la página 2 (modelos detallados), en la 5
+     (7 criaturas) y en la 7 (24). En la 0.5 eran las páginas 1, 4 y 6.
+2. **DECISIONES 11 a 18** (`HISTORIA.md` §8-9, `BESTIARIO_UNIVERSAL.md` y `PLAN_PRODUCCION.md` §14) y
+   la regla de respeto cultural (se aplica salvo veto). La 15 (modelos detallados) necesita créditos
+   para el piloto de esqueleto (unos 5-10 $); la 18 (estilo), para rehacer imágenes, créditos o Colab.
+   Créditos solo los compra el usuario.
 3. **Imágenes del bestiario en Colab:** ejecutar el cuaderno con la GPU T4 (o la sesión que maneja Colab).
 4. Si tiene el `samurai.py` original, subirlo.
 
@@ -162,8 +190,9 @@ pulido será el primer capítulo (castillo + planicie + aldea).
    - los yōkai del capítulo 1 (kappa, oni, onibi y el oni gigante de jefe; fichas en
      `BESTIARIO.md`);
    - salida a la planicie con un encuentro de dados;
-   - aldea mínima;
-   - menú y guardado (en estatuas jizō);
+   - aldea mínima, con una estatua jizō y un sastre si se aprueba la DECISIÓN 16 (para qué sirven las
+     monedas);
+   - menú y guardado (en estatuas jizō), que guarde también las monedas y la skin;
    - música.
    El detalle (luces, sombras, enemigos) se ajusta a los FPS que dé su móvil.
 2. Medir 10 criaturas reales con el sistema (patrones de ataque, equilibrio y tiempo por criatura): es
@@ -186,12 +215,12 @@ pulido será el primer capítulo (castillo + planicie + aldea).
 | Bestiario por capítulos | `ronin3d/BESTIARIO.md` |
 | Bestiario universal (análisis y decisiones 12-15) | `ronin3d/BESTIARIO_UNIVERSAL.md` · datos en `ronin3d/bestiario/` · Drive `ronin/06-Bestiario/` |
 | Colab (imágenes del bestiario) | `ronin3d/colab/` · Drive `ronin/06-Bestiario/` y la carpeta de Colab del usuario |
-| Conceptos 2D | `ronin3d/arte/conceptos/` (JPG; estilo y prompts en su LEEME; las anteriores en `fichas/`) · Drive `ronin/05-Arte/conceptos-2d/` (PNG originales; las anteriores en `fichas/`) |
+| Conceptos 2D | `ronin3d/arte/conceptos/` (JPG; estilo y prompts en su LEEME; las anteriores en `fichas/`; prueba de estilos del nuevo Akira en `estilos/`) · Drive `ronin/05-Arte/conceptos-2d/` (PNG originales; también `fichas/` y `estilos/`) |
 | Modelos 3D detallados | `ronin3d/godot/modelos/criaturas/` (GLB y LEEME) · herramientas en `ronin3d/herramientas/modelos3d/` · Drive `ronin/05-Arte/modelos3d/` (GLB, .skp y retratos) |
 | Comparativa | `ronin3d/COMPARATIVA.md` · página privada https://claude.ai/artifact/6urV5FCikt9CWAUV35gBCu |
 | Capturas de hoy | `ronin3d/capturas/actual/` |
 | Clave de firma de prueba | Drive `Respaldos Claude/ronin/03-Godot/firma-prueba/` (privada; nunca en GitHub) |
-| APK de prueba | Drive `Respaldos Claude/ronin/ronin-0.5-prueba.apk` (como con Curtzz: el nuevo va en la raíz con el nombre `ronin-<versión>-prueba.apk` y el anterior pasa a la carpeta «Versiones anteriores (RONIN)», dentro de `ronin/`) |
+| APK de prueba | Drive `Respaldos Claude/ronin/ronin-0.6-prueba.apk` (como con Curtzz: el nuevo va en la raíz con el nombre `ronin-<versión>-prueba.apk` y el anterior pasa a la carpeta «Versiones anteriores (RONIN)», dentro de `ronin/`) |
 | Respaldo | Google Drive `Respaldos Claude/ronin/` (01-Diseno, 02-Prototipo-2D, 03-Godot, 04-Otros-motores, 05-Arte, 06-Bestiario, Versiones anteriores (RONIN)) |
 | Memoria | Vertiso Memory, handoff con ámbito `ronin-juego` |
 

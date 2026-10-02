@@ -1,10 +1,12 @@
 # Genera los efectos de sonido del combate (WAV mono, 22050 Hz, 16 bits) con síntesis
 # sencilla: ruido filtrado, senos que se apagan y chasquidos. Sin librerías externas.
-# Uso: python3 generar_sonidos.py   (escribe los .wav junto a este archivo)
+# Uso: python3 generar_sonidos.py [nombre.wav ...]   (escribe los .wav junto a este archivo;
+# sin nombres, todos)
 import math
 import pathlib
 import random
 import struct
+import sys
 import wave
 
 FRECUENCIA = 22050
@@ -169,8 +171,65 @@ def caida():
                    (multiplicar(pasa_bajo(ruido(n, 12), 600), envolvente(n, 0.005, 0.15)), 0.5))
 
 
+def moneda():
+    # «¡Clin!» de una moneda de cobre: dos toques metálicos agudos, el segundo algo más alto.
+    n = muestras(0.35)
+    salida = [0.0] * n
+    for inicio, subida, semilla in [(0.0, 1.0, 13), (0.055, 1.33, 14)]:
+        desplazamiento = muestras(inicio)
+        m = n - desplazamiento
+        toque = resonancias(m, [(2350 * subida, 0.6, 0.11), (3720 * subida, 0.45, 0.08), (5230 * subida, 0.3, 0.05)], semilla)
+        clic = multiplicar(pasa_banda(ruido(m, semilla), 3400, 1.2), envolvente(m, 0.0005, 0.004))
+        for i, x in enumerate(mezclar((toque, 1.0), (clic, 0.4))):
+            salida[desplazamiento + i] += x * (1.0 if subida == 1.0 else 0.8)
+    return salida
+
+
+def escarbar():
+    # Shiro escarba: arañazos rápidos en la tierra y algún terrón que cae.
+    n = muestras(1.4)
+    azar = random.Random(15)
+    salida = [0.0] * n
+    t = 0.0
+    while t < 1.3:
+        desplazamiento = muestras(t)
+        m = min(muestras(0.05), n - desplazamiento)
+        aranazo = multiplicar(pasa_banda(ruido(m, azar.randint(0, 9999)), azar.uniform(1400, 2600), 1.4),
+                              envolvente(m, 0.003, 0.015))
+        golpe = multiplicar(pasa_bajo(ruido(m, azar.randint(0, 9999)), 450), envolvente(m, 0.002, 0.02))
+        fuerza = azar.uniform(0.6, 1.0)
+        for i in range(m):
+            salida[desplazamiento + i] += (aranazo[i] * 0.9 + golpe[i] * 0.7) * fuerza
+        t += azar.uniform(0.07, 0.11)
+    return salida
+
+
+def ladrido():
+    # «¡Guau, guau!» de un perro pequeño: tono que sube y baja, filtrado por dos formantes.
+    n = muestras(0.5)
+    salida = [0.0] * n
+    for inicio, semilla in [(0.0, 16), (0.21, 17)]:
+        desplazamiento = muestras(inicio)
+        m = min(muestras(0.17), n - desplazamiento)
+        fase = 0.0
+        sierra = []
+        for i in range(m):
+            t = i / m
+            tono = 480 + 260 * math.sin(math.pi * min(1.0, t * 1.6)) - 120 * t
+            fase += tono / FRECUENCIA
+            sierra.append(2.0 * (fase - math.floor(fase + 0.5)))
+        voz = mezclar((pasa_banda(sierra, 950, 3.0), 1.0), (pasa_banda(sierra, 1900, 4.0), 0.6),
+                      (pasa_banda(ruido(m, semilla), 2600, 1.5), 0.25))
+        forma = envolvente(m, 0.008, 0.07)
+        for i in range(m):
+            salida[desplazamiento + i] += voz[i] * forma[i]
+    return salida
+
+
 if __name__ == "__main__":
     for nombre, generador in [("tajo.wav", tajo), ("estocada.wav", estocada), ("golpe.wav", golpe),
                               ("parada.wav", parada), ("herido.wav", herido), ("aviso.wav", aviso),
-                              ("caida.wav", caida)]:
-        guardar(nombre, generador())
+                              ("caida.wav", caida), ("moneda.wav", moneda), ("escarbar.wav", escarbar),
+                              ("ladrido.wav", ladrido)]:
+        if len(sys.argv) == 1 or nombre in sys.argv[1:]:
+            guardar(nombre, generador())

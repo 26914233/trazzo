@@ -3,7 +3,8 @@
 **Estado:** **aprobada el 1-10-2026** (DECISIÓN 8A: tal cual, con los textos nuevos del capítulo 1;
 DECISIÓN 9A: el gran yōkai es Tamamo-no-Mae). Los textos del capítulo 1 ya están cambiados en
 `godot/scripts/datos.gd`; llegarán al APK con la próxima versión. Lo marcado como **[propuesta]**
-sigue sin decidir; hoy es la capa del Silencio (§8, DECISIÓN 11).
+sigue sin decidir; hoy son la capa del Silencio (§8, DECISIÓN 11) y el origen de Shiro y de la
+cicatriz de Akira (§9, DECISIÓN 17).
 
 Etiquetas: **[Hecho]** comprobado · **[propuesta]** idea para decidir · **[Opinión]** criterio del
 equipo.
@@ -31,7 +32,8 @@ yōkai más antiguo de Japón… mientras medio pueblo le da la razón al genera
 
 | Personaje | Quién es | Qué quiere |
 | --- | --- | --- |
-| **Akira** | Guardia personal del shōgun. Domina el iaidō. | Fuera, justicia; dentro, recuperar el honor que perdió al no proteger a su señor |
+| **Akira** | Guardia personal del shōgun. Domina el iaidō. Desde el 02-10-2026, un joven endurecido con una cicatriz que le cruza la cara (otros aspectos, como skins) | Fuera, justicia; dentro, recuperar el honor que perdió al no proteger a su señor |
+| **Shiro** | Su perro: blanco, de raza japonesa, con collar rojo. Lo acompaña y de vez en cuando desentierra monedas (decidido el 02-10-2026) | Seguir a Akira. De dónde viene: §9 **[propuesta]** |
 | **Shōgun Takeda** | Señor de Japón, desde el castillo de Hoshiyama. Mantiene el kekkai. | Convivir con los yōkai sin guerras; se niega a sacrificar aldeas para reforzar la barrera |
 | **General Genzo** | Mano derecha del shōgun. | Proteger Japón a cualquier precio. Cree que Takeda es demasiado blando y que el kekkai se está muriendo |
 | **Tamamo-no-Mae** | El gran yōkai: la zorra de nueve colas. | Poner todo Japón bajo el mando de los monstruos |
@@ -174,3 +176,41 @@ que no se confunda con ninguno de los dos.
   prueba del efecto de silencio en el prototipo (apagar el audio cerca de un enemigo).
 - **Nombre:** si no te convence *Shijima*, otras opciones: *Mugon* (無言, «sin palabras») o *Ma no
   Yami* (間の闇, «la oscuridad del intervalo»).
+
+
+## 9. Shiro y la cicatriz de Akira [propuesta]
+
+**Decidido el 02-10-2026 [Hecho]:** Akira pasa a ser un joven endurecido con una cicatriz en la cara
+(los aspectos curtido, veterano y mujer quedan como skins), y le acompaña un perro, **Shiro**, que
+camina con él y de vez en cuando desentierra monedas. En el juego ya están los dos (prototipo 0.6).
+
+**Lo que falta decidir es cómo entran en la historia.** El nombre viene del cuento popular
+*Hanasaka Jiisan*: el perro blanco Shiro escarba y su dueño encuentra oro. Encaja con su mecánica sin
+explicarla.
+
+### DECISIÓN 17 — De dónde vienen Shiro y la cicatriz
+- **OPCIONES:**
+  - A) **Shiro era el perro del shōgun Takeda.** La noche de la traición huye con Akira: es lo último
+    que le queda de su señor. **La cicatriz se la hizo Genzo** esa misma noche.
+  - B) **Shiro es un perro callejero** que se une a Akira en la aldea (capítulo 1). La cicatriz es de
+    antes, de un duelo de juventud.
+  - C) **Shiro es un yōkai perro benévolo**, como el *okuri-inu* del folclore, que acompaña a los
+    viajeros de noche; se descubre más adelante. La cicatriz, como en A.
+- **VENTAJAS:**
+  - A refuerza el tema sin texto extra: Shiro es leal a Akira como Akira lo era a Takeda. Y la cicatriz
+    recuerda la traición cada vez que se le ve la cara.
+  - B es lo más sencillo.
+  - C conecta con el mundo yōkai y guarda un giro.
+- **RIESGOS:**
+  - A pide una frase en la intro aprobada (8A), y solo se toca si la apruebas.
+  - B no aporta nada a la historia.
+  - C se cruza con el *inugami* del bestiario (un perro yōkai enemigo) y añade un arco más.
+- **COSTE:**
+  - A: una frase y una ilustración.
+  - B: casi nada.
+  - C: un arco en los capítulos 2-3.
+- **RECOMENDACIÓN:** **A.** Es la que más da por menos: une al perro y la cicatriz con la traición,
+  que es el corazón de la historia.
+- **SIGUIENTE PASO:** si eliges A, te propongo la frase exacta para la intro antes de cambiar
+  `datos.gd`. Por ejemplo, tras el segundo párrafo: «Solo Shiro, el perro del shōgun, sigue a Akira
+  en la huida».

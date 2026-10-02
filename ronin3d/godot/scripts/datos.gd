@@ -82,6 +82,30 @@ const PATRULLAS := [
 	[Vector3(19, 0, -2), Vector3(19, 0, 2)],
 ]
 
+# --- Shiro (el perro de Akira) y las monedas ---------------------------------------
+# Shiro sigue a Akira, no pelea y nadie le ataca. En calma, de vez en cuando olfatea,
+# escarba y desentierra unas monedas, y trae las que Akira deja atrás. Solo mientras se
+# juega: con el juego cerrado no se gana nada (DECISIÓN 7, opción C).
+const SHIRO_VELOCIDAD := 5.6              # algo más que Akira andando, para alcanzarlo
+const SHIRO_VELOCIDAD_CORRER := 9.0
+const SHIRO_DISTANCIA_MAXIMA := 14.0      # más lejos (o atascado), aparece junto a Akira
+const SHIRO_PRIMER_HALLAZGO := 9.0        # segundos en calma hasta el primero: así se descubre
+const SHIRO_ESPERA_HALLAZGO := Vector2(22.0, 40.0)   # y entre uno y otro, al azar
+const SHIRO_OLFATEO := 1.1
+const SHIRO_ESCARBADO := 1.5
+const SHIRO_ALCANCE_TRAER := 10.0         # trae las monedas que queden a esta distancia de Akira
+const SHIRO_CALMA := 11.0                 # sin soldados alerta a esta distancia de Akira
+const MONEDAS_HALLAZGO := Vector2i(3, 6)
+const MONEDAS_SOLDADO := Vector2i(2, 4)
+const RADIO_RECOGER := 0.8                # Akira recoge las monedas al pasar
+const RADIO_IMAN := 2.2                   # y las atrae desde un poco más lejos
+const ESPERA_IMAN := 0.5                  # recién soltadas, tardan un poco en poder recogerse
+const SHIRO_BLANCO := Color("f1ece0")
+const SHIRO_CREMA := Color("dcc8a2")
+const SHIRO_NARIZ := Color("1a1416")
+const SHIRO_COLLAR := Color("b3282a")
+const COBRE := Color("d4954f")
+
 # --- Cámara ---------------------------------------------------------------------
 const CAMARA_DISTANCIA := 12.0
 const CAMARA_INCLINACION := 38.0
@@ -127,3 +151,9 @@ const AMBIENTE := Color("1a1f3a")
 const DORADO := Color("e2ba62")
 const ROJO_VIDA := Color("c8322e")
 const CREMA := Color("eee4c8")
+# Akira desde el 02-10-2026 (apariencias_akira.gd): sandalias de paja, vendas, cicatriz
+const WARAJI := Color("a88d5a")
+const VENDAS := Color("d8ccae")
+const CUERDA := Color("c8b48a")
+const PAJA := Color("b89a5a")
+const CICATRIZ := Color("a8463c")

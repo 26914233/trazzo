@@ -14,6 +14,8 @@ const Aspecto := preload("res://scripts/aspecto.gd")
 const Criatura := preload("res://scripts/criatura_modular.gd")
 const ModeloCriatura := preload("res://scripts/modelo_criatura.gd")
 
+const Apariencias := preload("res://scripts/apariencias_akira.gd")
+
 const CATALOGO := "res://datos/bestiario.json"
 const FAMILIAS := ["bipedo", "cuadrupedo", "serpentino", "alado", "acuatico", "flotante", "artropodo"]
 
@@ -32,6 +34,45 @@ var carpeta_capturas := ""
 var catalogo: Array = []
 var tiempo_fps := 0.0
 var texto_datos := ""
+
+
+# Personajes en la galería (los aspectos de Akira y Shiro), con la misma interfaz que las
+# criaturas: configurar, cuerpo, piezas y actualizar.
+class Figura extends Node3D:
+	const VisualModelo := preload("res://scripts/visual_modelo.gd")
+	const VisualShiro := preload("res://scripts/visual_shiro.gd")
+	var visual
+	var cuerpo: Node3D
+	var piezas := 0
+	var es_shiro := false
+	var pose := "normal"
+
+	func configurar(aspecto, receta: Dictionary) -> void:
+		es_shiro = receta.get("personaje") == "shiro"
+		if es_shiro:
+			visual = VisualShiro.new()
+			visual.configurar(aspecto)
+		else:
+			visual = VisualModelo.new()
+			visual.configurar(aspecto, false, String(receta.get("apariencia", "joven")))
+		add_child(visual)
+		cuerpo = visual.cuerpo
+		piezas = _contar(visual)
+		pose = String(receta.get("pose", "sentado" if es_shiro else "normal"))
+
+	func _contar(nodo: Node) -> int:
+		var cuenta := 1 if nodo is MeshInstance3D else 0
+		for hijo in nodo.get_children():
+			cuenta += _contar(hijo)
+		return cuenta
+
+	func actualizar(delta: float) -> void:
+		if es_shiro:
+			visual.actualizar(delta, {"mirando": Vector3.BACK, "pose": pose, "en_boca": false})
+		else:
+			visual.actualizar(delta, {"mirando": Vector3.BACK, "moviendose": false, "corriendo": false,
+				"en_aire": false, "pose": pose, "progreso": 0.0, "visible": true, "destello": 0.0,
+				"muerte": -1.0, "aviso": false})
 
 
 func iniciar(solo_capturas: bool) -> void:
@@ -132,6 +173,13 @@ func _definir_paginas() -> Array:
 	var oni_gigante := _receta("bipedo", "XL", "fuego", "gigante", 2326, {"nombre": "Oni gigante",
 		"partes": ["cuernos", "garrote", "ojos"], "paleta": [Color("8e2a1c"), Color("2a1a14"), Color("ffb347")]})
 	var lista: Array = []
+	# Akira (el joven endurecido y sus tres skins) y Shiro, desde la 0.6
+	var personajes: Array = []
+	for id in Apariencias.ORDEN:
+		personajes.append({"personaje": "akira", "apariencia": id, "tamano": "M",
+			"nombre": String(Apariencias.APARIENCIAS[id].nombre)})
+	personajes.insert(1, {"personaje": "shiro", "tamano": "S", "nombre": "Shiro"})
+	lista.append({"titulo": "Akira (el joven endurecido y sus tres skins) y Shiro", "filas": [personajes]})
 	if ModeloCriatura.tiene_modelo(2315):
 		var detallado := {"detallado": true, "id": 2315}
 		var oni_modelo := _receta("bipedo", "M", "fuego", "poderoso", 2315, detallado.merged({"nombre": "Aka-oni (modelo)"}))
@@ -255,7 +303,13 @@ func _mostrar_pagina(numero: int) -> void:
 		var x := -ancho_fila / 2.0
 		for receta in fila:
 			var ancho := _separacion(receta)
-			var criatura = ModeloCriatura.new() if receta.get("detallado", false) else Criatura.new()
+			var criatura
+			if receta.has("personaje"):
+				criatura = Figura.new()
+			elif receta.get("detallado", false):
+				criatura = ModeloCriatura.new()
+			else:
+				criatura = Criatura.new()
 			add_child(criatura)
 			criatura.configurar(aspecto, receta)
 			criatura.position = Vector3(x + ancho / 2.0, 0.0, z)

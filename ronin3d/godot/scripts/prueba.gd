@@ -11,6 +11,7 @@ const VisualModelo := preload("res://scripts/visual_modelo.gd")
 const Aspecto := preload("res://scripts/aspecto.gd")
 const Criatura := preload("res://scripts/criatura_modular.gd")
 const ModeloCriatura := preload("res://scripts/modelo_criatura.gd")
+const Apariencias := preload("res://scripts/apariencias_akira.gd")
 const MOVIMIENTOS := ["mover_adelante", "mover_atras", "mover_izquierda", "mover_derecha"]
 
 var principal
@@ -41,6 +42,11 @@ var objetivos_luna: Array = []
 var luna_lanzada := false
 var luna_capturada := false
 var cuenta_anime := 0
+var juego_procesa_en_pausa := true
+var monedas_antes := 0
+var soltadas_antes := 0
+var hallazgos_antes := 0
+var entregadas_antes := 0
 var carpeta_fotogramas := OS.get_environment("RONIN_FOTOGRAMAS")
 
 
@@ -60,6 +66,7 @@ func _ready() -> void:
 		[4.65, _terminar_medida],
 		[4.7, _capturar.bind("patio")],
 		[4.72, _comprobar_hud],
+		[4.75, _comprobar_shiro_sigue],
 		[4.8, _empezar_giro],
 		[5.8, _terminar_giro],
 		[6.0, _capturar.bind("camara_girada")],
@@ -102,7 +109,15 @@ func _ready() -> void:
 		[31.4, _comprobar_bestiario],
 		[31.5, _construir_todo_el_bestiario],
 		[31.6, _comprobar_modelo_detallado],
-		[31.7, _terminar],
+		[31.7, _comprobar_apariencias],
+		[31.8, _preparar_shiro],
+		[34.0, _capturar.bind("shiro_escarba")],
+		[35.6, _comprobar_hallazgo],
+		[36.4, _comprobar_recogida],
+		[36.5, _preparar_traer],
+		[41.5, _comprobar_traer],
+		[41.6, _capturar.bind("monedas")],
+		[41.8, _terminar],
 	]
 
 
@@ -290,6 +305,10 @@ func _terminar_combate() -> void:
 	_registrar("La espada daña al soldado", danado, "derrotados=%d" % _juego().derrotados)
 	_registrar("El soldado se defiende (resta vida o Akira gana antes)", true,
 		"vida de Akira %d → %d" % [vida_akira, _juego().akira.vida])
+	var soltadas: int = _juego().monedas_suelo.soltadas
+	_registrar("Los soldados derrotados sueltan monedas", _juego().derrotados == 0
+		or soltadas >= _juego().derrotados * Datos.MONEDAS_SOLDADO.x,
+		"%d derrotados, %d monedas soltadas" % [_juego().derrotados, soltadas])
 	_proteger(true)
 
 
@@ -333,14 +352,15 @@ var pausa_vista := false
 
 func _comprobar_pausa() -> void:
 	pausa_vista = get_tree().paused
+	juego_procesa_en_pausa = _juego().can_process()
 	await _capturar("pausa")
 	_pulsar("pausa")
 
 
 func _comprobar_reanudar() -> void:
-	var correcto: bool = pausa_vista and not get_tree().paused
-	_registrar("ESC pausa el juego y lo reanuda", correcto,
-		"pausado=%s, después=%s" % [pausa_vista, get_tree().paused])
+	var correcto: bool = pausa_vista and not get_tree().paused and not juego_procesa_en_pausa
+	_registrar("ESC pausa el juego de verdad (soldados y Shiro quietos) y lo reanuda", correcto,
+		"pausado=%s, el juego seguía=%s, después=%s" % [pausa_vista, juego_procesa_en_pausa, get_tree().paused])
 
 
 # --- Controles táctiles y mando --------------------------------------------------------
@@ -530,7 +550,9 @@ func _comprobar_galeria_abierta() -> void:
 	var criaturas := 0
 	var piezas := 0
 	if galeria:
-		galeria._mostrar_pagina(3)            # la de las siete familias
+		for i in galeria.paginas.size():      # la de las siete familias
+			if "7 familias" in String(galeria.paginas[i].titulo):
+				galeria._mostrar_pagina(i)
 		criaturas = galeria.criaturas.size()
 		for c in galeria.criaturas:
 			piezas += c.piezas
@@ -651,6 +673,100 @@ func _comprobar_modelo_detallado() -> void:
 		otra.queue_free()
 	_registrar("Los modelos detallados se cargan con textura y cel-shading (el Aka-oni, con sus tres rangos)",
 		bien, "; ".join(resultados))
+
+
+# --- Shiro, las monedas y los aspectos de Akira (0.6) ----------------------------------------
+
+func _comprobar_shiro_sigue() -> void:
+	var juego = _juego()
+	var distancia: float = juego.shiro.global_position.distance_to(juego.akira.global_position)
+	_registrar("Shiro sigue a Akira", distancia < 3.5 and juego.shiro.visual.actualizaciones > 0,
+		"a %.1f m de Akira tras caminar" % distancia)
+
+
+func _contar_mallas(nodo: Node) -> int:
+	var cuenta := 1 if nodo is MeshInstance3D else 0
+	for hijo in nodo.get_children():
+		cuenta += _contar_mallas(hijo)
+	return cuenta
+
+
+func _comprobar_apariencias() -> void:
+	var aspecto = Aspecto.new()
+	var piezas := {}
+	var con_cicatriz := 0
+	for id in Apariencias.ORDEN:
+		var modelo = VisualModelo.new()
+		modelo.configurar(aspecto, false, id)
+		piezas[id] = _contar_mallas(modelo)
+		if modelo.find_child("Cicatriz0", true, false) != null:
+			con_cicatriz += 1
+		modelo.free()
+	var distintas := {}
+	for id in piezas:
+		distintas[piezas[id]] = true
+	# En la pausa se cambia el aspecto en el momento; cuatro cambios devuelven el de antes.
+	var antes := Apariencias.elegida
+	var cambios_bien := true
+	principal.alternar_pausa()
+	for i in Apariencias.ORDEN.size():
+		principal.cambiar_apariencia()
+		cambios_bien = cambios_bien and _juego().akira.visual.apariencia == Apariencias.elegida
+	principal.alternar_pausa()
+	_registrar("Los cuatro aspectos de Akira llevan la cicatriz y se cambian en la pausa",
+		con_cicatriz == 4 and distintas.size() >= 3 and cambios_bien and Apariencias.elegida == antes,
+		"piezas: %s" % str(piezas))
+
+
+func _preparar_shiro() -> void:
+	var juego = _juego()
+	_proteger(true)
+	_teletransportar(Vector3(-18, 0, 10), Vector3.RIGHT)
+	juego.camara.distancia = Datos.CAMARA_DISTANCIA_MIN
+	juego.shiro.aparecer_junto_a_akira()
+	juego.shiro.en_calma = func(): return true      # sin depender de dónde quedaron los soldados
+	juego.shiro.forzar_hallazgo()
+	monedas_antes = juego.monedas
+	soltadas_antes = juego.monedas_suelo.soltadas
+	hallazgos_antes = juego.shiro.hallazgos
+
+
+func _comprobar_hallazgo() -> void:
+	var juego = _juego()
+	var nuevas: int = juego.monedas_suelo.soltadas - soltadas_antes
+	_registrar("Shiro olfatea, escarba y desentierra monedas", juego.shiro.hallazgos > hallazgos_antes
+		and nuevas >= Datos.MONEDAS_HALLAZGO.x, "%d monedas desenterradas" % nuevas)
+	# Akira va a por ellas
+	var centro := Vector3.ZERO
+	for moneda in juego.monedas_suelo.monedas:
+		centro += moneda.nodo.global_position
+	if not juego.monedas_suelo.monedas.is_empty():
+		centro /= juego.monedas_suelo.monedas.size()
+		_teletransportar(Vector3(centro.x, 0, centro.z), Vector3.RIGHT)
+
+
+func _comprobar_recogida() -> void:
+	var juego = _juego()
+	_registrar("Akira recoge las monedas al pasar y el HUD las cuenta", juego.monedas > monedas_antes
+		and principal.hud.marcador.monedas == juego.monedas, "%d → %d" % [monedas_antes, juego.monedas])
+
+
+func _preparar_traer() -> void:
+	var juego = _juego()
+	_teletransportar(Vector3(-18, 0, 10), Vector3.RIGHT)
+	juego.shiro.aparecer_junto_a_akira()
+	monedas_antes = juego.monedas
+	entregadas_antes = juego.shiro.entregadas
+	juego.monedas_suelo.soltar(Vector3(-18, 1.0, 3.5), 3)      # 6,5 m al norte de Akira
+
+
+func _comprobar_traer() -> void:
+	var juego = _juego()
+	_registrar("Shiro trae las monedas que Akira deja atrás", juego.shiro.entregadas > entregadas_antes
+		and juego.monedas >= monedas_antes + 3, "entregó %d · monedas %d → %d" % [
+			juego.shiro.entregadas - entregadas_antes, monedas_antes, juego.monedas])
+	juego.shiro.en_calma = juego.en_calma
+	juego.camara.distancia = Datos.CAMARA_DISTANCIA
 
 
 func _empezar_cuenta_anime() -> void:

@@ -30,9 +30,59 @@ demás imágenes tuvieran su nivel de detalle y su estilo, y se rehicieron así:
 | `genzo.jpg` | Genzo en el gran salón; la sombra de la zorra en los biombos (su pacto) | `fichas/genzo.jpg` |
 | `takeda.jpg` | El shōgun Takeda en el gran salón, con el joven Akira de guardia | `fichas/takeda.jpg` |
 | `gran_yokai.jpg`, `shijima.jpg` | Sin cambios: otra forma de Tamamo, y una propuesta (DECISIÓN 11) | — |
+| `shiro.jpg` | **Shiro**, el perro de Akira, junto a las monedas que acaba de desenterrar | (nuevo, 02-10) |
+| `estilos/akira_*.jpg` | **El nuevo Akira** (joven endurecido, con cicatriz) en 4 estilos de dibujo, para elegir (DECISIÓN 18) | `akira.jpg` queda como el Akira anterior |
 
 En el repositorio van en JPG de 1024 px. Los PNG originales, de 2048 × 1536 o 1536 × 2048, están en
-Drive › `ronin/05-Arte/conceptos-2d/`.
+Drive › `ronin/05-Arte/conceptos-2d/` (los de la prueba de estilos, en `estilos/`).
+
+## Prueba de estilos y Shiro (02-10-2026, tarde)
+
+El usuario pidió un Akira más rudo, con una cicatriz en la cara y «joven endurecido» (las otras
+opciones, curtido, veterano y mujer, quedan como skins), y ver el dibujo en cuatro estilos. Mismo
+Akira y mismo camino al atardecer en las cuatro; solo cambia el bloque de estilo:
+
+| Archivo | Estilo | Qué tiene a favor | Qué tiene en contra |
+|---|---|---|---|
+| `estilos/akira_tinta.jpg` | Manga de tinta (blanco y negro, rojo de acento) | El más rudo; casa con el pilar «grabado en tinta» y con el cel-shading | En blanco y negro luce menos en miniaturas de tienda |
+| `estilos/akira_realista.jpg` | Realista pintado | El más espectacular | Recuerda a Ghost of Tsushima y promete más de lo que da un juego cel-shading |
+| `estilos/akira_anime90.jpg` | Anime de los 90 | Cercano y conocido | Genérico (recuerda a series concretas); la cicatriz no se ve |
+| `estilos/akira_ukiyoe.jpg` | Ukiyo-e (grabado en madera) | El más distinto; estilo de dominio público; la cicatriz se ve | Caras poco expresivas para escenas de emoción |
+
+**Lo que se aprendió:**
+- **Higgsfield rechaza una persona y un perro en la misma imagen.** Akira con Shiro falló 12 veces
+  (en vertical y en horizontal, con y sin la palabra «scar», con 4 estilos). Cada uno por separado
+  salió a la primera. Todo apunta al filtro que evita personas con animales: **hay que hacerlos por
+  separado**. Las 12 se devolvieron.
+- **Coste:** 5 imágenes, 0,75 créditos (Shiro 0,15 y los cuatro estilos 0,60). Quedan 0,01.
+
+**Prompts** (el Akira es el mismo en las cuatro):
+
+> Akira, a young hardened ronin swordsman: lean and wiry, a thin healed scar crossing his face
+> diagonally from the left brow over the nose to the right cheek, stern eyes, messy black hair tied
+> back in a loose ponytail with stray strands, a frayed dark red headband, a worn dark indigo kimono
+> with patched sleeves and a faded red sash, grey hakama, straw sandals, his hand resting on the hilt
+> of a sheathed katana, standing alone on a dirt road at dusk with tall wind-blown grass. Full body.
+
+Bloques de estilo, delante:
+- **tinta:** *Seinen manga ink illustration drawn with a sumi brush: gritty dry-brush strokes, realistic
+  proportions, heavy black shadows, cross-hatching, grey ink wash, black and white with a single red
+  accent on the headband, rough paper texture.*
+- **realista:** *Cinematic realistic digital painting, video game key art: dramatic golden-hour
+  backlight, wind-blown pampas grass and drifting red leaves, detailed fabric, leather and steel
+  textures, painterly brushwork, atmospheric depth, muted earthy colors with crimson accents.*
+- **anime90:** *1990s Japanese anime cel animation still: hand-painted cels, thin clean line art,
+  slightly muted retro colors, soft film grain, painted watercolor background, dramatic sunset anime
+  lighting.*
+- **ukiyoe:** *Edo-period ukiyo-e woodblock print: bold carved black outlines, flat areas of color in
+  indigo, vermilion and ochre, a Prussian blue gradient sky, stylized wind-swept grass and clouds,
+  visible wood grain and aged washi paper texture.* (y al final *No text, no seals, no cartouches*)
+
+**shiro.jpg** (estilo del Bahamut, 4:3): *…Shiro, a loyal small white Japanese dog like a Shiba Inu:
+pointed ears, a tightly curled tail over its back, cream-colored muzzle and paws, a black nose, bright
+friendly eyes, a red braided cord collar, sitting proudly on a dirt road beside a few old copper coins
+with square holes that it has just dug up from the ground, small clumps of earth around its paws.*
+La moneda que le cuelga del collar salió sola; se copió al modelo del juego.
 
 ## `fichas/`: los conceptos anteriores, para 3D
 

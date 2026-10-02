@@ -3,12 +3,14 @@ OK     Los textos del capítulo 1 son los aprobados (shōgun Takeda, yōkai, lun
 OK     La intro da paso al juego  fase=jugando
 OK     Akira camina  recorrió 8.0 m
 OK     El HUD se ve entero en pantalla  vida, soldados y versión
+OK     Shiro sigue a Akira  a 1.7 m de Akira tras caminar
 OK     La cámara gira con E  giró 90°
 OK     La espada daña al soldado  derrotados=1
 OK     El soldado se defiende (resta vida o Akira gana antes)  vida de Akira 5 → 5
+OK     Los soldados derrotados sueltan monedas  1 derrotados, 4 monedas soltadas
 OK     El muro oeste detiene a Akira  x=-23.65 (el muro empieza en −24)
 OK     Llegar al portón cierra el capítulo  fase=cierre
-OK     ESC pausa el juego y lo reanuda  pausado=true, después=false
+OK     ESC pausa el juego de verdad (soldados y Shiro quietos) y lo reanuda  pausado=true, el juego seguía=false, después=false
 OK     Tocar la pantalla sigue los textos  fase=jugando
 OK     El joystick táctil mueve a Akira  recorrió 7.2 m
 OK     El stick del mando mueve a Akira  recorrió 3.5 m
@@ -16,10 +18,14 @@ OK     Iai perfecto: soltar justo al «!» desvía la lanza y derriba al soldado
 OK     Soltar a destiempo no sirve: la lanza alcanza a Akira  vida de Akira=4, soldado en pie=true
 OK     Corte de luna: con la barra llena derriba a los soldados cercanos  derribados 2 de 2, espíritu=0.0
 OK     Animación anime: 12 poses por segundo; T cambia a suave (cada paso)  anime=12, suave=60 poses en 1 s
-OK     La galería de criaturas se abre desde la pausa y reparte páginas  9 páginas; la tercera tiene 7 criaturas y 125 piezas
+OK     La galería de criaturas se abre desde la pausa y reparte páginas  10 páginas; la tercera tiene 7 criaturas y 125 piezas
 OK     Al cerrar la galería se vuelve a la pausa y el juego sigue entero  en pausa=true, juego en el árbol=true
 OK     El catálogo del bestiario se carga y todos sus datos son válidos  929 criaturas (123 con modelo propio), 0 con datos no válidos
-OK     Todas las criaturas del catálogo se construyen dentro del presupuesto de piezas  929 criaturas (1163 construcciones con los rangos 2 y 3 de 1 de cada 8) en 488 ms; rango 1: media 20.5 piezas, máximo 42; máximo con rangos: 42
+OK     Todas las criaturas del catálogo se construyen dentro del presupuesto de piezas  929 criaturas (1163 construcciones con los rangos 2 y 3 de 1 de cada 8) en 547 ms; rango 1: media 20.5 piezas, máximo 42; máximo con rangos: 42
 OK     Los modelos detallados se cargan con textura y cel-shading (el Aka-oni, con sus tres rangos)  rango 1: 14024 triángulos, 1.91 m; rango 2: 14024 triángulos, 2.29 m; rango 3: 14024 triángulos, 1.91 m; modelo 353: 41471 triángulos; modelo 680: 2588 triángulos
-Resultado: 22 de 22 comprobaciones correctas
-FPS al caminar por el patio: 9.4 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)
+OK     Los cuatro aspectos de Akira llevan la cicatriz y se cambian en la pausa  piezas: { "joven": 38, "curtido": 39, "veterano": 35, "mujer": 38 }
+OK     Shiro olfatea, escarba y desentierra monedas  3 monedas desenterradas
+OK     Akira recoge las monedas al pasar y el HUD las cuenta  7 → 8
+OK     Shiro trae las monedas que Akira deja atrás  entregó 3 · monedas 9 → 12
+Resultado: 28 de 28 comprobaciones correctas
+FPS al caminar por el patio: 12.3 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)

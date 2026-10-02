@@ -1,5 +1,6 @@
-# El capítulo 1 en 3D: construye el patio, crea a Akira, los soldados y la cámara,
-# resuelve los golpes de espada y decide cuándo se gana o se pierde.
+# El capítulo 1 en 3D: construye el patio, crea a Akira, a Shiro (su perro), los soldados y
+# la cámara, resuelve los golpes de espada, lleva la cuenta de las monedas y decide cuándo se
+# gana o se pierde.
 extends Node3D
 
 const Datos := preload("res://scripts/datos.gd")
@@ -10,12 +11,17 @@ const Soldado := preload("res://scripts/soldado.gd")
 const CamaraOrbital := preload("res://scripts/camara_orbital.gd")
 const VisualModelo := preload("res://scripts/visual_modelo.gd")
 const Efectos := preload("res://scripts/efectos.gd")
+const Shiro := preload("res://scripts/shiro.gd")
+const VisualShiro := preload("res://scripts/visual_shiro.gd")
+const Monedas := preload("res://scripts/monedas.gd")
+const Apariencias := preload("res://scripts/apariencias_akira.gd")
 
 signal fase_cambiada(fase: String)
 signal vida_cambiada(vida: int)
 signal derrotados_cambiados(cantidad: int, total: int)
 signal espiritu_cambiado(valor: float)
 signal mensaje(texto: String)
+signal monedas_cambiadas(total: int)
 
 var aspecto
 var efectos
@@ -23,12 +29,18 @@ var constructor
 var akira
 var camara
 var soldados: Array = []
+var shiro
+var monedas_suelo                    # las monedas que hay por el suelo (monedas.gd)
+var monedas := 0                     # las que lleva Akira
+var azar := RandomNumberGenerator.new()
 var derrotados := 0
 var fase := "intro"          # intro, jugando, cierre, derrota
 var tiempo_derrota := 0.0
 
 
-func iniciar(con_intro := true) -> void:
+func iniciar(con_intro := true, monedas_iniciales := 0) -> void:
+	monedas = monedas_iniciales
+	azar.seed = 5
 	aspecto = Aspecto.new()
 	constructor = ConstructorMundo.new()
 	constructor.construir(self, aspecto)
@@ -56,6 +68,12 @@ func iniciar(con_intro := true) -> void:
 	akira.espiritu_cambiado.connect(func(valor): espiritu_cambiado.emit(valor))
 	akira.vida_cambiada.connect(func(_vida): efectos.herido(akira.global_position + Vector3.UP * 1.1))
 
+	monedas_suelo = Monedas.new()
+	add_child(monedas_suelo)
+	monedas_suelo.configurar(aspecto, akira)
+	monedas_suelo.recogidas.connect(_al_recoger_monedas)
+	_crear_shiro()
+
 	for patrulla in Datos.PATRULLAS:
 		var soldado = Soldado.new()
 		add_child(soldado)
@@ -63,6 +81,7 @@ func iniciar(con_intro := true) -> void:
 		soldado.visual = _crear_visual(true)
 		soldado.add_child(soldado.visual)
 		soldado.derrotado.connect(_al_derrotar)
+		soldado.derrotado.connect(func(): _soltar_monedas(soldado))
 		soldado.aviso_iniciado.connect(func(): efectos.aviso(soldado.global_position + Vector3.UP * 2.0))
 		soldado.estocada_iniciada.connect(func(): efectos.estocada(soldado.global_position + Vector3.UP * 1.1))
 		soldados.append(soldado)
@@ -76,8 +95,62 @@ func iniciar(con_intro := true) -> void:
 
 func _crear_visual(soldado: bool) -> Node3D:
 	var modelo = VisualModelo.new()
-	modelo.configurar(aspecto, soldado)
+	modelo.configurar(aspecto, soldado, "" if soldado else Apariencias.elegida)
 	return modelo
+
+
+func _crear_shiro() -> void:
+	shiro = Shiro.new()
+	add_child(shiro)
+	shiro.position = Datos.INICIO_AKIRA + Vector3(-1.0, 0, 1.1)
+	shiro.mirando = Vector3.RIGHT
+	shiro.akira = akira
+	shiro.monedas = monedas_suelo
+	shiro.en_calma = en_calma
+	shiro.visual = VisualShiro.new()
+	shiro.visual.configurar(aspecto)
+	shiro.add_child(shiro.visual)
+	shiro.ladro.connect(func(punto): efectos.ladrido(punto))
+	shiro.empezo_a_escarbar.connect(func(punto): efectos.escarbar(punto, Datos.SHIRO_ESCARBADO))
+	shiro.desenterro.connect(_al_desenterrar)
+	shiro.entrego.connect(_al_recoger_monedas)
+	shiro.aparecio.connect(func(punto): efectos.polvo(punto))
+
+
+# Cambia el aspecto de Akira en el momento (también en pausa): la pose se aplica al instante.
+func cambiar_apariencia_akira() -> void:
+	var anterior: Node3D = akira.visual
+	akira.visual = _crear_visual(false)
+	akira.add_child(akira.visual)
+	akira.visual.actualizar(0.0, akira.info())
+	anterior.queue_free()
+
+
+# En calma: ningún soldado persigue a Akira cerca. Solo entonces Shiro busca monedas.
+func en_calma() -> bool:
+	for soldado in soldados_vivos():
+		if soldado.persigue() and soldado.global_position.distance_to(akira.global_position) < Datos.SHIRO_CALMA:
+			return false
+	return akira.vivo()
+
+
+func _soltar_monedas(soldado) -> void:
+	var cantidad := azar.randi_range(Datos.MONEDAS_SOLDADO.x, Datos.MONEDAS_SOLDADO.y)
+	monedas_suelo.soltar(soldado.global_position + Vector3.UP * 0.9, cantidad)
+
+
+func _al_desenterrar(punto: Vector3) -> void:
+	efectos.desenterrar(punto)
+	efectos.sonar("moneda", punto, -4.0, 0.0)
+	monedas_suelo.soltar(punto + Vector3.UP * 0.2, azar.randi_range(Datos.MONEDAS_HALLAZGO.x, Datos.MONEDAS_HALLAZGO.y), 0.9)
+	if shiro.hallazgos == 1:
+		mensaje.emit("¡Shiro ha desenterrado unas monedas!")
+
+
+func _al_recoger_monedas(cantidad: int, punto: Vector3) -> void:
+	monedas += cantidad
+	monedas_cambiadas.emit(monedas)
+	efectos.moneda(punto)
 
 
 func comenzar() -> void:
@@ -89,6 +162,7 @@ func comenzar() -> void:
 
 func _cambiar_fase(nueva: String) -> void:
 	fase = nueva
+	shiro.activo = fase == "jugando"
 	fase_cambiada.emit(fase)
 
 

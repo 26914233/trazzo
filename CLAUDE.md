@@ -433,8 +433,8 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   - Que Takeda sea el shōgun y el pacto de Genzo los decidió el usuario el 01-10-2026. Ese mismo
     día aprobó la sinopsis completa (`HISTORIA.md`, DECISIÓN 8A) y que el gran yōkai es
     **Tamamo-no-Mae** (9A); los textos del capítulo 1 ya la cuentan. Lo que sigue marcado
-    **[propuesta]** en `HISTORIA.md` (hoy, la capa del Silencio, DECISIÓN 11) no se aplica sin su
-    aprobación.
+    **[propuesta]** en `HISTORIA.md` (hoy, la capa del Silencio, DECISIÓN 11, y el origen de Shiro y
+    de la cicatriz, DECISIÓN 17) no se aplica sin su aprobación.
 - **Mapa:** castillo, aldea, templo, dojo, ruinas y la planicie que los une.
 - **Decisiones cerradas (27-09-2026):** motor **Godot 4.7** con el renderizador *Compatibility*;
   estética **cel-shading**; los textos de intro y cierre se quedan como están por ahora; alcance:
@@ -453,11 +453,24 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   - **cada criatura tiene una variante más fuerte**, se añaden **ángeles y demonios** y el
     gancho que el usuario quiere explorar es **la cantidad de monstruos** (el bestiario universal:
     939 criaturas, 825 utilizables como enemigos). Cómo se presenta ese gancho es la DECISIÓN 12.
-- **Decisiones abiertas:** 11 (papel del Silencio, `HISTORIA.md` §8), 12 (gancho: cantidad frente a
-  precisión), 13 (cómo se modelan las criaturas icónicas), 14 (cuántos rangos) y 15 (cómo dar a todos
-  los enemigos el detalle de un jefe, `BESTIARIO_UNIVERSAL.md` §8.2), más la regla de respeto cultural
-  (los dioses y seres sagrados de religiones vivas no son enemigos). Detalle y recomendaciones en
-  `ronin3d/BESTIARIO_UNIVERSAL.md`.
+- **Decisiones cerradas (02-10-2026, tarde; elegidas con preguntas de opciones):**
+  - **Akira es un «joven endurecido»** con una cicatriz que le cruza la cara (mirada dura, cinta
+    deshilachada, ropa gastada). Las otras opciones son **skins**: curtido (unos 30), veterano (unos
+    40) y Akira mujer. En el juego desde la 0.6 (`apariencias_akira.gd`).
+  - **Compañero: Shiro, un perro japonés blanco** que camina con Akira y de vez en cuando desentierra
+    monedas («mon»). Solo mientras se juega, para respetar «sin farmeo automático».
+- **Decisiones abiertas:**
+  - 11: papel del Silencio (`HISTORIA.md` §8).
+  - 12: gancho, cantidad frente a precisión.
+  - 13: cómo se modelan las criaturas icónicas.
+  - 14: cuántos rangos.
+  - 15: cómo dar a todos los enemigos el detalle de un jefe (`BESTIARIO_UNIVERSAL.md` §8.2).
+  - 16: para qué sirven las monedas (`PLAN_PRODUCCION.md` §14).
+  - 17: de dónde vienen Shiro y la cicatriz (`HISTORIA.md` §9).
+  - 18: estilo de las ilustraciones 2D (`PLAN_PRODUCCION.md` §14).
+  - La regla de respeto cultural: los dioses y seres sagrados de religiones vivas no son enemigos.
+
+  Detalle y recomendaciones en `ronin3d/BESTIARIO_UNIVERSAL.md` y `ronin3d/PLAN_PRODUCCION.md`.
 - **Modelos 3D detallados (desde el 02-10-2026):** van en `ronin3d/godot/modelos/criaturas/` (su LEEME
   tiene origen, sumas y licencias) y los carga `modelo_criatura.gd`. Herramientas en
   `ronin3d/herramientas/modelos3d/`. Hay tres vías probadas:
@@ -469,10 +482,14 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   Tripo y Meshy (esqueleto y animaciones) necesitan créditos que hoy no hay. Antes de generar, el
   coste se mira con `get_cost: true`.
 - **Imágenes 2D:** Higgsfield por Composio, modelo `z_image`, a 0,15 créditos por imagen (quedan
-  0,76 créditos el 02-10-2026). Nunca se compran créditos ni planes sin que el usuario lo pida.
-  **Estilo de referencia: el del Bahamut**, que el usuario pidió para todas: escena con niebla de tinta
-  y un samurái para la escala. Receta y prompts en `ronin3d/arte/conceptos/LEEME.md`. A los oni hay que
-  ponerles armadura, porque el filtro de Higgsfield rechaza el torso desnudo.
+  0,01 créditos el 02-10-2026 por la tarde). Nunca se compran créditos ni planes sin que el usuario lo
+  pida. **Estilo de referencia: el del Bahamut**, que el usuario pidió para todas: escena con niebla de
+  tinta y un samurái para la escala. Luego pidió probar 4 estilos para el nuevo Akira (tinta,
+  realista, anime de los 90 y ukiyo-e, en `arte/conceptos/estilos/`); cuál se queda es la DECISIÓN 18.
+  Receta y prompts en `ronin3d/arte/conceptos/LEEME.md`. Hay dos filtros de Higgsfield que conocer:
+  - rechaza a los oni con el torso desnudo: hay que ponerles armadura;
+  - rechaza **una persona con un animal en la misma imagen** (Akira con Shiro falló 12 veces): se
+    hacen por separado.
 - **Colab (imágenes del bestiario):** `ronin3d/colab/` (cuaderno y receta). Reglas del usuario: una
   sesión de Claude aparte maneja Colab con colab-mcp; él elige la GPU T4 y acepta los permisos;
   comprobar con `!ls` que `drive.mount` ve `Respaldos Claude/ronin` (si no, es la cuenta equivocada:

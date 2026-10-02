@@ -85,6 +85,8 @@ que hace cada lugar (la tercera columna) sigue siendo una propuesta y se cierra 
   recompensa (avanzar, abrir camino).
 - **Secundario (sesión):** viajar por la planicie → encuentro con dados → llegar a un lugar →
   su reto → técnica u objeto nuevo → siguiente lugar.
+- **Exploración con Shiro (desde la 0.6):** explorar → Shiro olfatea y desentierra monedas (y trae
+  las que dejas atrás) → gastarlas (para qué, DECISIÓN 16). Solo mientras se juega (DECISIÓN 7 C).
 - **Largo plazo:** honor y justicia se acumulan y cambian cómo es la vuelta a Hoshiyama.
 
 ## 5. Vertical slice (siguiente hito)
@@ -132,6 +134,8 @@ nada público sin tu permiso.
 | Nombre poco distintivo | Medio | Nombre o subtítulo propio antes de la página de tienda |
 | Sonido y música | Medio | Efectos generados; música con licencia libre o encargada |
 | Detalle de jefe en cientos de enemigos (2-10-2026) | Alto | Por niveles: modelo propio para jefes, bases compartidas para el resto; vigilar peso del APK y FPS (DECISIÓN 15) |
+| Monedas sin nada que comprar (2-10-2026) | Medio | Una moneda que no sirve para nada no motiva: darles uso pronto y pequeño (DECISIÓN 16) |
+| El compañero y la economía crecen más que el núcleo | Medio | Shiro no pelea; la economía, mínima. El duelo sigue siendo lo primero |
 
 ## 8. Negocio (supuestos, no certezas)
 
@@ -258,3 +262,97 @@ estimadas). Por eso la recomendación es medir 10 criaturas reales antes de prom
 | # | Decisión | Dónde | Recomendación |
 | --- | --- | --- | --- |
 | 15 | Cómo dar a todos los enemigos el detalle que pediste | `BESTIARIO_UNIVERSAL.md` §8.2 | D: por niveles, tras un piloto de esqueleto |
+
+
+## 14. Hecho el 2-10-2026 (tarde): Akira endurecido, skins, Shiro y monedas
+
+Lo que pediste: Akira con más aire de samurái (más rudo, con una cicatriz en la cara), un compañero
+que camine con él y recoja monedas de vez en cuando, y probar estilos de dibujo.
+
+1. **Akira, el joven endurecido** (lo elegiste tú), en el juego: cicatriz en diagonal, mirada dura,
+   cinta roja deshilachada, ropa remendada y vendas. **Tres skins**: curtido (unos 30), veterano (unos
+   40, con canas, barba y sombrero de paja a la espalda) y Akira mujer. Se cambian en la pausa (V o
+   el botón) y el juego recuerda la elegida.
+2. **Shiro**, el perro (opción recomendada que elegiste):
+   - Sigue a Akira y se sienta cuando se para.
+   - Se queda atrás, agachado, si hay soldados alerta. No pelea y nadie le ataca.
+   - En calma, cada 22-40 s olfatea, ladra, escarba y desentierra 3-6 monedas. El primer hallazgo
+     llega a los 9 s, para que se descubra solo.
+   - Trae las monedas que se quedan atrás.
+3. **Monedas «mon»** (cobre con agujero cuadrado, del periodo Edo):
+   - Los soldados sueltan 2-4.
+   - Akira las recoge al pasar y el contador del HUD suena más agudo en racha.
+   - Se conservan al reintentar, pero todavía no hay partida guardada.
+4. **Arreglado un fallo de antes:** en la pausa los soldados seguían moviéndose (el juego no se
+   paraba de verdad). Ahora la pausa lo detiene todo.
+5. **Prueba de estilos de dibujo** (`arte/conceptos/estilos/`) y concepto de Shiro. Higgsfield
+   rechaza una persona con un perro en la misma imagen: se hacen por separado.
+6. **Prueba automática: 28 de 28** (antes 22).
+
+### DECISIÓN 16 — Para qué sirven las monedas
+- **OPCIONES:**
+  - A) **Estatuas jizō:** rezar y mejorar un poco a Akira (vida o espíritu). Ya estaba en el plan.
+  - B) **Tienda de la aldea:** vendas para curarse o amuletos.
+  - C) **El sastre de la aldea:** las skins se compran con monedas del juego.
+  - D) **Skins de pago** con dinero real (DLC de aspecto).
+- **VENTAJAS:**
+  - A da progresión y una razón para explorar.
+  - B da decisiones de gasto.
+  - C da un sumidero que no toca el equilibrio del combate.
+  - D da ingresos.
+- **RIESGOS:**
+  - A: si los números suben mucho, el combate de precisión pierde tensión.
+  - B: añade un sistema (inventario).
+  - C: las skins tienen que valer el precio.
+  - D: en un juego de pago, cobrar aparte por el aspecto del protagonista se recibe mal si llega con el
+    lanzamiento [Opinión]. Y las monedas nunca deben venderse por dinero: rompería la DECISIÓN 7 C.
+- **COSTE:**
+  - A: bajo.
+  - B: medio.
+  - C: bajo (las tres skins ya existen).
+  - D: medio (la tienda de la plataforma y más arte).
+- **RECOMENDACIÓN:** **A + C.** Las monedas se ganan jugando y se gastan en dos sitios: las estatuas
+  (pocas mejoras y pequeñas) y el sastre (las skins). D, solo como contenido después del lanzamiento
+  y nunca para monedas.
+- **SIGUIENTE PASO:** una estatua jizō y un sastre en la aldea del vertical slice, con 2 o 3 precios,
+  para medir cuántas monedas junta un jugador en una partida.
+
+### DECISIÓN 17 — De dónde vienen Shiro y la cicatriz
+En `HISTORIA.md` §9. Recomendación: **A**, Shiro era el perro del shōgun y la cicatriz se la hizo
+Genzo la noche de la traición.
+
+### DECISIÓN 18 — Estilo de las ilustraciones 2D
+- **OPCIONES** (`arte/conceptos/estilos/`):
+  - A) Manga de tinta (blanco y negro con rojo de acento).
+  - B) Realista pintado.
+  - C) Anime de los 90.
+  - D) Ukiyo-e.
+  - E) Seguir con el estilo del Bahamut (anime en color con tinta), que es el de las 8 imágenes de
+    esta mañana.
+- **VENTAJAS:**
+  - A: la más ruda; casa con el pilar «grabado en tinta que se mueve» y con el cel-shading; un solo
+    color de acento es fácil de mantener coherente.
+  - B: la más espectacular.
+  - C: cercana.
+  - D: la más distinta y de dominio público.
+  - E: ya hecha y te gustó.
+- **RIESGOS:**
+  - A: en blanco y negro luce menos en miniaturas; el arte de tienda puede ir en color.
+  - B: comparación directa con Ghost of Tsushima; promete más de lo que da un juego cel-shading.
+  - C: genérica; recuerda a series concretas.
+  - D: caras poco expresivas para escenas de emoción.
+  - E: pediste un cambio.
+- **COSTE:** 0,15 créditos por imagen en Higgsfield. Rehacer las 8 de esta mañana costaría 1,20
+  créditos y quedan 0,01: haría falta comprar créditos (decides tú) o usar Colab, gratis con la T4. El
+  cuaderno acepta cualquier bloque de estilo.
+- **RECOMENDACIÓN [Opinión]:** **A para la historia y los personajes**, y el color (E) para las fichas
+  de criaturas del bestiario, que comparten el trazo negro. D queda como opción para títulos de
+  capítulo o el tráiler.
+- **SIGUIENTE PASO:** cuando elijas, poner ese bloque de estilo en el cuaderno de Colab y rehacer allí
+  a Genzo, a Takeda y la escena de la traición.
+
+| # | Decisión | Dónde | Recomendación |
+| --- | --- | --- | --- |
+| 16 | Para qué sirven las monedas | §14 | A + C: estatuas jizō y sastre |
+| 17 | De dónde vienen Shiro y la cicatriz | `HISTORIA.md` §9 | A: el perro del shōgun; la cicatriz, de Genzo |
+| 18 | Estilo de las ilustraciones 2D | §14 | A (tinta) para la historia; color para el bestiario |

@@ -7,11 +7,13 @@ extends Node3D
 
 const Datos := preload("res://scripts/datos.gd")
 const TEXTURA_SOMBRA := preload("res://recursos/sombra.png")
+const Apariencias := preload("res://scripts/apariencias_akira.gd")
 
 static var estilo_anime := true
 
 var aspecto
 var es_soldado := false
+var apariencia := ""                  # aspecto de Akira (apariencias_akira.gd); vacío: el elegido
 var cuerpo: Node3D
 var torso: Node3D
 var cadera_izq: Node3D
@@ -38,9 +40,10 @@ var ultimo_destello := 0.0
 var actualizaciones := 0              # poses aplicadas (lo usa la prueba automática)
 
 
-func configurar(aspecto_del_juego, soldado: bool) -> void:
+func configurar(aspecto_del_juego, soldado: bool, id_apariencia := "") -> void:
 	aspecto = aspecto_del_juego
 	es_soldado = soldado
+	apariencia = id_apariencia
 	cuerpo = Node3D.new()
 	add_child(cuerpo)
 	if soldado:
@@ -72,6 +75,23 @@ func _pieza(padre: Node3D, malla: Mesh, color: Color, posicion: Vector3, por_nor
 	return instancia
 
 
+# Detalles pequeños de la cara (ojos, cejas, cicatriz, mechón): sin contorno, que en piezas tan
+# pequeñas lo convierte todo en manchas negras.
+func _detalle(padre: Node3D, tamano: Vector3, color: Color, posicion: Vector3,
+		rotacion := Vector3.ZERO) -> MeshInstance3D:
+	var malla := BoxMesh.new()
+	malla.size = tamano
+	var instancia := MeshInstance3D.new()
+	instancia.mesh = malla
+	var material: Material = aspecto.material_toon(color, false)
+	instancia.material_override = material
+	materiales.append(material)
+	instancia.position = posicion
+	instancia.rotation = rotacion
+	padre.add_child(instancia)
+	return instancia
+
+
 func _caja(padre: Node3D, tamano: Vector3, color: Color, posicion: Vector3,
 		rotacion := Vector3.ZERO) -> MeshInstance3D:
 	var malla := BoxMesh.new()
@@ -80,12 +100,12 @@ func _caja(padre: Node3D, tamano: Vector3, color: Color, posicion: Vector3,
 
 
 func _cilindro(padre: Node3D, radio_abajo: float, radio_arriba: float, alto: float, color: Color,
-		posicion: Vector3, rotacion := Vector3.ZERO) -> MeshInstance3D:
+		posicion: Vector3, rotacion := Vector3.ZERO, lados := 12) -> MeshInstance3D:
 	var malla := CylinderMesh.new()
 	malla.bottom_radius = radio_abajo
 	malla.top_radius = radio_arriba
 	malla.height = alto
-	malla.radial_segments = 12
+	malla.radial_segments = lados
 	malla.rings = 1
 	return _pieza(padre, malla, color, posicion, true, rotacion)
 
@@ -112,36 +132,64 @@ func _capsula(padre: Node3D, radio: float, alto: float, color: Color, posicion: 
 # --- Akira ---------------------------------------------------------------------------
 
 func _construir_akira() -> void:
+	var a: Dictionary = Apariencias.datos(apariencia)
+	var ancho: float = a.ancho
+	cuerpo.scale = Vector3.ONE * float(a.escala)
 	cadera_izq = _pivote(cuerpo, Vector3(0.11, 0.8, 0))
 	cadera_der = _pivote(cuerpo, Vector3(-0.11, 0.8, 0))
 	for cadera in [cadera_izq, cadera_der]:
-		_cilindro(cadera, 0.17, 0.11, 0.74, Datos.HAKAMA, Vector3(0, -0.37, 0))
-		_caja(cadera, Vector3(0.14, 0.07, 0.24), Datos.TABI, Vector3(0, -0.76, 0.04))
+		_cilindro(cadera, 0.17, 0.11, 0.74, a.hakama, Vector3(0, -0.37, 0))
+		_caja(cadera, Vector3(0.14, 0.07, 0.24), Datos.WARAJI, Vector3(0, -0.76, 0.04))
 	torso = _pivote(cuerpo, Vector3(0, 0.8, 0))
-	_caja(torso, Vector3(0.44, 0.52, 0.28), Datos.KIMONO, Vector3(0, 0.27, 0))
-	_caja(torso, Vector3(0.46, 0.1, 0.3), Datos.OBI, Vector3(0, 0.05, 0))
-	_caja(torso, Vector3(0.05, 0.24, 0.02), Datos.HACHIMAKI, Vector3(0.06, 0.42, 0.142), Vector3(0, 0, 0.45))
-	_caja(torso, Vector3(0.05, 0.24, 0.02), Datos.HACHIMAKI, Vector3(-0.06, 0.42, 0.142), Vector3(0, 0, -0.45))
-	hombro_izq = _pivote(torso, Vector3(0.29, 0.48, 0))
-	hombro_der = _pivote(torso, Vector3(-0.29, 0.48, 0))
+	_caja(torso, Vector3(0.44 * ancho, 0.52, 0.28), a.kimono, Vector3(0, 0.27, 0))
+	_caja(torso, Vector3(0.46 * ancho, 0.1, 0.3), a.obi, Vector3(0, 0.05, 0))
+	_caja(torso, Vector3(0.05, 0.24, 0.02), a.solapa, Vector3(0.06, 0.42, 0.142), Vector3(0, 0, 0.45))
+	_caja(torso, Vector3(0.05, 0.24, 0.02), a.solapa, Vector3(-0.06, 0.42, 0.142), Vector3(0, 0, -0.45))
+	# ropa gastada: un remiendo delante y otro detrás
+	_caja(torso, Vector3(0.11, 0.09, 0.012), a.remiendo, Vector3(0.13 * ancho, 0.33, 0.142), Vector3(0, 0, 0.12))
+	_caja(torso, Vector3(0.12, 0.1, 0.012), a.remiendo, Vector3(-0.09 * ancho, 0.22, -0.142), Vector3(0, 0, -0.2))
+	if a.tasuki:
+		# cuerda que recoge las mangas: una X en el pecho y otra en la espalda
+		for z in [0.145, -0.145]:
+			for giro in [0.72, -0.72]:
+				_caja(torso, Vector3(0.025, 0.6, 0.012), Datos.CUERDA, Vector3(0, 0.3, z), Vector3(0, 0, giro))
+	if a.sombrero:
+		# sugegasa (sombrero de paja) colgado a la espalda
+		_cilindro(torso, 0.36, 0.03, 0.15, Datos.PAJA, Vector3(0, 0.46, -0.24), Vector3(-1.25, 0, 0), 16)
+	hombro_izq = _pivote(torso, Vector3(0.29 * ancho, 0.48, 0))
+	hombro_der = _pivote(torso, Vector3(-0.29 * ancho, 0.48, 0))
 	for hombro in [hombro_izq, hombro_der]:
-		_capsula(hombro, 0.075, 0.5, Datos.KIMONO_OSCURO, Vector3(0, -0.22, 0))
-		_esfera(hombro, 0.06, Datos.PIEL, Vector3(0, -0.47, 0))
+		_capsula(hombro, 0.075, 0.5, a.manga, Vector3(0, -0.22, 0))
+		_esfera(hombro, 0.06, a.piel, Vector3(0, -0.47, 0))
+		if a.vendas:
+			_cilindro(hombro, 0.079, 0.079, 0.13, Datos.VENDAS, Vector3(0, -0.37, 0))
 	var cabeza := _pivote(torso, Vector3(0, 0.72, 0))
-	_esfera(cabeza, 0.16, Datos.PIEL, Vector3.ZERO)
-	_esfera(cabeza, 0.172, Datos.PELO, Vector3(0, 0.02, -0.025), true)
-	_esfera(cabeza, 0.066, Datos.PELO, Vector3(0, 0.2, -0.05))
-	_caja(cabeza, Vector3(0.03, 0.04, 0.02), Datos.PELO, Vector3(0.055, -0.01, 0.152))
-	_caja(cabeza, Vector3(0.03, 0.04, 0.02), Datos.PELO, Vector3(-0.055, -0.01, 0.152))
+	_esfera(cabeza, 0.16, a.piel, Vector3.ZERO)
+	_esfera(cabeza, 0.172, a.pelo, Vector3(0, 0.02, -0.025), true)
+	_peinado(cabeza, a)
+	if a.barba != "":
+		var barba := _esfera(cabeza, 0.13 if a.barba == "de_dias" else 0.136,
+			a.piel.lerp(a.pelo, 0.45) if a.barba == "de_dias" else a.pelo.lerp(a.piel, 0.15),
+			Vector3(0, -0.075, 0.045))
+		barba.scale = Vector3(1.0, 0.62, 0.85)
+		if a.barba == "corta":
+			_detalle(cabeza, Vector3(0.09, 0.02, 0.02), a.pelo, Vector3(0, -0.05, 0.153))
+	# Mirada dura: ojos rasgados y cejas en ceño
+	for lado in [-1.0, 1.0]:
+		_detalle(cabeza, Vector3(0.036, 0.014, 0.02), Datos.PELO, Vector3(0.055 * lado, -0.005, 0.15))
+		_detalle(cabeza, Vector3(0.05, 0.014, 0.02), a.pelo.darkened(0.3), Vector3(0.055 * lado, 0.035, 0.147),
+			Vector3(0, 0, 0.38 * lado))
+	_cicatriz(cabeza)
+	# Cinta (hachimaki) deshilachada, con las puntas al viento
 	var anillo := TorusMesh.new()
 	anillo.inner_radius = 0.158
 	anillo.outer_radius = 0.19
 	anillo.rings = 16
 	anillo.ring_segments = 6
-	_pieza(cabeza, anillo, Datos.HACHIMAKI, Vector3(0, 0.05, 0))
+	_pieza(cabeza, anillo, a.cinta, Vector3(0, 0.05, 0))
 	for lado in [-1, 1]:
 		var cinta := _pivote(cabeza, Vector3(0.035 * lado, 0.05, -0.17))
-		_caja(cinta, Vector3(0.035, 0.02, 0.28), Datos.HACHIMAKI, Vector3(0, 0, -0.14))
+		_caja(cinta, Vector3(0.035, 0.02, 0.32), a.cinta, Vector3(0, 0, -0.16))
 		cintas.append(cinta)
 	# katana envainada a la izquierda (vaina hacia atrás y abajo, empuñadura delante)
 	var cinto := _pivote(torso, Vector3(0.25, 0.05, 0.03))
@@ -158,6 +206,47 @@ func _construir_akira() -> void:
 	material_estela = estela.material_override
 	estela_iai = _crear_estela(Vector3(-0.1, 1.2, 0.0), true)
 	material_estela_iai = estela_iai.material_override
+
+
+# Peinados: coleta revuelta (el Akira joven), moño (curtido y veterano) y coleta larga (mujer).
+func _peinado(cabeza: Node3D, a: Dictionary) -> void:
+	match a.peinado:
+		"coleta_revuelta":
+			_esfera(cabeza, 0.06, a.pelo, Vector3(0, 0.1, -0.16))
+			var coleta := _capsula(cabeza, 0.04, 0.28, a.pelo, Vector3(0, -0.04, -0.21))
+			coleta.rotation.x = 0.35
+			for punto in [Vector3(0.07, 0.15, 0.07), Vector3(-0.05, 0.17, 0.06)]:
+				_cilindro(cabeza, 0.045, 0.0, 0.11, a.pelo, punto, Vector3(0.7, 0, -punto.x * 3.0), 5)
+			# un mechón suelto junto a la cara
+			_detalle(cabeza, Vector3(0.022, 0.13, 0.02), a.pelo, Vector3(0.125, 0.0, 0.1), Vector3(0, 0, -0.12))
+		"coleta_larga":
+			_esfera(cabeza, 0.062, a.pelo, Vector3(0, 0.15, -0.13))
+			var coleta := _capsula(cabeza, 0.045, 0.52, a.pelo, Vector3(0, -0.12, -0.21))
+			coleta.rotation.x = 0.12
+			_caja(cabeza, Vector3(0.24, 0.05, 0.05), a.pelo, Vector3(0, 0.11, 0.12), Vector3(-0.35, 0, 0))
+			for lado in [-1.0, 1.0]:
+				_caja(cabeza, Vector3(0.03, 0.18, 0.03), a.pelo, Vector3(0.125 * lado, -0.01, 0.08))
+		_:
+			_esfera(cabeza, 0.066, a.pelo, Vector3(0, 0.2, -0.05))
+
+
+# Cicatriz: dos tramos finos pegados a la cara (la cabeza es una esfera de 0,16 m), de la ceja
+# izquierda, por encima de la nariz, a la mejilla derecha.
+func _cicatriz(cabeza: Node3D) -> void:
+	var puntos := [Vector2(0.075, 0.062), Vector2(0.0, 0.006), Vector2(-0.07, -0.07)]
+	var radio := 0.168
+	for i in 2:
+		var a: Vector2 = puntos[i]
+		var b: Vector2 = puntos[i + 1]
+		var a3 := Vector3(a.x, a.y, sqrt(radio * radio - a.length_squared()))
+		var b3 := Vector3(b.x, b.y, sqrt(radio * radio - b.length_squared()))
+		var normal := ((a3 + b3) / 2.0).normalized()
+		var eje_y := (b3 - a3).normalized()
+		var eje_x := eje_y.cross(normal).normalized()
+		var eje_z := eje_x.cross(eje_y).normalized()
+		var tramo := _detalle(cabeza, Vector3(0.017, a3.distance_to(b3) + 0.012, 0.012), Datos.CICATRIZ, (a3 + b3) / 2.0)
+		tramo.basis = Basis(eje_x, eje_y, eje_z)
+		tramo.name = "Cicatriz%d" % i
 
 
 # Estela del corte: media luna blanca que aparece con el tajo y se apaga. La del tajo es

@@ -14,16 +14,19 @@ const Prueba := preload("res://scripts/prueba.gd")
 const ControlesTactiles := preload("res://scripts/controles_tactiles.gd")
 const VisualModelo := preload("res://scripts/visual_modelo.gd")
 const Galeria := preload("res://scripts/galeria.gd")
-const VERSION := "RONIN · prototipo 0.5"
+const Apariencias := preload("res://scripts/apariencias_akira.gd")
+const VERSION := "RONIN · prototipo 0.6"
 
 var hud
 var juego
 var tactil
 var galeria_abierta: Node
+var monedas := 0                      # se conservan al reintentar (aún no hay partida guardada)
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	Apariencias.cargar()
 	# Android: «atrás» pausa en vez de cerrar el juego (ver _notification).
 	get_tree().quit_on_go_back = false
 	var argumentos := OS.get_cmdline_user_args()
@@ -64,6 +67,7 @@ func _registrar_acciones(clic_ataca: bool) -> void:
 		"especial": [KEY_L],
 		"estilo_animacion": [KEY_T],
 		"galeria": [KEY_G],
+		"apariencia": [KEY_V],
 		"girar_izquierda": [KEY_Q],
 		"girar_derecha": [KEY_E],
 		"acercar": [KEY_PLUS, KEY_KP_ADD, KEY_EQUAL],
@@ -115,6 +119,9 @@ func _iniciar_juego(con_intro: bool) -> void:
 	if juego:
 		juego.queue_free()
 	juego = Juego.new()
+	# «principal» se procesa siempre (para atender la pausa); el juego, no: sin esto, los
+	# soldados seguían moviéndose con el juego en pausa (arreglado en la 0.6).
+	juego.process_mode = Node.PROCESS_MODE_PAUSABLE
 	add_child(juego)
 	move_child(juego, 0)          # el HUD queda por encima en el árbol
 	juego.fase_cambiada.connect(_al_cambiar_fase)
@@ -122,11 +129,18 @@ func _iniciar_juego(con_intro: bool) -> void:
 	juego.derrotados_cambiados.connect(hud.poner_derrotados)
 	juego.espiritu_cambiado.connect(hud.poner_espiritu)
 	juego.mensaje.connect(hud.mostrar_mensaje)
+	juego.monedas_cambiadas.connect(_al_cambiar_monedas)
 	hud.poner_espiritu(0.0)
-	juego.iniciar(con_intro)
+	juego.iniciar(con_intro, monedas)
+	hud.poner_monedas(monedas, false)
 	hud.poner_vida(Datos.VIDA_MAXIMA)
 	hud.poner_derrotados(0, Datos.PATRULLAS.size())
 	_al_cambiar_fase(juego.fase)
+
+
+func _al_cambiar_monedas(total: int) -> void:
+	monedas = total
+	hud.poner_monedas(total)
 
 
 func _al_cambiar_fase(fase: String) -> void:
@@ -174,6 +188,14 @@ func alternar_estilo_animacion() -> void:
 		else "Animación suave")
 
 
+# Aspecto de Akira (el joven endurecido o una de las tres skins). Se guarda para la próxima vez.
+func cambiar_apariencia() -> void:
+	Apariencias.siguiente()
+	if juego:
+		juego.cambiar_apariencia_akira()
+	hud.poner_apariencia()
+
+
 # Galería de criaturas del bestiario (prueba de rendimiento): sustituye al juego mientras está
 # abierta y, al volver, deja el juego en pausa tal como estaba.
 func abrir_galeria() -> void:
@@ -208,6 +230,10 @@ func _input(evento: InputEvent) -> void:
 		return
 	if get_tree().paused and evento.is_action_pressed("galeria"):
 		abrir_galeria()
+		get_viewport().set_input_as_handled()
+		return
+	if get_tree().paused and evento.is_action_pressed("apariencia"):
+		cambiar_apariencia()
 		get_viewport().set_input_as_handled()
 		return
 	if evento.is_action_pressed("estilo_animacion"):

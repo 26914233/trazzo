@@ -1,9 +1,10 @@
-# HUD: vida y espíritu de Akira, soldados derrotados, ayuda de controles, versión, avisos
-# breves, textos de la historia (con efecto de máquina de escribir) y pausa.
+# HUD: vida, espíritu y monedas de Akira, soldados derrotados, ayuda de controles, versión,
+# avisos breves, textos de la historia (con efecto de máquina de escribir) y pausa.
 extends CanvasLayer
 
 const Datos := preload("res://scripts/datos.gd")
 const VisualModelo := preload("res://scripts/visual_modelo.gd")
+const Apariencias := preload("res://scripts/apariencias_akira.gd")
 const VELOCIDAD_TEXTO := 45.0
 
 var fuente: SystemFont
@@ -17,6 +18,7 @@ var tiempo_fps := 0.0
 var indicacion_pausa: Label
 var boton_animacion: Label            # en la pausa: cambia la animación anime / suave
 var boton_galeria: Label              # en la pausa: abre la galería de criaturas (prueba de rendimiento)
+var boton_apariencia: Label           # en la pausa: cambia el aspecto de Akira
 var etiqueta_mensaje: Label
 var tiempo_mensaje := 0.0
 var en_tactil := false
@@ -39,6 +41,9 @@ class MarcadorVida extends Control:
 	var maximo := 5
 	var espiritu := 0.0
 	var latido := 0.0
+	var monedas := 0
+	var brillo_moneda := 0.0          # destello del contador al ganar monedas
+	var color_moneda := Color(0.83, 0.58, 0.31)
 	var fuente: Font
 	var color_texto := Color.WHITE
 	var color_vida := Color.RED
@@ -56,6 +61,17 @@ class MarcadorVida extends Control:
 		if espiritu >= 1.0:
 			draw_string_outline(fuente, Vector2(barra.end.x + 8, 42), "LUNA", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, 4, Color(0, 0, 0, 0.8))
 			draw_string(fuente, Vector2(barra.end.x + 8, 42), "LUNA", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, dorado)
+		# Monedas: un mon de cobre (con su agujero cuadrado) y la cantidad
+		var centro_moneda := Vector2(9, 64)
+		var cobre := color_moneda.lerp(Color(1.0, 0.95, 0.75), brillo_moneda)
+		draw_circle(centro_moneda, 11.0, Color(0, 0, 0, 0.75))
+		draw_circle(centro_moneda, 9.0, cobre)
+		draw_arc(centro_moneda, 9.0, 0.0, TAU, 20, cobre.darkened(0.35), 1.5)
+		draw_rect(Rect2(centro_moneda - Vector2(3, 3), Vector2(6, 6)), Color(0.1, 0.07, 0.05))
+		var cantidad := "%d" % monedas
+		var tamano := 20 + int(brillo_moneda * 4.0)
+		draw_string_outline(fuente, Vector2(26, 71), cantidad, HORIZONTAL_ALIGNMENT_LEFT, -1, tamano, 5, Color(0, 0, 0, 0.8))
+		draw_string(fuente, Vector2(26, 71), cantidad, HORIZONTAL_ALIGNMENT_LEFT, -1, tamano, color_texto.lerp(cobre, 0.5))
 		draw_string_outline(fuente, Vector2(0, 24), "AKIRA", HORIZONTAL_ALIGNMENT_LEFT, -1, 24, 6, Color(0, 0, 0, 0.8))
 		draw_string(fuente, Vector2(0, 24), "AKIRA", HORIZONTAL_ALIGNMENT_LEFT, -1, 24, color_texto)
 		for i in maximo:
@@ -81,8 +97,9 @@ func _ready() -> void:
 	marcador.fuente = fuente
 	marcador.color_texto = Datos.CREMA
 	marcador.color_vida = Datos.ROJO_VIDA
+	marcador.color_moneda = Datos.COBRE
 	marcador.position = Vector2(22, 16)
-	marcador.size = Vector2(300, 48)
+	marcador.size = Vector2(300, 82)
 	marcador.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(marcador)
 
@@ -211,6 +228,13 @@ func _crear_capa_pausa() -> void:
 	boton_galeria.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	boton_galeria.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	boton_galeria.add_theme_stylebox_override("normal", marco)
+	boton_apariencia = _etiqueta(20, Datos.CREMA)
+	remove_child(boton_apariencia)
+	capa_pausa.add_child(boton_apariencia)
+	_colocar(boton_apariencia, Control.PRESET_CENTER, Rect2(-300, 184, 600, 46))
+	boton_apariencia.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	boton_apariencia.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	boton_apariencia.add_theme_stylebox_override("normal", marco)
 	capa_pausa.visible = false
 
 
@@ -224,6 +248,18 @@ func poner_vida(valor: int) -> void:
 
 func poner_derrotados(cantidad: int, total: int) -> void:
 	etiqueta_soldados.text = "Soldados derrotados: %d/%d" % [cantidad, total]
+
+
+func poner_monedas(total: int, con_destello := true) -> void:
+	marcador.monedas = total
+	if con_destello:
+		marcador.brillo_moneda = 1.0
+	marcador.queue_redraw()
+
+
+func poner_apariencia() -> void:
+	var como := "toca aquí para cambiar" if en_tactil else "V para cambiar"
+	boton_apariencia.text = "Akira: %s · %s" % [Apariencias.datos().nombre, como]
 
 
 func poner_version(texto: String) -> void:
@@ -301,6 +337,7 @@ func poner_pausa(activa: bool, tactil := false) -> void:
 		else "ESC o ENTER: continuar      Q: salir del juego"
 	boton_galeria.text = "Galería de criaturas (prueba) · " + ("toca aquí" if tactil else "G")
 	poner_estilo_animacion()
+	poner_apariencia()
 	if activa and not capa_pausa.visible:
 		texto_antes_de_pausa = capa_texto.visible
 		capa_texto.visible = false
@@ -315,6 +352,9 @@ func _process(delta: float) -> void:
 	tiempo += delta
 	if marcador.espiritu >= 1.0:
 		marcador.latido = tiempo
+		marcador.queue_redraw()
+	if marcador.brillo_moneda > 0.0:
+		marcador.brillo_moneda = maxf(0.0, marcador.brillo_moneda - delta * 3.0)
 		marcador.queue_redraw()
 	if tiempo_mensaje > 0.0:
 		tiempo_mensaje -= delta
