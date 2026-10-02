@@ -199,6 +199,17 @@ pulido será el primer capítulo (castillo + planicie + aldea).
     Recomendado: piezas con trucos de anime, más un piloto de Blender solo con Akira (descarga
     grande: pedir permiso) y un modo tinta opcional.
   - Antes y después: `capturas/comparativa_cabezas.jpg`.
+- **Prueba de estilos de render (02-10-2026, noche; sin cambios en el juego).** El usuario preguntó
+  cómo quedarían los personajes si se cambia el «motor gráfico» y ya no es cel-shading.
+  - `godot/scripts/estilos_render.gd` dibuja los mismos personajes (en fila, la cara y un combate en
+    el patio con la cámara del juego) en seis estilos: cel, manga de tinta, sumi-e, ukiyo-e, pixel art
+    3D y 3D realista. Los filtros están en `godot/shaders/estilos/`.
+  - Hoja: `capturas/comparativa_estilos_personajes.jpg`, que monta `herramientas/hoja_estilos.py`.
+  - Coste en la nube frente al cel: tinta +8 %, sumi-e +10 %, ukiyo-e +2 %, pixel −43 % y realista +44 %.
+  - Motor y estilo no son lo mismo: todos salen de Godot. Unreal 5.8 recomienda 32 GB de RAM
+    (documentación de Epic).
+  - **DECISIÓN 20** en `PLAN_PRODUCCION.md` §17. Recomendado: G, es decir, cel de base y tinta y pixel
+    art opcionales en la pausa del APK 0.9 para medirlos en el móvil.
 - **Prueba automática: 31 de 31.** **APK 0.8** (`ronin/ronin-0.8-prueba.apk`, 30,6 MB, SHA-256
   `cdb208aa…96e97d56`, misma firma `CN=RONIN prueba`, versionCode 8). La prueba sobre la exportación
   de Linux sigue sin pasarse (el usuario la paró en la 0.5).
@@ -214,9 +225,11 @@ pulido será el primer capítulo (castillo + planicie + aldea).
    - si las cabezas nuevas (pelo y caras dibujadas) se leen bien en la pantalla del móvil;
    - **la galería de criaturas** (pausa → botón): FPS en la página 2 (modelos detallados), en la 5
      (7 criaturas) y en la 7 (24). En la 0.5 eran las páginas 1, 4 y 6.
-2. **DECISIONES 11 a 15 y 19** (`HISTORIA.md` §8, `BESTIARIO_UNIVERSAL.md` y `PLAN_PRODUCCION.md` §16)
-   y la regla de respeto cultural (se aplica salvo veto). La 19 decide si se hace un piloto de
-   Akira en Blender (descarga grande: pedir permiso) y un modo tinta. La 15 (modelos detallados) necesita créditos para el piloto de
+2. **DECISIONES 11 a 15, 19 y 20** (`HISTORIA.md` §8, `BESTIARIO_UNIVERSAL.md` y `PLAN_PRODUCCION.md`
+   §16-17) y la regla de respeto cultural (se aplica salvo veto).
+   - La 19 decide si se hace un piloto de Akira en Blender (descarga grande: pedir permiso) y un modo
+     tinta.
+   - La 20, el estilo de render; si sale G, el APK 0.9 lleva un ajuste «Estilo» en la pausa. La 15 (modelos detallados) necesita créditos para el piloto de
    esqueleto (unos 5-10 $). Rehacer a Genzo y Takeda en tinta (18A) necesita créditos (quedan 0,01) o
    Colab. Créditos solo los compra el usuario.
 3. **Imágenes del bestiario en Colab:** ejecutar el cuaderno con la GPU T4 (o la sesión que maneja Colab).
@@ -259,6 +272,7 @@ pulido será el primer capítulo (castillo + planicie + aldea).
 | Comparativa | `ronin3d/COMPARATIVA.md` · página privada https://claude.ai/artifact/6urV5FCikt9CWAUV35gBCu |
 | Capturas de hoy | `ronin3d/capturas/actual/` (antes y después de las cabezas: `ronin3d/capturas/comparativa_cabezas.jpg`) |
 | Caras dibujadas | `ronin3d/godot/recursos/caras/` (PNG y `generar_caras.py`) |
+| Prueba de estilos de render | `ronin3d/capturas/comparativa_estilos_personajes.jpg` y `ronin3d/capturas/estilos_render/` · script `godot/scripts/estilos_render.gd` · filtros en `godot/shaders/estilos/` |
 | Clave de firma de prueba | Drive `Respaldos Claude/ronin/03-Godot/firma-prueba/` (privada; nunca en GitHub) |
 | APK de prueba | Drive `Respaldos Claude/ronin/ronin-0.8-prueba.apk` (como con Curtzz: el nuevo va en la raíz con el nombre `ronin-<versión>-prueba.apk` y el anterior pasa a la carpeta «Versiones anteriores (RONIN)», dentro de `ronin/`) |
 | Respaldo | Google Drive `Respaldos Claude/ronin/` (01-Diseno, 02-Prototipo-2D, 03-Godot, 04-Otros-motores, 05-Arte, 06-Bestiario, Versiones anteriores (RONIN)) |

@@ -493,3 +493,97 @@ Antes y después: `capturas/comparativa_cabezas.jpg`.
 | # | Decisión | Dónde | Estado |
 | --- | --- | --- | --- |
 | 19 | Camino hacia el «2D lo más pulido» | §16 | **Pendiente.** Recomendado: A + piloto de B con Akira + prototipo de E |
+
+## 17. Prueba de estilos de render (2-10-2026, noche): los personajes sin cel-shading
+
+El usuario preguntó cómo quedarían los personajes si se cambia el «motor gráfico» y ya no es
+cel-shading. Se dibujaron en seis estilos:
+- los mismos personajes en fila (las cuatro skins, un soldado y Shiro);
+- la cara de Akira de cerca;
+- un momento de combate en el patio, con la cámara del juego.
+
+La hoja con todo es `capturas/comparativa_estilos_personajes.jpg`, y cada imagen está en
+`capturas/estilos_render/`. Las hace `godot/scripts/estilos_render.gd`, que no cambia el juego.
+
+**Motor y estilo no son lo mismo [Hecho]:**
+- Los seis estilos los dibuja el mismo motor (Godot 4.7, renderizador Compatibility). El estilo lo
+  deciden los shaders (`godot/shaders/estilos/`).
+- Cambiar de motor no cambiaría el aspecto por sí solo y obligaría a rehacer el juego. Unreal Engine
+  5.8, por ejemplo, recomienda 32 GB de RAM según la documentación de Epic.
+
+**Lo que enseñan las imágenes [Opinión]:**
+- **Ningún estilo arregla que los personajes sean piezas:** unos lo disimulan y otros lo delatan.
+  - Lo disimulan el **pixel art**, porque a baja resolución no se ven las cajas, y el **manga de
+    tinta**: sin color mandan la silueta y la línea, que es lo que mejor hacen las piezas.
+  - El **sumi-e** y el **ukiyo-e** cambian el ambiente, pero no los cuerpos.
+  - El **3D realista** lo delata: con luz y sombras normales parecen muñecos de plástico. Para que
+    luzca harían falta modelos y texturas de verdad.
+- **Identidad:** la tinta, el sumi-e y el ukiyo-e dan una identidad japonesa muy fuerte. El blanco y
+  negro ya existe en juegos de samuráis (Trek to Yomi, el modo Kurosawa de Ghost of Tsushima), pero
+  como cine; en manga con trama hay pocos.
+- **Riesgo de diseño de los estilos sin color** (la tinta y, en parte, el sumi-e): el bestiario usa
+  el color para los elementos (fuego, agua…) y para los rangos (alfa, silenciada). En blanco y negro
+  solo queda el rojo.
+- **Legibilidad:** con tinta, de noche en el patio, los personajes quedan como siluetas oscuras y
+  habría que aclararlos. A cambio, los soldados salen en rojo y el enemigo queda marcado.
+
+**Coste medido [Hecho]:** milisegundos por cuadro dibujando el patio, en la nube con OpenGL por
+software (media de 3 pasadas).
+
+| Estilo | ms por cuadro | Frente al cel-shading |
+| --- | --- | --- |
+| Cel-shading | 84 | — |
+| Manga de tinta | 91 | +8 % |
+| Sumi-e | 92 | +10 % |
+| Ukiyo-e | 86 | +2 % |
+| Pixel art 3D | 48 | −43 % |
+| 3D realista | 121 | +44 % |
+
+Entre una pasada y otra los números varían hasta un 10 %. Aquí, la tinta, el sumi-e y el ukiyo-e
+cuestan casi lo mismo que el cel-shading. En un móvil, los filtros de pantalla completa pesan más que
+aquí [Estimación], sobre todo el sumi-e, que lee unas 40 veces la imagen por cada píxel. Hay que
+medirlo en tu móvil.
+
+### DECISIÓN 20 — Estilo de render · **pendiente**
+- **DECISIÓN:** seguir con el cel-shading (decidido el 27-09-2026) o cambiar el estilo de render.
+- **OPCIONES:**
+  - A) Seguir con cel-shading.
+  - B) Cambiar a manga de tinta.
+  - C) Cambiar a sumi-e.
+  - D) Cambiar a ukiyo-e.
+  - E) Cambiar a pixel art 3D.
+  - F) Cambiar a 3D realista.
+  - G) Cel-shading de base y estilos opcionales en la pausa (por ejemplo, tinta y pixel art), para
+    probarlos con jugadores. Es la opción E de la DECISIÓN 19, ampliada.
+- **VENTAJAS:**
+  - A: ya está hecho; el color sirve al bestiario (elementos y rangos) y se lee bien de noche.
+  - B: la identidad más fuerte. Casa con la 18A y con los cuadros de impacto, y disimula las piezas.
+  - C: japonés y elegante, con algo de color; su referencia, Ōkami, es muy querida.
+  - D: muy distinto, de dominio público y con buen arte para la tienda.
+  - E: el más ligero (−43 %), bueno para móviles modestos; también disimula las piezas.
+  - F: ninguna con los modelos actuales.
+  - G: no se pierde nada y se decide con datos.
+- **RIESGOS:**
+  - A: es el más común: se parece a otros juegos de anime en 3D.
+  - B: se pierde el color del bestiario, la noche se lee peor y puede cansar en partidas largas.
+  - C: el filtro es caro en móviles y, de noche, el patio queda apagado.
+  - D: la paleta corta aplana la noche y cuesta distinguir a los enemigos.
+  - E: la estética retro promete otro tipo de juego, y en un móvil se pierden los detalles de la cara.
+  - F: parecen muñecos de plástico. Necesitaría modelos y texturas de verdad (lo más caro) y un
+    equipo potente.
+  - G: un ajuste más que mantener.
+- **COSTE** [Estimación]:
+  - A: nada.
+  - B, C y D: una o dos sesiones para pasarlos al juego entero (HUD, intro, galería) y ajustar la
+    noche.
+  - E y G: una sesión.
+  - F: el más alto, porque hacen falta modelos nuevos.
+- **RECOMENDACIÓN [Opinión]:** **G.** Seguir con el cel-shading de base y poner en la pausa del
+  próximo APK la **tinta**, como estilo de identidad, y el **pixel art**, como modo ligero para
+  móviles modestos. Así decides viéndolos en movimiento y con tus FPS. Descartaría la F.
+- **SIGUIENTE PASO:** si te parece, el APK 0.9 con un ajuste «Estilo» en la pausa (cel, tinta,
+  sumi-e, ukiyo-e y pixel; cel por defecto), que muestre los FPS de cada uno.
+
+| # | Decisión | Dónde | Estado |
+| --- | --- | --- | --- |
+| 20 | Estilo de render | §17 | **Pendiente.** Recomendado: G (cel de base; tinta y pixel art opcionales en la pausa) |

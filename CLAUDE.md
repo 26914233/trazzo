@@ -478,6 +478,10 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
     (`PLAN_PRODUCCION.md` §16). Recomendado: piezas con trucos de anime, más un piloto de modelo en
     Blender solo con Akira (necesita permiso para descargar Blender) y un modo tinta opcional.
     VRoid Studio pide 8 GB de RAM y no cabe en su PC.
+  - 20: estilo de render (`PLAN_PRODUCCION.md` §17): seguir con cel-shading o pasar a tinta, sumi-e,
+    ukiyo-e, pixel art o 3D realista. Se dibujaron los seis con `godot/scripts/estilos_render.gd`
+    (hoja en `capturas/comparativa_estilos_personajes.jpg`). Recomendado: cel de base y tinta y pixel
+    art opcionales en la pausa. Cambiar de motor no cambia el estilo: todos salen de Godot.
   - La regla de respeto cultural: los dioses y seres sagrados de religiones vivas no son enemigos.
 
   Detalle y recomendaciones en `ronin3d/BESTIARIO_UNIVERSAL.md` y `ronin3d/PLAN_PRODUCCION.md`.

@@ -122,6 +122,7 @@ ronin3d/
 | **Dados de la planicie** | Chō-han (par o impar con dos dados) | Al empezar la planicie en 3D |
 | **Nombre** | «RONIN» ya lo usan otros juegos: buscar nombre o subtítulo propio | Antes de abrir una página de tienda |
 | **Camino al «2D lo más pulido»** | Piezas con trucos de anime (hecho en la 0.8) + piloto de modelo en Blender solo con Akira + modo tinta opcional. VRoid no cabe en tu PC (pide 8 GB de RAM) | DECISIÓN 19 (`PLAN_PRODUCCION.md` §16) |
+| **Estilo de render** | Seguir con cel-shading de base y probar en la pausa la tinta (identidad) y el pixel art (modo ligero). Los seis estilos, en `capturas/comparativa_estilos_personajes.jpg` | DECISIÓN 20 (`PLAN_PRODUCCION.md` §17) |
 
 ---
 
@@ -136,9 +137,11 @@ ronin3d/
    - **la galería de criaturas** (pausa → «Galería de criaturas»): los FPS con los modelos detallados
      (página 2), con 7 y con 24 criaturas a la vez (páginas 5 y 7), y si las siluetas por familia te
      convencen.
-2. **DECISIONES 11 a 15 y 19** (`HISTORIA.md` §8, `BESTIARIO_UNIVERSAL.md` y `PLAN_PRODUCCION.md` §16).
+2. **DECISIONES 11 a 15, 19 y 20** (`HISTORIA.md` §8, `BESTIARIO_UNIVERSAL.md` y `PLAN_PRODUCCION.md` §16-17).
    - La 15 es cómo dar a todos los enemigos el detalle que pediste.
    - La 19, el camino hacia el «2D lo más pulido».
+   - La 20, si seguimos con el cel-shading u otro estilo de render (tinta, sumi-e, ukiyo-e, pixel art o
+     3D realista).
    - Las 16, 17 y 18 ya están decididas y en el juego.
 3. **Imágenes del bestiario en Colab:** el cuaderno está listo (`colab/`), falta ejecutarlo con la GPU T4.
 

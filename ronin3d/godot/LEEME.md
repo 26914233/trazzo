@@ -111,6 +111,18 @@ Para que los personajes se parezcan más a un dibujo de anime y la cabeza no se 
 - Para revisarlos de cerca: `godot --path ronin3d/godot --script res://scripts/retrato.gd -- akira`
   (las cuatro skins, un soldado y Shiro; deja las imágenes en `../capturas/actual/`).
 
+## Prueba de estilos de render (sin cambios en el juego)
+
+`godot --path ronin3d/godot --script res://scripts/estilos_render.gd` dibuja los mismos personajes en
+seis estilos: cel-shading, manga de tinta, sumi-e, ukiyo-e, pixel art 3D y 3D realista.
+- Hace tres vistas de cada estilo: en fila, la cara y un combate en el patio con la cámara del juego.
+- También mide cuánto tarda cada uno en dibujar el patio.
+- Las imágenes van a `../capturas/estilos_render/`, y `python3 ronin3d/herramientas/hoja_estilos.py`
+  monta la hoja `../capturas/comparativa_estilos_personajes.jpg`.
+- Los filtros son shaders de pantalla en `shaders/estilos/`. Se aplican al SubViewportContainer que
+  dibuja el mundo; el pixel art lo dibuja además a ¼ de resolución.
+- Es la base de la DECISIÓN 20 (`../PLAN_PRODUCCION.md` §17).
+
 ## Galería de criaturas (nueva en la 0.4)
 
 Sirve para ver y medir el sistema que construye criaturas con piezas (`../BESTIARIO_UNIVERSAL.md`):
@@ -200,6 +212,7 @@ godot/
 ├── datos/bestiario.json   Las criaturas del catálogo (lo genera ronin3d/herramientas/bestiario/unir_clasificacion.py)
 ├── sonidos/               Efectos de sonido (.wav) y su generador
 ├── shaders/               cielo, toon (cel-shading), toon_cara (caras dibujadas), toon_textura (modelos detallados), contorno y tinta
+│   └── estilos/           Filtros de la prueba de estilos: tinta_manga, sumie, ukiyoe, pixel y cara_realista
 ├── modelos/criaturas/     Modelos detallados (GLB) y su LEEME: cómo se hicieron, sumas y licencias
 └── scripts/
     ├── principal.gd       Controles, flujo intro → juego → cierre, pausa
@@ -223,6 +236,7 @@ godot/
     ├── criatura_modular.gd  Construye una criatura a partir de una receta (familia, tamaño, elemento, rol, rango)
     ├── modelo_criatura.gd   La misma interfaz con un modelo detallado (GLB): cel-shading, rangos, garrote, agua
     ├── retrato.gd         Retratos de cerca (--script res://scripts/retrato.gd -- <id | akira>)
+    ├── estilos_render.gd  Prueba de estilos de render (--script res://scripts/estilos_render.gd)
     ├── extraer_lod.gd     Saca un LOD de un modelo importado a un archivo (visor 3D del chat)
     ├── galeria.gd         Galería de criaturas: páginas, FPS y capturas
     ├── datos.gd           Medidas, reglas del combate, textos y colores
