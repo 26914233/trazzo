@@ -38,7 +38,8 @@ ronin/                         (Google Drive: Respaldos Claude › ronin)
 ├── 03-Godot/                  Versión Godot: LEEME, pruebas, huellas SHA-256, capturas y
 │                              firma-prueba/ (clave de los APK de prueba; privada)
 ├── 04-Otros-motores/          Three.js y Ursina (solo como referencia)
-├── 05-Arte/conceptos-2d/      Conceptos 2D en PNG a tamaño completo (Higgsfield)
+├── 05-Arte/conceptos-2d/      Conceptos 2D en PNG a tamaño completo (Higgsfield), al estilo del Bahamut;
+│                              las fichas anteriores (para 3D) en fichas/
 ├── 05-Arte/modelos3d/         Modelos 3D de enemigos (GLB, el .skp de SketchUp) y sus retratos
 └── Versiones anteriores (RONIN)/  APK anteriores (0.2, 0.3 y 0.4) y capturas retiradas
 ```
@@ -61,7 +62,7 @@ ronin3d/
 ├── DISENO_3D.md               Especificación del patio y de las reglas de combate
 ├── COMPARATIVA.md             Cómo se eligieron motor y estética (y otros motores y APK)
 ├── godot/                     El juego (principal)
-├── arte/conceptos/            Conceptos 2D de personajes y criaturas (JPG)
+├── arte/conceptos/            Conceptos 2D de personajes y criaturas (JPG) y su LEEME (estilo y prompts)
 ├── capturas/                  Capturas: actual/ = versión de hoy (con GIF); el resto, de la comparativa
 ├── herramientas/              hacer_gifs.py (GIF de la prueba) y bestiario/ (limpiar, clasificar y unir el catálogo)
 ├── recursos/                  Sprites y texturas pixel art de la comparativa

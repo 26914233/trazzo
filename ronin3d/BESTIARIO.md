@@ -92,9 +92,11 @@ se ajustan probando. Como referencia, el soldado actual avisa 0,5 s antes de ata
   más oscuro: caras más huecas y llama más fría.
 
 ### Oni gigante — jefe del capítulo 1, en el portón · gigante
-- **Sin imagen todavía:** Higgsfield devolvió la imagen en negro tres veces (su filtro; las cobró
-  igual), así que no insistí. Es la versión gigante del oni: 8 m, grietas de brasa, tres cuernos y
-  grilletes rotos.
+![Oni gigante](arte/conceptos/oni_gigante.jpg)
+
+- **Imagen (02-10-2026):** es la versión gigante del oni: 8 m, grietas de brasa, tres cuernos y
+  grilletes rotos. Salió a la primera con armadura. Sin ella, el filtro de Higgsfield la había
+  rechazado cuatro veces, porque toma el torso desnudo por un desnudo (`arte/conceptos/LEEME.md`).
 - **En el juego [propuesta]:** derriba el portón para cerrar la huida.
   1. **Puñetazos:** su sombra marca dónde caerá el golpe (aviso enorme). Tras cada golpe, el brazo
      queda en el suelo: cortarlo 3 veces lo inutiliza. Son dos brazos.

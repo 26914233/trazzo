@@ -126,6 +126,15 @@ pulido será el primer capítulo (castillo + planicie + aldea).
     (`herramientas/modelos3d/`).
   - **Visor de Three.js:** se probó con la Karakasa-obake en movimiento. Sirve para enseñar, no
     para fabricar.
+- **Conceptos 2D al estilo del Bahamut (02-10-2026).** Al usuario le encantó la imagen del dragón y
+  pidió que las demás se vieran así. Se rehicieron 8 imágenes con Higgsfield `z_image` (1,20 créditos;
+  quedan 0,76) en `arte/conceptos/`: Aka-oni, kappa, onibi, **oni gigante** (por fin, con armadura:
+  el filtro rechazaba el torso desnudo), **Tamamo-no-Mae en su forma de zorra**, Akira, Genzo y
+  Takeda. Cada una es una escena con niebla de tinta y un samurái para la escala.
+  - Las anteriores pasan a `arte/conceptos/fichas/`: son de cuerpo entero sin fondo, y sirven para 3D.
+  - Receta y prompts exactos: `arte/conceptos/LEEME.md`.
+  - El cuaderno de Colab tiene ahora el modo **escena** (este estilo, por defecto) y el modo
+    **ficha** (para 3D). `prompts_colab.csv` lleva la columna `bioma`.
   - **Análisis, precios verificados y DECISIÓN 15** (cómo llevar a todos los enemigos a ese nivel):
     `BESTIARIO_UNIVERSAL.md` §8.1-8.2.
 - **Prueba automática: 22 de 22.** **APK 0.5** (`ronin/ronin-0.5-prueba.apk`, 30,4 MB, SHA-256
@@ -177,7 +186,7 @@ pulido será el primer capítulo (castillo + planicie + aldea).
 | Bestiario por capítulos | `ronin3d/BESTIARIO.md` |
 | Bestiario universal (análisis y decisiones 12-15) | `ronin3d/BESTIARIO_UNIVERSAL.md` · datos en `ronin3d/bestiario/` · Drive `ronin/06-Bestiario/` |
 | Colab (imágenes del bestiario) | `ronin3d/colab/` · Drive `ronin/06-Bestiario/` y la carpeta de Colab del usuario |
-| Conceptos 2D | `ronin3d/arte/conceptos/` (JPG) · Drive `ronin/05-Arte/conceptos-2d/` (PNG originales) |
+| Conceptos 2D | `ronin3d/arte/conceptos/` (JPG; estilo y prompts en su LEEME; las anteriores en `fichas/`) · Drive `ronin/05-Arte/conceptos-2d/` (PNG originales; las anteriores en `fichas/`) |
 | Modelos 3D detallados | `ronin3d/godot/modelos/criaturas/` (GLB y LEEME) · herramientas en `ronin3d/herramientas/modelos3d/` · Drive `ronin/05-Arte/modelos3d/` (GLB, .skp y retratos) |
 | Comparativa | `ronin3d/COMPARATIVA.md` · página privada https://claude.ai/artifact/6urV5FCikt9CWAUV35gBCu |
 | Capturas de hoy | `ronin3d/capturas/actual/` |

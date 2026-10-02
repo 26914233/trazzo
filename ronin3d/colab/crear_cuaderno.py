@@ -24,8 +24,10 @@ def codigo(texto):
 md("""
 # RONIN · Imágenes del bestiario
 
-Genera la ilustración 2D de cada criatura del catálogo y la guarda en tu Google Drive. Es el mismo
-estilo de tinta y cel-shading de los conceptos de Akira, Genzo y compañía.
+Genera la ilustración 2D de cada criatura del catálogo y la guarda en tu Google Drive. Por defecto usa
+el **estilo del Bahamut** (modo «escena»): cada criatura en su sitio, con niebla de tinta y un samurái
+para la escala. El modo «ficha» la dibuja sola, de cuerpo entero y sin fondo, que es lo que hace falta
+para pasarla a 3D.
 
 **Antes de empezar**
 1. Menú **Entorno de ejecución → Cambiar tipo de entorno de ejecución → GPU T4**.
@@ -46,6 +48,7 @@ permite uso comercial con restricciones de uso responsable. Z-Image-Turbo es Apa
 codigo('''
 #@title 1 · Ajustes { display-mode: "form" }
 MODELO = "sdxl"            #@param ["sdxl", "zimage"]
+MODO = "escena"            #@param ["escena", "ficha"]
 RANGOS = "1"               #@param ["1", "1,2"]
 DESDE = 0                  #@param {type:"integer"}
 HASTA = 50                 #@param {type:"integer"}
@@ -59,11 +62,14 @@ PASOS = 28                 #@param {type:"integer"}
 CFG = 6.5                  #@param {type:"number"}
 SIMULAR = False            #@param {type:"boolean"}
 
+# MODO: "escena" = estilo del Bahamut, en 4:3 (bestiario, tienda) · "ficha" = sola y cuadrada (para 3D).
 # RANGOS: 1 = criatura base · "1,2" = además su variante fuerte (alfa).
 # DESDE / HASTA: posición en la lista (HASTA no incluido). Para 50 por tanda: 0-50, 50-100, ...
 # REPETIR: ids separados por comas ("0353, 2301") para rehacer solo esas con otra semilla (SEMILLA_EXTRA).
 # INCLUIR_SENSIBLES: las entradas con sensibilidad 2 (dioses y seres sagrados) no se dibujan por defecto.
 # MODELO "zimage": 9 pasos y CFG 0; necesita una GPU de 16 GB o más (L4, A100) y NO está probado en T4.
+ANCHO, ALTO = ((TAMANO * 9 // 8) // 64 * 64, (TAMANO * 7 // 8) // 64 * 64) if MODO == "escena" else (TAMANO, TAMANO)
+print("Modo", MODO, "·", ANCHO, "×", ALTO, "píxeles")
 ''')
 
 codigo('''
@@ -115,9 +121,29 @@ print(len(FILAS), "criaturas en la lista · carpeta de salida:", SALIDA)
 
 codigo('''
 #@title 4 · Estilo y elección de criaturas { display-mode: "form" }
-ESTILO = ("2D anime monster concept art, cel-shaded illustration, bold black ink outlines, flat color bands "
-          "with two-tone shading, sumi-e ink brush splatter accents, plain warm parchment background, "
-          "full body, whole creature visible, centered, feudal Japan dark fantasy bestiary page. ")
+ESTILO_FICHA = ("2D anime monster concept art, cel-shaded illustration, bold black ink outlines, flat color bands "
+                "with two-tone shading, sumi-e ink brush splatter accents, plain warm parchment background, "
+                "full body, whole creature visible, centered, feudal Japan dark fantasy bestiary page. ")
+# Estilo del Bahamut (arte/conceptos/LEEME.md): la criatura en su sitio y un samurái para la escala
+ESTILO_ESCENA = ("2D anime boss monster concept art, cel-shaded illustration, bold black ink outlines, flat color "
+                 "bands with two-tone shading, sumi-e ink brush splatter accents, plain warm parchment background, "
+                 "dark fantasy. ")
+SITIO = {"montana": "on a misty mountain pass among jagged pines",
+         "bosque": "deep in a dark bamboo and cedar forest",
+         "ciudad_hogar": "in an old Japanese village street at night lit by paper lanterns",
+         "ruinas": "among overgrown stone ruins and broken statues",
+         "rio_lago": "at the edge of a misty river with reeds and an old wooden bridge",
+         "llanura": "on a windswept grassy plain under drifting ink clouds",
+         "cielo": "high among storm clouds above distant mountains",
+         "mar": "rising from stormy ocean waves near a rocky coast",
+         "selva": "in a dense steaming jungle with giant ferns and vines",
+         "inframundo": "in a shadowy underworld of black rock, mist and pale ghost fires",
+         "desierto": "among desert dunes and wind-carved rocks",
+         "subsuelo": "in a deep cavern lit by glowing crystals",
+         "pantano": "in a foggy swamp with dead trees and still dark water",
+         "nieve": "on a snowy mountainside in a blizzard"}
+ESCALA = {"XL": "a tiny samurai standing before it for scale", "L": "a small samurai standing before it for scale",
+          "M": "a lone samurai facing it in the distance for scale", "S": ""}
 CIERRE = ", no text, no watermark"
 NEGATIVO = ("photo, photorealistic, 3d render, text, letters, watermark, signature, frame, border, cropped, "
             "multiple creatures, duplicate, deformed, extra limbs, blurry, low resolution, nsfw, gore")
@@ -130,7 +156,13 @@ FUERTE = (", elite alpha variant: larger and more menacing, ornate bone and gold
 
 
 def construir_prompt(fila, rango):
-    texto = ESTILO + fila["prompt_en"].strip().rstrip(".")
+    descripcion = fila["prompt_en"].strip().rstrip(".")
+    if MODO == "escena":
+        sitio = SITIO.get(fila.get("bioma", ""), "in a dramatic atmospheric landscape of feudal Japan")
+        escala = ESCALA.get(fila.get("tamano", "M"), "")
+        texto = ESTILO_ESCENA + descripcion + ", " + sitio + (", " + escala if escala else "")
+    else:
+        texto = ESTILO_FICHA + descripcion
     if rango == 2:
         texto += FUERTE.format(aura=AURA.get(fila.get("elemento", "ninguno"), AURA["ninguno"]))
     return texto + CIERRE, NEGATIVO
@@ -159,10 +191,10 @@ class Simulado:
     def __call__(self, prompt, semilla, **_):
         from PIL import Image, ImageDraw
         azar = semilla % 255
-        degradado = Image.linear_gradient("L").resize((TAMANO, TAMANO))
+        degradado = Image.linear_gradient("L").resize((ANCHO, ALTO))
         rojo = degradado.point(lambda v: (v + azar) % 256)
-        verde = degradado.transpose(Image.ROTATE_90)
-        azul = Image.new("L", (TAMANO, TAMANO), 140)
+        verde = degradado.resize((ALTO, ANCHO)).transpose(Image.ROTATE_90)
+        azul = Image.new("L", (ANCHO, ALTO), 140)
         imagen = Image.merge("RGB", (rojo, verde, azul))
         ImageDraw.Draw(imagen).text((20, 20), prompt[-60:], fill=(255, 255, 255))
         return imagen
@@ -178,7 +210,7 @@ def cargar_modelo():
                                                  low_cpu_mem_usage=False)
         tuberia.enable_model_cpu_offload()
         def generar(prompt, semilla, **_):
-            return tuberia(prompt=prompt, height=TAMANO, width=TAMANO, num_inference_steps=PASOS if PASOS <= 12 else 9,
+            return tuberia(prompt=prompt, height=ALTO, width=ANCHO, num_inference_steps=PASOS if PASOS <= 12 else 9,
                            guidance_scale=0.0, generator=torch.Generator("cuda").manual_seed(semilla)).images[0]
         return generar
     from diffusers import StableDiffusionXLPipeline, EulerAncestralDiscreteScheduler
@@ -188,7 +220,7 @@ def cargar_modelo():
     tuberia.to("cuda")
     def generar(prompt, semilla, negativo="", **_):
         return tuberia(prompt=prompt, negative_prompt=negativo, num_inference_steps=PASOS, guidance_scale=CFG,
-                       width=TAMANO, height=TAMANO, generator=torch.Generator("cuda").manual_seed(semilla)).images[0]
+                       width=ANCHO, height=ALTO, generator=torch.Generator("cuda").manual_seed(semilla)).images[0]
     return generar
 
 

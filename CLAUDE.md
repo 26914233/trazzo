@@ -469,7 +469,10 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   Tripo y Meshy (esqueleto y animaciones) necesitan créditos que hoy no hay. Antes de generar, el
   coste se mira con `get_cost: true`.
 - **Imágenes 2D:** Higgsfield por Composio, modelo `z_image`, a 0,15 créditos por imagen (quedan
-  1,96 créditos el 02-10-2026). Nunca se compran créditos ni planes sin que el usuario lo pida.
+  0,76 créditos el 02-10-2026). Nunca se compran créditos ni planes sin que el usuario lo pida.
+  **Estilo de referencia: el del Bahamut**, que el usuario pidió para todas: escena con niebla de tinta
+  y un samurái para la escala. Receta y prompts en `ronin3d/arte/conceptos/LEEME.md`. A los oni hay que
+  ponerles armadura, porque el filtro de Higgsfield rechaza el torso desnudo.
 - **Colab (imágenes del bestiario):** `ronin3d/colab/` (cuaderno y receta). Reglas del usuario: una
   sesión de Claude aparte maneja Colab con colab-mcp; él elige la GPU T4 y acepta los permisos;
   comprobar con `!ls` que `drive.mount` ve `Respaldos Claude/ronin` (si no, es la cuenta equivocada:

@@ -102,7 +102,11 @@ fronteras antes que las criaturas de otras tierras** ([Wikipedia](https://en.wik
 | **Lo que no sabe** | La piedra de Nasu no solo la retenía a ella. Al partirse, algo más se movió (ver §8) |
 | **Dónde se la ve** | Capítulo 1: solo su sombra y su voz. Capítulo 2: una ilusión. Capítulo 4: combate en tres fases, una por forma |
 
-Concepto 2D: `arte/conceptos/gran_yokai.jpg`. Ficha de combate: `BESTIARIO.md`.
+Conceptos 2D: `arte/conceptos/gran_yokai.jpg` (la dama con máscara de zorro) y
+`arte/conceptos/tamamo_zorro.jpg` (la forma final, la zorra de nueve colas sobre Hoshiyama bajo la
+luna roja). Ficha de combate: `BESTIARIO.md`.
+
+![Tamamo-no-Mae, forma final](arte/conceptos/tamamo_zorro.jpg)
 
 ## 8. Capa nueva: el ser de la oscuridad silenciosa [propuesta]
 

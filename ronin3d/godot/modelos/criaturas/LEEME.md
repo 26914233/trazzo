@@ -18,7 +18,7 @@ cel-shading, el mismo contorno y los mismos tres rangos que las criaturas de pie
 
 ## Cómo se hicieron
 
-1. **Concepto 2D:** `oni.png` y `kappa.png` de Drive › `ronin/05-Arte/conceptos-2d/`, hechos con
+1. **Concepto 2D:** `oni.png` y `kappa.png` de Drive › `ronin/05-Arte/conceptos-2d/fichas/` (las fichas sin fondo; desde el 02-10 los conceptos principales son escenas), hechos con
    Higgsfield (`z_image`).
 2. **Recorte:** `herramientas/modelos3d/recortar_concepto.py` quita el fondo y pone la figura sobre
    gris claro (`*_plano.png`). Con transparencia, SAM 3D falló (el crédito se devolvió).

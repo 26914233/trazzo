@@ -172,11 +172,11 @@ def main():
     dibujables = [f for f in filas if f["tipo_entrada"] != "no_criatura" and f["prompt_en"]]
     with open(destino / "prompts_colab.csv", "w", encoding="utf-8", newline="") as f:
         escritor = csv.writer(f)
-        escritor.writerow(["id", "nombre", "semilla", "familia", "tamano", "elemento", "modelado",
+        escritor.writerow(["id", "nombre", "semilla", "familia", "tamano", "elemento", "bioma", "modelado",
                            "sensibilidad", "ola", "prompt_en"])
         for fila in dibujables:
             escritor.writerow([fila["id"], fila["nombre"], fila["id"] * 10, fila["familia"], fila["tamano"],
-                               fila["elemento"], fila["modelado"], fila["sensibilidad"], fila["ola"],
+                               fila["elemento"], fila["bioma"], fila["modelado"], fila["sensibilidad"], fila["ola"],
                                fila["prompt_en"]])
 
     # Informe de calidad
