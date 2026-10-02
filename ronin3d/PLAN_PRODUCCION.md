@@ -674,3 +674,4 @@ Las hojas de sprites están en `capturas/sprites_pixel_art.png`, y el antes y de
 | # | Decisión | Dónde | Estado |
 | --- | --- | --- | --- |
 | 21 | Cómo es el mundo con los personajes en pixel art | §18 | **Pendiente.** Recomendado: B (texturas de píxel, con niebla y desenfoque) |
+| 22 | Qué lanzamos primero | `puzles/PLAN.md` §1 | **Decidida el 02-10-2026:** primero un juego de puzles tipo The Room (cuatro prototipos en `puzles/`). RONIN, en pausa en la 0.9 |

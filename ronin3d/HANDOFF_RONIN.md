@@ -6,6 +6,10 @@
 Game Director, diseño, producción, marketing, negocio…) están en `CLAUDE.md`, en la raíz del
 repositorio. Síguelas: fases, MVP/Must/Should/Nice, formato DECISIÓN y hablar como socio.
 
+> **En pausa desde el 02-10-2026 (DECISIÓN 22).** Antes de seguir con RONIN se prueban cuatro
+> prototipos de juegos de puzles tipo The Room, en `puzles/` (índice en `puzles/LEEME.md`). RONIN
+> queda en la 0.9, completo en el repositorio y en Drive.
+
 ---
 
 ## 1. Objetivo

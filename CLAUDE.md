@@ -1,7 +1,7 @@
 # Instrucciones para Claude en este repositorio
 
-Este repositorio guarda los juegos del usuario: la web de **Trazzo** (raíz) y **RONIN**
-(`samurai.py` y `ronin3d/`). Claude Code no puede leer las instrucciones de los proyectos de
+Este repositorio guarda los juegos del usuario: la web de **Trazzo** (raíz), **RONIN**
+(`samurai.py` y `ronin3d/`) y los prototipos de puzles **Cuatro cajas** (`puzles/`). Claude Code no puede leer las instrucciones de los proyectos de
 claude.ai, así que aquí va la copia que el usuario pegó el 27-09-2026, seguida de las reglas de
 trabajo y del estado de RONIN. **Léelo entero al empezar cada sesión.**
 
@@ -417,6 +417,9 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
 
 # RONIN: estado y decisiones
 
+- **En pausa en la 0.9 desde el 02-10-2026 (DECISIÓN 22):** antes se prueban los prototipos de
+  puzles de `puzles/` (sección del final). RONIN no se abandona: todo sigue en el repositorio y en
+  Drive.
 - **Índice:** `ronin3d/LEEME.md` · **traspaso:** `ronin3d/HANDOFF_RONIN.md` · **plan:**
   `ronin3d/PLAN_PRODUCCION.md` · **especificación 3D:** `ronin3d/DISENO_3D.md` · **mundo
   yōkai:** `ronin3d/PROPUESTA_MUNDO_YOKAI.md` · **sinopsis (aprobada):** `ronin3d/HISTORIA.md` ·
@@ -540,3 +543,30 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
 - **Proyecto principal:** `ronin3d/godot/`. Prueba automática:
   `godot --path ronin3d/godot --fixed-fps 30 -- --prueba` (en Linux sin pantalla, con
   `xvfb-run -a`). Las versiones Three.js y Ursina de `ronin3d/` quedan solo como referencia.
+
+# Cuatro cajas (puzles): estado y decisiones
+
+- **Índice:** `puzles/LEEME.md` · **plan, datos de mercado y cómo se valida:** `puzles/PLAN.md`.
+- **DECISIÓN 22 (cerrada el 02-10-2026):** lanzar primero un juego de puzles tipo The Room. El usuario
+  eligió «algo ambicioso»: la caja viva y las tres ideas de la B en paralelo. Se hicieron como
+  **cuatro prototipos pequeños sobre un mismo núcleo**, no como cuatro producciones:
+  - **La caja viva:** *himitsu-bako* tsukumogami con un ojo que no deja tocar mientras te ve. Usa el
+    mundo y el estilo de RONIN sin tocar su historia.
+  - **La caja del relojero:** misterio victoriano; el reloj es la llave.
+  - **La reliquia:** artefacto de otro mundo; anillos que guían la luz.
+  - **El cuarto del farero:** habitación de escape por puntos de vista.
+- **DECISIÓN 23 (abierta):** cuál se convierte en juego, según la prueba con jugadores (`PLAN.md` §3).
+  Recomendación previa: la caja viva. Manda la prueba.
+- **Proyecto:** `puzles/godot/` (Godot 4.7.2, Compatibility).
+  - Núcleo: `mesa.gd`, `camara_puzle.gd`, `hud.gd`, `piezas/` y `puzle.gd`.
+  - Prototipos: `prototipos/`.
+  - Arte y sonido por código: `puzles/herramientas/generar_texturas.py` y `generar_sonidos.py`.
+    Tras generar texturas, reimportar y revisar sus `.import` (`puzles/LEEME.md`).
+- **Prueba automática:** `xvfb-run -a godot --path puzles/godot --rendering-driver opengl3 -- --prueba`.
+  Da 64 de 64 en la 0.1. Las esperas de la prueba van en tiempo real y comprobando el estado: sin
+  tarjeta gráfica, un cuadro puede tardar segundos mientras compila sombreadores.
+- **APK de prueba:** `puzles-0.1-prueba.apk` en Drive › `Respaldos Claude/puzles/`.
+  - Paquete `com.thunderdarkness.puzles`, nombre «Cuatro cajas», 43,9 MB.
+  - Firmado con la misma clave de prueba de RONIN.
+  - Las versiones nuevas siguen la regla de Curtzz: la nueva en la raíz y la anterior a «Versiones
+    anteriores (puzles)».
