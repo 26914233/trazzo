@@ -547,6 +547,17 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
 # Cuatro cajas (puzles): estado y decisiones
 
 - **Índice:** `puzles/LEEME.md` · **plan, datos de mercado y cómo se valida:** `puzles/PLAN.md`.
+- **Análisis de The Room:** `puzles/ANALISIS_THE_ROOM.md`, con anexos en `puzles/referencia/`.
+  Se hizo con los cuatro vídeos de partidas que mandó el usuario el 02-10-2026 y su consejo de 30
+  apartados.
+- **Biblia de diseño:** `puzles/BIBLIA_DISENO.md`. Las cajas nuevas se diseñan con ella:
+  - plantilla de nivel (§8);
+  - generador de 18 campos (§5 y anexo C);
+  - tabla contra la repetición (§7);
+  - ficha para programar (§19);
+  - checklist (§21);
+  - control de originalidad (anexo B): principios sí, expresiones concretas de la referencia no.
+    Nada de lente u ocular, miniaturas, portales ni sustancia irisada.
 - **DECISIÓN 22 (cerrada el 02-10-2026):** lanzar primero un juego de puzles tipo The Room. El usuario
   eligió «algo ambicioso»: la caja viva y las tres ideas de la B en paralelo. Se hicieron como
   **cuatro prototipos pequeños sobre un mismo núcleo**, no como cuatro producciones:
@@ -557,16 +568,33 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   - **El cuarto del farero:** habitación de escape por puntos de vista.
 - **DECISIÓN 23 (abierta):** cuál se convierte en juego, según la prueba con jugadores (`PLAN.md` §3).
   Recomendación previa: la caja viva. Manda la prueba.
+- **Decisiones abiertas que propone la biblia (03-10-2026)** (`PLAN.md` §5; ninguna tomada):
+  - **24, cómo se organiza el juego:** recomendada la C, una línea completa de 4 cajas más la caja 1
+    de las otras como muestras;
+  - **25, el marco de la historia:** recomendada la C, heredas el gabinete de tu abuela (o abuelo);
+  - **26, las pistas:** recomendada la B, 4 niveles más un aviso suave a los 3 minutos.
 - **Proyecto:** `puzles/godot/` (Godot 4.7.2, Compatibility).
+  - Menú: `gabinete.gd`, un cuarto en 3D con los juegos en pedestales y sus cajas; `catalogo.gd`.
   - Núcleo: `mesa.gd`, `camara_puzle.gd`, `hud.gd`, `piezas/` y `puzle.gd`.
+  - Salas: `arquitectura.gd` y `salas/`. Cada caja tiene su sala y una entrada de cámara.
   - Prototipos: `prototipos/`.
-  - Arte y sonido por código: `puzles/herramientas/generar_texturas.py` y `generar_sonidos.py`.
-    Tras generar texturas, reimportar y revisar sus `.import` (`puzles/LEEME.md`).
+  - Arte y sonido por código: `puzles/herramientas/generar_texturas.py`, `generar_sonidos.py` y
+    `generar_iconos.py`. Tras generar texturas, reimportar y revisar sus `.import`
+    (`puzles/LEEME.md`).
+- **Lecciones técnicas de la 0.2:**
+  - Una etiqueta con ajuste de línea mide su alto con el ancho que tiene: hay que dárselo antes de
+    calcular el tamaño de su panel.
+  - Los metales necesitan un cielo que reflejar, aunque no se vea (`entorno_estudio()` de `mesa.gd`).
+  - Un guion nuevo con `class_name` pide reimportar el proyecto.
 - **Prueba automática:** `xvfb-run -a godot --path puzles/godot --rendering-driver opengl3 -- --prueba`.
-  Da 64 de 64 en la 0.1. Las esperas de la prueba van en tiempo real y comprobando el estado: sin
-  tarjeta gráfica, un cuadro puede tardar segundos mientras compila sombreadores.
-- **APK de prueba:** `puzles-0.1-prueba.apk` en Drive › `Respaldos Claude/puzles/`.
-  - Paquete `com.thunderdarkness.puzles`, nombre «Cuatro cajas», 43,9 MB.
+  - Da 95 de 95 en la 0.2.1.
+  - Las esperas de la prueba van en tiempo real y comprobando el estado: sin tarjeta gráfica, un
+    cuadro puede tardar segundos mientras compila sombreadores.
+- **APK de prueba:** `puzles-0.2.1-prueba.apk` en Drive › `Respaldos Claude/puzles/`.
+  - Paquete `com.thunderdarkness.puzles`, nombre «Cuatro cajas», 49,9 MB, código de versión 3.
   - Firmado con la misma clave de prueba de RONIN.
   - Las versiones nuevas siguen la regla de Curtzz: la nueva en la raíz y la anterior a «Versiones
     anteriores (puzles)».
+  - El usuario solo tiene el móvil: el APK se le manda también en el chat, partido en trozos de
+    10 MB (`.zip.001…`, que se juntan abriendo el primero con ZArchiver). Si se rehace una
+    versión, se cambia el nombre (0.2 → 0.2.1) para que no se mezclen partes de dos versiones.

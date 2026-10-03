@@ -1,7 +1,10 @@
 # Cuatro cajas: plan
 
 Juego de puzles tipo The Room. Hoy son **cuatro prototipos** para elegir, con datos de jugadores, cuál
-se convierte en el primer juego que se lanza. Índice y comandos en `LEEME.md`.
+se convierte en el primer juego que se lanza.
+- **Índice y comandos:** `LEEME.md`.
+- **Análisis de la referencia:** `ANALISIS_THE_ROOM.md`.
+- **Sistema de diseño propio:** `BIBLIA_DISENO.md`.
 
 Marcas: **[Hecho]** comprobado con fuente, **[Estimación]**, **[Supuesto]**, **[Hipótesis]** u
 **[Opinión]**.
@@ -120,15 +123,42 @@ piezas que usa el jugador y comprueba:
 - las pistas y los iconos del inventario;
 - un arrastre real con eventos de toque.
 
+### 2.1 Versión 0.2 y 0.2.1 (03-10-2026)
+
+Lo que pidió el usuario tras probar la 0.1, todo hecho **[Hecho]**:
+- un menú vistoso: el **gabinete**, con los cuatro juegos y sus cajas (una jugable y dos selladas);
+- cada caja en **su sala**, con una entrada de cámara que llega hasta ella;
+- la caja más pequeña en pantalla, con acercar y alejar;
+- el **doble toque** que viaja con suavidad, como en The Room;
+- letra más grande;
+- lo bloqueado **no se mueve**: suena, vibra y destella;
+- la parte de atrás del relojero, iluminada.
+
+La 0.2.1 corrige tres fallos de la primera 0.2:
+- el marco gigante del primer aviso;
+- la puerta del taller, que tapaba la entrada;
+- el latón negro y el cristal blanco en el examen.
+
+**Prueba automática:** 95 de 95. **APK:** 49,9 MB (detalles en `LEEME.md`).
+
+Además, con los cuatro vídeos de partidas que envió el usuario se hizo:
+- el **análisis de The Room** (`ANALISIS_THE_ROOM.md`);
+- la **biblia de diseño** (`BIBLIA_DISENO.md`).
+
+La biblia compara la 0.2.1 con la referencia (anexo A). Su conclusión **[Opinión]**:
+- funcionan la respuesta del objeto, la cámara y la identidad de la caja viva;
+- falta profundidad: más pasos, más capas y un «¡ajá!» por caja.
+
 **Lo que aún no hay [Hecho]:**
 - guardado a mitad de partida;
 - música;
 - textos en inglés;
+- pistas de 4 niveles (DECISIÓN 26);
 - prueba en un móvil de verdad (el rendimiento en el teléfono está por medir).
 
 ## 3. Cómo se valida (lo que pide la DECISIÓN 23)
 
-1. **Tú primero:** instala `puzles-0.1-prueba.apk` y juega los cuatro sin pistas al principio.
+1. **Tú primero:** instala `puzles-0.2.1-prueba.apk` y juega los cuatro sin pistas al principio.
 2. **Después, 3 a 5 personas** que no los conozcan, cada una en un orden distinto. Para cada
    prototipo, que digan:
    - el tiempo y las pistas que muestra la pantalla final;
@@ -167,6 +197,12 @@ piezas que usa el jugador y comprueba:
   - Cada caja puede ser un yōkai distinto: escala a una colección.
 
   Pero manda la prueba.
+- **Lo que añade el análisis [Opinión]** (`BIBLIA_DISENO.md`, anexos A y B):
+  - la caja viva es la más propia;
+  - el farero, la más débil: es una habitación de escape clásica y comparte tema con el faro de The
+    Room Three;
+  - el relojero y la reliquia quedan en medio, y cada uno tiene un detalle que cambiar para no
+    rozar la referencia: la hora escrita y el mapa de estrellas.
 - **SIGUIENTE PASO:** probar el APK y apuntar los datos.
 
 ## 4. Del prototipo al lanzamiento (para el elegido)
@@ -184,6 +220,9 @@ piezas que usa el jugador y comprueba:
 - **Nice to Have:** logros, más idiomas y versión de Steam.
 - **Fases:** prototipo (hecho) → corte vertical (una caja pulida) → alfa (todas las cajas) → beta
   (la prueba cerrada de Google Play) → lanzamiento.
+- **Cómo se diseñan las cajas 2-4:** con la plantilla, el generador y la ficha para programar de
+  `BIBLIA_DISENO.md` (§8, §5 y §19). La biblia trae un ejemplo completo: la caja viva 2, «Los
+  gemelos».
 - **Modelo [Hipótesis]:** primera caja gratis y el resto con **un solo pago**, sin anuncios ni monedas.
   Rusty Lake combina juegos gratis y de pago [Hecho]. Lo confirmarán los datos de la prueba.
 - **Costes [Hecho]:**
@@ -195,3 +234,21 @@ piezas que usa el jugador y comprueba:
   **[Estimación; depende sobre todo de lo que tardemos en dar con buenos puzles]**.
 - **Cuenta de Google Play [Hecho, según `ronin3d/PLAN_PRODUCCION.md`]:** existe (la de Trazzo) y el
   27-09 estaba pendiente de la verificación de identidad.
+
+## 5. Decisiones abiertas que propone la biblia (03-10-2026)
+
+El detalle de cada una, con el formato DECISIÓN, está al final de `BIBLIA_DISENO.md`.
+**Ninguna está tomada.**
+
+- **DECISIÓN 24, cómo se organiza el juego.**
+  - Opciones: A) una línea de 4 cajas; B) 4 líneas de 2 cajas; C) una línea completa más la caja 1
+    de las otras tres como muestras.
+  - Recomendación: **C**.
+- **DECISIÓN 25, el marco de la historia.**
+  - Opciones: A) sin marco; B) un coleccionista desaparecido (se parece a la referencia); C) heredas
+    el gabinete de tu abuela (o abuelo).
+  - Recomendación: **C**.
+- **DECISIÓN 26, las pistas.**
+  - Opciones: A) 3 niveles a petición, como ahora; B) 4 niveles más un aviso suave tras 3 minutos
+    sin avanzar; C) automáticas.
+  - Recomendación: **B**.
