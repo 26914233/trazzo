@@ -27,7 +27,8 @@ ANCHO, ALTO = 1376, 768
 # Sonidos del juego de Godot (generar_sonidos.py) que usa la página
 LISTA_SONIDOS = ['noche', 'fuego', 'trabado', 'recoger', 'encajar', 'despertar', 'final_caja_viva',
                  'suspiro', 'ojo_abre', 'grunido', 'espiritu', 'papel', 'llave', 'candado_abre',
-                 'tope_madera', 'clic_madera', 'acercar', 'pista', 'toque', 'mecanismo', 'racha', 'bisagra']
+                 'tope_madera', 'clic_madera', 'acercar', 'pista', 'toque', 'mecanismo', 'racha', 'bisagra',
+                 'deslizar_madera']
 
 
 # --- Utilidades ---------------------------------------------------------------------------------
@@ -176,6 +177,9 @@ IRIS = (784.5, 369.0, 11.2)
 CAJA = [(688, 205), (782, 170), (1150, 178), (1158, 200), (1188, 213), (1192, 300), (1205, 430), (1205, 525),
         (1178, 545), (1172, 590), (1050, 672), (1000, 688), (905, 668), (660, 612), (655, 585), (690, 548)]
 
+# Zona amplia de la caja (con su reflejo en la mesa), para sacar su silueta de frente y de espaldas
+CAJA_SILUETA = [(640, 150), (1240, 150), (1240, 760), (640, 760)]
+
 # Regiones del despertar, para que aparezca por partes
 REGION_OJOS = [(640, 322), (1075, 322), (1075, 418), (640, 418)]
 REGION_TRAMPILLA = [(735, 0), (1160, 0), (1160, 214), (1000, 222), (860, 222), (735, 214)]
@@ -314,6 +318,40 @@ def principal():
     # 9. Máscara de la caja para la respiración: blanca, con el borde difuminado hacia fuera
     alfa_caja = np.clip(suave(crecer(poligono(CAJA), 4), 5.0) * 1.1, 0, 1)
     guardar('caja_mascara', np.full((ALTO, ANCHO, 3), 255, np.float32), alfa_caja, calidad=80)
+
+    # 10. Profundidad (técnicas A y B): las planchas sin caja y sin mesa, la caja de espaldas y las siluetas
+    mesa_vacia = cargar('sala_mesa_vacia.jpg')
+    vacia = cargar('sala_vacia.jpg')
+    detras = cargar('sala_detras.jpg')
+    for nombre, img in (('sala_vacia', vacia), ('sala_mesa_vacia', mesa_vacia), ('sala_detras', detras)):
+        Image.fromarray(np.clip(img, 0, 255).astype(np.uint8)).save(os.path.join(CAPAS, nombre + '.webp'), 'WEBP',
+                                                                   quality=90, method=6)
+        capas[nombre] = {'x': 0, 'y': 0, 'w': ANCHO, 'h': ALTO}
+        print(f"  {nombre}.webp  {os.path.getsize(os.path.join(CAPAS, nombre + '.webp')) // 1024} KB")
+
+    def silueta(a, b, umbral, zona, minimo, crecer_px=2, cerrar=3):
+        """Lo que cambia entre dos planchas, dentro de una zona: una silueta limpia y con borde suave."""
+        m = (diferencia(a, b, 1.5) > umbral) & (zona > 0.5)
+        m = ndimage.binary_closing(m, iterations=cerrar)
+        m = _sin_motas(ndimage.binary_fill_holes(m), minimo)
+        return np.clip(suave(crecer(m.astype(np.float32), crecer_px), 1.2) * 1.15, 0, 1)
+
+    zona_caja = poligono(CAJA_SILUETA)
+    zona_mesa = rectangulo(400, 440, ANCHO, ALTO)
+    alfa_mesa = silueta(mesa_vacia, vacia, 18, zona_mesa, 4000, crecer_px=1)
+    alfa_caja_frente = silueta(sala, mesa_vacia, 16, zona_caja, 3000)
+    alfa_caja_detras = silueta(detras, mesa_vacia, 16, zona_caja, 3000)
+    zona_inc = poligono([(498, 425), (652, 425), (652, 612), (498, 612)])
+    alfa_incensario = np.maximum(silueta(sala, mesa_vacia, 18, zona_inc, 400), silueta(abierto, mesa_vacia, 18, zona_inc, 400))
+    alfa_incensario = np.maximum(alfa_incensario, silueta(vacio, mesa_vacia, 18, zona_inc, 400))
+    alfa_te = silueta(sala, mesa_vacia, 18, rectangulo(1140, 470, ANCHO, 700), 300)
+    # cada silueta, como una imagen blanca con alfa (la página las usa de máscara)
+    blanco = np.full((ALTO, ANCHO, 3), 255, np.float32)
+    guardar('silueta_mesa', blanco, alfa_mesa, calidad=85)
+    guardar('silueta_caja', blanco, alfa_caja_frente, calidad=85)
+    guardar('silueta_caja_detras', blanco, alfa_caja_detras, calidad=85)
+    guardar('silueta_incensario', blanco, alfa_incensario, calidad=85)
+    guardar('silueta_te', blanco, alfa_te, calidad=85)
 
     # Formas que usa la página (párpado, almendra)
     datos = {'ancho': ANCHO, 'alto': ALTO, 'capas': capas, 'almendra': ALMENDRA, 'iris': IRIS}

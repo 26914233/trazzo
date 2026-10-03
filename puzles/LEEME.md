@@ -17,9 +17,11 @@ la versión 0.9 mientras tanto.
 - **Bocetos de las cuatro cajas** (03-10-2026), antes de construir: `bocetos/`. Su `LEEME.md` tiene
   la lectura de cada uno, el control de originalidad y si se pueden construir con esa calidad; los
   prompts, en `bocetos/PROMPTS.md`. Las DECISIONES 27 y 28 están en `PLAN.md` §6.
-- **La caja viva ilustrada** (03-10-2026): el boceto de la A+C, animado por capas y jugable en el móvil.
+- **La caja viva ilustrada** (03-10-2026): el boceto de la A+C, jugable en el móvil, en tres técnicas.
   - Responde a «no se parece nada al boceto» tras la prueba de Blender.
-  - Su técnica es la DECISIÓN 29 (abierta), en `PLAN.md` §7.
+  - Las técnicas son A (ilustración por capas), B (pintura sobre 3D) y C (3D con acuarela). Las tres tienen
+    cámara que se mueve y caja que gira.
+  - Cuál se usa es la DECISIÓN 29 (abierta), en `PLAN.md` §7.
   - Método y comandos: `ilustrada/LEEME.md`.
 
 ## Carpetas
@@ -31,7 +33,7 @@ la versión 0.9 mientras tanto.
 - **Bocetos:** `bocetos/`.
 - **Prueba ilustrada:** `ilustrada/`.
   - Las ilustraciones fuente.
-  - `preparar_capas.py`.
+  - `preparar_capas.py` y `herramientas/` (la cámara del boceto, la escena 3D y los modelos ligeros).
   - La página jugable (`pagina/`).
   - Su prueba automática (`prueba/`).
 - **Arte de origen:** `arte/` (de momento, la cara de la caja viva: el mapa de alturas de Gemini y lo que

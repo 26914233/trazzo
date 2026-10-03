@@ -397,55 +397,88 @@ https://claude.ai/artifact/7fC2cECS62soiVNBa2kMG3 (solo la puede abrir el usuari
   - la página dibuja todo en un lienzo, a unos 40 cuadros por segundo en el Chromium de pruebas, y pesa
     unos 2 MB con los sonidos.
 
+### Las tres técnicas, jugables (03-10-2026, noche) [Hecho]
+
+El usuario pidió hacer las tres opciones, con movimiento y animación de cámara: «me gustó mucho este tipo
+de animación… sería lo distinto a The Room… se puede llenar de detalles». Están en la misma página privada,
+con el mismo recorrido; se elige la técnica en la portada y se cambia jugando (botones A, B y C de arriba).
+
+- **Lo común:**
+  - la cámara del boceto, calculada a partir de las esquinas de la caja (error de unos 4,5 px);
+  - una sala sencilla en 3D: el suelo, dos paredes, la mesa redonda, la peana y los objetos;
+  - tres retoques nuevos de Gemini con el mismo encuadre: la caja de espaldas, la mesa sin nada y la sala
+    sin mesa. Unos 0,14 USD **[Estimación]**;
+  - las «planchas»: la pintura original y, solo detrás de cada objeto, lo que Gemini pintó. Quieta, la
+    escena es el boceto exacto; al moverse, detrás de cada cosa hay algo pintado.
+- **A · Ilustración por capas:**
+  - cada franja de la sala y de la mesa se desplaza según su profundidad al arrastrar el dedo;
+  - la caja gira como en un teatro de papel: se estrecha, se da la vuelta y aparece su espalda pintada;
+  - pellizcar acerca; 53 cuadros por segundo en el Chromium de pruebas, sin tarjeta gráfica.
+- **B · Pintura sobre 3D** (Three.js):
+  - la pintura se proyecta desde la cámara del boceto sobre la caja, la mesa y la sala;
+  - la caja gira de verdad con el dedo: el frente y el costado derecho salen del boceto de frente, y la
+    espalda y el costado izquierdo, del de espaldas;
+  - la cámara se acerca a cada vista y da vueltas alrededor con el dedo (hasta unos 20°);
+  - el ojo animado, el humo, la luz y la tapa siguen siendo los de la técnica A, anclados en 3D.
+- **C · 3D con acuarela** (Three.js):
+  - el modelo de Blender de la caja y de lo que hay en la mesa, aligerado de 9 a 2,2 MB;
+  - tinta (contorno) y acuarela (bandas de luz, papel, manchas de pigmento y borde oscurecido);
+  - el ojo se mueve y parpadea pintado en la cara del modelo;
+  - lo mecánico es 3D: la tapa con el león vuela a la mesa, hay brasas, el cuerno se pone y la trampilla
+    se abre con luz;
+  - la sala sigue pintada. Es la que más deja mover la cámara (hasta unos 55°).
+- **Prueba automática:** juega la partida entera con toques de móvil en cada técnica, gira la caja y
+  cambia de técnica a mitad. Da 18 de 18 en A y 20 de 20 en B y C, en horizontal y en vertical.
+
+**Lo que se aprendió al hacerlas [Opinión]:**
+- **A** es la que más se parece al boceto, porque lo es, pero la caja no gira de verdad: al girar se
+  estrecha como un cartón.
+- **B** se ve igual que el boceto mientras no se mueve y gira de verdad, que es lo que el usuario pedía:
+  - hasta unos 20-30° convence;
+  - más allá se estira (los cajones abiertos) y, fuera de lo pintado, la sala se oscurece.
+- **C** se mueve libre, pero parece un dibujo animado 3D y no el boceto. Además, cada objeto necesita un
+  modelo bueno: el incensario de la prueba de Blender es tosco y se nota.
+
 ### DECISIÓN 29 — Cómo se hace el juego con el aspecto de los bocetos · **abierta**
 
 - **DECISIÓN:** con qué técnica se construye el juego para que se vea y se mueva como el boceto.
-- **OPCIONES:**
-  - A) **2D ilustrado por capas**, como la prueba:
-    - cada vista es una ilustración pintada;
-    - lo que se mueve va recortado en capas;
-    - cada estado es la misma ilustración retocada;
-    - el humo, la luz, la respiración y el ojo, por código;
-    - para cambiar de vista, la cámara se acerca a la ilustración.
-  - B) **3D con la ilustración proyectada encima** (2.5D): un modelo sencillo de la caja con la pintura
-    puesta desde el ángulo del boceto; deja girarla un poco.
-  - C) **3D con un sombreado de acuarela y tinta** sobre el modelo de Blender.
+- **OPCIONES:** A) ilustración por capas; B) pintura sobre 3D; C) 3D con acuarela. Las tres se pueden jugar
+  en la página privada.
 - **VENTAJAS:**
   - A:
-    - es el boceto mismo, con su luz y su tinta;
-    - la animación es orgánica, no piezas rígidas;
-    - pesa poco: la prueba ocupa 2 MB y va bien en un móvil y en un PC modesto;
-    - cada estado nuevo es una edición de imagen.
-  - B: algo de giro real, más cerca de la sensación de The Room.
+    - es el boceto mismo;
+    - pesa poco (unos 3 MB con los sonidos);
+    - funciona en cualquier móvil, sin 3D.
+  - B:
+    - el aspecto del boceto con giro real de la caja y cámara que se mueve;
+    - más cerca de la sensación de The Room sin perder el estilo.
   - C: cámara libre y puzles mecánicos en 3D.
 - **RIESGOS:**
-  - A:
-    - la caja no se gira libremente: cada ángulo es otra ilustración;
-    - la IA cambia detalles entre imágenes (en el despertar puso un cuerno de más y se quitó al recortar);
-    - la resolución: la herramienta de hoy da 1376 × 768 y, al acercarse en el móvil, se ve algo blando.
-      Para la versión final hay que pintar a 2K o 4K, o ampliar las imágenes.
-  - B: costuras y estiramientos en cuanto se gira; doble trabajo (modelo y pintura).
-  - C: se aleja del boceto, que es justo lo que no gustó; es el camino más caro en técnica.
+  - A: la caja no gira de verdad. Cada ángulo nuevo es otra ilustración.
+  - B:
+    - para girar del todo sin estirarse, cada caja pide sus costados pintados, no solo el frente y la espalda;
+    - las cosas que sobresalen necesitan su propio volumen (los cajones abiertos ya lo tienen);
+    - necesita WebGL, aunque cualquier móvil de los últimos años lo tiene.
+  - C:
+    - se aleja del boceto, que es justo lo que no gustó;
+    - cada objeto necesita un modelo bueno y retocado;
+    - es el camino más caro.
 - **COSTE:**
-  - A:
-    - unos 0,045 USD por imagen **[Estimación]**;
-    - una caja completa, con 3 a 5 vistas y sus estados, son unas 30 a 50 imágenes: de 1,5 a 2,5 USD,
-      más el retoque **[Estimación]**;
-    - el precio de las imágenes en 2K o 4K hay que mirarlo antes de usarlas **[Supuesto]**;
-    - la técnica ya está hecha (el guion de capas y el motor de la página).
-  - B: medio-alto en tiempo.
-  - C: alto en tiempo.
-- **RECOMENDACIÓN [Opinión]:** la **A**.
-  - Es literalmente el estilo que le gustó y ya se puede jugar.
-  - La profundidad de The Room se consigue con más vistas pintadas (la cara de cerca, el costado de los
-    cajones, la parte de atrás) y transiciones animadas entre ellas.
-  - Blender no se tira: puede servir de maqueta. Se renderiza el ángulo que haga falta y Gemini lo pinta en
-    el estilo del boceto, para que todas las vistas encajen.
-  - Para el APK, el núcleo se pasaría a Godot 2D (el proyecto, la exportación y la prueba automática ya
-    existen) **[Propuesta: se decide después]**.
+  - A: unas 30-50 imágenes por caja, de 1,5 a 2,5 USD **[Estimación]**.
+  - B:
+    - lo mismo que A más 2-4 vistas pintadas de cada objeto que gira (frente, espalda y costados) y su
+      geometría sencilla;
+    - el motor ya está hecho (`tecnica_3d.js`).
+  - C: modelar y retocar cada objeto. En tiempo, el más caro.
+- **RECOMENDACIÓN [Opinión]:** la **B**, con lo mejor de la A dentro.
+  - Ya lleva el ojo, el humo y la luz de la A, y da el movimiento de cámara y el giro que se pidieron.
+  - La A se queda como reserva para móviles sin 3D.
+  - La C solo si se prefiere explorar libremente aunque se pierda el aspecto del boceto.
+  - Cambia la recomendación anterior (la A), porque ahora se ha visto la B funcionando.
 - **SIGUIENTE PASO:**
-  1. el usuario juega la prueba y dice qué le convence y qué no;
-  2. si elige la A, se pintan la vista de frente en más resolución y dos vistas más (la cara de cerca y el
-     costado de los cajones);
-  3. se pasa el núcleo a Godot 2D con los 19 pasos de la caja viva;
-  4. el APK, cuando se resuelva la firma.
+  1. el usuario juega las tres en el móvil y elige;
+  2. si es la B: pintar los dos costados de la caja (con el mismo encuadre girado) y subir la resolución
+     del frente a 2K;
+  3. llevar los 19 pasos de la caja viva a la técnica elegida;
+  4. el APK: la página ya funciona en el móvil. Falta decidir si se empaqueta tal cual o se pasa a Godot,
+     y resolver la firma **[Propuesta: se decide después]**.

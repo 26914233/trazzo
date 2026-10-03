@@ -594,20 +594,35 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
     su toque tétrico y misterioso, y quiere el juego en ese estilo animado e interactivo. Lo que más le
     falla es la calidad de imagen y el tipo de animación.
 - **La caja viva ilustrada (03-10-2026, hecha):** `puzles/ilustrada/` (método en su `LEEME.md`).
-  - Es el boceto de la A+C, animado por capas y jugable en el móvil. Página privada:
+  - Es el boceto de la A+C, jugable en el móvil. Página privada:
     https://claude.ai/artifact/7fC2cECS62soiVNBa2kMG3.
   - Lo que se mueve: el ojo sigue el dedo (y la regla «no deja tocar mientras te ve»), la caja respira y
     hay humo en cintas a tinta, luz de lámpara y motas.
   - El recorrido: la llave (se coge distrayendo al ojo con la lámpara), el incensario, el cuerno y el
-    despertar.
-  - Las capas salen de cuatro retoques de Gemini con el mismo encuadre (`preparar_capas.py`).
-  - Su prueba automática (`prueba/jugar.mjs`, con `prueba/servir.py`) da 14 de 14 en horizontal y en
-    vertical.
+    despertar. Detrás de la caja hay más cajones, un hueco de ficha de shōgi y un cajón largo con otra
+    cerradura.
+  - **Las tres técnicas de la DECISIÓN 29, jugables (pedidas por el usuario el 03-10-2026, hechas):** se
+    elige en la portada y se cambia jugando (A, B y C arriba). Todas con cámara que se mueve (arrastrar,
+    pellizcar, transiciones) y la caja que gira.
+    - A: ilustración por capas con profundidad; la caja gira como un teatro de papel.
+    - B: la pintura proyectada sobre una sala y una caja 3D sencillas (Three.js); la caja gira de verdad.
+    - C: el modelo de Blender (aligerado a 2,2 MB) con tinta y acuarela; la sala sigue pintada.
+  - Cómo se hace: la cámara del boceto se calculó a partir de la caja (`herramientas/camara_boceto.py`).
+    Hay siete retoques de Gemini con el mismo encuadre, entre ellos la caja de espaldas, la mesa vacía y la
+    sala sin mesa.
+  - Su prueba automática (`prueba/jugar.mjs <A|B|C> <horizontal|vertical>`, con `prueba/servir.py`) da
+    18 de 18 en A y 20 de 20 en B y C, en las dos orientaciones.
+    - B y C usan WebGL con SwiftShader: son lentas sin tarjeta gráfica, así que las esperas van en tiempo
+      de juego.
+    - Three.js viene de jsDelivr y la prueba lo baja con el `fetch` de Node.
 - **DECISIÓN 29 (abierta):** con qué técnica se hace el juego para que sea como el boceto (`puzles/PLAN.md` §7).
-  - Las opciones: A) 2D ilustrado por capas, como la prueba; B) 3D con la ilustración proyectada;
-    C) 3D con un sombreado de acuarela.
-  - Recomendada la **A**: más vistas pintadas a 2K-4K y Blender solo como maqueta para que encajen.
-    Después, pasar el núcleo a Godot 2D para el APK.
+  - Las opciones: A) ilustración por capas; B) pintura sobre 3D; C) 3D con acuarela. Las tres están
+    jugables.
+  - Recomendada ahora la **B**, con lo de la A dentro:
+    - da el giro real y la cámara que se pidieron sin perder el boceto;
+    - pide pintar los costados de cada caja;
+    - la A queda de reserva para móviles sin 3D.
+  - La C se aleja del boceto y necesita modelar bien cada objeto.
 - **Resistencia creativa (pedida por el usuario el 03-10-2026, hecha):** lo bloqueado ni se mueve ni
   se marca (nada de destello rojo); el sonido «trabado» le gusta y se queda. Reacciona el objeto entero,
   cada uno a su manera, y va a más si se insiste (`BIBLIA_DISENO.md` §3.4):
