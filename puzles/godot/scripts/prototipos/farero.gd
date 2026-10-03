@@ -32,6 +32,7 @@ var mecha: PiezaRanura
 var lampara: OmniLight3D
 var llama_grande: MeshInstance3D
 var haz: Node3D
+var puerta: Node3D
 var candado_abierto := false
 var encendido := false
 var _proximo_rayo := 6.0
@@ -68,18 +69,12 @@ func _girar_hacia_centro(nodo: Node3D) -> void:
 # --- Habitación redonda de piedra ------------------------------------------------------------------
 
 func _habitacion() -> void:
-	var pared := CylinderMesh.new()
-	pared.top_radius = RADIO
-	pared.bottom_radius = RADIO
-	pared.height = ALTO
-	pared.radial_segments = 40
-	pared.cap_top = false
-	pared.cap_bottom = false
-	pared.flip_faces = true
+	# muro redondo de piedra con el hueco de la puerta (mira a +Z, detrás de la vista de la sala)
 	var piedra := Materiales.con_textura("piedra", 1.0, 0.85, 0.0, Color(0.85, 0.85, 0.85), 1.2)
 	piedra = piedra.duplicate()
-	piedra.uv1_scale = Vector3(8.0, 1.5, 1.0)
-	Geometria.pieza(pared, piedra, Vector3(0.0, ALTO / 2.0, 0.0), self)
+	piedra.uv1_scale = Vector3(0.64, 0.58, 1.0)
+	Arquitectura.pared_curva(Vector3.ZERO, RADIO, ALTO, piedra, self, [PI / 2.0, 1.0, 2.05], 40, 0.35)
+	_rellano(piedra)
 	var suelo := Escena.bloque(Vector3(-RADIO, -0.05, -RADIO), Vector3(RADIO, 0.0, RADIO), Materiales.con_textura("tablones", 0.6, 0.7), self, 0.0, false)
 	suelo.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	# techo de tablas con vigas y el hueco de la trampilla
@@ -90,15 +85,40 @@ func _habitacion() -> void:
 	Escena.bloque(Vector3(0.45, ALTO, 0.95), Vector3(0.95, ALTO + 0.06, RADIO), techo, self, 0.0, false)
 	for x in [-1.2, -0.4]:
 		Escena.bloque(Vector3(x - 0.07, ALTO - 0.16, -RADIO), Vector3(x + 0.07, ALTO, RADIO), madera, self, 0.01, false)
-	# puerta (detrás de la vista de la sala) y una alfombra
-	var puerta := Escena.grupo(self, Vector3(0.0, 0.0, RADIO - 0.04), "Puerta")
-	Escena.bloque(Vector3(-0.45, 0.0, -0.05), Vector3(0.45, 2.0, 0.0), madera, puerta, 0.01, false)
-	Escena.bloque(Vector3(-0.52, 2.0, -0.07), Vector3(0.52, 2.1, 0.0), madera, puerta, 0.01, false)
+	# la puerta, que se abre hacia dentro al llegar, con su marco
+	for x in [-0.55, 0.47]:
+		Escena.bloque(Vector3(x, 0.0, RADIO - 0.12), Vector3(x + 0.08, 2.1, RADIO - 0.04), madera, self, 0.008, false)
+	Escena.bloque(Vector3(-0.55, 2.04, RADIO - 0.12), Vector3(0.55, 2.14, RADIO - 0.04), madera, self, 0.008, false)
+	puerta = Arquitectura.puerta(self, Vector3(-0.46, 0.0, RADIO - 0.08), 0.92, 2.03, madera, laton)
 	var alfombra := CylinderMesh.new()
 	alfombra.top_radius = 0.9
 	alfombra.bottom_radius = 0.9
 	alfombra.height = 0.01
 	Geometria.pieza(alfombra, Materiales.liso(Color(0.35, 0.12, 0.08), 0.95), Vector3(0.0, 0.005, 0.1), self)
+
+
+# Rellano de fuera: de ahí viene la cámara. Tiene un ventanuco con la misma tormenta.
+func _rellano(piedra: Material) -> void:
+	var z0 := RADIO - 0.2
+	var z1 := RADIO + 1.7
+	Arquitectura.losa(Vector3(-0.85, -0.05, z0), Vector3(0.85, 0.0, z1), Materiales.con_textura("tablones", 0.6, 0.7, 0.0, Color(0.6, 0.55, 0.5)), self)
+	Arquitectura.losa(Vector3(-0.85, 2.45, z0), Vector3(0.85, 2.5, z1), piedra, self)
+	Arquitectura.pared(Vector3(-0.85, 0.0, z1), Vector3.FORWARD, z1 - z0, 2.45, Vector3.RIGHT, piedra, self)
+	Arquitectura.pared(Vector3(0.85, 0.0, z0), Vector3.BACK, z1 - z0, 2.45, Vector3.LEFT, piedra, self, [[0.75, 1.25, 1.2, 1.9]])
+	Arquitectura.pared(Vector3(0.85, 0.0, z1), Vector3.LEFT, 1.7, 2.45, Vector3.FORWARD, piedra, self)
+	var vista := QuadMesh.new()
+	vista.size = Vector2(0.5, 0.7)
+	_material_tormenta()
+	var ventanuco := Geometria.pieza(vista, ventana, Vector3(0.9, 1.55, z0 + 1.0), self)
+	ventanuco.rotation.y = -PI / 2.0
+	Escena.luz(self, Vector3(-0.6, 1.9, z1 - 0.4), Color(1.0, 0.7, 0.4), 0.45, 2.4)
+
+
+# El mismo cielo de tormenta en la ventana y en el ventanuco del rellano (los rayos iluminan los dos)
+func _material_tormenta() -> void:
+	if ventana == null:
+		ventana = ShaderMaterial.new()
+		ventana.shader = preload("res://shaders/tormenta.gdshader")
 
 
 # --- Ventana con la tormenta y la placa ------------------------------------------------------------
@@ -107,8 +127,7 @@ func _ventana() -> void:
 	var nodo := Escena.grupo(self, Vector3(0.0, 1.55, -RADIO + 0.08), "Ventana")
 	var vista := QuadMesh.new()
 	vista.size = Vector2(0.9, 1.2)
-	ventana = ShaderMaterial.new()
-	ventana.shader = preload("res://shaders/tormenta.gdshader")
+	_material_tormenta()
 	Geometria.pieza(vista, ventana, Vector3.ZERO, nodo)
 	for barra in [[Vector3(-0.5, -0.65, 0.0), Vector3(0.5, -0.57, 0.08)], [Vector3(-0.5, 0.57, 0.0), Vector3(0.5, 0.65, 0.08)],
 			[Vector3(-0.5, -0.65, 0.0), Vector3(-0.44, 0.65, 0.08)], [Vector3(0.44, -0.65, 0.0), Vector3(0.5, 0.65, 0.08)],
@@ -442,7 +461,6 @@ func _abrir_trampilla(tapa: Node3D) -> void:
 	animacion.tween_property(tapa, "rotation", Vector3(0.0, 0.0, 1.9), 1.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	await animacion.finished
 	subir.habilitada = true
-	mesa.camara.sacudir(0.4)
 	mesa.mensaje("La trampilla está abierta. Toca el hueco para subir.", 3.4)
 
 
@@ -591,11 +609,11 @@ func _pasos() -> void:
 	paso("trampilla", [
 		"La llave es grande, de hierro, como de una puerta.",
 		"Arriba, al final de la escalera, hay una trampilla con cerradura.",
-		"Ve a la escalera, elige la llave abajo y toca la cerradura de la trampilla."], "cerradura")
+		"Ve a la escalera, elige la llave a la izquierda y toca la cerradura de la trampilla."], "cerradura")
 	paso("lampara", [
 		"Sube a la linterna del faro.",
 		"La lámpara de aceite está apagada.",
-		"Elige las cerillas abajo y toca la lámpara."], "mecha")
+		"Elige las cerillas a la izquierda y toca la lámpara."], "mecha")
 	titulo_final = "El faro brilla"
 	texto_final = "La luz barrió el mar y, entre la lluvia, el barco del correo viró a tiempo.\nDel farero, ni rastro: solo su chaqueta, todavía mojada, colgada junto a la lámpara."
 
@@ -605,6 +623,14 @@ func _pasos() -> void:
 func preparar_camara(camara: CamaraPuzle) -> void:
 	camara.camara.fov = 55.0
 	camara.configurar_puntos(vistas, "sala", 55.0)
+	camara.poner_luz(0.3, 2.2)
+
+
+# Del rellano, por la puerta, hasta la vista de la sala
+func ruta_entrada() -> Dictionary:
+	return {"puntos": [Vector3(0.0, 1.62, RADIO + 1.35), Vector3(0.03, 1.62, RADIO + 0.35)],
+		"miradas": [Vector3(-0.1, 1.3, 0.0), Vector3(-0.2, 1.25, -0.6)],
+		"duracion": 5.0, "fov": 58.0}
 
 
 func preparar_entorno(entorno: Environment) -> void:
@@ -624,13 +650,21 @@ func preparar_entorno(entorno: Environment) -> void:
 	Escena.polvo(self, Vector3(1.4, 1.0, 1.4), Color(1.0, 0.85, 0.6, 0.4), 80, 0.006).position = Vector3(0.0, 1.2, 0.0)
 
 
+# Al entrar: la tormenta y la puerta que se abre
 func empezar() -> void:
 	_ruido.frequency = 2.0
 	mesa.sonido.bucle("lluvia", -10.0, 2.0)
 	mesa.sonido.bucle("viento", -16.0, 3.0)
-	await get_tree().create_timer(4.2).timeout
+	mesa.sonido.sonar("puerta", -3.0)
+	var animacion := create_tween()
+	animacion.tween_interval(0.3)
+	animacion.tween_property(puerta, "rotation:y", 1.6, 1.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+
+func al_llegar() -> void:
+	await get_tree().create_timer(1.0).timeout
 	if hechos.is_empty():
-		mesa.mensaje("Toca un mueble para acercarte. «Volver» te devuelve a la sala.", 4.5)
+		mesa.mensaje("Toca un mueble para acercarte; toca dos veces para mirar un punto de cerca. El botón de la esquina te devuelve a la sala.", 5.5)
 
 
 func actualizar(delta: float) -> void:
@@ -738,6 +772,10 @@ func arrastre_de_prueba() -> Dictionary:
 	return {"pieza": zona, "punto": zona.global_position, "direccion": Vector3.UP, "pixeles": 0.0,
 		"comprobar": func() -> bool: return mesa.camara.punto_actual == "escritorio"}
 
+
+# Una pieza bloqueada al empezar (la prueba comprueba que no se mueve al tocarla)
+func bloqueo_de_prueba() -> Pieza:
+	return cajon
 
 func capturas_de_prueba() -> Array:
 	return ["diario", "placa", "candado", "libro", "trampilla"]

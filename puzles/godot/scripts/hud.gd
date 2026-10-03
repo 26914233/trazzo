@@ -1,32 +1,49 @@
-# Interfaz de una partida: menú, pistas, centrar/volver, progreso por pasos, inventario abajo,
-# avisos cortos, notas que se leen en grande y el resumen final con el tiempo y las pistas.
+# Interfaz de una caja. Ocupa poco: botones redondos con iconos en las esquinas (volver, pista,
+# centrar), el progreso arriba, el inventario en columna a la izquierda y avisos abajo, con letra
+# grande. Encima van las capas que piden atención: la cartela de la entrada, las notas que se leen, el
+# visor para examinar objetos en 3D, la confirmación de salida y el resumen final.
 extends CanvasLayer
 
 const Estilo := preload("res://scripts/estilo.gd")
 
+const MARGEN := 22.0
+const BOTON := 92.0
+const RANURA := 104.0
+
 var mesa
 var acento := Color.WHITE
 var raiz: Control
-var boton_menu: Button
+var interfaz: Control                 # lo que se ve mientras se juega (oculto durante la entrada)
+var boton_volver: Button
 var boton_pista: Button
 var boton_centrar: Button
 var progreso: Label
-var barra: HBoxContainer
+var columna_inventario: VBoxContainer
 var ranuras: Array = []               # botones del inventario
+var boton_lupa: Button
 var aviso: PanelContainer
+var aviso_encabezado: Label
 var aviso_texto: Label
 var capa_nota: Control
 var nota_titulo: Label
 var nota_texto: Label
+var nota_desplazable: ScrollContainer
+var capa_salida: Control
 var capa_final: Control
 var final_titulo: Label
 var final_texto: Label
 var final_datos: Label
 var boton_repetir: Button
 var boton_salir: Button
-var portada: Control
+var capa_examen: Control
+var cartela: Control
+var _vista_examen: SubViewport
+var _pivote_examen: Node3D
+var _camara_examen: Camera3D
+var _distancia_examen := 1.0
+var _toques_examen := {}
+var _pellizco_examen := 0.0
 var _aviso_animacion: Tween
-var _salida_pedida := 0.0
 var _total_pasos := 0
 
 
@@ -46,48 +63,60 @@ func configurar(datos: Dictionary, total_pasos: int) -> void:
 	vineta.material = _material_vineta()
 	raiz.add_child(vineta)
 
-	boton_menu = _boton("‹  Menú", Control.PRESET_TOP_LEFT, Vector2(28, 24))
-	boton_menu.pressed.connect(_pedir_salida)
-	boton_pista = _boton("Pista", Control.PRESET_TOP_RIGHT, Vector2(-160, 24))
+	interfaz = Control.new()
+	interfaz.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	interfaz.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	raiz.add_child(interfaz)
+
+	boton_volver = _boton_esquina("volver", Control.PRESET_TOP_LEFT, Vector2(MARGEN, MARGEN))
+	boton_volver.pressed.connect(_pedir_salida)
+	boton_pista = _boton_esquina("pista", Control.PRESET_TOP_RIGHT, Vector2(-MARGEN - BOTON, MARGEN))
 	boton_pista.pressed.connect(func(): mesa.pedir_pista())
-	boton_centrar = _boton("Centrar", Control.PRESET_TOP_RIGHT, Vector2(-312, 24))
+	boton_centrar = _boton_esquina("centrar", Control.PRESET_TOP_RIGHT, Vector2(-MARGEN * 2.0 - BOTON * 2.0, MARGEN))
 	boton_centrar.pressed.connect(func(): mesa.centrar())
 
-	progreso = Estilo.etiqueta("", 30, acento.lightened(0.15))
+	progreso = Estilo.sombra(Estilo.etiqueta("", 30, acento.lightened(0.2)))
 	progreso.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	progreso.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	raiz.add_child(progreso)
-	colocar(progreso, Control.PRESET_CENTER_TOP, Vector2(-260, 34), Vector2(520, 40))
+	interfaz.add_child(progreso)
+	colocar(progreso, Control.PRESET_CENTER_TOP, Vector2(-300, MARGEN + 26), Vector2(600, 44))
 	poner_progreso(0)
 
-	barra = HBoxContainer.new()
-	barra.alignment = BoxContainer.ALIGNMENT_CENTER
-	barra.add_theme_constant_override("separation", 14)
-	raiz.add_child(barra)
-	colocar(barra, Control.PRESET_CENTER_BOTTOM, Vector2(-300, -120), Vector2(600, 96))
+	columna_inventario = VBoxContainer.new()
+	columna_inventario.add_theme_constant_override("separation", 12)
+	interfaz.add_child(columna_inventario)
+	colocar(columna_inventario, Control.PRESET_TOP_LEFT, Vector2(MARGEN, MARGEN + BOTON + 22), Vector2(RANURA, 500))
+	boton_lupa = Estilo.boton_icono("lupa", acento, 76)
+	boton_lupa.visible = false
+	boton_lupa.pressed.connect(func(): mesa.examinar(mesa.seleccionado))
+	interfaz.add_child(boton_lupa)
 
 	aviso = PanelContainer.new()
 	aviso.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	aviso.modulate.a = 0.0
 	raiz.add_child(aviso)
-	aviso_texto = Estilo.etiqueta("", 26)
+	var columna_aviso := VBoxContainer.new()
+	columna_aviso.add_theme_constant_override("separation", 4)
+	columna_aviso.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	aviso.add_child(columna_aviso)
+	aviso_encabezado = Estilo.etiqueta("", Estilo.LETRA_PEQUENA, acento.lightened(0.25), Estilo.FUENTE_NEGRITA)
+	aviso_encabezado.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	columna_aviso.add_child(aviso_encabezado)
+	aviso_texto = Estilo.etiqueta("", Estilo.LETRA)
 	aviso_texto.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	aviso_texto.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	aviso_texto.custom_minimum_size = Vector2(620, 0)
-	aviso.add_child(aviso_texto)
+	columna_aviso.add_child(aviso_texto)
 
 	_crear_nota()
+	_crear_salida()
 	_crear_final()
-	_crear_portada(datos)
+	_crear_cartela(datos)
 
 
-func _boton(texto: String, ancla: Control.LayoutPreset, desplazamiento: Vector2) -> Button:
-	var boton := Button.new()
-	boton.text = texto
-	boton.custom_minimum_size = Vector2(136, 64)
-	boton.focus_mode = Control.FOCUS_NONE
-	raiz.add_child(boton)
-	colocar(boton, ancla, desplazamiento, Vector2(136, 64))
+func _boton_esquina(nombre: String, ancla: Control.LayoutPreset, desplazamiento: Vector2) -> Button:
+	var boton := Estilo.boton_icono(nombre, acento, BOTON)
+	interfaz.add_child(boton)
+	colocar(boton, ancla, desplazamiento, Vector2(BOTON, BOTON))
 	return boton
 
 
@@ -100,27 +129,95 @@ static func colocar(control: Control, ancla: Control.LayoutPreset, desplazamient
 	control.offset_bottom = desplazamiento.y + tamano.y
 
 
+func _ancho() -> float:
+	return raiz.get_viewport_rect().size.x if raiz.is_inside_tree() else 1280.0
+
+
 # ¿Este toque cae sobre la interfaz? (los toques no los frena la interfaz por sí sola)
 func toca_interfaz(posicion: Vector2) -> bool:
-	if capa_nota.visible or capa_final.visible:
+	if bloquea_todo():
 		return true
-	for control in [boton_menu, boton_pista, boton_centrar] + ranuras:
-		if control.is_visible_in_tree() and control.get_global_rect().grow(6).has_point(posicion):
+	if not interfaz.visible:
+		return false
+	for control in [boton_volver, boton_pista, boton_centrar, boton_lupa] + ranuras:
+		if control.is_visible_in_tree() and control.get_global_rect().grow(8).has_point(posicion):
 			return true
 	return false
 
 
 func bloquea_todo() -> bool:
-	return capa_nota.visible or capa_final.visible
+	return capa_nota.visible or capa_final.visible or capa_salida.visible or (capa_examen != null and capa_examen.visible)
+
+
+# --- Entrada: cartela con el título mientras la cámara entra en la habitación --------------------
+
+func _crear_cartela(datos: Dictionary) -> void:
+	cartela = Control.new()
+	cartela.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	cartela.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cartela.visible = false
+	raiz.add_child(cartela)
+	var columna := VBoxContainer.new()
+	columna.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	columna.add_theme_constant_override("separation", 6)
+	cartela.add_child(columna)
+	var titulo := Estilo.sombra(Estilo.etiqueta(datos.get("titulo", ""), 76, acento.lightened(0.3), Estilo.FUENTE_NEGRITA), 10)
+	titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	columna.add_child(titulo)
+	var nombre := Estilo.sombra(Estilo.etiqueta(datos.get("nombre", ""), 40, Estilo.TEXTO, Estilo.FUENTE_CURSIVA), 8)
+	nombre.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	columna.add_child(nombre)
+	var frase := Estilo.sombra(Estilo.etiqueta(datos.get("frase", ""), 30, Estilo.TEXTO_SUAVE, Estilo.FUENTE_CURSIVA), 8)
+	frase.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	frase.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	frase.custom_minimum_size = Vector2(minf(900.0, _ancho() - 120.0), 0)
+	columna.add_child(frase)
+	var tamano := columna.get_combined_minimum_size()
+	colocar(columna, Control.PRESET_CENTER_BOTTOM, Vector2(-tamano.x / 2.0, -tamano.y - 70.0), tamano)
+	var saltar := Estilo.sombra(Estilo.etiqueta("Toca para saltar", Estilo.LETRA_PEQUENA, Estilo.TEXTO_SUAVE, Estilo.FUENTE_CURSIVA))
+	saltar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cartela.add_child(saltar)
+	colocar(saltar, Control.PRESET_BOTTOM_RIGHT, Vector2(-290, -58), Vector2(270, 40))
+	saltar.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+
+
+func empezar_entrada() -> void:
+	interfaz.visible = false
+	cartela.visible = true
+	cartela.modulate.a = 0.0
+	var animacion := create_tween()
+	animacion.tween_interval(0.5)
+	animacion.tween_property(cartela, "modulate:a", 1.0, 1.0)
+
+
+func mostrar_interfaz() -> void:
+	if cartela.visible:
+		var salida := create_tween()
+		salida.tween_property(cartela, "modulate:a", 0.0, 0.6)
+		salida.tween_callback(cartela.hide)
+	interfaz.visible = true
+	interfaz.modulate.a = 0.0
+	create_tween().tween_property(interfaz, "modulate:a", 1.0, 0.6)
 
 
 # --- Avisos, pistas y progreso -------------------------------------------------------------
 
-func mensaje(texto: String, segundos := 3.4) -> void:
+func mensaje(texto: String, segundos := 3.4, encabezado := "") -> void:
+	aviso_encabezado.text = encabezado
+	aviso_encabezado.visible = encabezado != ""
 	aviso_texto.text = texto
+	var maximo := minf(1000.0, _ancho() - 2.0 * (MARGEN + RANURA + 30.0)) - 48.0
+	var natural := _ancho_texto(texto)
+	if encabezado != "":
+		natural = maxf(natural, _ancho_texto(encabezado))
+	# el alto se calcula aquí: la etiqueta con ajuste de línea aún no conoce su ancho en este cuadro
+	var ancho := minf(natural, maximo)
+	var fuente: Font = aviso_texto.get_theme_font("font")
+	var alto := fuente.get_multiline_string_size(texto, HORIZONTAL_ALIGNMENT_CENTER, ancho, Estilo.LETRA).y
+	aviso_texto.custom_minimum_size = Vector2(ancho, alto)
+	aviso.reset_size()
 	var tamano := aviso.get_combined_minimum_size()
-	var alto_barra := 120.0 if not ranuras.is_empty() else 0.0
-	colocar(aviso, Control.PRESET_CENTER_BOTTOM, Vector2(-tamano.x / 2.0, -tamano.y - 34.0 - alto_barra), tamano)
+	colocar(aviso, Control.PRESET_CENTER_BOTTOM, Vector2(-tamano.x / 2.0, -tamano.y - MARGEN), tamano)
 	if _aviso_animacion:
 		_aviso_animacion.kill()
 	_aviso_animacion = create_tween()
@@ -129,19 +226,25 @@ func mensaje(texto: String, segundos := 3.4) -> void:
 	_aviso_animacion.tween_property(aviso, "modulate:a", 0.0, 0.6)
 
 
+# Ancho que ocuparía el texto en una sola línea (para que los avisos cortos no salgan enormes)
+func _ancho_texto(texto: String) -> float:
+	var fuente: Font = aviso_texto.get_theme_font("font")
+	return fuente.get_string_size(texto, HORIZONTAL_ALIGNMENT_LEFT, -1, Estilo.LETRA).x + 4.0
+
+
 func mostrar_pista(texto: String, nivel: int, total: int) -> void:
-	mensaje("Pista %d de %d · %s" % [nivel, total, texto], 6.0)
+	mensaje(texto, 7.0, "Pista %d de %d" % [nivel, total])
 
 
 func poner_progreso(hechos: int) -> void:
 	var marcas := ""
 	for i in _total_pasos:
-		marcas += ("●" if i < hechos else "○") + (" " if i < _total_pasos - 1 else "")
+		marcas += ("●" if i < hechos else "○") + ("  " if i < _total_pasos - 1 else "")
 	progreso.text = marcas
 
 
-func modo_habitacion(activo: bool) -> void:
-	boton_centrar.text = "Volver" if activo else "Centrar"
+func modo_habitacion(_activo: bool) -> void:
+	pass
 
 
 # --- Inventario ------------------------------------------------------------------------------
@@ -150,24 +253,36 @@ func poner_inventario(objetos: Array, seleccionado: String) -> void:
 	for ranura in ranuras:
 		ranura.queue_free()
 	ranuras.clear()
+	var elegido: Button = null
 	for objeto in objetos:
 		var boton := Button.new()
-		boton.custom_minimum_size = Vector2(96, 96)
+		boton.custom_minimum_size = Vector2(RANURA, RANURA)
 		boton.focus_mode = Control.FOCUS_NONE
 		boton.toggle_mode = true
 		boton.button_pressed = objeto.id == seleccionado
-		boton.tooltip_text = objeto.nombre
 		if objeto.icono:
 			boton.icon = objeto.icono
 			boton.expand_icon = true
 			boton.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			for estado in ["normal", "hover", "pressed", "hover_pressed", "focus"]:
+				var caja: StyleBoxFlat = boton.get_theme_stylebox(estado).duplicate()
+				caja.content_margin_left = 8
+				caja.content_margin_right = 8
+				caja.content_margin_top = 8
+				caja.content_margin_bottom = 8
+				boton.add_theme_stylebox_override(estado, caja)
 		else:
 			boton.text = objeto.nombre.left(1)
 		boton.pressed.connect(func(): mesa.seleccionar(objeto.id))
-		barra.add_child(boton)
+		columna_inventario.add_child(boton)
 		ranuras.append(boton)
-	var ancho := maxf(96.0, ranuras.size() * 110.0)
-	colocar(barra, Control.PRESET_CENTER_BOTTOM, Vector2(-ancho / 2.0, -120), Vector2(ancho, 96))
+		if objeto.id == seleccionado:
+			elegido = boton
+	boton_lupa.visible = elegido != null
+	if elegido:
+		var indice := ranuras.find(elegido)
+		colocar(boton_lupa, Control.PRESET_TOP_LEFT,
+			Vector2(MARGEN + RANURA + 14.0, MARGEN + BOTON + 22.0 + indice * (RANURA + 12.0) + (RANURA - 76.0) / 2.0), Vector2(76, 76))
 
 
 # --- Notas -----------------------------------------------------------------------------------
@@ -178,11 +293,11 @@ func _crear_nota() -> void:
 	capa_nota.visible = false
 	capa_nota.mouse_filter = Control.MOUSE_FILTER_STOP
 	capa_nota.gui_input.connect(func(evento: InputEvent):
-		if (evento is InputEventMouseButton and evento.pressed) or (evento is InputEventScreenTouch and evento.pressed):
+		if evento is InputEventMouseButton and evento.pressed and evento.button_index == MOUSE_BUTTON_LEFT:
 			cerrar_nota())
 	raiz.add_child(capa_nota)
 	var oscuro := ColorRect.new()
-	oscuro.color = Color(0, 0, 0, 0.6)
+	oscuro.color = Color(0, 0, 0, 0.66)
 	oscuro.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	oscuro.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	capa_nota.add_child(oscuro)
@@ -198,13 +313,17 @@ func _crear_nota() -> void:
 	columna.add_theme_constant_override("separation", 14)
 	columna.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hoja.add_child(columna)
-	nota_titulo = Estilo.etiqueta("", 34, Color(0.25, 0.16, 0.1), Estilo.FUENTE_NEGRITA)
+	nota_titulo = Estilo.etiqueta("", 44, Color(0.25, 0.16, 0.1), Estilo.FUENTE_NEGRITA)
 	columna.add_child(nota_titulo)
-	nota_texto = Estilo.etiqueta("", 28, Color(0.18, 0.12, 0.08), Estilo.FUENTE_CURSIVA)
+	nota_desplazable = ScrollContainer.new()
+	nota_desplazable.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	nota_desplazable.mouse_filter = Control.MOUSE_FILTER_PASS
+	columna.add_child(nota_desplazable)
+	nota_texto = Estilo.etiqueta("", 36, Color(0.17, 0.11, 0.07), Estilo.FUENTE_CURSIVA)
 	nota_texto.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	nota_texto.custom_minimum_size = Vector2(760, 0)
-	columna.add_child(nota_texto)
-	var cierre := Estilo.etiqueta("Toca para cerrar", 20, Color(0.4, 0.32, 0.24))
+	nota_texto.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	nota_desplazable.add_child(nota_texto)
+	var cierre := Estilo.etiqueta("Toca para cerrar", 26, Color(0.42, 0.33, 0.24))
 	cierre.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	columna.add_child(cierre)
 
@@ -212,6 +331,13 @@ func _crear_nota() -> void:
 func mostrar_nota(titulo: String, texto: String) -> void:
 	nota_titulo.text = titulo
 	nota_texto.text = texto
+	var ancho := minf(1040.0, _ancho() - 140.0)
+	nota_texto.custom_minimum_size = Vector2(ancho, 0)
+	nota_texto.reset_size()
+	var alto_texto := nota_texto.get_combined_minimum_size().y
+	var alto_pantalla := raiz.get_viewport_rect().size.y
+	nota_desplazable.custom_minimum_size = Vector2(ancho + 24.0, minf(alto_texto, alto_pantalla - 250.0))
+	nota_desplazable.scroll_vertical = 0
 	capa_nota.visible = true
 	capa_nota.modulate.a = 0.0
 	create_tween().tween_property(capa_nota, "modulate:a", 1.0, 0.2)
@@ -219,6 +345,188 @@ func mostrar_nota(titulo: String, texto: String) -> void:
 
 func cerrar_nota() -> void:
 	capa_nota.visible = false
+
+
+# --- Salir con confirmación -------------------------------------------------------------------
+
+func _crear_salida() -> void:
+	capa_salida = Control.new()
+	capa_salida.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	capa_salida.visible = false
+	capa_salida.mouse_filter = Control.MOUSE_FILTER_STOP
+	raiz.add_child(capa_salida)
+	var oscuro := ColorRect.new()
+	oscuro.color = Color(0, 0, 0, 0.6)
+	oscuro.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	oscuro.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	capa_salida.add_child(oscuro)
+	var centro := CenterContainer.new()
+	centro.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	capa_salida.add_child(centro)
+	var panel := PanelContainer.new()
+	centro.add_child(panel)
+	var columna := VBoxContainer.new()
+	columna.add_theme_constant_override("separation", 20)
+	panel.add_child(columna)
+	var titulo := Estilo.etiqueta("¿Salir de esta caja?", 46, acento.lightened(0.25), Estilo.FUENTE_NEGRITA)
+	titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	columna.add_child(titulo)
+	var texto := Estilo.etiqueta("Volverás a la lista de cajas y se perderá lo que llevas hecho.", 32, Estilo.TEXTO)
+	texto.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	texto.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	texto.custom_minimum_size = Vector2(620, 0)
+	columna.add_child(texto)
+	var botones := HBoxContainer.new()
+	botones.alignment = BoxContainer.ALIGNMENT_CENTER
+	botones.add_theme_constant_override("separation", 28)
+	columna.add_child(botones)
+	var seguir := Button.new()
+	seguir.text = "Seguir aquí"
+	seguir.custom_minimum_size = Vector2(250, 84)
+	seguir.focus_mode = Control.FOCUS_NONE
+	seguir.pressed.connect(func(): capa_salida.visible = false)
+	botones.add_child(seguir)
+	var salir := Button.new()
+	salir.text = "Salir"
+	salir.custom_minimum_size = Vector2(250, 84)
+	salir.focus_mode = Control.FOCUS_NONE
+	salir.pressed.connect(func(): mesa.salir.emit())
+	botones.add_child(salir)
+
+
+func _pedir_salida() -> void:
+	capa_salida.visible = true
+	capa_salida.modulate.a = 0.0
+	create_tween().tween_property(capa_salida, "modulate:a", 1.0, 0.18)
+
+
+# --- Examinar un objeto del inventario en 3D -------------------------------------------------------
+
+func mostrar_examen(nombre: String, modelo: Node3D) -> void:
+	cerrar_examen()
+	capa_examen = Control.new()
+	capa_examen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	capa_examen.mouse_filter = Control.MOUSE_FILTER_STOP
+	raiz.add_child(capa_examen)
+	var oscuro := ColorRect.new()
+	oscuro.color = Color(0.0, 0.0, 0.0, 0.93)
+	oscuro.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	oscuro.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	capa_examen.add_child(oscuro)
+	var contenedor := SubViewportContainer.new()
+	contenedor.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	contenedor.stretch = true
+	contenedor.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	capa_examen.add_child(contenedor)
+	_vista_examen = SubViewport.new()
+	_vista_examen.own_world_3d = true
+	_vista_examen.transparent_bg = true
+	_vista_examen.msaa_3d = Viewport.MSAA_2X
+	contenedor.add_child(_vista_examen)
+	var copia: Node3D = mesa.copia_de(modelo)
+	var caja: AABB = mesa.caja_de(copia)
+	_pivote_examen = Node3D.new()
+	_vista_examen.add_child(_pivote_examen)
+	copia.position = -caja.get_center()
+	_pivote_examen.add_child(copia)
+	_pivote_examen.rotation = Vector3(0.35, -0.5, 0.0)
+	_distancia_examen = maxf(caja.size.length(), 0.01) * 2.2
+	_camara_examen = Camera3D.new()
+	_camara_examen.fov = 32.0
+	_camara_examen.near = 0.005
+	_camara_examen.position = Vector3(0.0, 0.0, _distancia_examen)
+	_vista_examen.add_child(_camara_examen)
+	var principal := DirectionalLight3D.new()
+	principal.rotation = Vector3(-0.7, 0.5, 0.0)
+	principal.light_energy = 1.5
+	principal.light_color = Color(1.0, 0.94, 0.86)
+	_vista_examen.add_child(principal)
+	var relleno := DirectionalLight3D.new()
+	relleno.rotation = Vector3(0.4, -2.4, 0.0)
+	relleno.light_energy = 0.6
+	relleno.light_color = Color(0.7, 0.78, 1.0)
+	_vista_examen.add_child(relleno)
+	var ambiente := WorldEnvironment.new()
+	ambiente.environment = Environment.new()
+	ambiente.environment.background_mode = Environment.BG_CLEAR_COLOR
+	ambiente.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	ambiente.environment.ambient_light_color = Color(0.6, 0.6, 0.66)
+	ambiente.environment.ambient_light_energy = 0.7
+	ambiente.environment.tonemap_mode = Environment.TONE_MAPPER_ACES
+	_vista_examen.add_child(ambiente)
+
+	var titulo := Estilo.sombra(Estilo.etiqueta(nombre, 46, acento.lightened(0.3), Estilo.FUENTE_NEGRITA), 8)
+	titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	titulo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	capa_examen.add_child(titulo)
+	colocar(titulo, Control.PRESET_CENTER_TOP, Vector2(-400, MARGEN + 16), Vector2(800, 60))
+	var ayuda := Estilo.sombra(Estilo.etiqueta("Gira el objeto con el dedo · pellizca para acercarlo", Estilo.LETRA_PEQUENA,
+		Estilo.TEXTO_SUAVE, Estilo.FUENTE_CURSIVA))
+	ayuda.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	ayuda.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	capa_examen.add_child(ayuda)
+	colocar(ayuda, Control.PRESET_CENTER_BOTTOM, Vector2(-450, -MARGEN - 44), Vector2(900, 44))
+	var cerrar := Estilo.boton_icono("cerrar", acento, BOTON)
+	cerrar.pressed.connect(cerrar_examen)
+	capa_examen.add_child(cerrar)
+	colocar(cerrar, Control.PRESET_TOP_RIGHT, Vector2(-MARGEN - BOTON, MARGEN), Vector2(BOTON, BOTON))
+	capa_examen.modulate.a = 0.0
+	create_tween().tween_property(capa_examen, "modulate:a", 1.0, 0.2)
+	_toques_examen.clear()
+
+
+func cerrar_examen() -> void:
+	if capa_examen:
+		capa_examen.queue_free()
+	capa_examen = null
+	_vista_examen = null
+	_pivote_examen = null
+	_toques_examen.clear()
+
+
+func examinando() -> bool:
+	return capa_examen != null and is_instance_valid(capa_examen) and capa_examen.visible
+
+
+# Girar con un dedo y acercar con dos, mientras se examina un objeto
+func _input(evento: InputEvent) -> void:
+	if not examinando() or _pivote_examen == null:
+		return
+	if evento is InputEventScreenTouch:
+		if evento.pressed:
+			_toques_examen[evento.index] = evento.position
+			if _toques_examen.size() == 2:
+				_pellizco_examen = _distancia_examen_toques()
+		else:
+			_toques_examen.erase(evento.index)
+	elif evento is InputEventScreenDrag and _toques_examen.has(evento.index):
+		_toques_examen[evento.index] = evento.position
+		if _toques_examen.size() >= 2:
+			var distancia := _distancia_examen_toques()
+			if _pellizco_examen > 10.0 and distancia > 10.0:
+				_acercar_examen(_pellizco_examen / distancia)
+			_pellizco_examen = distancia
+		else:
+			var escala := 720.0 / maxf(1.0, raiz.get_viewport_rect().size.y)
+			_pivote_examen.rotate(Vector3.UP, evento.relative.x * escala * 0.012)
+			_pivote_examen.rotate(Vector3.RIGHT, evento.relative.y * escala * 0.012)
+	elif evento is InputEventMouseButton and evento.pressed:
+		if evento.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_acercar_examen(0.9)
+		elif evento.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_acercar_examen(1.1)
+
+
+func _distancia_examen_toques() -> float:
+	var lista := _toques_examen.values()
+	return (lista[0] as Vector2).distance_to(lista[1]) if lista.size() >= 2 else 0.0
+
+
+func _acercar_examen(factor: float) -> void:
+	if _camara_examen == null:
+		return
+	var actual := _camara_examen.position.z
+	_camara_examen.position.z = clampf(actual * factor, _distancia_examen * 0.4, _distancia_examen * 1.6)
 
 
 # --- Final -----------------------------------------------------------------------------------
@@ -240,31 +548,36 @@ func _crear_final() -> void:
 	var panel := PanelContainer.new()
 	centro.add_child(panel)
 	var columna := VBoxContainer.new()
-	columna.add_theme_constant_override("separation", 16)
+	columna.add_theme_constant_override("separation", 18)
 	panel.add_child(columna)
-	final_titulo = Estilo.etiqueta("", 52, acento.lightened(0.25), Estilo.FUENTE_NEGRITA)
+	final_titulo = Estilo.etiqueta("", 60, acento.lightened(0.25), Estilo.FUENTE_NEGRITA)
 	final_titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	columna.add_child(final_titulo)
-	final_texto = Estilo.etiqueta("", 26, Estilo.TEXTO, Estilo.FUENTE_CURSIVA)
+	final_texto = Estilo.etiqueta("", 32, Estilo.TEXTO, Estilo.FUENTE_CURSIVA)
 	final_texto.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	final_texto.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	final_texto.custom_minimum_size = Vector2(720, 0)
 	columna.add_child(final_texto)
-	final_datos = Estilo.etiqueta("", 26, Estilo.TEXTO_SUAVE)
+	final_datos = Estilo.etiqueta("", 30, Estilo.TEXTO_SUAVE)
 	final_datos.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	final_datos.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	columna.add_child(final_datos)
 	var botones := HBoxContainer.new()
 	botones.alignment = BoxContainer.ALIGNMENT_CENTER
-	botones.add_theme_constant_override("separation", 24)
+	botones.add_theme_constant_override("separation", 28)
 	columna.add_child(botones)
 	boton_repetir = Button.new()
 	boton_repetir.text = "Otra vez"
-	boton_repetir.custom_minimum_size = Vector2(200, 66)
+	boton_repetir.icon = Estilo.icono("repetir")
+	boton_repetir.expand_icon = false
+	boton_repetir.add_theme_constant_override("icon_max_width", 40)
+	boton_repetir.custom_minimum_size = Vector2(250, 84)
+	boton_repetir.focus_mode = Control.FOCUS_NONE
 	boton_repetir.pressed.connect(func(): mesa.repetir.emit())
 	botones.add_child(boton_repetir)
 	boton_salir = Button.new()
-	boton_salir.text = "Volver al menú"
-	boton_salir.custom_minimum_size = Vector2(260, 66)
+	boton_salir.text = "Volver a las cajas"
+	boton_salir.custom_minimum_size = Vector2(380, 84)
+	boton_salir.focus_mode = Control.FOCUS_NONE
 	boton_salir.pressed.connect(func(): mesa.salir.emit())
 	botones.add_child(boton_salir)
 
@@ -273,45 +586,14 @@ func mostrar_final(titulo: String, texto: String, resumen: String) -> void:
 	final_titulo.text = titulo
 	final_texto.text = texto
 	final_datos.text = resumen
-	for control in [boton_menu, boton_pista, boton_centrar, barra]:
-		control.visible = false
+	var ancho := minf(960.0, _ancho() - 160.0)
+	final_texto.custom_minimum_size = Vector2(ancho, 0)
+	final_datos.custom_minimum_size = Vector2(ancho, 0)
+	interfaz.visible = false
+	aviso.modulate.a = 0.0
 	capa_final.visible = true
 	capa_final.modulate.a = 0.0
 	create_tween().tween_property(capa_final, "modulate:a", 1.0, 0.8)
-
-
-# --- Portada (título y frase al empezar) -------------------------------------------------------
-
-func _crear_portada(datos: Dictionary) -> void:
-	portada = VBoxContainer.new()
-	portada.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	portada.add_theme_constant_override("separation", 8)
-	raiz.add_child(portada)
-	var titulo := Estilo.etiqueta(datos.titulo, 64, acento.lightened(0.3), Estilo.FUENTE_NEGRITA)
-	titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	portada.add_child(titulo)
-	var frase := Estilo.etiqueta(datos.frase, 28, Estilo.TEXTO, Estilo.FUENTE_CURSIVA)
-	frase.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	frase.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	frase.custom_minimum_size = Vector2(820, 0)
-	portada.add_child(frase)
-	var tamano := portada.get_combined_minimum_size()
-	colocar(portada, Control.PRESET_CENTER, Vector2(-tamano.x / 2.0, -tamano.y / 2.0 - 120.0), tamano)
-	var animacion := create_tween()
-	animacion.tween_interval(3.2)
-	animacion.tween_property(portada, "modulate:a", 0.0, 1.2)
-	animacion.tween_callback(portada.hide)
-
-
-# --- Salir con confirmación -------------------------------------------------------------------
-
-func _pedir_salida() -> void:
-	var ahora := Time.get_ticks_msec() * 0.001
-	if ahora - _salida_pedida < 2.5:
-		mesa.salir.emit()
-		return
-	_salida_pedida = ahora
-	mensaje("Toca «Menú» otra vez para salir (se pierde lo avanzado).", 2.2)
 
 
 func _material_vineta() -> ShaderMaterial:
@@ -320,9 +602,8 @@ func _material_vineta() -> ShaderMaterial:
 shader_type canvas_item;
 void fragment() {
 	vec2 p = UV - 0.5;
-	float sombra = smoothstep(0.35, 0.85, length(p * vec2(1.15, 1.6)));
-	float grano = fract(sin(dot(floor(FRAGCOORD.xy), vec2(12.9898, 78.233)) + TIME * 0.0) * 43758.5453);
-	COLOR = vec4(vec3(grano * 0.04), sombra * 0.55);
+	float sombra = smoothstep(0.38, 0.9, length(p * vec2(1.1, 1.5)));
+	COLOR = vec4(vec3(0.0), sombra * 0.5);
 }
 """
 	var material := ShaderMaterial.new()

@@ -3,8 +3,11 @@
 # te ve, no se deja tocar. Hay que girarla para trabajar por su punto ciego y, al final, dormirla.
 #
 # Pasos: costado derecho → tapa (1) → costado izquierdo (sin que el ojo te vea) → tapa (2) →
-# ficha de shōgi → ficha en la base (la caja se duerme) → disco en la ola → abrir la cara delantera.
+# ficha de shōgi → ficha en el hueco de atrás (la caja se duerme) → disco en la ola → abrir la cara
+# delantera. La caja está sobre una mesa baja en un washitsu de noche (salas/washitsu.gd).
 extends Puzle
+
+const Washitsu := preload("res://scripts/salas/washitsu.gd")
 
 const ANCHO := 0.26
 const ALTO := 0.15
@@ -49,6 +52,7 @@ var _ruido := FastNoiseLite.new()
 var madera: Material
 var laca_roja: Material
 var laca_negra: Material
+var sala: Node3D
 
 
 func construir() -> void:
@@ -64,6 +68,13 @@ func construir() -> void:
 	_hueco()
 	_camara_interior()
 	_pasos()
+	_zonas()
+
+
+func construir_sala() -> void:
+	sala = Washitsu.new()
+	add_child(sala)
+	sala.construir()
 
 
 func _mosaico(nombre: String) -> Material:
@@ -182,19 +193,20 @@ func _fondo_y_base() -> void:
 	_placa(base, tamano, Vector3.DOWN, "yabane")
 	_opaco(base, tamano)
 
+	# el hueco de la ficha, en la cara de atrás (la caja está sobre la mesa: por debajo no se ve)
 	ranura = PiezaRanura.new()
 	ranura.id = "ranura"
 	ranura.acepta = "koma"
 	ranura.aviso_vacia = "Hay un hueco con forma de ficha de shōgi."
-	ranura.position = Vector3(0.0, -(ALTO / 2.0 + PLACA) - 0.0004, 0.0)
+	ranura.position = Vector3(0.0, -0.004, -(FONDO / 2.0 + PLACA) - 0.0004)
 	var hueco := Geometria.pieza(Geometria.extruir(_contorno_koma(1.1), 0.001), laca_negra, Vector3.ZERO, ranura)
-	hueco.rotation = Vector3(PI / 2.0, 0.0, 0.0)
-	var dentro := Escena.grupo(ranura, Vector3(0.0, 0.003, 0.0), "Colocada")
-	_modelo_koma(dentro).rotation = Vector3(PI / 2.0, 0.0, 0.0)
+	hueco.rotation = Vector3(0.0, PI, 0.0)
+	var dentro := Escena.grupo(ranura, Vector3(0.0, 0.0, -0.003), "Colocada")
+	_modelo_koma(dentro).rotation = Vector3(0.0, PI, 0.0)
 	dentro.hide()
 	ranura.colocado = dentro
-	ranura.desde = Vector3(0.0, -0.03, 0.0)
-	ranura.colisor_caja(Vector3(0.04, 0.005, 0.045))
+	ranura.desde = Vector3(0.0, 0.0, -0.03)
+	ranura.colisor_caja(Vector3(0.042, 0.046, 0.006))
 	agregar(ranura, caja)
 	ranura.accionada.connect(func(_p):
 		completar("dormir")
@@ -438,8 +450,8 @@ func _pasos() -> void:
 		"Toca la ficha del hueco para guardarla."], "koma")
 	paso("dormir", [
 		"La ficha encaja en algún sitio de la caja.",
-		"Mira la caja por debajo.",
-		"Elige la ficha abajo y toca el hueco de la base."], "ranura")
+		"Mira la caja por detrás.",
+		"Elige la ficha a la izquierda y toca el hueco de la parte de atrás."], "ranura")
 	paso("simbolo", [
 		"El disco de la cara delantera tiene cuatro símbolos. ¿Cuál viste pintado antes?",
 		"En el fondo del hueco de arriba había un símbolo en rojo: una ola.",
@@ -453,42 +465,73 @@ func _pasos() -> void:
 		+ "En la colección quedan otras cajas, y también tienen cien años."
 
 
+# Zonas de cerca para el doble toque: cada cara de la caja y el hueco de arriba
+func _zonas() -> void:
+	zona("frente", Vector3(0.0, 0.0, 0.09), 0.36, 0.0, 0.12, 0.1)
+	zona("tapa", Vector3(0.0, 0.09, 0.0), 0.42, NAN, 1.05, 0.1)
+	zona("hueco", Vector3(-0.088, 0.06, 0.0), 0.27, NAN, 1.15, 0.05)
+	zona("derecho", Vector3(0.14, 0.0, 0.0), 0.38, PI / 2.0, 0.15, 0.1)
+	zona("izquierdo", Vector3(-0.14, 0.0, 0.0), 0.38, -PI / 2.0, 0.15, 0.1)
+	zona("trasera", Vector3(0.0, 0.0, -0.095), 0.36, PI, 0.12, 0.1)
+
+
 # --- Cámara, luz y ambiente --------------------------------------------------------------------
 
 func preparar_camara(camara: CamaraPuzle) -> void:
 	camara.camara.fov = 38.0
-	camara.configurar_orbita(Vector3(0.0, 0.0, 0.0), 0.55, 0.4, 0.66, Vector2(0.26, 1.0), Vector2(-1.38, 1.38))
+	camara.configurar_orbita(Vector3(0.0, 0.0, 0.0), 0.55, 0.42, 0.95, Vector2(0.2, 1.5), Vector2(-1.38, 1.38))
+	camara.altura_minima = -0.06
+	camara.poner_luz(0.4, 1.4)
+
+
+# De las fusuma del pasillo a la mesa baja
+func ruta_entrada() -> Dictionary:
+	var piso: float = Washitsu.PISO
+	return {"puntos": [Vector3(0.0, piso + 1.47, 3.15), Vector3(0.0, piso + 1.4, 2.25), Vector3(0.12, piso + 1.12, 1.35)],
+		"miradas": [Vector3(0.0, -0.1, 0.0), Vector3(0.0, -0.1, 0.0), Vector3(0.0, -0.05, 0.0)],
+		"duracion": 6.0, "fov": 52.0}
 
 
 func preparar_entorno(entorno: Environment) -> void:
+	# el cielo solo da reflejos a la laca: la habitación está cerrada
 	Escena.cielo(entorno, {
 		"arriba": Color(0.015, 0.02, 0.05), "horizonte": Color(0.07, 0.055, 0.1), "abajo": Color(0.01, 0.008, 0.015),
 		"resplandor": Color(0.45, 0.2, 0.08), "direccion_resplandor": Vector3(-0.6, 0.3, 0.7), "apertura": 5.0,
-		"nubes": 0.5, "color_nubes": Color(0.1, 0.08, 0.13), "estrellas": 0.5})
+		"nubes": 0.5, "color_nubes": Color(0.1, 0.08, 0.13), "estrellas": 0.5}, false)
+	entorno.background_mode = Environment.BG_COLOR
+	entorno.background_color = Color(0.01, 0.01, 0.015)
 	entorno.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	entorno.ambient_light_color = Color(0.36, 0.38, 0.55)
-	entorno.ambient_light_energy = 0.22
-	entorno.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
+	entorno.ambient_light_color = Color(0.42, 0.42, 0.55)
+	entorno.ambient_light_energy = 0.24
 	entorno.tonemap_mode = Environment.TONE_MAPPER_ACES
-	entorno.tonemap_exposure = 1.0
+	entorno.tonemap_exposure = 1.05
 	entorno.glow_enabled = true
 	entorno.glow_intensity = 0.9
 	entorno.glow_bloom = 0.04
-	farol = Escena.luz(self, Vector3(-0.46, 0.38, 0.3), Color(1.0, 0.72, 0.48), 1.15, 2.4, true)
-	Escena.luz(self, Vector3(0.35, -0.4, 0.3), Color(0.45, 0.5, 0.8), 0.45, 1.6)
-	Escena.luz_lejana(self, Vector3(0.6, 0.7, -0.8), Color(0.55, 0.65, 1.0), 0.9)
-	Escena.polvo(self, Vector3(0.5, 0.35, 0.5), Color(1.0, 0.8, 0.6, 0.55), 60, 0.0025)
+	if sala:
+		farol = sala.andon
+	else:
+		farol = Escena.luz(self, Vector3(-0.46, 0.38, 0.3), Color(1.0, 0.72, 0.48), 1.15, 2.4, true)
+	# luz cálida de arriba, como el reflejo del andon en el techo
+	Escena.luz(self, Vector3(0.1, 0.9, 0.25), Color(1.0, 0.8, 0.6), 0.35, 1.8)
 
 
+# Al entrar: el ambiente de la noche y las fusuma que se abren
 func empezar() -> void:
 	_ruido.frequency = 1.3
 	mesa.sonido.bucle("noche", -13.0, 3.0)
-	await get_tree().create_timer(1.6).timeout
+	if sala:
+		sala.abrir_puertas(mesa.sonido)
+
+
+# Al llegar a la mesa: la caja abre el ojo
+func al_llegar() -> void:
+	await get_tree().create_timer(0.5).timeout
 	_despierta = true
 	mesa.sonido.sonar("ojo_abre", -4.0)
-	await get_tree().create_timer(2.6).timeout
+	await get_tree().create_timer(2.2).timeout
 	if hechos.is_empty():
-		mesa.mensaje("Gira la caja con el dedo. Pellizca para acercarte.", 4.0)
+		mesa.mensaje("Gira la caja con un dedo. Toca dos veces para mirar de cerca; pellizca para alejarte.", 5.0)
 
 
 # --- El ojo --------------------------------------------------------------------------------------
@@ -506,8 +549,7 @@ func _quizas_enfadar() -> void:
 	bloqueo_por_ojo += 1
 	_enfado = 1.3
 	mesa.sonido.sonar("grunido", -2.0)
-	mesa.camara.sacudir(0.7)
-	mesa.vibrar(70, 0.9)
+	mesa.vibrar(60, 0.8)
 	if not _avisado_ojo:
 		_avisado_ojo = true
 		mesa.mensaje("La caja te está mirando. Mientras te vea, no se deja tocar.", 4.5)
@@ -522,8 +564,21 @@ func _dormir() -> void:
 
 
 func actualizar(delta: float) -> void:
+	if sala:
+		sala.actualizar(delta)
+	elif farol:
+		farol.light_energy = 1.15 + _ruido.get_noise_1d(_tiempo * 3.0) * 0.15
+	_animar(delta, mesa.camara.camara.global_position)
+
+
+# En el gabinete del menú: duerme, y abre el ojo cuando la miras
+func animar_vitrina(delta: float, camara: Camera3D, activa: bool) -> void:
+	_despierta = activa
+	_animar(delta, camara.global_position)
+
+
+func _animar(delta: float, posicion_camara: Vector3) -> void:
 	_tiempo += delta
-	farol.light_energy = 1.15 + _ruido.get_noise_1d(_tiempo * 3.0) * 0.15
 	_enfado = maxf(0.0, _enfado - delta)
 	var objetivo := 1.0
 	if _despierta and not dormida:
@@ -539,10 +594,10 @@ func actualizar(delta: float) -> void:
 	_poner_parpados()
 	var intensidad := 0.0 if dormida else (2.4 + _enfado * 5.0)
 	material_iris.emission_energy_multiplier = lerpf(material_iris.emission_energy_multiplier, intensidad, minf(1.0, delta * 6.0))
-	if not dormida and _despierta:
-		luz_ojo.light_energy = 0.22 + _enfado * 1.4
+	if not dormida:
+		luz_ojo.light_energy = (0.22 + _enfado * 1.4) if _despierta else 0.0
 	# la pupila mira a la cámara
-	var hacia: Vector3 = ojo.global_basis.orthonormalized().inverse() * (mesa.camara.camara.global_position - ojo.global_position).normalized()
+	var hacia: Vector3 = ojo.global_basis.orthonormalized().inverse() * (posicion_camara - ojo.global_position).normalized()
 	var mirada := Vector2(hacia.x, hacia.y).limit_length(1.0) * 0.0068
 	pupila.position = Vector3(mirada.x, mirada.y, 0.0024)
 	pupila.scale = Vector3.ONE * (0.75 if _enfado > 0.0 else 1.0)
@@ -597,7 +652,7 @@ func resolver_paso(id: String) -> void:
 			koma.tocar()
 		"dormir":
 			mesa.seleccionar("koma")
-			mesa.camara.enfocar(Vector3.ZERO, 0.6, 0.3, -1.2, 0.1)
+			mesa.camara.enfocar(Vector3.ZERO, 0.6, PI, 0.15, 0.1)
 			await esperar_camara()
 			ranura.tocar()
 		"simbolo":
@@ -616,6 +671,10 @@ func arrastre_de_prueba() -> Dictionary:
 	return {"pieza": lado_derecho, "direccion": Vector3.DOWN, "pixeles": 90.0,
 		"comprobar": func() -> bool: return lado_derecho.en(BAJADA)}
 
+
+# Una pieza bloqueada al empezar (la prueba comprueba que no se mueve al tocarla)
+func bloqueo_de_prueba() -> Pieza:
+	return tapa
 
 func capturas_de_prueba() -> Array:
 	return ["lado_izquierdo", "tapa_2", "dormir", "simbolo"]

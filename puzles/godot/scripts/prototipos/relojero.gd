@@ -4,7 +4,10 @@
 #
 # Pasos: cuerda → las tres en punto (se suelta el cajón) → abrir el cajón → coger el engranaje →
 # ponerlo en la maquinaria de atrás → las 9:45 (se suelta la tapa) → abrir la tapa.
+# El escritorio está en medio de su taller (salas/taller.gd), con la carta y la lámpara de banquero.
 extends Puzle
+
+const Taller := preload("res://scripts/salas/taller.gd")
 
 const ANCHO := 0.3
 const ALTO := 0.14
@@ -27,6 +30,7 @@ var maquinaria: Array = []            # engranajes que giran cuando la máquina 
 var reloj_bolsillo: Node3D
 var aguja_bolsillo: Node3D
 var lampara: OmniLight3D
+var sala: Node3D
 var en_marcha := false
 var cierre_suelto := false
 var cajon_bloqueado_antes := false    # para la prueba: el cajón no se abría antes de tiempo
@@ -42,7 +46,6 @@ func construir() -> void:
 	caoba = Materiales.con_textura("caoba", 5.0, 0.3, 0.0, Color(0.62, 0.5, 0.46), 0.6)
 	laton = Materiales.laton(0.3)
 	terciopelo = Materiales.liso(Color(0.32, 0.03, 0.05), 0.95)
-	_escritorio()
 	caja = Escena.grupo(self, Vector3.ZERO, "Caja")
 	_cuerpo()
 	_tapa_y_reloj()
@@ -50,13 +53,35 @@ func construir() -> void:
 	_cajon()
 	_maquinaria()
 	_pasos()
+	_zonas()
+
+
+func construir_sala() -> void:
+	sala = Taller.new()
+	add_child(sala)
+	sala.construir()
+	_escritorio()
 
 
 # --- Escritorio, carta, lámpara y otros objetos ------------------------------------------------------
 
 func _escritorio() -> void:
-	Escena.bloque(Vector3(-0.8, -0.045, -0.5), Vector3(0.8, 0.0, 0.45), Materiales.con_textura("madera_oscura", 2.0, 0.45), self, 0.004)
+	var nogal := Materiales.con_textura("madera_oscura", 2.0, 0.45)
+	Escena.bloque(Vector3(-0.8, -0.045, -0.5), Vector3(0.8, 0.0, 0.45), nogal, self, 0.004, false)
 	Escena.bloque(Vector3(-0.62, 0.0, -0.36), Vector3(0.62, 0.0012, 0.32), Materiales.con_textura("cuero_verde", 3.0, 0.75), self, 0.0, false)
+	# cajoneras a los lados y el faldón: un escritorio de socios, con hueco para las piernas
+	var suelo: float = Taller.SUELO
+	for lado in [-1.0, 1.0]:
+		Escena.bloque(Vector3(lado * 0.78 - 0.21, suelo, -0.46), Vector3(lado * 0.78 + 0.21, -0.045, 0.41), nogal, self, 0.006, false)
+		for k in 3:
+			var y := suelo + 0.08 + k * 0.21
+			Escena.bloque(Vector3(lado * 0.78 - 0.18, y, 0.41), Vector3(lado * 0.78 + 0.18, y + 0.18, 0.425), nogal, self, 0.004, false)
+			var tirador := SphereMesh.new()
+			tirador.radius = 0.012
+			tirador.height = 0.024
+			Geometria.pieza(tirador, Materiales.laton(0.3), Vector3(lado * 0.78, y + 0.09, 0.437), self)
+	Escena.bloque(Vector3(-0.57, -0.2, -0.44), Vector3(0.57, -0.045, -0.4), nogal, self, 0.004, false)
+	Escena.bloque(Vector3(-0.57, -0.14, 0.39), Vector3(0.57, -0.045, 0.43), nogal, self, 0.004, false)
 	var carta := PiezaNota.new()
 	carta.id = "carta"
 	carta.titulo = "Carta sin enviar"
@@ -88,7 +113,7 @@ func _escritorio() -> void:
 	verde.emission = Color(0.1, 0.5, 0.2)
 	verde.emission_energy_multiplier = 0.3
 	Geometria.pieza(pantalla, verde, Vector3(0.0, 0.29, 0.0), lampara_nodo)
-	lampara = Escena.luz(lampara_nodo, Vector3(0.0, 0.25, 0.04), Color(1.0, 0.78, 0.5), 1.5, 1.8, true)
+	lampara = Escena.luz(lampara_nodo, Vector3(0.0, 0.25, 0.04), Color(1.0, 0.78, 0.5), 1.6, 2.2, true)
 	# tintero y libros
 	var tintero := CylinderMesh.new()
 	tintero.top_radius = 0.02
@@ -256,7 +281,6 @@ func _comprobar_hora() -> void:
 		mesa.sonido.sonar("mecanismo", -2.0)
 		cierre_suelto = true
 		tapa.mover_a(-0.07, 0.2)
-		mesa.camara.sacudir(0.4)
 		mesa.mensaje("Un chasquido en la tapa: el cierre se ha soltado.", 3.6)
 
 
@@ -362,7 +386,8 @@ func _cajon() -> void:
 func _maquinaria() -> void:
 	var trasera := Escena.grupo(caja, Vector3(0.0, 0.058, -FONDO / 2.0), "Maquinaria")
 	trasera.rotation.y = PI
-	Escena.bloque(Vector3(-0.075, -0.04, 0.0), Vector3(0.075, 0.04, 0.002), Materiales.liso(Color(0.08, 0.06, 0.05), 0.6), trasera, 0.0, false)
+	Escena.bloque(Vector3(-0.075, -0.04, 0.0), Vector3(0.075, 0.04, 0.002), Materiales.con_textura("laton", 12.0, 0.5, 0.7, Color(0.5, 0.4, 0.28)), trasera, 0.0, false)
+	Escena.luz(trasera, Vector3(0.0, 0.03, 0.012), Color(1.0, 0.82, 0.58), 0.22, 0.2)
 	for lado in [[Vector3(-0.078, -0.043, 0.0), Vector3(0.078, -0.037, 0.016)], [Vector3(-0.078, 0.037, 0.0), Vector3(0.078, 0.043, 0.016)],
 			[Vector3(-0.078, -0.043, 0.0), Vector3(-0.072, 0.043, 0.016)], [Vector3(0.072, -0.043, 0.0), Vector3(0.078, 0.043, 0.016)]]:
 		Escena.bloque(lado[0], lado[1], laton, trasera, 0.001, false)
@@ -425,7 +450,7 @@ func _pasos() -> void:
 	paso("insertar", [
 		"A la máquina del reloj le falta algo.",
 		"Mira la caja por detrás: hay una ventanita con ruedas.",
-		"Elige el engranaje abajo y toca el eje vacío de la ventanita."], "eje_vacio")
+		"Elige el engranaje a la izquierda y toca el eje vacío de la ventanita."], "eje_vacio")
 	paso("tren", [
 		"La maquinaria ya mueve el cierre de la tapa. Falta la hora.",
 		"En el cajón había un billete de tren.",
@@ -440,9 +465,29 @@ func _pasos() -> void:
 
 # --- Cámara, luz y ambiente ---------------------------------------------------------------------------
 
+# Zonas de cerca para el doble toque
+func _zonas() -> void:
+	zona("reloj", Vector3(0.0, ALTO, 0.0), 0.42, NAN, 1.2, 0.09)
+	zona("manivela", Vector3(ANCHO / 2.0 + 0.012, 0.062, 0.0), 0.38, PI / 2.0, 0.25, 0.06)
+	zona("cajon", Vector3(-ANCHO / 2.0 - 0.01, 0.035, 0.0), 0.42, -PI / 2.0, 0.32, 0.08)
+	zona("maquinaria", Vector3(0.0, 0.058, -FONDO / 2.0), 0.36, PI, 0.12, 0.09)
+	zona("placa", Vector3(0.0, 0.052, FONDO / 2.0), 0.36, 0.0, 0.2, 0.06)
+	zona("carta", Vector3(-0.27, 0.0, 0.13), 0.42, NAN, 1.1, 0.1)
+
+
 func preparar_camara(camara: CamaraPuzle) -> void:
 	camara.camara.fov = 40.0
-	camara.configurar_orbita(Vector3(0.0, 0.07, 0.0), 0.35, 0.55, 0.78, Vector2(0.32, 1.3), Vector2(0.08, 1.4))
+	camara.configurar_orbita(Vector3(0.0, 0.07, 0.0), 0.35, 0.5, 1.1, Vector2(0.22, 1.7), Vector2(-0.2, 1.4))
+	camara.altura_minima = 0.03
+	camara.poner_luz(0.45, 1.6)
+
+
+# De la puerta del taller al escritorio
+func ruta_entrada() -> Dictionary:
+	var suelo: float = Taller.SUELO
+	return {"puntos": [Vector3(0.62, suelo + 1.62, 3.95), Vector3(0.6, suelo + 1.58, 2.7), Vector3(0.5, suelo + 1.35, 1.65)],
+		"miradas": [Vector3(0.0, -0.05, 0.0), Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.05, 0.0)],
+		"duracion": 6.0, "fov": 54.0}
 
 
 func preparar_entorno(entorno: Environment) -> void:
@@ -457,26 +502,48 @@ func preparar_entorno(entorno: Environment) -> void:
 	entorno.tonemap_exposure = 1.0
 	entorno.glow_enabled = true
 	entorno.glow_intensity = 0.7
-	Escena.luz_lejana(self, Vector3(1.0, 0.8, -0.6), Color(0.6, 0.7, 1.0), 0.5)
-	Escena.luz(self, Vector3(0.5, 0.3, 0.6), Color(0.5, 0.55, 0.75), 0.35, 2.0)
+	if sala:
+		entorno.background_mode = Environment.BG_COLOR
+		entorno.background_color = Color(0.01, 0.008, 0.006)
+		entorno.ambient_light_energy = 0.26
+	else:
+		Escena.luz_lejana(self, Vector3(1.0, 0.8, -0.6), Color(0.6, 0.7, 1.0), 0.5)
+	Escena.luz(self, Vector3(0.5, 0.3, 0.6), Color(0.5, 0.55, 0.75), 0.3, 2.0)
 	Escena.polvo(self, Vector3(0.6, 0.3, 0.5), Color(1.0, 0.85, 0.6, 0.5), 60, 0.0025).position = Vector3(0.0, 0.32, 0.0)
 
 
+# Al entrar: los relojes del taller y la puerta que se abre
 func empezar() -> void:
 	_ruido.frequency = 0.8
-	await get_tree().create_timer(4.2).timeout
+	mesa.sonido.bucle("pendulo", -16.0, 2.0)
+	mesa.sonido.bucle("fuego", -20.0, 2.0)
+	if sala:
+		sala.abrir_puerta(mesa.sonido)
+
+
+func al_llegar() -> void:
+	await get_tree().create_timer(1.2).timeout
 	if hechos.is_empty():
-		mesa.mensaje("Gira alrededor de la caja con el dedo. Toca la carta para leerla.", 4.0)
+		mesa.mensaje("Gira alrededor de la caja con un dedo. Toca dos veces para mirar de cerca. La carta del escritorio se puede leer.", 5.5)
 
 
 func actualizar(delta: float) -> void:
 	_tiempo += delta
-	lampara.light_energy = 1.5 + _ruido.get_noise_1d(_tiempo) * 0.05
+	if sala:
+		sala.actualizar(delta)
+	lampara.light_energy = 1.6 + _ruido.get_noise_1d(_tiempo) * 0.05
 	if hecho("insertar"):
 		for datos in maquinaria:
 			(datos[0] as Node3D).rotation.z += delta * float(datos[1]) * 0.8
 	if aguja_bolsillo.is_visible_in_tree():
 		aguja_bolsillo.rotation.y += delta * 1.2
+
+
+# En el gabinete del menú: el reloj de la tapa marca la hora de verdad
+func animar_vitrina(_delta: float, _camara: Camera3D, _activa: bool) -> void:
+	var ahora := Time.get_time_dict_from_system()
+	aguja_hora.angulo = -(float(ahora.hour % 12) + float(ahora.minute) / 60.0) * PASO_HORA
+	aguja_minuto.angulo = -float(ahora.minute) / 60.0 * TAU
 
 
 # --- Final ----------------------------------------------------------------------------------------
@@ -527,6 +594,10 @@ func arrastre_de_prueba() -> Dictionary:
 	return {"pieza": manivela, "direccion": Vector3.BACK, "pixeles": 70.0,
 		"comprobar": func() -> bool: return absf(manivela.angulo) > 0.3}
 
+
+# Una pieza bloqueada al empezar (la prueba comprueba que no se mueve al tocarla)
+func bloqueo_de_prueba() -> Pieza:
+	return cajon
 
 func capturas_de_prueba() -> Array:
 	return ["cuerda", "cajon", "insertar", "tren"]

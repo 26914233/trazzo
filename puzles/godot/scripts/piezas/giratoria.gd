@@ -45,6 +45,10 @@ func vueltas() -> float:
 	return angulo / TAU
 
 
+func arrastrable() -> bool:
+	return true
+
+
 func empezar_arrastre(punto: Vector3, _camara: Camera3D) -> void:
 	if _animacion:
 		_animacion.kill()

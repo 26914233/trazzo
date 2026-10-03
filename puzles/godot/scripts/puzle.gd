@@ -1,17 +1,27 @@
-# Base de cada prototipo: construye la escena, define los pasos con sus tres pistas y decide qué
-# desbloquea cada acción. Las clases hijas rellenan construir(), preparar_camara(),
-# preparar_entorno(), resolver_paso() (para la prueba automática) y final().
+# Base de cada caja: construye la escena, define los pasos con sus tres pistas, las zonas a las que
+# se acerca la cámara con el doble toque y el recorrido de entrada por la habitación. Las clases
+# hijas rellenan construir_sala(), construir(), preparar_camara(), preparar_entorno(),
+# ruta_entrada(), resolver_paso() (para la prueba automática) y final().
+# En el menú, el mismo guion monta solo el objeto («vitrina»), sin habitación ni mesa.
 class_name Puzle
 extends Node3D
 
 var mesa
+var vitrina := false                  # true: solo el objeto, para el gabinete del menú
 var pasos: Array = []                 # [{id, pistas: [tres textos], pieza: id de la pieza que se resalta}]
 var hechos := {}
 var piezas := {}
+var zonas: Array = []                 # [{id, centro, distancia, guinada, cabeceo, radio}]
 var titulo_final := "Abierta"
 var texto_final := ""
 
 
+# La habitación donde está la caja (no se monta en la vitrina del menú)
+func construir_sala() -> void:
+	pass
+
+
+# El objeto del puzle con todas sus piezas
 func construir() -> void:
 	pass
 
@@ -24,12 +34,28 @@ func preparar_entorno(_entorno: Environment) -> void:
 	pass
 
 
-# Al empezar: ambiente sonoro, primer mensaje
+# Recorrido de la cámara al entrar: {puntos: [Vector3], miradas: [Vector3], duracion, fov}.
+# El último tramo, hasta la vista de partida, lo añade la cámara.
+func ruta_entrada() -> Dictionary:
+	return {}
+
+
+# Cuando empieza la entrada (abrir la puerta, el ambiente sonoro…)
 func empezar() -> void:
 	pass
 
 
+# Cuando la cámara llega a la caja y empieza el juego
+func al_llegar() -> void:
+	pass
+
+
 func actualizar(_delta: float) -> void:
+	pass
+
+
+# En el gabinete del menú: pequeñas animaciones del objeto («activa»: es el que se está mirando)
+func animar_vitrina(_delta: float, _camara: Camera3D, _activa: bool) -> void:
 	pass
 
 
@@ -75,6 +101,32 @@ func esperar_camara() -> void:
 	await get_tree().process_frame
 	while not mesa.camara.quieta() and Time.get_ticks_msec() < fin:
 		await get_tree().process_frame
+
+
+# --- Zonas de cerca (doble toque) ------------------------------------------------------------
+
+# Una zona: si el doble toque cae a menos de «radio» de «centro», la cámara viaja a mirarla desde
+# «distancia», con esa guiñada y ese cabeceo (NAN: los deja como estén). Coordenadas del puzle.
+func zona(id: String, centro: Vector3, distancia: float, guinada := NAN, cabeceo := NAN, radio := 0.07) -> void:
+	zonas.append({"id": id, "centro": centro, "distancia": distancia, "guinada": guinada, "cabeceo": cabeceo,
+		"radio": radio})
+
+
+# La zona más cercana a un punto del mundo (vacío si no cae en ninguna)
+func zona_en(punto: Vector3) -> Dictionary:
+	var local := to_local(punto)
+	var mejor := {}
+	var mejor_distancia := INF
+	for datos in zonas:
+		var d: float = local.distance_to(datos.centro)
+		if d <= datos.radio and d < mejor_distancia:
+			mejor = datos
+			mejor_distancia = d
+	if mejor.is_empty():
+		return {}
+	var resultado := mejor.duplicate()
+	resultado.centro = to_global(mejor.centro)
+	return resultado
 
 
 # --- Piezas ----------------------------------------------------------------------------------

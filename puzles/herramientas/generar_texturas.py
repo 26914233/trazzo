@@ -606,6 +606,304 @@ def tex_diario():
     guardar("diario", imagen)
 
 
+# --- Habitaciones (0.2): washitsu, taller victoriano, santuario y gabinete --------------------------
+
+def tex_tatami():
+    """Tatami: tallos de junco (igusa) paralelos con los hilos de la trama cada pocos centímetros."""
+    tam = 1024
+    y = np.arange(tam)[:, None]
+    x = np.arange(tam)[None, :]
+    tallo = 0.5 + 0.5 * np.sin(y / tam * 2 * np.pi * 128)
+    tallo = tallo ** 0.6
+    variacion = ruido(tam, tam, 4, 128, 811) * 0.6 + ruido(tam, tam, 16, 256, 813) * 0.4
+    trama = np.exp(-((np.abs(((x / tam * 48) % 1.0) - 0.5) - 0.5) ** 2) / 0.0008)
+    trama = trama * (0.6 + 0.4 * ruido(tam, tam, 48, 8, 815))
+    manchas = fbm(tam, tam, 3, 3, 817, 3)
+    t = np.clip(0.35 + (variacion - 0.5) * 0.7 + (manchas - 0.5) * 0.4 - tallo * 0.12, 0, 1)
+    color = mezcla(hexa("c8c486"), hexa("8e8a4e"), t)
+    color = color * (1 - trama[..., None] * 0.35)
+    altura = tallo * 0.7 + variacion * 0.2 - trama * 0.5
+    guardar("tatami", color, altura, 2.2)
+
+
+def tex_shoji():
+    """Papel de shōji (washi) con fibras, iluminado desde fuera por la luna, y la sombra suave de unas
+    cañas de bambú que mueve el viento (se usa también como emisión). Cubre la pared entera una vez."""
+    ancho, alto = 1024, 512
+    fibras = ruido(ancho, alto, 140, 60, 821) * 0.5 + ruido(ancho, alto, 300, 120, 823) * 0.5
+    nubes = fbm(ancho, alto, 6, 3, 825, 4)
+    base = mezcla(hexa("f2efe6"), hexa("d8d4c8"), np.clip(nubes * 0.6 + fibras * 0.3, 0, 1))
+    sombra = Image.new("L", (ancho, alto), 0)
+    d = ImageDraw.Draw(sombra)
+    azar = np.random.default_rng(827)
+    for k in range(5):
+        x = 80 + k * 210 + azar.uniform(-40, 40)
+        inclinacion = azar.uniform(-0.12, 0.12)
+        grosor = azar.uniform(14, 22)
+        d.line([(x, alto + 20), (x + inclinacion * alto, -20)], fill=150, width=int(grosor))
+        for nudo in range(4):
+            yn = alto - nudo * alto / 4 - azar.uniform(20, 60)
+            xn = x + inclinacion * (alto - yn)
+            d.line([(xn - grosor, yn), (xn + grosor, yn)], fill=190, width=4)
+            for hoja in range(azar.integers(2, 5)):
+                angulo = azar.uniform(-2.6, -0.5) if azar.random() < 0.5 else azar.uniform(-2.6, -0.5) + 3.14
+                largo = azar.uniform(60, 120)
+                x1 = xn + math.cos(angulo) * largo
+                y1 = yn + math.sin(angulo) * largo * 0.6
+                d.polygon([(xn, yn), ((xn + x1) / 2 + 8, (yn + y1) / 2 - 8), (x1, y1), ((xn + x1) / 2 - 8, (yn + y1) / 2 + 8)], fill=130)
+    sombra = np.array(sombra.filter(ImageFilter.GaussianBlur(9))) / 255.0
+    color = base * (1 - sombra[..., None] * 0.45)
+    color = color * np.array([0.97, 0.99, 1.0])
+    guardar("shoji", color)
+
+
+def tex_fusuma():
+    """Fusuma: papel con pan de oro en cuadrados y, en tinta, montes entre niebla, una luna y olas."""
+    tam = 1024
+    azar = np.random.default_rng(831)
+    oro = np.zeros((tam, tam, 3))
+    celda = 64
+    for j in range(tam // celda):
+        for i in range(tam // celda):
+            tono = azar.uniform(0.85, 1.08)
+            oro[j * celda:(j + 1) * celda, i * celda:(i + 1) * celda] = hexa("c9a85a") * tono
+    juntas = np.zeros((tam, tam))
+    juntas[::celda, :] = 1
+    juntas[:, ::celda] = 1
+    juntas = np.array(Image.fromarray((juntas * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(0.8))) / 255.0
+    grano = fbm(tam, tam, 8, 8, 833, 4)
+    oro = oro * (0.88 + grano[..., None] * 0.2) * (1 - juntas[..., None] * 0.18)
+    tinta = Image.new("L", (tam, tam), 0)
+    d = ImageDraw.Draw(tinta)
+    for capa, (base_y, altura, intensidad) in enumerate(((560, 300, 70), (640, 260, 120), (720, 200, 190))):
+        puntos = [(0, tam)]
+        for k in range(0, tam + 32, 32):
+            ondas = math.sin(k / tam * math.pi * (2 + capa) + capa) * 0.5 + math.sin(k / tam * math.pi * 7 + capa * 3) * 0.2
+            puntos.append((k, base_y - altura * max(0.0, ondas) - azar.uniform(0, 12)))
+        puntos.append((tam, tam))
+        d.polygon(puntos, fill=intensidad)
+    d.ellipse([690, 110, 860, 280], fill=0)
+    luna = Image.new("L", (tam, tam), 0)
+    ImageDraw.Draw(luna).ellipse([690, 110, 860, 280], fill=255)
+    olas = Image.new("L", (tam, tam), 0)
+    do = ImageDraw.Draw(olas)
+    for fila in range(5):
+        y0 = 830 + fila * 44
+        for k in range(-1, tam // 88 + 2):
+            x0 = k * 88 + (44 if fila % 2 else 0)
+            for r in (40, 28, 16):
+                do.arc([x0 - r, y0 - r, x0 + r, y0 + r], 180, 360, fill=230, width=5)
+    tinta = Image.fromarray(np.maximum(np.array(tinta), np.array(olas) * 0.0).astype(np.uint8))
+    niebla = fbm(tam, tam, 3, 6, 835, 4)
+    t = np.array(tinta.filter(ImageFilter.GaussianBlur(2.5))) / 255.0
+    t = t * np.clip(0.55 + niebla * 0.6, 0, 1)
+    color = oro * (1 - t[..., None]) + hexa("1c1814") * t[..., None]
+    o = np.array(olas.filter(ImageFilter.GaussianBlur(1.2))) / 255.0
+    color = color * (1 - o[..., None] * 0.75) + hexa("26303a") * o[..., None] * 0.75
+    lu = np.array(luna.filter(ImageFilter.GaussianBlur(1.5))) / 255.0
+    color = color * (1 - lu[..., None]) + hexa("efe6cc") * lu[..., None]
+    guardar("fusuma", color)
+
+
+def tex_kakejiku():
+    """Rollo colgante: brocado oscuro alrededor y, en el centro, una rama de pino bajo la luna en tinta."""
+    ancho, alto = 512, 1536
+    color = np.zeros((alto, ancho, 3))
+    brocado = ruido(ancho, alto, 64, 192, 841)
+    color[:] = mezcla(hexa("2a2236"), hexa("3d3150"), brocado)
+    papel = papel_base(ancho - 120, alto - 420, 843, "efe8d6", "d6caa8")
+    color[230:230 + papel.shape[0], 60:60 + papel.shape[1]] = papel
+    imagen = Image.fromarray(np.clip(color, 0, 255).astype(np.uint8))
+    d = ImageDraw.Draw(imagen)
+    d.rectangle([54, 224, ancho - 55, alto - 186], outline=(150, 120, 60), width=4)
+    tinta = Image.new("L", (ancho, alto), 0)
+    dt = ImageDraw.Draw(tinta)
+    dt.ellipse([300, 300, 420, 420], outline=200, width=6)
+    azar = np.random.default_rng(845)
+    x, y = 90.0, 980.0
+    for k in range(14):
+        largo = azar.uniform(50, 90)
+        angulo = -0.9 + azar.uniform(-0.35, 0.35)
+        pincelada(dt, azar, x, y, largo, angulo, 16 - k * 0.6, 235)
+        x += math.cos(angulo) * largo
+        y += math.sin(angulo) * largo
+        if k % 3 == 1:
+            for agujas in range(9):
+                a = azar.uniform(0, 2 * math.pi)
+                dt.line([(x, y), (x + math.cos(a) * 34, y + math.sin(a) * 22)], fill=210, width=3)
+    tinta = tinta.filter(ImageFilter.GaussianBlur(1.0))
+    imagen.paste(Image.new("RGB", (ancho, alto), (24, 20, 18)), (0, 0), tinta)
+    d.rectangle([ancho / 2 - 22, alto - 330, ancho / 2 + 22, alto - 286], fill=(176, 40, 30))
+    d.rectangle([20, 0, ancho - 21, 30], fill=(60, 44, 30))
+    d.rectangle([10, alto - 40, ancho - 11, alto - 1], fill=(60, 44, 30))
+    guardar("kakejiku", imagen)
+
+
+def tex_yeso():
+    """Muro de tierra (tsuchikabe): arena ocre con grano fino y las ondas suaves de la llana."""
+    tam = 512
+    grano = ruido(tam, tam, 180, 180, 851) * 0.5 + ruido(tam, tam, 90, 90, 853) * 0.5
+    llana = fbm(tam, tam, 3, 5, 855, 4)
+    manchas = fbm(tam, tam, 5, 5, 857, 3)
+    t = np.clip(llana * 0.5 + manchas * 0.35 + (grano - 0.5) * 0.35, 0, 1)
+    color = mezcla(hexa("c9ac80"), hexa("8e7452"), t)
+    guardar("yeso", color, grano * 0.4 + llana * 0.6, 1.4)
+
+
+def tex_papel_pintado():
+    """Papel pintado victoriano: enrejado de curvas (ojivas) en oro viejo sobre verde oscuro, con una
+    flor de cuatro pétalos en cada hueco. Se repite sin costura."""
+    tam = 1024
+    escala = 4
+    g = tam * escala
+    fondo = mezcla(hexa("2b4838"), hexa("1d3628"), fbm(tam, tam, 6, 6, 861, 4))
+    lineas = Image.new("L", (g, g), 0)
+    d = ImageDraw.Draw(lineas)
+    celdas_x, celdas_y = 4, 3
+    cw, ch = g / celdas_x, g / celdas_y
+    for i in range(-1, celdas_x + 2):
+        for j in range(-1, celdas_y + 2):
+            x0 = i * cw
+            y0 = j * ch
+            for signo in (1, -1):
+                puntos = []
+                for k in range(41):
+                    v = k / 40
+                    x = x0 + cw / 2 + signo * (cw / 2) * math.sin(v * math.pi) * (1 + 0.25 * math.sin(v * 2 * math.pi))
+                    y = y0 + v * ch
+                    puntos.append((x, y))
+                d.line(puntos, fill=255, width=int(7 * escala), joint="curve")
+            cx, cy = x0 + cw / 2, y0 + ch / 2
+            for a in range(4):
+                angulo = a * math.pi / 2
+                px, py = cx + math.cos(angulo) * 34 * escala, cy + math.sin(angulo) * 34 * escala
+                d.ellipse([px - 22 * escala, py - 22 * escala, px + 22 * escala, py + 22 * escala], fill=170)
+            d.ellipse([cx - 14 * escala, cy - 14 * escala, cx + 14 * escala, cy + 14 * escala], fill=255)
+            for (dx, dy) in ((0, -ch / 2), (0, ch / 2)):
+                d.ellipse([cx + dx - 10 * escala, cy + dy - 10 * escala, cx + dx + 10 * escala, cy + dy + 10 * escala], fill=255)
+    m = np.array(lineas.resize((tam, tam), Image.LANCZOS)) / 255.0
+    color = fondo * (1 - m[..., None] * 0.75) + hexa("a88a4c") * m[..., None] * 0.75
+    brillo = ruido(tam, tam, 220, 220, 863)
+    color = color * (0.92 + brillo[..., None] * 0.12)
+    guardar("papel_pintado", color, m * 0.8 + brillo * 0.2, 1.2)
+
+
+def tex_alfombra():
+    """Alfombra persa: cenefas, campo con flores pequeñas y un medallón en el centro. Se ve una vez."""
+    ancho, alto = 1024, 640
+    azar = np.random.default_rng(871)
+    imagen = Image.new("RGB", (ancho, alto), (110, 24, 22))
+    d = ImageDraw.Draw(imagen)
+    for i, (margen, color) in enumerate(((0, (40, 22, 30)), (22, (150, 110, 60)), (34, (30, 40, 70)), (80, (150, 110, 60)), (90, (110, 24, 22)))):
+        d.rectangle([margen, margen, ancho - 1 - margen, alto - 1 - margen], fill=color)
+    for k in range(0, ancho, 36):
+        d.polygon([(k + 18, 40), (k + 34, 57), (k + 18, 74), (k + 2, 57)], fill=(190, 150, 80))
+        d.polygon([(k + 18, alto - 40), (k + 34, alto - 57), (k + 18, alto - 74), (k + 2, alto - 57)], fill=(190, 150, 80))
+    for k in range(0, alto, 36):
+        d.polygon([(40, k + 18), (57, k + 34), (74, k + 18), (57, k + 2)], fill=(190, 150, 80))
+        d.polygon([(ancho - 40, k + 18), (ancho - 57, k + 34), (ancho - 74, k + 18), (ancho - 57, k + 2)], fill=(190, 150, 80))
+    for y in range(120, alto - 100, 54):
+        for x in range(120, ancho - 100, 54):
+            tono = (200, 160, 90) if (x // 54 + y // 54) % 2 else (60, 70, 110)
+            d.ellipse([x - 6, y - 6, x + 6, y + 6], fill=tono)
+            d.line([(x - 14, y), (x + 14, y)], fill=tono, width=2)
+            d.line([(x, y - 14), (x, y + 14)], fill=tono, width=2)
+    cx, cy = ancho / 2, alto / 2
+    for r, color in ((230, (150, 110, 60)), (210, (30, 40, 70)), (150, (110, 24, 22)), (110, (190, 150, 80)), (60, (30, 40, 70)), (26, (200, 170, 100))):
+        puntos = [(cx + math.cos(a) * r * (1 + 0.12 * math.cos(8 * a)), cy + math.sin(a) * r * 0.62 * (1 + 0.12 * math.cos(8 * a)))
+                  for a in (k / 64 * 2 * math.pi for k in range(64))]
+        d.polygon(puntos, fill=color)
+    imagen = imagen.filter(ImageFilter.GaussianBlur(0.7))
+    pelo = ruido(ancho, alto, 400, 250, 873)
+    desgaste = fbm(ancho, alto, 4, 3, 875, 4)
+    color = np.array(imagen, dtype=np.float64) * (0.82 + pelo[..., None] * 0.22) * (0.85 + desgaste[..., None] * 0.25)
+    guardar("alfombra", color)
+
+
+def tex_carta_celeste():
+    """Carta celeste antigua: papel azul noche, círculos de coordenadas, constelaciones en oro y un
+    sol en el centro (inventadas: no copian ninguna carta real)."""
+    ancho, alto = 1024, 680
+    azar = np.random.default_rng(881)
+    papel = mezcla(hexa("1a2440"), hexa("0e1428"), fbm(ancho, alto, 5, 4, 883, 4))
+    imagen = Image.fromarray(np.clip(papel, 0, 255).astype(np.uint8))
+    d = ImageDraw.Draw(imagen)
+    oro = (206, 170, 96)
+    cx, cy = ancho / 2, alto / 2
+    for r in (300, 240, 180, 120):
+        d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=oro, width=2)
+    for k in range(72):
+        a = k / 72 * 2 * math.pi
+        largo = 14 if k % 6 == 0 else 7
+        d.line([(cx + math.cos(a) * 300, cy + math.sin(a) * 300), (cx + math.cos(a) * (300 - largo), cy + math.sin(a) * (300 - largo))], fill=oro, width=2)
+    for k in range(12):
+        a = k / 12 * 2 * math.pi
+        d.line([(cx + math.cos(a) * 120, cy + math.sin(a) * 120), (cx + math.cos(a) * 300, cy + math.sin(a) * 300)], fill=(150, 125, 75), width=1)
+    for grupo in range(9):
+        a = azar.uniform(0, 2 * math.pi)
+        r = azar.uniform(140, 290)
+        x, y = cx + math.cos(a) * r, cy + math.sin(a) * r
+        estrellas = [(x, y)]
+        for _ in range(azar.integers(3, 7)):
+            x += azar.uniform(-46, 46)
+            y += azar.uniform(-46, 46)
+            estrellas.append((x, y))
+        d.line(estrellas, fill=oro, width=2)
+        for (sx, sy) in estrellas:
+            s = azar.uniform(3, 7)
+            d.ellipse([sx - s, sy - s, sx + s, sy + s], fill=(250, 232, 180))
+    for _ in range(260):
+        sx, sy = azar.uniform(10, ancho - 10), azar.uniform(10, alto - 10)
+        s = azar.uniform(0.6, 1.8)
+        d.ellipse([sx - s, sy - s, sx + s, sy + s], fill=(220, 210, 180))
+    for k in range(16):
+        a = k / 16 * 2 * math.pi
+        largo = 70 if k % 2 == 0 else 40
+        d.polygon([(cx + math.cos(a - 0.08) * 34, cy + math.sin(a - 0.08) * 34), (cx + math.cos(a) * largo, cy + math.sin(a) * largo),
+                   (cx + math.cos(a + 0.08) * 34, cy + math.sin(a + 0.08) * 34)], fill=oro)
+    d.ellipse([cx - 36, cy - 36, cx + 36, cy + 36], fill=(230, 196, 110))
+    d.rectangle([14, 14, ancho - 15, alto - 15], outline=oro, width=3)
+    d.rectangle([24, 24, ancho - 25, alto - 25], outline=(150, 125, 75), width=1)
+    guardar("carta_celeste", imagen)
+
+
+def tex_losas():
+    """Losas de piedra del santuario: 4 x 4 por textura, con juntas, tonos distintos y grietas."""
+    tam = 1024
+    azar = np.random.default_rng(891)
+    n = 4
+    lado = tam // n
+    color = np.zeros((tam, tam, 3))
+    altura = np.zeros((tam, tam))
+    textura = fbm(tam, tam, 16, 16, 893, 5)
+    manchas = fbm(tam, tam, 4, 4, 895, 4)
+    for j in range(n):
+        for i in range(n):
+            tono = azar.uniform(0.82, 1.08)
+            base = mezcla(hexa("7d7a78"), hexa("4f4e50"), np.clip(textura[j * lado:(j + 1) * lado, i * lado:(i + 1) * lado] * 0.7 +
+                                                                manchas[j * lado:(j + 1) * lado, i * lado:(i + 1) * lado] * 0.4, 0, 1))
+            color[j * lado:(j + 1) * lado, i * lado:(i + 1) * lado] = base * tono
+            altura[j * lado:(j + 1) * lado, i * lado:(i + 1) * lado] = 0.7 + azar.uniform(-0.08, 0.08)
+    junta = np.zeros((tam, tam))
+    for k in range(n + 1):
+        p = (k * lado) % tam
+        for g in range(-3, 4):
+            junta[(p + g) % tam, :] = np.maximum(junta[(p + g) % tam, :], 1 - abs(g) / 4)
+            junta[:, (p + g) % tam] = np.maximum(junta[:, (p + g) % tam], 1 - abs(g) / 4)
+    grietas = Image.new("L", (tam, tam), 0)
+    dg = ImageDraw.Draw(grietas)
+    for _ in range(10):
+        x, y = azar.uniform(0, tam), azar.uniform(0, tam)
+        for _ in range(14):
+            nx, ny = x + azar.uniform(-24, 24), y + azar.uniform(-24, 24)
+            dg.line([(x, y), (nx, ny)], fill=255, width=2)
+            x, y = nx, ny
+    g = np.array(grietas.filter(ImageFilter.GaussianBlur(0.8))) / 255.0
+    color = color * (1 - junta[..., None] * 0.55) * (1 - g[..., None] * 0.4)
+    altura = altura * (1 - junta) - g * 0.3 + textura * 0.15
+    guardar("losas", color, altura, 2.0)
+
+
 TODAS = {
     "maderas": tex_maderas,
     "tablones": tex_tablones,
@@ -621,6 +919,15 @@ TODAS = {
     "esfera_reloj": tex_esfera_reloj,
     "carta": tex_carta,
     "diario": tex_diario,
+    "tatami": tex_tatami,
+    "shoji": tex_shoji,
+    "fusuma": tex_fusuma,
+    "kakejiku": tex_kakejiku,
+    "yeso": tex_yeso,
+    "papel_pintado": tex_papel_pintado,
+    "alfombra": tex_alfombra,
+    "carta_celeste": tex_carta_celeste,
+    "losas": tex_losas,
 }
 
 

@@ -1,6 +1,6 @@
 # Pieza que se desliza a lo largo de un eje y se queda en topes: paneles, cajones, libros.
 # Se arrastra con el dedo (el movimiento se proyecta sobre el eje tal como se ve en pantalla)
-# o se toca para ir al siguiente tope. Contra un límite bloqueado tiembla y suena seca.
+# o se toca para ir al siguiente tope. Contra un límite bloqueado no se mueve: suena trabada y destella.
 class_name PiezaDeslizante
 extends Pieza
 
@@ -31,6 +31,10 @@ func _transform_actual() -> Transform3D:
 
 func en(tope: float) -> bool:
 	return absf(reposo - tope) < EPSILON
+
+
+func arrastrable() -> bool:
+	return true
 
 
 # Tramo por el que se puede mover ahora mismo
@@ -70,7 +74,7 @@ func arrastrar(relativo: Vector2, _posicion: Vector2, camara: Camera3D) -> void:
 				rechazar()
 			else:
 				mesa.sonido.sonar(sonido_tope, -8.0, 0.8)
-		nuevo = clampf(nuevo, tramo.x - 0.0012, tramo.y + 0.0012)
+		nuevo = clampf(nuevo, tramo.x, tramo.y)
 	var rapidez := absf(nuevo - valor) / maxf(get_process_delta_time(), 0.008)
 	valor = nuevo
 	mesa.sonido.roce(rapidez / 0.12)

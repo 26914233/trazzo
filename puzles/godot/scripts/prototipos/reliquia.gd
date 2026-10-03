@@ -4,7 +4,10 @@
 #
 # Pasos: despertar el núcleo → luz en el primer anillo → luz en el glifo de abajo (se abre un hueco) →
 # coger el cristal → ponerlo en el núcleo → luz en el glifo de arriba a la derecha → tocar el núcleo.
+# Flota sobre el altar de un santuario circular (salas/santuario.gd), bajo un óculo abierto al cielo.
 extends Puzle
+
+const Santuario := preload("res://scripts/salas/santuario.gd")
 
 const PASOS := 8                      # posiciones de cada anillo (45 grados)
 const RADIOS := [[0.05, 0.08], [0.086, 0.116], [0.122, 0.154]]
@@ -41,6 +44,7 @@ var color_luz := CIAN
 var final_luz := -1
 var camino: Array = []                # [[anillo, surco]] por donde pasa la luz
 var _rellenos := {}                   # material -> relleno objetivo
+var sala: Node3D
 var _tiempo := 0.0
 
 var metal: Material
@@ -55,7 +59,14 @@ func construir() -> void:
 	_hueco_del_cristal()
 	_holograma()
 	_pasos()
+	_zonas()
 	_trazar()
+
+
+func construir_sala() -> void:
+	sala = Santuario.new()
+	add_child(sala)
+	sala.construir()
 
 
 # Ángulo (desde +X, en sentido antihorario visto de frente) de la posición k: k = 0 es arriba
@@ -193,6 +204,8 @@ func _nucleo() -> void:
 		material_nucleo.emission = VIOLETA
 		luz_nucleo.light_color = VIOLETA
 		mesa.sonido.sonar("cristal", -2.0)
+		if sala:
+			sala.poner_color(VIOLETA)
 		mesa.mensaje("La luz ha cambiado de color. Ahora late otro glifo.", 3.4)
 		_trazar())
 
@@ -217,7 +230,8 @@ func _tocar_nucleo() -> void:
 		var animacion := create_tween().set_parallel()
 		animacion.tween_property(material_nucleo, "emission_energy_multiplier", 2.2, 1.5)
 		animacion.tween_property(luz_nucleo, "light_energy", 1.4, 1.5)
-		mesa.camara.sacudir(0.5)
+		if sala:
+			sala.encender(1.0)
 		mesa.mensaje("La reliquia despierta. La luz sale del núcleo hacia arriba.", 3.6)
 		_trazar()
 	elif hecho("glifo_2") and not hecho("despliegue"):
@@ -316,7 +330,8 @@ func _trazar() -> void:
 	elif final_luz == GLIFO_2 and hecho("zocalo") and not hecho("glifo_2"):
 		completar("glifo_2")
 		mesa.sonido.sonar("despertar", -3.0, 1.3)
-		mesa.camara.sacudir(0.5)
+		if sala:
+			sala.encender(1.6)
 		mesa.mensaje("Toda la reliquia vibra. El núcleo espera.", 3.4)
 	elif final_luz >= 0:
 		mesa.sonido.sonar("luz_fluye", -8.0)
@@ -373,7 +388,7 @@ func _pasos() -> void:
 	paso("zocalo", [
 		"El cristal encaja en algún sitio.",
 		"El núcleo tiene un hueco en el centro.",
-		"Elige el cristal abajo y toca el núcleo."], "zocalo")
+		"Elige el cristal a la izquierda y toca el núcleo."], "zocalo")
 	paso("glifo_2", [
 		"Ahora late otro glifo.",
 		"El camino de antes ya no sirve: prueba los otros surcos.",
@@ -388,9 +403,27 @@ func _pasos() -> void:
 
 # --- Cámara, luz y ambiente ---------------------------------------------------------------------------
 
+# Zonas de cerca para el doble toque
+func _zonas() -> void:
+	zona("nucleo", Vector3(0.0, 0.0, 0.03), 0.38, 0.0, 0.05, 0.045)
+	zona("glifo_abajo", _polar((MARCO[0] + MARCO[1]) / 2.0, _angulo(GLIFO_1), 0.02), 0.4, 0.0, -0.15, 0.05)
+	zona("glifo_arriba", _polar((MARCO[0] + MARCO[1]) / 2.0, _angulo(GLIFO_2), 0.02), 0.4, 0.2, 0.25, 0.05)
+	zona("anillos", Vector3(0.0, 0.0, 0.01), 0.62, 0.0, 0.08, 0.17)
+
+
 func preparar_camara(camara: CamaraPuzle) -> void:
 	camara.camara.fov = 40.0
-	camara.configurar_orbita(Vector3.ZERO, 0.25, 0.12, 0.88, Vector2(0.35, 1.5), Vector2(-1.0, 1.0), Vector2(-1.3, 1.3))
+	camara.configurar_orbita(Vector3.ZERO, 0.25, 0.12, 1.3, Vector2(0.3, 2.2), Vector2(-0.8, 1.0), Vector2(-1.3, 1.3))
+	camara.altura_minima = -0.95
+	camara.poner_luz(0.4, 1.8, Color(0.85, 0.92, 1.0))
+
+
+# Del pasillo, bajo el arco, hasta el altar
+func ruta_entrada() -> Dictionary:
+	var suelo: float = Santuario.SUELO
+	return {"puntos": [Vector3(0.0, suelo + 1.65, 5.45), Vector3(0.0, suelo + 1.62, 3.7), Vector3(0.12, suelo + 1.5, 2.3)],
+		"miradas": [Vector3(0.0, -0.1, 0.0), Vector3(0.0, -0.05, 0.0), Vector3(0.0, 0.0, 0.0)],
+		"duracion": 6.0, "fov": 55.0}
 
 
 func preparar_entorno(entorno: Environment) -> void:
@@ -407,17 +440,24 @@ func preparar_entorno(entorno: Environment) -> void:
 	entorno.glow_bloom = 0.08
 	entorno.glow_hdr_threshold = 0.9
 	Escena.luz(self, Vector3(-0.5, 0.45, 0.6), Color(0.6, 0.7, 1.0), 0.9, 2.5, true)
-	Escena.luz_lejana(self, Vector3(0.7, 0.5, -0.9), Color(0.7, 0.4, 1.0), 0.9)
+	if not sala:
+		Escena.luz_lejana(self, Vector3(0.7, 0.5, -0.9), Color(0.7, 0.4, 1.0), 0.9)
 	Escena.polvo(self, Vector3(0.6, 0.4, 0.4), Color(0.4, 0.8, 1.0, 0.6), 70, 0.003)
 
 
 func empezar() -> void:
-	await get_tree().create_timer(4.2).timeout
+	mesa.sonido.bucle("viento", -24.0, 3.0)
+
+
+func al_llegar() -> void:
+	await get_tree().create_timer(1.2).timeout
 	if hechos.is_empty():
-		mesa.mensaje("Gira alrededor con el dedo. Pellizca para acercarte.", 4.0)
+		mesa.mensaje("Gira alrededor con un dedo. Toca dos veces para mirar de cerca; pellizca para alejarte.", 5.0)
 
 
 func actualizar(delta: float) -> void:
+	if sala:
+		sala.actualizar(delta)
 	_tiempo += delta
 	artefacto.position.y = sin(_tiempo * 0.9) * 0.008
 	artefacto.rotation.z = sin(_tiempo * 0.5) * 0.015
@@ -438,6 +478,16 @@ func actualizar(delta: float) -> void:
 		material_nucleo.emission_energy_multiplier = 2.2 + sin(_tiempo * 9.0) * 1.0
 	if holograma.visible:
 		holograma.rotation.y += delta * 0.15
+
+
+# En el gabinete del menú: flota y el núcleo late más cuando la miras
+func animar_vitrina(delta: float, _camara: Camera3D, activa: bool) -> void:
+	_tiempo += delta
+	artefacto.position.y = sin(_tiempo * 0.9) * 0.012
+	artefacto.rotation.z = sin(_tiempo * 0.5) * 0.02
+	var energia := 1.2 + 0.6 * sin(_tiempo * 3.0) if activa else 0.7
+	material_nucleo.emission_energy_multiplier = lerpf(material_nucleo.emission_energy_multiplier, energia, minf(1.0, delta * 3.0))
+	luz_nucleo.light_energy = lerpf(luz_nucleo.light_energy, 0.5 if activa else 0.0, minf(1.0, delta * 3.0))
 
 
 # --- Final --------------------------------------------------------------------------------------------
@@ -496,6 +546,10 @@ func arrastre_de_prueba() -> Dictionary:
 	return {"pieza": anillos[2], "punto": punto, "direccion": Vector3.LEFT, "pixeles": 110.0,
 		"comprobar": func() -> bool: return absf(anillos[2].reposo - GIRO_INICIAL[2] * TAU / PASOS) > 0.01}
 
+
+# Una pieza bloqueada al empezar (la prueba comprueba que no se mueve al tocarla)
+func bloqueo_de_prueba() -> Pieza:
+	return anillos[0]
 
 func capturas_de_prueba() -> Array:
 	return ["primer_anillo", "glifo_1", "zocalo", "glifo_2"]

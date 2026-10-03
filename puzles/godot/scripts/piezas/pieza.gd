@@ -8,6 +8,7 @@ signal accionada(pieza: Pieza)        # llegó a un estado nuevo (tras soltarla 
 signal rechazada(pieza: Pieza)        # se intentó mover, pero está bloqueada
 
 const SHADER_RESALTE := preload("res://shaders/resalte.gdshader")
+const SHADER_DESTELLO := preload("res://shaders/destello.gdshader")
 const EPSILON := 0.0005
 
 var mesa                              # la mesa del prototipo (sonido, vibración, mensajes)
@@ -15,15 +16,16 @@ var id := ""
 var habilitada := true                # false: no responde a los toques
 var permiso := Callable()             # opcional: func() -> bool; false = bloqueada
 var aviso_bloqueo := ""               # mensaje que se enseña la primera vez que se bloquea
-var sonido_bloqueo := "bloqueo"
+var sonido_bloqueo := "trabado"
 var solo_desde: Array = []            # en las habitaciones: puntos de vista desde donde se toca
 var base := Transform3D.IDENTITY
 var controla_transform := true        # false: otro código mueve el nodo (p. ej., al recogerla)
 var _base_lista := false
 var _avisada := false
-var _temblor := 0.0
 var _resalte := 0.0
+var _destello := 0.0
 var _material_resalte: ShaderMaterial
+var _material_destello: ShaderMaterial
 
 
 func _ready() -> void:
@@ -47,6 +49,11 @@ func interactiva() -> bool:
 
 func puede() -> bool:
 	return not permiso.is_valid() or bool(permiso.call())
+
+
+# ¿Se mueve arrastrándola? (si no, un arrastre que empiece sobre ella gira la cámara)
+func arrastrable() -> bool:
+	return false
 
 
 # --- Formas de choque (para que el dedo la encuentre) --------------------------------------
@@ -96,12 +103,13 @@ func _transform_actual() -> Transform3D:
 
 # --- Respuestas comunes -------------------------------------------------------------------
 
-# La pieza no se deja: tiembla, suena seca, vibra y, la primera vez, explica por qué
+# La pieza no se deja. No se mueve: suena trabada, vibra corto, un destello la recorre y, la primera
+# vez, se explica por qué
 func rechazar() -> void:
-	_temblor = 1.0
+	senalar()
 	if mesa:
-		mesa.sonido.sonar(sonido_bloqueo, -3.0)
-		mesa.vibrar(40, 0.7)
+		mesa.sonido.sonar(sonido_bloqueo, -2.0)
+		mesa.vibrar(35, 0.6)
 		mesa.registrar_bloqueo(self)
 		if aviso_bloqueo != "" and not _avisada:
 			_avisada = true
@@ -117,7 +125,18 @@ func resaltar(segundos := 4.0) -> void:
 		if mesa:
 			_material_resalte.set_shader_parameter("color", mesa.datos.get("acento", Color(1, 0.85, 0.5)))
 	_resalte = segundos
-	_poner_resalte(_material_resalte)
+	if _destello <= 0.0:
+		_poner_resalte(_material_resalte)
+
+
+# Destello cálido de «así no» (dos pulsos en medio segundo)
+func senalar() -> void:
+	if _material_destello == null:
+		_material_destello = ShaderMaterial.new()
+		_material_destello.shader = SHADER_DESTELLO
+	_destello = 1.0
+	_material_destello.set_shader_parameter("intensidad", 0.0)
+	_poner_resalte(_material_destello)
 
 
 func _poner_resalte(material: Material) -> void:
@@ -126,16 +145,16 @@ func _poner_resalte(material: Material) -> void:
 
 
 func _process(delta: float) -> void:
+	if _destello > 0.0:
+		_destello = maxf(0.0, _destello - delta * 1.8)
+		var avance := 1.0 - _destello
+		_material_destello.set_shader_parameter("intensidad", pow(sin(avance * TAU), 2.0) * (1.0 - avance * 0.4))
+		if _destello <= 0.0:
+			_poner_resalte(_material_resalte if _resalte > 0.0 else null)
 	if _resalte > 0.0:
 		_resalte -= delta
-		if _resalte <= 0.0:
+		if _resalte <= 0.0 and _destello <= 0.0:
 			_poner_resalte(null)
 	if not controla_transform:
 		return
-	var transformacion := _transform_actual()
-	if _temblor > 0.0:
-		_temblor = maxf(0.0, _temblor - delta * 3.5)
-		var t := Time.get_ticks_msec() * 0.001
-		transformacion.origin += transformacion.basis * Vector3(sin(t * 83.0), cos(t * 71.0), sin(t * 59.0)) \
-			* 0.0018 * _temblor
-	transform = transformacion
+	transform = _transform_actual()

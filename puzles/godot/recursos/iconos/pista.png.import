@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c8foqe1xa6lmf"
-path="res://.godot/imported/caja_viva.png-cd86d737213c3eb9ebd10927ea90387e.ctex"
+uid="uid://f8eo8yv35hjn"
+path="res://.godot/imported/pista.png-cb72aeaa953453ceb04fe6f9a8e09b03.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://recursos/portadas/caja_viva.png"
-dest_files=["res://.godot/imported/caja_viva.png-cd86d737213c3eb9ebd10927ea90387e.ctex"]
+source_file="res://recursos/iconos/pista.png"
+dest_files=["res://.godot/imported/pista.png-cb72aeaa953453ceb04fe6f9a8e09b03.ctex"]
 
 [params]
 

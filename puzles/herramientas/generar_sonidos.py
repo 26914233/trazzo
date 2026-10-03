@@ -7,9 +7,14 @@ Caja viva: noche (bucle), ojo que se abre, gruñido, suspiro, espíritu y el fin
 Relojero: tic-tac (bucle), cuerda, campanada, mecanismo, cajón y el final (caja de música).
 Reliquia: zumbido (bucle), despertar, pulso, luz que fluye, cristal, despliegue y el final.
 Farero: lluvia y viento (bucles), trueno, candado, libro, llave, trampilla, cerilla y el final.
+Salas (0.2): traba seca de «así no», viaje de la cámara, puerta corredera, puerta con bisagra, fuego
+de chimenea y péndulo (bucles) y el ambiente del gabinete del menú (bucle).
 
-Uso:  python3 puzles/herramientas/generar_sonidos.py
+Uso:  python3 puzles/herramientas/generar_sonidos.py [grupo ...]   (sin grupos: todos)
+      grupos: comunes, caja_viva, relojero, reliquia, farero, salas
 """
+
+import sys
 
 import os
 
@@ -364,10 +369,93 @@ def farero():
     guardar("final_farero", x, 0.7)
 
 
+# --- Salas y menú (0.2) ------------------------------------------------------------------------
+
+def salas():
+    # Traba: golpe sordo de madera y el pestillo que choca dos veces (sin que nada se mueva)
+    t = tiempo(0.34)
+    golpe = np.sin(2 * np.pi * (115 - 50 * t / 0.34) * t) * envolvente(len(t), 0.001, 0.035)
+    golpe += paso_bajo(blanco(0.34), 700) * envolvente(len(t), 0.0005, 0.015) * 0.7
+    x = np.zeros(muestras(0.34))
+    colocar(x, golpe, 0.0)
+    for k, inicio in enumerate((0.012, 0.075)):
+        pestillo = blanco(0.06) * envolvente(muestras(0.06), 0.0003, 0.005)
+        sonido = resonancia(pestillo, 2350 + k * 420, 70) + resonancia(pestillo, 3900 + k * 300, 80) * 0.6
+        colocar(x, sonido, inicio, 0.55 - k * 0.2)
+    guardar("trabado", x, 0.75)
+
+    # Viaje de la cámara: un soplo suave que sube
+    t = tiempo(0.6)
+    soplo = blanco(0.6)
+    centro = 500 + 1400 * (t / 0.6)
+    salida = np.zeros_like(soplo)
+    for i in range(0, len(soplo), 2048):
+        tramo = soplo[i:i + 2048]
+        c = float(centro[min(i, len(centro) - 1)])
+        salida[i:i + len(tramo)] = banda(tramo, c * 0.6, c * 1.6)
+    x = salida * np.sin(np.pi * t / 0.6) ** 2
+    guardar("acercar", x, 0.35)
+
+    # Puerta corredera (fusuma): madera que roza el carril y un toque al llegar
+    t = tiempo(1.1)
+    grano = np.abs(paso_bajo(blanco(1.1), 35)) * 6
+    x = banda(blanco(1.1), 300, 2600) * (0.5 + grano) * np.sin(np.pi * np.clip(t / 0.95, 0, 1)) ** 0.7
+    toque = np.sin(2 * np.pi * 150 * tiempo(0.15)) * envolvente(muestras(0.15), 0.001, 0.03)
+    colocar(x, toque, 0.92, 0.9)
+    guardar("corredera", x, 0.55)
+
+    # Puerta con bisagra: el pestillo y un chirrido largo y grave
+    t = tiempo(1.6)
+    frecuencia = 150 + 35 * np.sin(2 * np.pi * 1.1 * t) + paso_bajo(blanco(1.6), 6) * 400
+    fase = np.cumsum(frecuencia) / FM
+    diente = 2 * (fase % 1) - 1
+    friccion = np.abs(paso_bajo(blanco(1.6), 30)) * 7
+    x = banda(diente * (0.3 + friccion), 250, 2600) * envolvente(len(t), 0.15, 1.0)
+    pestillo = resonancia(blanco(0.08) * envolvente(muestras(0.08), 0.0005, 0.006), 1900, 25)
+    colocar(x, pestillo, 0.0, 1.2)
+    guardar("puerta", x, 0.55)
+
+    # Fuego de chimenea (bucle): rumor grave y chasquidos sueltos
+    n = muestras(7.0)
+    rumor = paso_bajo(blanco(7.0), 180) * 1.2 + banda(blanco(7.0), 300, 1200) * 0.12
+    for _ in range(140):
+        inicio = azar.uniform(0, 6.8)
+        fuerza = azar.uniform(0.05, 0.6) ** 2
+        chasquido = banda(blanco(0.03) * envolvente(muestras(0.03), 0.0003, 0.004), 1200, 7000)
+        colocar(rumor, chasquido, inicio, fuerza * 3)
+    guardar("fuego", bucle(rumor, 0.5), 0.5)
+
+    # Péndulo de un reloj de pie (bucle de dos segundos): tac grave y tic
+    x = np.zeros(muestras(2.0))
+    for inicio, frecuencia in ((0.0, 900), (1.0, 1250)):
+        golpe = blanco(0.12) * envolvente(muestras(0.12), 0.0005, 0.01)
+        sonido = resonancia(golpe, frecuencia, 30) + resonancia(golpe, frecuencia * 2.3, 40) * 0.4
+        colocar(x, sonido, inicio)
+    guardar("pendulo", x, 0.5)
+
+    # Ambiente del gabinete (bucle de 24 s): un acorde grave que respira y notas de caja de música
+    duracion = 24.0
+    t = tiempo(duracion)
+    lento = 0.65 + 0.35 * np.sin(2 * np.pi * t / duracion)
+    acorde = np.zeros_like(t)
+    for frecuencia, amplitud in ((110.0, 0.5), (164.8, 0.32), (220.0, 0.22), (277.2, 0.1)):
+        acorde += np.sin(2 * np.pi * frecuencia * t + np.sin(2 * np.pi * 0.07 * t) * 0.6) * amplitud
+    acorde = paso_bajo(acorde, 900) * lento
+    sala = paso_bajo(blanco(duracion), 220) * 0.05
+    x = acorde * 0.5 + sala
+    escala = (440.0, 493.9, 554.4, 659.3, 740.0, 880.0)
+    momentos = (1.0, 2.6, 4.1, 7.5, 8.4, 11.0, 13.8, 15.1, 17.9, 19.6, 21.2)
+    for k, inicio in enumerate(momentos):
+        nota = escala[(k * 3 + 1) % len(escala)] * (0.5 if k % 4 == 3 else 1.0)
+        colocar(x, karplus(nota, 2.6, 0.62) * envolvente(muestras(2.6), 0.002, 1.2) * 0.22, inicio)
+    guardar("gabinete", bucle(x, 1.5), 0.55)
+
+
 def main():
-    for grupo in (comunes, caja_viva, relojero, reliquia, farero):
-        print(grupo.__name__)
-        grupo()
+    grupos = {g.__name__: g for g in (comunes, caja_viva, relojero, reliquia, farero, salas)}
+    for nombre in sys.argv[1:] or list(grupos):
+        print(nombre)
+        grupos[nombre]()
 
 
 if __name__ == "__main__":
