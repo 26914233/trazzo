@@ -6,7 +6,8 @@
 sola pantalla (un WebView).
 - Todo va dentro del APK: la ilustración, los sonidos, Three.js r170 y las fuentes. Se juega **sin conexión**.
 - La partida guardada (el paso de nivel) se queda en el móvil, como en el navegador.
-- A pantalla completa, en horizontal y en vertical (respeta el bloqueo de rotación).
+- A pantalla completa y **siempre en horizontal** (desde la 0.2, `sensorLandscape`: gira con el sensor entre los dos
+  horizontales). Lo pidió el usuario al probar la 0.1: «el juego tiene que ser horizontal cuando entre».
 - El botón «atrás» cierra lo que esté abierto (la nota, examinar) o vuelve a la sala; si ya no hay nada que
   cerrar, la app pasa a segundo plano sin perder la partida en curso. Al salir, el sonido se para.
 
@@ -15,7 +16,8 @@ sola pantalla (un WebView).
 | Paquete | `com.thunderdarkness.cajaviva` (otro distinto del de «Cuatro cajas»: no lo pisa) |
 | Nombre | «La caja viva», con la cara de la caja como icono |
 | Android | 7.0 o más (SDK mínimo 24; objetivo 34; compilado con la plataforma 35) |
-| Versión 0.1 | código 1, 5,3 MB, `caja-viva-0.1-prueba.apk` |
+| Versión 0.2 | código 2, 5,3 MB, `caja-viva-0.2-prueba.apk`: gestos (tirar de los cajones, girar la llave, levantar la tapa, deslizar las tablillas), pellizcar para acercar o alejar, la cámara fija de cerca y en horizontal |
+| Versión 0.1 | código 1, 5,3 MB, `caja-viva-0.1-prueba.apk` (en «Versiones anteriores (puzles)») |
 | Firma | clave de prueba propia («La caja viva prueba»); ver abajo |
 
 ## Cómo se construye
@@ -26,7 +28,7 @@ sola pantalla (un WebView).
 # y la clave de prueba en /root/.local/share/caja_viva/firma (de Drive; ver «La firma»)
 
 python3 puzles/ilustrada/apk/herramientas/icono_apk.py        # el icono (solo si cambia)
-python3 puzles/ilustrada/apk/construir_apk.py --version 0.1 --codigo 1
+python3 puzles/ilustrada/apk/construir_apk.py --version 0.2 --codigo 2
 ```
 
 El guion (`construir_apk.py`):
@@ -64,7 +66,7 @@ En el contenedor no hay un Android donde instalarlo. Se comprueba esto:
 ```
 python3 -m http.server 8766 -d puzles/ilustrada/apk/construccion/assets/web &
 CAJA_VIVA_URL=http://localhost:8766/index.html SIN_RED=1 node puzles/ilustrada/prueba/jugar.mjs B horizontal <capturas>
-CAJA_VIVA_URL=http://localhost:8766/index.html SIN_RED=1 node puzles/ilustrada/prueba/jugar_nivel2.mjs vertical <capturas>
+CAJA_VIVA_URL=http://localhost:8766/index.html SIN_RED=1 node puzles/ilustrada/prueba/jugar_nivel2.mjs horizontal <capturas>
 ```
 
 Con `SIN_RED=1`, cualquier petición fuera de `localhost` falla. Además, la prueba comprueba que nada sale de la

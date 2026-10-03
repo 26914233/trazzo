@@ -21,10 +21,10 @@ const SONIDOS = ['noche', 'fuego', 'trabado', 'recoger', 'encajar', 'despertar',
 // Encuadres de la técnica A: [x0, y0, x1, y1] de lo que debe verse en horizontal (h) y en vertical (v)
 const VISTAS = {
   sala:       { h: [0, 70, 1376, 698],    v: [480, 140, 1250, 720] },
-  caja:       { h: [668, 176, 1222, 612], v: [592, 168, 1232, 640] },
-  cajones:    { h: [975, 205, 1245, 575], v: [990, 215, 1230, 565] },
+  caja:       { h: [668, 168, 1222, 620], v: [592, 168, 1232, 640] },
+  cajones:    { h: [985, 196, 1240, 626], v: [990, 215, 1230, 565] },      // con sitio para los de abajo abiertos
   incensario: { h: [446, 392, 734, 664],  v: [440, 360, 740, 664] },
-  cara:       { h: [700, 300, 1020, 640], v: [726, 228, 1000, 560] },
+  cara:       { h: [705, 236, 1020, 560], v: [726, 228, 1000, 560] },      // de los huecos de la frente a la boca
   // nivel 2 (solo en la B): la caja hija sube de la trampilla y se mira de cerca en la mesa, con el ojo grande encima
   subida:     { h: [560, 0, 1300, 700],   v: [620, 40, 1240, 720] },
   hija:       { h: [240, 270, 1268, 745],  v: [618, 270, 903, 745] },     // solo cuenta su tamaño (ver tecnica_3d.js)
@@ -141,8 +141,8 @@ function estadoInicial() {
   return {
     fase: 'portada',          // portada | jugando | despertar | fin
     vista: 'sala',
-    llave: 'cajon',           // cajon | mano | usada
-    tapa: 'puesta',           // puesta | abierta
+    llave: 'cajon',           // cajon | mano | cerradura (metida, sin girar) | usada
+    tapa: 'puesta',           // puesta (cerrada con llave) | suelta (sin llave, aún encima) | abierta (en la mesa o en la mano)
     tapaEnMesa: false,
     cuerno: 'brasas',         // brasas | mano | puesto
     nota: 'cajon',            // cajon | mano (se guarda en el inventario)
@@ -924,8 +924,25 @@ function dibujarOndas(c) {
 // dibuja a su manera: A los proyecta en 2D con la cámara del boceto; B y C los mueven en 3D.
 // ---------------------------------------------------------------------------------------------
 let cajonesDatos = null;
-const cajonAnim = Object.fromEntries(Object.keys(CAJONES).map(id => [id, { k: 0 }]));   // 0 cerrado … 1 abierto
-const salidaRebote = k => { const c1 = 1.2, c3 = c1 + 1; return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2); };
+// Cada cajón: cuánto ha salido (k: 0 cerrado … 1 abierto), su velocidad y adónde va. Un muelle lo lleva a su sitio
+// (con un rebote al abrirse y un golpe seco al cerrarse); mientras el dedo lo agarra, va donde lo lleve el dedo.
+const cajonAnim = Object.fromEntries(Object.keys(CAJONES).map(id => [id, { k: 0, v: 0, objetivo: 0, agarrado: false, golpe: 0 }]));
+function actualizarCajones(dt) {
+  for (const a of Object.values(cajonAnim)) {
+    if (a.agarrado) continue;
+    if (Math.abs(a.objetivo - a.k) < 0.0004 && Math.abs(a.v) < 0.004) { a.k = a.objetivo; a.v = 0; continue; }
+    for (let r = dt; r > 0; r -= 1 / 120) {
+      const h = Math.min(r, 1 / 120), kk = 170, am = 2 * Math.sqrt(kk) * 0.55;
+      a.v += ((a.objetivo - a.k) * kk - a.v * am) * h;
+      a.k += a.v * h;
+      if (a.k < 0) {                                   // el fondo: cierra de golpe, sin rebotar hacia dentro
+        if (a.v < -0.7 && reloj > a.golpe) { a.golpe = reloj + 0.25; sonar('tope_madera', -9, 1.15); vibrar(10); agitarTe(0.3); }
+        a.k = 0; a.v = 0;
+      }
+      if (a.k > 1.06) { a.k = 1.06; a.v = Math.min(a.v, 0); }      // el tope de fuera
+    }
+  }
+}
 const geometriaCajon = id => cajonesDatos.cajones.find(c => c.id === id);
 const aBoceto = ([x, y, z]) => proyectarBoceto(x, y, z);
 function centroCajon(id) {
@@ -959,23 +976,24 @@ function textoCajon(id) {
   if (def.contiene === 'nota') return estado.nota === 'cajon' ? 'Un papel doblado, con letra fina.' : 'Vacío. Aquí estaba la nota.';
   return def.texto;
 }
-function abrirCajon(id, callado = false) {
-  const a = cajonAnim[id], desde = a.k;
+function abrirCajon(id, callado = false, sinSonido = false) {
+  const a = cajonAnim[id];
   estado.cajones[id] = 'abierto';
-  animar(0.55, k => { a.k = desde + (1 - desde) * salidaRebote(k); }, () => { a.k = 1; });
+  a.objetivo = 1;
   if (callado) return;
-  sonar('cajon', -5, azar(0.95, 1.06)); vibrar(12);
+  if (!sinSonido) { sonar('cajon', -5, azar(0.95, 1.06)); vibrar(12); }
   const c = centroCajon(id);
   mirarA(c, 1.6);
   setTimeoutReloj(0.25, () => polvoDeCajon(c.x + 10, c.y + 2));
   setTimeoutReloj(0.35, () => mensaje(textoCajon(id)));
 }
-function cerrarCajon(id) {
-  const a = cajonAnim[id], desde = a.k;
+function cerrarCajon(id, sinSonido = false) {
+  const a = cajonAnim[id];
   estado.cajones[id] = 'cerrado';
-  sonar('deslizar_madera', -15, 1.3);
-  animar(0.32, k => { a.k = desde * (1 - k * k); }, () => { a.k = 0; sonar('tope_madera', -9, 1.15); vibrar(10); agitarTe(0.35); });
+  a.objetivo = 0;
+  if (!sinSonido) { sonar('deslizar_madera', -15, 1.3); a.v = Math.min(a.v, -1.2); }
 }
+// Un toque en un cajón no lo abre: asoma un poco y vuelve, para enseñar que se tira de él (los de cerradura ni eso)
 function tocarCajon(id) {
   const def = CAJONES[id];
   if (def.cerradura) {
@@ -983,11 +1001,18 @@ function tocarCajon(id) {
     cajonCerrado(id, c.x, c.y, 1, -0.6, 'Tiene una cerradura pequeña. No cede.');
     return;
   }
-  if (estado.cajones[id] !== 'abierto') { abrirCajon(id); return; }
-  if (cajonAnim[id].k < 0.7) return;                   // todavía se está abriendo
+  const a = cajonAnim[id];
+  if (estado.cajones[id] !== 'abierto') {
+    a.v += 1.9;
+    sonar('clic_madera', -12, 1.3);
+    mensaje(primeraVez('tirar') ? 'Tira del cajón hacia fuera: arrastra el dedo.' : 'Tira de él.');
+    return;
+  }
+  if (a.k < 0.7) return;                                // todavía se está abriendo
   if (def.contiene === 'llave' && estado.llave === 'cajon') { tocarLlave(id); return; }
   if (def.contiene === 'nota' && estado.nota === 'cajon') { cogerNota(id); return; }
-  cerrarCajon(id);
+  a.v -= 1.3;
+  mensaje(primeraVez('empujar') ? 'Para cerrarlo, empújalo hacia dentro.' : textoCajon(id));
 }
 // Al despertar, la caja se sacude y todos sus cajones traquetean
 function sacudirCajones() {
@@ -995,9 +1020,8 @@ function sacudirCajones() {
   Object.keys(CAJONES).forEach((id, i) => {
     const a = cajonAnim[id];
     setTimeoutReloj(i * 0.07, () => {
-      const base = a.k, hacia = base > 0.5 ? -0.12 : 0.2;
       sonar('clic_madera', -14, azar(0.8, 1.2));
-      animar(0.32, k => { a.k = base + hacia * Math.sin(k * Math.PI * 2) * (1 - k); }, () => { a.k = base; });
+      if (!a.agarrado) a.v += a.objetivo > 0.5 ? -1.4 : 2.1;
     });
   });
 }
@@ -1279,16 +1303,17 @@ const tecnicaA = {
   transicion: null,
   mirada: { x: 0, y: 0, vx: 0, vy: 0, objetivoX: 0, objetivoY: 0 },   // cuánto se ha movido la cámara (m)
   giro: 0, giroObjetivo: 0,                                           // la caja: 0 de frente, π de espaldas
-  zoom: 1, zoomObjetivo: 1,                                           // pellizcar acerca un poco más
+  zoom: 1, zoomObjetivo: 1,                                           // pellizcar acerca o aleja (más de 1, más cerca)
+  foco: { x: 0, y: 0 }, focoObjetivo: { x: 0, y: 0 },                 // y lleva el centro hacia los dedos
   camDibujo: { cx: ANCHO / 2, cy: ALTO / 2, s: 1 },
   activar() { lienzo3d.hidden = true; lienzo.classList.remove('encima'); this.transicion = null; Object.assign(this.cam, this.camaraDe(estado.vista)); },
   desactivar() {},
   medir() {},
-  camaraDe(nombre, extra = 1) {
+  camaraDe(nombre, extra = 1, foco = null) {
     const v = VISTAS[nombre];
     const [x0, y0, x1, y1] = alto > ancho * 1.05 ? v.v : v.h;
     const s = Math.min(ancho / (x1 - x0), alto / (y1 - y0)) * extra;
-    let cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    let cx = (x0 + x1) / 2 + (foco ? foco.x : 0), cy = (y0 + y1) / 2 + (foco ? foco.y : 0);
     const mx = ancho / (2 * s), my = alto / (2 * s);
     cx = 2 * mx >= ANCHO ? ANCHO / 2 : limitar(cx, mx, ANCHO - mx);
     cy = 2 * my >= ALTO ? ALTO / 2 : limitar(cy, my, ALTO - my);
@@ -1296,15 +1321,18 @@ const tecnicaA = {
   },
   irA(nombre, duracion = 0.75) {
     this.transicion = { desde: { ...this.cam }, t: 0, duracion };
-    // al cambiar de vista la cámara vuelve a su sitio poco a poco
-    this.mirada.objetivoX = 0; this.mirada.objetivoY = 0; this.zoomObjetivo = 1;
+    // al cambiar de vista la cámara vuelve a su sitio poco a poco (la transición ya sale de lo que se ve)
+    this.mirada.objetivoX = 0; this.mirada.objetivoY = 0;
+    this.zoom = this.zoomObjetivo = 1; this.foco = { x: 0, y: 0 }; this.focoObjetivo = { x: 0, y: 0 };
   },
   empezar(duracion) {
     this.transicion = { desde: { ...this.cam, s: this.cam.s * 1.07 }, t: 0, duracion };
   },
   actualizar(dt) {
-    this.zoom = mezclar(this.zoom, this.zoomObjetivo, 1 - Math.exp(-dt * 8));
-    const destino = this.camaraDe(estado.vista, this.zoom);
+    const e = 1 - Math.exp(-dt * 20);
+    this.zoom = mezclar(this.zoom, this.zoomObjetivo, e);
+    this.foco.x = mezclar(this.foco.x, this.focoObjetivo.x, e); this.foco.y = mezclar(this.foco.y, this.focoObjetivo.y, e);
+    const destino = this.camaraDe(estado.vista, this.zoom, this.foco);
     if (this.transicion) {
       this.transicion.t += dt;
       const k = curva(limitar(this.transicion.t / this.transicion.duracion, 0, 1));
@@ -1340,8 +1368,28 @@ const tecnicaA = {
     m.objetivoY = limitar(m.objetivoY - dy * k, -0.05, 0.05);
   },
   soltar() {},
-  pellizcar(r) { this.zoomObjetivo = limitar(this.zoomObjetivo * r, 1, 1.6); },
-  reiniciar() { this.giro = this.giroObjetivo = 0; this.zoomObjetivo = 1; Object.assign(this.mirada, { objetivoX: 0, objetivoY: 0 }); },
+  // pellizcar: el punto que había bajo los dedos (m0) queda bajo ellos (m1). En la sala no se aleja más que el boceto.
+  // Devuelve 'fuera' o 'dentro' si se ha querido pasar del margen (como la B)
+  pellizcar(r, m0, m1) {
+    if (this.transicion) return null;
+    const l = estado.vista === 'sala' ? [1, 2.2] : [0.8, 2.2];
+    m0 = m0 || { x: ancho / 2, y: alto / 2 }; m1 = m1 || m0;
+    const pedido = this.zoomObjetivo * r, z1 = limitar(pedido, l[0], l[1]);
+    const antes = this.camaraDe(estado.vista, this.zoomObjetivo, this.focoObjetivo);
+    const bx = antes.cx + (m0.x - ancho / 2) / antes.s, by = antes.cy + (m0.y - alto / 2) / antes.s;
+    const v = VISTAS[estado.vista], [x0, y0, x1, y1] = alto > ancho * 1.05 ? v.v : v.h, vx = (x0 + x1) / 2, vy = (y0 + y1) / 2;
+    const s1 = this.camaraDe(estado.vista, z1).s;
+    // el foco se guarda ya ajustado a los bordes de la ilustración
+    const ajustada = this.camaraDe(estado.vista, z1, { x: bx - (m1.x - ancho / 2) / s1 - vx, y: by - (m1.y - alto / 2) / s1 - vy });
+    this.zoomObjetivo = z1;
+    this.focoObjetivo = { x: ajustada.cx - vx, y: ajustada.cy - vy };
+    return pedido > l[1] + 1e-4 ? 'dentro' : pedido < l[0] - 1e-4 ? 'fuera' : null;
+  },
+  lupa() { return 1 / this.zoomObjetivo; },
+  reiniciar() {
+    this.giro = this.giroObjetivo = 0; this.zoomObjetivo = 1; this.focoObjetivo = { x: 0, y: 0 };
+    Object.assign(this.mirada, { objetivoX: 0, objetivoY: 0 });
+  },
   camaraViva() {
     let { cx, cy, s } = this.cam;
     if (!quieto) {
@@ -1499,8 +1547,8 @@ const tecnicaA = {
 let tapaVuelo = null, llaveGirando = null, vueloEnCaja = null;
 function dibujarLlaveGirando(c) {
   const d = datos.capas.llave, k = llaveGirando.t;
-  c.save(); c.globalAlpha = 1 - suave(Math.max(0, k - 0.6) / 0.4);
-  c.translate(CERRADURA.x, CERRADURA.y); c.rotate(-1.2 * salida(k)); c.scale(0.8, 0.8 - 0.35 * salida(k));
+  c.save(); c.globalAlpha = 1 - (llaveGirando.desvanece || 0);
+  c.translate(CERRADURA.x, CERRADURA.y); c.rotate((llaveGirando.sentido || -1) * 1.2 * k); c.scale(0.8, 0.8 - 0.35 * k);
   c.drawImage(img.llave, -d.w / 2, -d.h / 2);
   c.restore();
 }
@@ -1522,7 +1570,7 @@ function irA(nombre, duracion = 0.75) {
   if (estado.vista === nombre && !(tec.transicion)) { /* ya está */ }
   estado.vista = nombre;
   tec.irA(nombre, duracion);
-  $('juego').classList.toggle('vista-hija', nombre === 'hija');
+  $('juego').classList.toggle('mensaje-al-lado', nombre === 'hija' || nombre === 'cajones');
   el.volver.hidden = nombre === 'sala' || estado.fase !== 'jugando';
   if (nombre !== 'sala') sonar('acercar', -16, nombre === 'incensario' ? 1.1 : 1);
   if (mensajeHasta) mensajeHasta = Math.min(mensajeHasta, reloj + 0.3);
@@ -1933,10 +1981,12 @@ function pista() {
   if (estado.nivel === 2) return pistaNivel2();
   if (estado.llave === 'cajon') {
     if (caraVisible() !== 'frente') return mensaje('Los cajones están junto a la cara. Gira la caja.');
-    if (estado.cajones.c8 !== 'abierto') return mensaje(n % 2 ? 'Los cajones del costado se abren. Prueba los de abajo.' : 'Algunos cajones tienen cerradura y otros no. Ábrelos y mira dentro.');
+    if (estado.cajones.c8 !== 'abierto') return mensaje(n % 2 ? 'Los cajones del costado se abren tirando de ellos. Prueba los de abajo.' : 'Algunos cajones tienen cerradura y otros no. Tira de ellos y mira dentro.');
     if (estado.intentosLlave === 0) return mensaje('En el cajón de abajo, junto a la cara, hay una llave.');
     return mensaje('Mientras el ojo te mira, la caja no deja tocar nada. Haz que mire la lámpara.');
   }
+  if (estado.llave === 'cerradura') return mensaje('La llave está en la cerradura: gírala arrastrando el dedo en círculo a su alrededor.');
+  if (estado.tapa === 'suelta') return mensaje('El león ya soltó la tapa: levántala arrastrando hacia arriba.');
   if (estado.nota === 'cajon' && estado.tapa === 'puesta' && n % 3 === 2) return mensaje('Otro cajón de abajo guarda un papel.');
   if (estado.tapa === 'puesta') return mensaje(n % 2 ? 'El incensario: la cerradura está bajo el león. Elige la llave y toca el incensario.' : 'La llave es diminuta. ¿Qué tiene una cerradura pequeña en esta sala?');
   if (estado.cuerno === 'brasas') return mensaje('Algo blanco asoma entre las brasas del incensario.');
@@ -1950,17 +2000,17 @@ function pistaNivel2() {
     const n = estado.pistasPaso[clave] = (estado.pistasPaso[clave] || 0) + 1;
     return mensaje(lista[Math.min(n, lista.length) - 1], 4);
   };
-  if (!h2 || h2.fase === 'dentro') return escalon('trampilla', ['La trampilla de arriba sigue dando luz.', 'Algo se mueve dentro de la trampilla. Tócala.']);
+  if (!h2 || h2.fase === 'dentro') return escalon('trampilla', ['La trampilla de arriba sigue dando luz.', 'Algo empuja dentro de la trampilla.', 'Pon el dedo en la trampilla y tira hacia arriba.']);
   if (h2.fase === 'subiendo') return mensaje('Mira.');
   const sig = h2.tablillas.indexOf(false);
   if (sig === 0) return escalon('t0', ['La tablilla de arriba de la caja pequeña: el ojo grande la está mirando.',
-    'Arrastra para girar la caja pequeña en la mano.', 'Escóndele la tablilla de arriba: gírala hacia ti, de espaldas al ojo, y tócala.']);
+    'Arrastra para girar la caja pequeña en la mano.', 'Escóndele la tablilla de arriba: gírala hacia ti, de espaldas al ojo, y deslízala con el dedo.']);
   if (sig === 1) return escalon('t1', ['Sigue la flecha que dejó la primera tablilla.', 'La siguiente está en el costado al que apunta la flecha.',
-    'Si el ojo ve esa cara, no se moverá: gírala hacia ti antes de tocarla.']);
+    'Si el ojo ve esa cara, no se moverá: gírala hacia ti antes de deslizarla.']);
   if (sig === 2) return escalon('t2', ['Te falta una cara por mirar.', 'La de abajo.', 'Arrastra hacia arriba o hacia abajo para volcar la caja… sin dejarle esa cara al ojo.']);
   if (sig === 3) return escalon('t3', ['La flecha de abajo apunta a un costado.', 'Gira la caja hasta tener ese costado de frente.']);
-  if (sig === 4) return escalon('t4', ['La flecha apunta hacia atrás: a la tapa.', 'El ojo grande ve la tapa de atrás.', 'Dale la vuelta a la caja pequeña y corre la tapa.']);
-  if (h2.cajon !== 'abierto') return mensaje('Detrás de la tapa hay un cajoncito. Tira de él.');
+  if (sig === 4) return escalon('t4', ['La flecha apunta hacia atrás: a la tapa.', 'El ojo grande ve la tapa de atrás.', 'Dale la vuelta a la caja pequeña y desliza la tapa de lado.']);
+  if (h2.cajon !== 'abierto') return mensaje('Detrás de la tapa hay un cajoncito. Tira de él con el dedo, hacia fuera.');
   if (h2.cajita === 'cajon') return escalon('cajita', ['Una cajita roja, en el cajoncito.', 'Cógela… sin que el ojo lo vea.']);
   if (h2.ojo === 'cajita') return escalon('bolsillo', ['Mira la cajita de cerca: tócala dos veces en la bandeja.', 'Su tapa gira.',
     'Gira la tapa hasta que su marca dorada toque la del borde.']);
@@ -2004,7 +2054,7 @@ const ZONAS_DETRAS = [
 function tocarEscena(sx, sy) {
   if (estado.fase !== 'jugando' || estado.ocupado) return;
   const p = tec.aPintura(sx, sy);
-  if (!p) { if (estado.vista !== 'sala') irA('sala'); return; }
+  if (!p) return;                        // de cerca, la cámara se queda: se vuelve con «Sala», atrás o pellizcando
   if (estado.seleccion) { usarObjeto(estado.seleccion, p, null); return; }
   const v = estado.vista, deCerca = v === 'caja' || v === 'cara' || v === 'cajones' || v === 'hija';
   if (p.hija) { tocarHija(p); return; }
@@ -2014,9 +2064,13 @@ function tocarEscena(sx, sy) {
     sonar('toque', -14); mensaje('La espalda de la caja: más cajones y un hueco extraño.');
     return;
   }
-  // un cajón: la cámara se acerca al costado mientras se abre (o resiste)
+  // un cajón: de lejos, la cámara se acerca al costado y se queda allí; de cerca, se tira de ellos
   if (p.cajon) {
-    if (v !== 'cajones') irA('cajones', 0.85);
+    if (v !== 'cajones') {
+      irA('cajones', 0.85);
+      if (primeraVez('costado')) setTimeoutReloj(0.9, () => mensaje('Los cajones se abren tirando de ellos: arrastra el dedo hacia fuera.', 4));
+      return;
+    }
     sonar('toque', -14); tocarCajon(p.cajon);
     return;
   }
@@ -2032,9 +2086,7 @@ function tocarEscena(sx, sy) {
   if (dentro(['poli', CAJA], p)) {
     if (!deCerca) irA('caja');
     else { sonar('toque', -14); mensaje(elegir(['La madera está tibia, como si respirara.', 'Mosaico de maderas claras y oscuras. Ni una junta se mueve.'])); }
-    return;
   }
-  if (v !== 'sala') irA('sala');
 }
 
 // La resistencia creativa: no se mueve ni se marca; reacciona la caja entera y va a más
@@ -2123,8 +2175,11 @@ function tocarFrente() {
 }
 function tocarTrampilla() {
   if (estado.nivel === 2 && estado.hija) {
-    if (estado.hija.fase === 'dentro') subirCajaHija();
-    else mensaje('La trampilla está vacía. La luz se va apagando.');
+    if (estado.hija.fase !== 'dentro') { mensaje('La trampilla está vacía. La luz se va apagando.'); return; }
+    // algo empuja desde dentro: se saca tirando hacia arriba
+    destello(TRAMPILLA.x, TRAMPILLA.y - 6, 90, '255,215,140', 0.4, 0.7);
+    sonar('clic_madera', -12, 0.9); vibrar(10);
+    mensaje(primeraVez('trampilla2') ? 'Dentro hay algo que empuja. Tira de ello hacia arriba con el dedo.' : 'Tira hacia arriba.');
     return;
   }
   const veces = insistir('trampilla');
@@ -2136,6 +2191,18 @@ function tocarTrampilla() {
 }
 function tocarIncensario() {
   if (estado.tapa === 'abierta') { mensaje(estado.cuerno === 'brasas' ? 'Algo blanco asoma entre las brasas.' : 'Solo quedan brasas.'); return; }
+  if (estado.llave === 'cerradura') {
+    // la llave se mueve un poco en la cerradura: hay que girarla con el dedo
+    animar(0.3, k => { if (llaveGirando) llaveGirando.t = 0.07 * Math.sin(k * Math.PI); });
+    sonar('clic_metal', -16, 1.2);
+    mensaje('La llave está en la cerradura. Gírala: arrastra el dedo en círculo a su alrededor.');
+    return;
+  }
+  if (estado.tapa === 'suelta') {
+    sonar('clic_madera', -12, 1.1); bocanada(575, 505, 0, -1, 1, 'incensario');
+    mensaje('La tapa está suelta. Levántala: pon el dedo en ella y arrastra hacia arriba.');
+    return;
+  }
   const veces = insistir('incensario');
   sonar('trabado', -3, 1.15); vibrar(30);
   bocanada(560, 478, -0.3, -1, Math.min(veces, 3), 'incensario'); bocanada(600, 480, 0.3, -1, 1, 'incensario');
@@ -2206,19 +2273,23 @@ function tocarHija(p) {
 }
 // ¿la ve el ojo grande? (si te mira y esa cara está vuelta hacia él)
 const laVeElOjo = i => laCajaMira() && tec.tablillaVista && tec.tablillaVista(i);
+// un toque en una tablilla no la corre: si le toca y el ojo no la ve, asoma un poco hacia donde corre (el gesto es
+// deslizarla con el dedo)
 function tocarTablilla(i) {
   const h2 = estado.hija, siguiente = h2.tablillas.indexOf(false);
   if (h2.tablillas[i]) { mensaje('Ya ha corrido. Debajo, la flecha.'); return; }
-  if (i !== siguiente) {
-    // no le toca: madera contra madera, sin que la caja grande intervenga
-    sonar('tope_madera', -12, 1.5); vibrar(12);
-    const veces = insistir('orden');
-    if (siguiente === 0) mensaje(primeraVez('orden') ? 'Trabada. En las cajas secretas, las tablillas corren en orden: la primera es la de arriba.' : 'Esta no. La primera es la de arriba.');
-    else mensaje(veces >= 2 ? 'Esta no. Sigue la flecha que dejó la anterior.' : 'Trabada. Le toca a otra.');
-    return;
-  }
+  if (i !== siguiente) { tablillaTrabada(siguiente); return; }
   if (laVeElOjo(i)) { resistirMirada(); return; }
-  correrTablilla(i);
+  tec.correrTablilla(i, 0.34, 0, 0.09);
+  sonar('clic_madera', -12, 1.6); vibrar(8);
+  mensaje(primeraVez('correr') ? 'Cede un poco. Deslízala con el dedo hacia donde asoma.' : 'Deslízala con el dedo.');
+}
+// no le toca: madera contra madera, sin que la caja grande intervenga
+function tablillaTrabada(siguiente) {
+  sonar('tope_madera', -12, 1.5); vibrar(12);
+  const veces = insistir('orden');
+  if (siguiente === 0) mensaje(primeraVez('orden') ? 'Trabada. En las cajas secretas, las tablillas corren en orden: la primera es la de arriba.' : 'Esta no. La primera es la de arriba.');
+  else mensaje(veces >= 2 ? 'Esta no. Sigue la flecha que dejó la anterior.' : 'Trabada. Le toca a otra.');
 }
 // la resistencia: la caja grande contiene el aliento y clava el ojo en la pequeña, y va a más si se insiste
 function resistirMirada() {
@@ -2232,10 +2303,10 @@ function resistirMirada() {
   const n = ++estado.intentosMirada;
   mensaje(n === 1 ? 'No se mueve. El ojo grande la está mirando.' : n === 2 ? 'Lo que el ojo ve, no se mueve.' : 'Gira la caja pequeña: escóndele esa cara.');
 }
-function correrTablilla(i) {
+function correrTablilla(i, duracion = 0.5) {
   const h2 = estado.hija;
   h2.tablillas[i] = true;
-  tec.correrTablilla(i, 0.5);
+  tec.correrTablilla(i, duracion);
   sonar('deslizar_madera', -5, 1.5); vibrar(15);
   setTimeoutReloj(0.42, () => sonar('clic_madera', -6, 1.6));
   const textos = [
@@ -2247,12 +2318,19 @@ function correrTablilla(i) {
   ];
   mensaje(textos[i]);
 }
+// el cajoncito de detrás: un toque lo hace asomar; se abre tirando de él
 function tirarCajoncito() {
   const h2 = estado.hija;
   if (h2.cajon === 'abierto') { mensaje(h2.cajita === 'cajon' ? 'Dentro, una cajita roja.' : 'Vacío.'); return; }
   if (laVeElOjo(4)) { resistirMirada(); return; }
+  tec.abrirCajonHija(0.34, 0, 0.12);
+  sonar('clic_madera', -12, 1.5); vibrar(8);
+  mensaje(primeraVez('cajoncito') ? 'Un cajoncito. Tira de él: arrastra hacia fuera.' : 'Tira de él.');
+}
+function abrirCajoncito(duracion = 0.6) {
+  const h2 = estado.hija;
   h2.cajon = 'abierto';
-  tec.abrirCajonHija(0.7);
+  tec.abrirCajonHija(duracion);
   sonar('cajon', -5, 1.45); vibrar(15);
   mensaje('Un cajoncito. Dentro, una cajita de laca roja.');
 }
@@ -2317,7 +2395,7 @@ function usarObjeto(objeto, p, desde = null) {
     mensaje(objeto === 'llave' ? (CAJONES[p.cajon].cerradura ? 'La cerradura de este cajón es aún más pequeña.' : 'Este cajón no tiene cerradura.') : 'Ahí no encaja.');
     return;
   }
-  if (objeto === 'llave' && deFrente && dentro(INCENSARIO, p) && estado.tapa === 'puesta') { deseleccionar(); abrirIncensario(desde); return; }
+  if (objeto === 'llave' && deFrente && dentro(INCENSARIO, p) && estado.tapa === 'puesta') { deseleccionar(); meterLlave(desde); return; }
   if (objeto === 'cuerno' && deFrente && dentro(['elipse', 912, 291, 40, 40], p)) { deseleccionar(); ponerCuerno(desde); return; }
   if (objeto === 'ojo' && deFrente && !p.hija && dentro(['elipse', CUENCA.x, CUENCA.y, 42, 28], p)) { deseleccionar(); ponerOjo(desde); return; }
   if (objeto === 'cajita') { deseleccionar(); sonar('trabado', -10, 1.3); mensaje('Primero habría que abrirla. Tócala dos veces en la bandeja para mirarla de cerca.'); return; }
@@ -2329,52 +2407,64 @@ function usarObjeto(objeto, p, desde = null) {
   else mensaje(enCaja ? 'Ahí no encaja. ¿Dónde le falta un cuerno?' : 'Ahí no encaja.');
 }
 
-async function abrirIncensario(desde) {
+// La llave entra en la cerradura del león y se queda en ella: hay que girarla con el dedo (gesto «llave»)
+async function meterLlave(desde) {
   estado.ocupado = true;
   irA('incensario');
   await desdeInventario('llave', 'llave', CERRADURA, 'incensario', desde);
-  estado.llave = 'usada';
-  sonar('llave', -2);
-  const giro = { t: 0 };
-  llaveGirando = giro;
-  await animarPromesa(0.45, k => { giro.t = k; });
-  llaveGirando = null;
-  sonar('candado_abre', -2);
-  estado.tapa = 'abierta';
-  tapaVuelo = { x: TAPA_ORIGEN.x, y: TAPA_ORIGEN.y, ang: 0, sx: 1, sy: 1 };
-  hornear();
-  humoDelIncienso();
-  await animarTapa();
-  bucle('fuego', -21, 2);
-  mensaje('Algo blanco asoma entre las brasas.');
+  estado.llave = 'cerradura';
+  llaveGirando = { t: 0, sentido: -1, desvanece: 0 };
+  sonar('llave', -4, 1.15); vibrar(12);
   estado.ocupado = false;
+  mensaje(primeraVez('girar-llave') ? 'La llave entra. Gírala: arrastra el dedo en círculo alrededor de la cerradura.' : 'Gírala.', 4.5);
 }
-function animarTapa() {
-  const a = TAPA_ORIGEN, b = TAPA_MESA, alto = 30;
+// el giro completo: clic, el león suelta la tapa y la llave se queda en la cerradura (se desvanece)
+async function abrirCerradura() {
+  estado.ocupado = true;
+  const t0 = llaveGirando.t;
+  await animarPromesa(0.16, k => { llaveGirando.t = mezclar(t0, 1, k); });
+  sonar('candado_abre', -2); vibrar(30);
+  bocanada(560, 500, -0.6, -1, 1, 'incensario'); bocanada(592, 500, 0.6, -1, 1, 'incensario');
+  estado.llave = 'usada';
+  estado.tapa = 'suelta';
+  await animarPromesa(0.5, k => { llaveGirando.desvanece = suave(k); }, 0.3);
+  llaveGirando = null;
+  estado.ocupado = false;
+  mensaje('Clic. El león suelta la tapa: levántala arrastrando hacia arriba.', 4);
+}
+// la tapa, levantada con el dedo (gesto «tapa»), va a la mesa; si se suelta antes, cae en su sitio
+function llevarTapaAMesa() {
+  const b = TAPA_MESA, x0 = tapaVuelo.x, y0 = tapaVuelo.y, ang0 = tapaVuelo.ang;
+  estado.ocupado = true;
   return new Promise(ok => {
-    animar(0.4, k => {
-      tapaVuelo.ang = Math.sin(k * Math.PI * 6) * 0.035 * (1 - k);
-      tapaVuelo.y = a.y - Math.abs(Math.sin(k * Math.PI * 6)) * 1.6 * (1 - k);
+    animar(0.6, k => {
+      const e = curva(k);
+      tapaVuelo.x = mezclar(x0, b.x, e);
+      tapaVuelo.y = mezclar(y0, b.y, e) - Math.sin(e * Math.PI) * 24;
+      tapaVuelo.ang = mezclar(ang0, 0.03, e);
+      tapaVuelo.sx = tapaVuelo.sy = mezclar(1, 1.04, e);
     }, () => {
-      sonar('clic_madera', -4);
-      bocanada(560, 500, -0.6, -1, 1, 'incensario'); bocanada(592, 500, 0.6, -1, 1, 'incensario');
-      animar(0.5, k => { const e = salida(k); tapaVuelo.y = a.y - alto * e; tapaVuelo.ang = -0.07 * e; }, () => {
-        animar(0.65, k => {
-          const e = curva(k);
-          tapaVuelo.x = mezclar(a.x, b.x, e);
-          tapaVuelo.y = mezclar(a.y - alto, b.y, e) - Math.sin(e * Math.PI) * 24;
-          tapaVuelo.ang = mezclar(-0.07, 0.03, e);
-          tapaVuelo.sx = tapaVuelo.sy = mezclar(1, 1.04, e);
-        }, () => {
-          sonar('tope_madera', -2); vibrar(20);
-          polvareda(b.x, b.y - 6);
-          animar(0.28, k => {
-            const q = Math.sin(k * Math.PI);
-            tapaVuelo.sy = 1.04 * (1 - 0.06 * q); tapaVuelo.sx = 1.04 * (1 + 0.03 * q); tapaVuelo.ang = 0.03 * (1 - k);
-          }, () => { estado.tapaEnMesa = true; tapaVuelo = null; hornear(); ok(); });
-        });
+      sonar('tope_madera', -2); vibrar(20);
+      polvareda(b.x, b.y - 6);
+      animar(0.28, k => {
+        const q = Math.sin(k * Math.PI);
+        tapaVuelo.sy = 1.04 * (1 - 0.06 * q); tapaVuelo.sx = 1.04 * (1 + 0.03 * q); tapaVuelo.ang = 0.03 * (1 - k);
+      }, () => {
+        estado.tapaEnMesa = true; tapaVuelo = null; hornear();
+        bucle('fuego', -21, 2);
+        estado.ocupado = false;
+        mensaje('Algo blanco asoma entre las brasas.');
+        ok();
       });
     });
+  });
+}
+function devolverTapa() {
+  const x0 = tapaVuelo.x, y0 = tapaVuelo.y, ang0 = tapaVuelo.ang;
+  animar(0.2, k => { const e = k * k; tapaVuelo.x = mezclar(x0, TAPA_ORIGEN.x, e); tapaVuelo.y = mezclar(y0, TAPA_ORIGEN.y, e); tapaVuelo.ang = mezclar(ang0, 0, e); }, () => {
+    sonar('tope_madera', -6, 1.25); vibrar(12);
+    bocanada(575, 505, 0, -1, 1, 'incensario');
+    estado.tapa = 'suelta'; tapaVuelo = null; hornear(); humoDelIncienso();
   });
 }
 async function ponerCuerno(desde) {
@@ -2528,6 +2618,7 @@ function actualizar(dt) {
   }
   for (let i = vuelos.length - 1; i >= 0; i--) { const v = vuelos[i]; v.t += dt; if (v.t >= v.duracion) { vuelos.splice(i, 1); v.ok(); } }
   for (let i = destellos.length - 1; i >= 0; i--) { destellos[i].t += dt; if (destellos[i].t >= destellos[i].duracion) destellos.splice(i, 1); }
+  actualizarCajones(dt);
   actualizarOjo(dt);
   actualizarOjo2(dt);
   actualizarAliento(dt);
@@ -2561,67 +2652,73 @@ function cuadro(ahora) {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Toques: tocar, arrastrar (mover la cámara o girar la caja) y pellizcar (acercarse)
+// Toques: tocar, arrastrar y pellizcar. De cerca, la cámara se queda quieta: arrastrar es la acción (tirar de un
+// cajón, girar la llave, levantar la tapa, sacar la caja pequeña, correr una tablilla) o girar la caja; en la sala,
+// arrastrar mira alrededor. Pellizcar acerca o aleja donde están los dedos; alejarse del todo vuelve a la vista de antes.
 // ---------------------------------------------------------------------------------------------
 const punteros = new Map();
 let puntero = null, arrastre = null, pellizco = null;
+const VISTA_PADRE = { cajones: 'caja', cara: 'caja', incensario: 'sala', caja: 'sala', hija: 'caja' };
 function posicion(e) { const r = lienzo.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
 lienzo.addEventListener('pointerdown', e => {
   desbloquearAudio();
   const q = posicion(e);
   punteros.set(e.pointerId, q);
-  if (punteros.size === 2) {
-    const [a, b] = [...punteros.values()];
-    pellizco = { d: Math.hypot(a.x - b.x, a.y - b.y) };
+  if (punteros.size >= 2) {
+    // un segundo dedo: lo que movía el primero se suelta y empieza el pellizco
+    if (puntero && puntero.gesto) soltarGesto(puntero.gesto, true);
     puntero = null;
+    const [a, b] = [...punteros.values()];
+    pellizco = { d: Math.max(1, Math.hypot(a.x - b.x, a.y - b.y)), m: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, exceso: 1, salio: false };
     return;
   }
   const p = tec.aPintura(q.x, q.y);
   moverDedo(p);
-  // en el nivel 2, con la caja pequeña en la mesa, la grande no se gira; de cerca, arrastrar gira la pequeña en la mano
-  puntero = { ...q, x0: q.x, y0: q.y, inicio: performance.now(), id: e.pointerId, movido: 0,
-    enCaja: !hijaEnMesa() && !!(p && (p.cara === 'detras' || p.cajon || dentro(['poli', CAJA], p))),
-    enHija: hijaEnMesa() && estado.vista === 'hija' };
+  // la caja grande se gira arrastrándola desde la sala o la vista de la caja (de más cerca, se queda quieta para poder
+  // tirar de sus cajones); en el nivel 2, con la caja pequeña en la mesa, no se gira: arrastrar gira la pequeña en la mano
+  const v = estado.vista;
+  puntero = { ...q, x0: q.x, y0: q.y, inicio: performance.now(), id: e.pointerId, movido: 0, gesto: gestoEn(p, q),
+    enCaja: (v === 'sala' || v === 'caja') && !hijaEnMesa() && !!(p && (p.cara === 'detras' || p.cajon || dentro(['poli', CAJA], p))),
+    enHija: hijaEnMesa() && v === 'hija' };
   if (estado.fase === 'jugando' && p && p.cara === 'frente') mirarA(p);
 });
 lienzo.addEventListener('pointermove', e => {
   const q = posicion(e);
   if (punteros.has(e.pointerId)) punteros.set(e.pointerId, q);
-  if (pellizco && punteros.size === 2) {
-    const [a, b] = [...punteros.values()];
-    const d = Math.hypot(a.x - b.x, a.y - b.y);
-    tec.pellizcar(d / pellizco.d);
-    pellizco.d = d;
-    return;
-  }
+  if (pellizco && punteros.size >= 2) { moverPellizco(); return; }
   if ((e.pointerType === 'mouse' || puntero) && estado.fase === 'jugando') {
     const p = tec.aPintura(q.x, q.y);
     moverDedo(p);
     if (p && p.cara === 'frente') mirarA(p);
   }
-  if (puntero && e.pointerId === puntero.id) {
-    const dx = q.x - puntero.x, dy = q.y - puntero.y;
-    puntero.movido = Math.max(puntero.movido, Math.hypot(q.x - puntero.x0, q.y - puntero.y0));
-    if (puntero.movido > 10 && estado.fase !== 'portada' && !estado.ocupado) {
-      if (puntero.enHija) tec.girarHija(dx, dy);
-      else tec.arrastrar(dx, dy, puntero.enCaja);
-      if (tec.nombre !== 'A' && (puntero.enCaja || puntero.enHija) && !puntero.sonoGiro && puntero.movido > 24) {
-        puntero.sonoGiro = true; sonar('deslizar_madera', puntero.enHija ? -17 : -14, puntero.enHija ? 1.5 : 1.1);
-      }
+  if (!puntero || e.pointerId !== puntero.id) return;
+  const dx = q.x - puntero.x, dy = q.y - puntero.y;
+  puntero.movido = Math.max(puntero.movido, Math.hypot(q.x - puntero.x0, q.y - puntero.y0));
+  if (puntero.gesto && moverGesto(puntero.gesto, q)) { puntero.x = q.x; puntero.y = q.y; return; }
+  if (puntero.movido > 10 && estado.fase !== 'portada' && !estado.ocupado) {
+    if (puntero.enHija) tec.girarHija(dx, dy);
+    else if (puntero.enCaja) tec.arrastrar(dx, dy, true);
+    else if (estado.vista === 'sala') tec.arrastrar(dx, dy, false);      // de cerca, la cámara no se mueve
+    if (tec.nombre !== 'A' && (puntero.enCaja || puntero.enHija) && !puntero.sonoGiro && puntero.movido > 24) {
+      puntero.sonoGiro = true; sonar('deslizar_madera', puntero.enHija ? -17 : -14, puntero.enHija ? 1.5 : 1.1);
     }
-    puntero.x = q.x; puntero.y = q.y;
-    // en la técnica A, deslizar la caja de lado la gira
-    if (tec.nombre === 'A' && puntero.enCaja && Math.abs(q.x - puntero.x0) > 90 && !puntero.giro && !estado.ocupado && estado.fase === 'jugando') {
-      puntero.giro = true; girarCaja();
-    }
+  }
+  puntero.x = q.x; puntero.y = q.y;
+  // en la técnica A, deslizar la caja de lado la gira
+  if (tec.nombre === 'A' && puntero.enCaja && Math.abs(q.x - puntero.x0) > 90 && !puntero.giro && !estado.ocupado && estado.fase === 'jugando') {
+    puntero.giro = true; girarCaja();
   }
 });
 function finToque(e) {
   punteros.delete(e.pointerId);
-  if (pellizco) { if (punteros.size < 2) pellizco = null; return; }
+  if (pellizco) {
+    if (punteros.size < 2) pellizco = null;
+    return;
+  }
   if (!puntero || e.pointerId !== puntero.id) return;
-  const q = posicion(e);
-  if (puntero.movido < 16 && performance.now() - puntero.inicio < 900 && e.type === 'pointerup') tocarEscena(q.x, q.y);
+  const q = posicion(e), g = puntero.gesto;
+  if (g && g.estado) soltarGesto(g, e.type === 'pointercancel');
+  else if (puntero.movido < 16 && performance.now() - puntero.inicio < 900 && e.type === 'pointerup') tocarEscena(q.x, q.y);
   else {
     if (puntero.enHija && tec.soltarHija) { tec.soltarHija(); if (puntero.movido >= 16) sonar('tope_madera', -18, 1.6); }
     tec.soltar();
@@ -2632,7 +2729,250 @@ lienzo.addEventListener('pointerup', finToque);
 lienzo.addEventListener('pointercancel', finToque);
 // sin el clic fantasma que el móvil manda tras un toque (caería en lo que se acaba de abrir)
 lienzo.addEventListener('touchend', e => { if (e.cancelable) e.preventDefault(); }, { passive: false });
-lienzo.addEventListener('wheel', e => { e.preventDefault(); tec.pellizcar(e.deltaY < 0 ? 1.08 : 0.93); }, { passive: false });
+
+// el pellizco: acerca o aleja alrededor de los dedos (y se desplaza con ellos); si se sigue alejando cuando ya no
+// se puede más, se vuelve a la vista de antes (del costado a la caja, de la caja a la sala…)
+function moverPellizco() {
+  const [a, b] = [...punteros.values()];
+  const d = Math.max(1, Math.hypot(a.x - b.x, a.y - b.y)), m = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+  const r = d / pellizco.d;
+  pellizco.d = d;
+  const m0 = pellizco.m; pellizco.m = m;
+  if (pellizco.salio || estado.fase !== 'jugando') return;
+  const limite = tec.pellizcar(r, m0, m);
+  if (limite === 'fuera' && r < 1) pellizco.exceso *= r;
+  else if (r > 1.004) pellizco.exceso = 1;
+  if (pellizco.exceso < 0.8) alejarseDelTodo() && (pellizco.salio = true);
+}
+function alejarseDelTodo() {
+  const padre = VISTA_PADRE[estado.vista];
+  if (!padre || estado.ocupado || estado.fase !== 'jugando') return false;
+  irA(padre);
+  return true;
+}
+// la rueda del ratón hace lo mismo que el pellizco, alrededor del puntero
+let ruedaFuera = 0;
+lienzo.addEventListener('wheel', e => {
+  e.preventDefault();
+  if (estado.fase !== 'jugando') return;
+  const m = posicion(e), r = e.deltaY < 0 ? 1.08 : 1 / 1.08;
+  const limite = tec.pellizcar(r, m, m);
+  if (limite === 'fuera' && r < 1) { if (++ruedaFuera >= 3) { ruedaFuera = 0; alejarseDelTodo(); } }
+  else ruedaFuera = 0;
+}, { passive: false });
+
+// ---------------------------------------------------------------------------------------------
+// Los gestos: lo que se mueve con el dedo. Al apoyar el dedo se mira qué hay debajo (gestoEn); el gesto empieza
+// cuando el dedo se mueve (empezarGesto) y, si no era para eso, el arrastre hace lo de siempre (girar la caja o
+// mirar). Un toque sin mover solo avisa: la pieza asoma un poco y el mensaje dice qué gesto hace falta.
+// ---------------------------------------------------------------------------------------------
+// la línea por la que sale un cajón del costado, en la pantalla: su frente cerrado (a) y abierto (b)
+function ejeCajon(id) {
+  if (tec.pantallaCajon) return { a: tec.pantallaCajon(id, 0), b: tec.pantallaCajon(id, 1) };
+  const g = geometriaCajon(id), y = (g.y[0] + g.y[1]) / 2, z = (g.z[0] + g.z[1]) / 2, X = cajonesDatos.x;
+  const enPantalla = s => { const [bx, by] = aBoceto([X + s, y, z]); return tec.ancla({ x: bx, y: by }, 'caja'); };
+  return { a: enPantalla(0), b: enPantalla(cajonesDatos.sale) };
+}
+// cuánto avanza el dedo por esa línea (en fracciones de ella); si en la pantalla es muy corta, cuenta como de 40 px
+function avanceEnEje(eje, dx, dy) {
+  const ax = eje.b.x - eje.a.x, ay = eje.b.y - eje.a.y;
+  return (dx * ax + dy * ay) / Math.max(ax * ax + ay * ay, 1600);
+}
+const cosenoConEje = (eje, dx, dy) => {
+  const ax = eje.b.x - eje.a.x, ay = eje.b.y - eje.a.y;
+  return (dx * ax + dy * ay) / (Math.hypot(ax, ay) * Math.hypot(dx, dy) || 1);
+};
+const cerraduraEnPantalla = () => tec.ancla(CERRADURA, 'incensario');
+function gestoEn(p, q) {
+  if (estado.fase !== 'jugando' || estado.ocupado) return null;
+  const v = estado.vista;
+  // la llave metida en el león: se gira en círculo alrededor de la cerradura
+  if (estado.llave === 'cerradura' && llaveGirando && v === 'incensario') {
+    const c = cerraduraEnPantalla();
+    if (c && ((p && dentro(INCENSARIO, p)) || Math.hypot(q.x - c.x, q.y - c.y) < 120)) return { tipo: 'llave' };
+  }
+  if (!p) return null;
+  if (p.cajon && v === 'cajones') return { tipo: 'cajon', id: p.cajon };
+  if (p.hija && v === 'hija' && hijaEnMesa()) {
+    if (p.hija === 'tablilla') return { tipo: 'tablilla', i: p.tablilla };
+    if (p.hija === 'cajon') return { tipo: 'cajoncito' };
+    return null;
+  }
+  // la tapa suelta del incensario: se levanta tirando hacia arriba
+  if (estado.tapa === 'suelta' && v === 'incensario' && dentro(INCENSARIO, p)) return { tipo: 'tapa' };
+  // la caja pequeña, dentro de la trampilla: se saca tirando hacia arriba
+  if (estado.nivel === 2 && estado.hija && estado.hija.fase === 'dentro' && p.cara === 'frente' && v !== 'sala'
+    && dentro(['elipse', TRAMPILLA.x, TRAMPILLA.y, 90, 40], p)) return { tipo: 'trampilla' };
+  return null;
+}
+// el dedo se ha movido: ¿empieza el gesto? (false: no era un gesto, el arrastre hace lo de siempre)
+function empezarGesto(g, dx, dy) {
+  if (estado.ocupado || estado.fase !== 'jugando') return false;
+  const h2 = estado.hija;
+  switch (g.tipo) {
+    case 'cajon': {
+      if (CAJONES[g.id].cerradura) {
+        const c = centroCajon(g.id);
+        cajonCerrado(g.id, c.x, c.y, 1, -0.6, 'Tiene una cerradura pequeña. No cede.');
+        g.estado = 'bloqueado';
+        return true;
+      }
+      const a = cajonAnim[g.id];
+      g.eje = ejeCajon(g.id); g.k0 = a.k; g.kAntes = a.k; g.t = performance.now();
+      a.agarrado = true; a.v = 0;
+      sonar('deslizar_madera', -14, 1.25);
+      break;
+    }
+    case 'tablilla': case 'cajoncito': {
+      g.eje = tec.ejeHija(g.tipo === 'cajoncito' ? 'cajon' : 'tablilla', g.i);
+      // por su línea, corre; en otra dirección, el dedo gira la caja pequeña. Solo se desliza la tablilla a la que le
+      // toca (las demás, al arrastrarlas, giran la caja: un toque dice que están trabadas)
+      if (!g.eje || cosenoConEje(g.eje, dx, dy) < 0.72) return false;
+      if (g.tipo === 'tablilla') {
+        if (h2.tablillas[g.i] || g.i !== h2.tablillas.indexOf(false)) return false;
+        if (laVeElOjo(g.i)) { resistirMirada(); g.estado = 'bloqueado'; return true; }
+      } else {
+        if (h2.cajon === 'abierto') return false;
+        if (laVeElOjo(4)) { resistirMirada(); g.estado = 'bloqueado'; return true; }
+      }
+      g.k = 0; g.v = 0; g.t = performance.now();
+      sonar('deslizar_madera', -12, 1.6);
+      break;
+    }
+    case 'llave': {
+      const c = cerraduraEnPantalla();
+      g.centro = { x: c.x, y: c.y };
+      g.angulo = Math.atan2(puntero.y0 - c.y, puntero.x0 - c.x);
+      g.giro = 0; g.sentido = 0; g.clics = 0;
+      break;
+    }
+    case 'tapa': {
+      if (dy > -Math.abs(dx) * 0.4) return false;          // solo hacia arriba
+      estado.tapa = 'abierta';
+      tapaVuelo = { x: TAPA_ORIGEN.x, y: TAPA_ORIGEN.y, ang: 0, sx: 1, sy: 1 };
+      hornear();
+      humoDelIncienso();
+      sonar('clic_madera', -6, 0.85); vibrar(10);
+      bocanada(560, 500, -0.6, -1, 1, 'incensario'); bocanada(592, 500, 0.6, -1, 1, 'incensario');
+      break;
+    }
+    case 'trampilla': {
+      if (dy > -Math.abs(dx) * 0.4) return false;
+      sonar('mecanismo', -14, 1.25); vibrar(12);
+      destello(TRAMPILLA.x, TRAMPILLA.y - 6, 110, '255,215,140', 0.45, 0.8);
+      break;
+    }
+  }
+  g.estado = 'activo';
+  return true;
+}
+// mientras el dedo se mueve; devuelve true si el gesto se queda con el movimiento
+function moverGesto(g, q) {
+  const dx = q.x - puntero.x0, dy = q.y - puntero.y0;
+  if (!g.estado) {
+    if (Math.hypot(dx, dy) < 9) return true;
+    if (!empezarGesto(g, dx, dy)) { puntero.gesto = null; return false; }
+  }
+  if (g.estado !== 'activo') return true;
+  const ahora = performance.now(), paso = Math.max(0.004, (ahora - g.t) / 1000);
+  switch (g.tipo) {
+    case 'cajon': {
+      const a = cajonAnim[g.id], k = limitar(g.k0 + avanceEnEje(g.eje, dx, dy), 0, 1.04);
+      a.v = mezclar(a.v, (k - a.k) / paso, 0.5); a.k = k; g.t = ahora;
+      if (k <= 0 && g.kAntes > 0.015 && reloj > a.golpe) {                  // cerrado de un empujón
+        a.golpe = reloj + 0.25; sonar('tope_madera', -9, 1.15); vibrar(10); agitarTe(0.3);
+      }
+      if (k >= 1 && g.kAntes < 1) sonar('clic_madera', -14, 0.9);              // el tope de fuera
+      g.kAntes = k;
+      break;
+    }
+    case 'tablilla': case 'cajoncito': {
+      const k = limitar(avanceEnEje(g.eje, dx, dy), 0, 1);
+      g.v = mezclar(g.v, (k - g.k) / paso, 0.5); g.k = k; g.t = ahora;
+      if (g.tipo === 'tablilla') tec.ponerTablilla(g.i, k); else tec.ponerCajonHija(k);
+      if (k >= 1 && !g.tope) { g.tope = true; sonar('clic_madera', -8, 1.6); }
+      break;
+    }
+    case 'llave': {
+      const c = g.centro, r = Math.hypot(q.x - c.x, q.y - c.y), ang = Math.atan2(q.y - c.y, q.x - c.x);
+      let d = ang - g.angulo;
+      if (d > Math.PI) d -= 2 * Math.PI; else if (d < -Math.PI) d += 2 * Math.PI;
+      g.angulo = ang;
+      if (r < 14) break;                          // en el centro mismo, el ángulo salta: no cuenta
+      g.giro += d;
+      if (!g.sentido && Math.abs(g.giro) > 0.12) { g.sentido = Math.sign(g.giro); llaveGirando.sentido = g.sentido; }
+      if (!g.sentido) break;
+      const t = limitar(g.giro * g.sentido / 1.2, 0, 1);
+      llaveGirando.t = t;
+      const clics = Math.floor(t * 5);
+      if (clics > g.clics) { g.clics = clics; sonar('clic_metal', -15, 1.25 + 0.07 * clics); vibrar(6); }
+      if (t >= 0.75) { g.estado = 'hecho'; abrirCerradura(); }
+      break;
+    }
+    case 'tapa': {
+      const m = tec.ancla(TAPA_ORIGEN, 'incensario'), k = Math.max(0.2, m ? m.k : 1);
+      const alzada = limitar(-dy / k, 0, 40), lado = limitar(dx / k, -40, 40) * 0.4;
+      tapaVuelo.x = TAPA_ORIGEN.x + lado; tapaVuelo.y = TAPA_ORIGEN.y - alzada;
+      tapaVuelo.ang = lado * 0.003 - 0.06 * Math.min(1, alzada / 30);
+      g.alzada = alzada;
+      if (alzada >= 34) { g.estado = 'hecho'; llevarTapaAMesa(); }
+      break;
+    }
+    case 'trampilla': {
+      if (dy < -40) { g.estado = 'hecho'; subirCajaHija(); }
+      break;
+    }
+  }
+  return true;
+}
+// el dedo se levanta (o llega otro dedo: «cancelado»)
+function soltarGesto(g, cancelado = false) {
+  if (g.estado !== 'activo') return;
+  g.estado = 'suelto';
+  switch (g.tipo) {
+    case 'cajon': {
+      const a = cajonAnim[g.id];
+      a.agarrado = false;
+      const final = a.k + limitar(a.v, -6, 6) * 0.12;
+      if (!cancelado && final > 0.5) {
+        if (estado.cajones[g.id] !== 'abierto') { abrirCajon(g.id, false, true); sonar('clic_madera', -10, 1.05); }
+        else a.objetivo = 1;
+      } else {
+        if (estado.cajones[g.id] === 'abierto') cerrarCajon(g.id, true);
+        a.objetivo = 0;
+        if (a.k > 0.02) a.v = Math.min(a.v, -1.2);           // vuelve solo, con su golpe al cerrar
+      }
+      break;
+    }
+    case 'tablilla': {
+      const final = g.k + limitar(g.v, -6, 6) * 0.1;
+      if (!cancelado && final > 0.55) correrTablilla(g.i, 0.22);
+      else { tec.correrTablilla(g.i, 0.22, 0); sonar('tope_madera', -18, 1.7); }
+      break;
+    }
+    case 'cajoncito': {
+      const final = g.k + limitar(g.v, -6, 6) * 0.1;
+      if (!cancelado && final > 0.5) abrirCajoncito(0.25);
+      else { tec.abrirCajonHija(0.22, 0); sonar('tope_madera', -18, 1.7); }
+      break;
+    }
+    case 'llave': {
+      const t0 = llaveGirando.t;
+      if (t0 > 0.02) { animar(0.25, k => { if (llaveGirando) llaveGirando.t = t0 * (1 - suave(k)); }); sonar('clic_metal', -18, 1.05); }
+      if (!cancelado && g.giro === 0) mensaje('Gírala: arrastra el dedo en círculo alrededor de la cerradura.');
+      break;
+    }
+    case 'tapa': {
+      if (!cancelado && (g.alzada || 0) > 16) llevarTapaAMesa();
+      else devolverTapa();
+      break;
+    }
+    case 'trampilla': {
+      if (!cancelado) mensaje('Algo empuja desde dentro. Tira más hacia arriba.');
+      break;
+    }
+  }
+}
 
 function girarCaja() {
   if (estado.fase !== 'jugando' || estado.ocupado || estado.nivel === 2) return;
@@ -2751,8 +3091,19 @@ async function usarTecnica(letra) {
 // ---------------------------------------------------------------------------------------------
 // Empezar, despertar el ojo y volver a empezar
 // ---------------------------------------------------------------------------------------------
+// en un móvil, al entrar: pantalla completa y en horizontal, si el navegador lo deja (si no, el aviso de girar el móvil
+// lo pide). En el APK no hace falta: la app ya va a pantalla completa y en horizontal
+function ponerEnHorizontal() {
+  if (!matchMedia('(pointer: coarse)').matches || navigator.webdriver || location.hostname === 'appassets.androidplatform.net') return;
+  const raiz = document.documentElement;
+  try {
+    const p = raiz.requestFullscreen ? raiz.requestFullscreen({ navigationUI: 'hide' }) : null;
+    if (p && p.then) p.then(() => screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape')).catch(() => {});
+  } catch (e) { /* sin pantalla completa: se queda el aviso */ }
+}
 async function entrar(nivel = 1) {
   desbloquearAudio();
+  ponerEnHorizontal();
   el.entrar.disabled = true; el.continuar.disabled = true;
   if (!(await usarTecnica(eleccion))) await usarTecnica('A');
   el.entrar.disabled = false; el.continuar.disabled = false;
@@ -2778,11 +3129,11 @@ async function entrar(nivel = 1) {
   animar(0.6, k => { ojo.parpadoBase = 0.6 * (1 - salida(k)); }, null, 1.25);
   await esperar(1.9);
   ojo.parpadoBase = 0;
-  if (estado.vista === 'sala') mensaje(alto > ancho ? 'Toca la caja para acercarte. Arrastra para mover la cámara.' : 'Toca la caja para acercarte. Arrastra para mover la cámara y desliza la caja para girarla.');
+  if (estado.vista === 'sala') mensaje('Toca la caja para acercarte. Pellizca para acercar o alejar; desliza la caja para girarla.', 5);
 }
 function reiniciar(nivel = 1) {
   estado = estadoInicial();
-  for (const a of Object.values(cajonAnim)) a.k = 0;
+  for (const a of Object.values(cajonAnim)) Object.assign(a, { k: 0, v: 0, objetivo: 0, agarrado: false });
   pintarInventario();
   cerrarExaminar();
   Object.assign(despertar, { ojos: 0, humo: 0, trampilla: 0, oscuridad: 0 });
@@ -2815,6 +3166,7 @@ function restaurar(guardado) {
   estado = { ...estadoInicial(), ...g, ocupado: false, seleccion: null, vista: 'sala' };
   if (estado.fase === 'despertar' || estado.fase === 'fin' || estado.fase === 'tarjeta') estado.fase = estado.nivel === 2 ? 'jugando' : 'fin';
   if (estado.tapa === 'abierta') estado.tapaEnMesa = true;
+  if (estado.llave === 'cerradura') llaveGirando = { t: 0, sentido: -1, desvanece: 0 };
   if (estado.nivel === 2 && estado.hija) {
     if (estado.hija.fase === 'subiendo') estado.hija.fase = 'mesa';
     Object.assign(despertar, { ojos: 0, humo: 0, trampilla: 1, oscuridad: 0.16 });
@@ -2826,7 +3178,7 @@ function restaurar(guardado) {
     pintarInventario();
     return true;
   }
-  for (const [id, st] of Object.entries(estado.cajones)) if (cajonAnim[id]) cajonAnim[id].k = st === 'abierto' ? 1 : 0;
+  for (const [id, st] of Object.entries(estado.cajones)) if (cajonAnim[id]) cajonAnim[id].k = cajonAnim[id].objetivo = st === 'abierto' ? 1 : 0;
   pintarInventario();
   ojo.parpadoBase = 0;
   if (estado.fase === 'fin') {
@@ -2917,7 +3269,15 @@ window.__prueba = {
   aPantalla: (x, y, objeto = 'caja') => { const m = tec.pantallaDe ? tec.pantallaDe(x, y, objeto) : tec.ancla({ x, y }, objeto); return m ? { x: m.x, y: m.y } : null; },
   usarTecnica: letra => usarTecnica(letra), girar: () => girarCaja(), irA: nombre => irA(nombre),
   distraer: () => { ojo.distraidoHasta = reloj + 5; },
+  // la llama tiembla sola cada 14-24 s y distrae al ojo un momento: para comprobar algo con el ojo mirando, se aparta
+  calmarLampara: () => { lampara.proxima = reloj + 30; if (ojo.distraidoHasta > reloj) ojo.distraidoHasta = reloj; },
   centroCajon: id => centroCajon(id), cajon: id => ({ estado: estado.cajones[id], k: cajonAnim[id].k }),
+  // los gestos: por dónde se tira de un cajón, dónde está la cerradura y la tapa, cuánto ha girado la llave, la lupa
+  ejeCajon: id => { const e = ejeCajon(id); return { a: { x: e.a.x, y: e.a.y }, b: { x: e.b.x, y: e.b.y } }; },
+  pantallaBoceto: (x, y, objeto) => { const m = tec.ancla({ x, y }, objeto); return m ? { x: m.x, y: m.y } : null; },
+  llave: () => (llaveGirando ? { ...llaveGirando } : null),
+  lupa: () => (tec.lupa ? tec.lupa() : 1),
+  ejeHija: (parte, i) => (tec.ejeHija ? tec.ejeHija(parte, i) : null),
   inventario: () => [...estado.inventario],
   // nivel 2
   hija: () => (estado.hija ? JSON.parse(JSON.stringify(estado.hija)) : null),

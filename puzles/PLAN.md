@@ -553,10 +553,12 @@ entrar al nivel final».
 - **Nivel 1 · El cuerno:** el recorrido de siempre, que ahora termina en su tarjeta.
 - **Nivel 2 · La caja de dentro** (solo en la B):
   1. la caja se calma y su trampilla sigue dando luz;
-  2. al tocarla, sube de dentro una caja pequeña (yosegi, con un párpado tallado), flota y baja a la mesa;
+  2. tirando de ella hacia arriba, sube de dentro una caja pequeña (yosegi, con un párpado tallado), flota y baja a
+     la mesa;
   3. la cámara se acerca: la caja pequeña delante y el ojo grande encima, vigilándola;
   4. arrastrar la gira en la mano; al soltarla se asienta con una cara hacia cada lado;
-  5. sus cinco tablillas corren en orden, y la flecha de marquetería que destapa cada una dice cuál sigue;
+  5. sus cinco tablillas corren en orden, deslizándolas con el dedo, y la flecha de marquetería que destapa cada
+     una dice cuál sigue;
   6. **la regla, ampliada:** la cara que ve el ojo grande no se mueve, y la lámpara ya no lo distrae; hay que
      girar la caja pequeña para esconderle cada tablilla (la de arriba, de entrada, la está mirando);
   7. la quinta es la tapa de atrás; detrás, un cajoncito con una cajita de laca roja;
@@ -570,6 +572,17 @@ entrar al nivel final».
 
 **El APK (03-10-2026) [Hecho]:** `caja-viva-0.1-prueba.apk` (5,3 MB), la misma página en una app de Android sin
 conexión: paquete `com.thunderdarkness.cajaviva`, Android 7 o más. Detalle en `ilustrada/apk/LEEME.md`.
+
+**Gestos y horizontal (03-10-2026, noche) [Hecho, APK 0.2]:** el usuario probó la 0.1 y pidió: «el juego tiene que
+ser horizontal cuando entre […] permite que pellizque para acercar o alejar […] cuando se acerque se mantenga para
+que pueda interactuar, que quede fijo en esa parte […] que jale el cajón, no solo tocar».
+- El juego es horizontal (la app siempre; la página pide girar el móvil). Los encuadres de cerca se ajustaron.
+- De cerca, la cámara se queda quieta; se vuelve con «Sala», atrás o pellizcando.
+- Pellizcar acerca o aleja alrededor de los dedos; alejarse del todo vuelve a la vista de antes.
+- Las acciones son gestos: los cajones se tiran y se empujan (con muelle, rebote y golpe), la llave se gira en
+  círculo, la tapa se levanta hacia arriba, la caja pequeña se saca tirando de la trampilla, las tablillas se
+  deslizan y el cajoncito se tira. Un toque solo avisa y hace asomar la pieza.
+- Detalle en `ilustrada/LEEME.md` («Gestos y horizontal»). Es la `caja-viva-0.2-prueba.apk`.
 
 **Siguiente:**
 - Nivel 3 · La caja del revés y el nivel final, en las próximas entregas (diseño en `NIVELES.md` §6 y §7).

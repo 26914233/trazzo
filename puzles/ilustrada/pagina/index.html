@@ -136,11 +136,11 @@ button { font: inherit; color: inherit; }
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9); opacity: 0; transition: opacity 0.45s, transform 0.45s; pointer-events: none;
 }
 #mensaje.visible { opacity: 1; transform: translate(-50%, 0); }
-/* de cerca de la caja pequeña, en horizontal, el texto va a la derecha para no taparla */
+/* de cerca de la caja pequeña y de los cajones, en horizontal, el texto va a la derecha para no taparlos */
 @media (orientation: landscape) {
-  #juego.vista-hija #mensaje { left: auto; right: 14px; bottom: auto; top: 50%; width: auto; max-width: min(300px, 36%);
+  #juego.mensaje-al-lado #mensaje { left: auto; right: 14px; bottom: auto; top: 50%; width: auto; max-width: min(300px, 36%);
     transform: translate(8px, -50%); text-align: left; padding-inline: 18px; }
-  #juego.vista-hija #mensaje.visible { transform: translate(0, -50%); }
+  #juego.mensaje-al-lado #mensaje.visible { transform: translate(0, -50%); }
 }
 
 .capa {
@@ -238,6 +238,20 @@ button { font: inherit; color: inherit; }
   max-width: calc(100% - 32px);
 }
 
+/* El juego es horizontal (el panorama de la sala entero). En un móvil en vertical, se pide girarlo */
+#girar-movil {
+  display: none; position: absolute; inset: 0; z-index: 9; flex-direction: column; align-items: center; justify-content: center;
+  gap: 18px; padding-inline: 16px; text-align: center; background: radial-gradient(ellipse 80% 60% at 50% 45%, #1d140e, var(--sumi) 75%);
+}
+#girar-movil svg { width: 92px; height: 92px; fill: none; stroke: var(--laton); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  animation: girar-movil 2.6s ease-in-out infinite; }
+#girar-movil p { margin: 0; max-width: 24ch; font-family: var(--fuente-titulo); font-size: 21px; line-height: 1.45; text-wrap: balance; }
+#girar-movil small { font-size: 13px; letter-spacing: 0.06em; color: var(--washi-tenue); }
+@keyframes girar-movil { 0%, 25% { transform: rotate(0deg); } 55%, 85% { transform: rotate(-90deg); } 100% { transform: rotate(0deg); } }
+@media (orientation: portrait) and (pointer: coarse) {
+  #girar-movil { display: flex; }
+}
+
 @media (orientation: portrait) {
   #inventario { top: auto; left: 50%; bottom: 14px; transform: translateX(-50%); }
   .bandeja { flex-direction: row; padding: 8px 11px; }
@@ -260,13 +274,14 @@ button { font: inherit; color: inherit; }
 }
 @media (prefers-reduced-motion: reduce) {
   .capa, #mensaje, .hueco { transition-duration: 0.01s; }
+  #girar-movil svg { animation: none; transform: rotate(-90deg); }
   .pieza.nueva b { animation: none; }
 }
 </style>
 
 <div id="juego">
   <canvas id="lienzo3d" hidden aria-hidden="true"></canvas>
-  <canvas id="lienzo" aria-label="La sala con la caja viva. Toca para mirar y usar las cosas; arrastra para mover la cámara."></canvas>
+  <canvas id="lienzo" aria-label="La sala con la caja viva. Toca para mirar y acercarte; arrastra para tirar, girar y deslizar; pellizca para acercar o alejar."></canvas>
 
   <button id="volver" type="button" hidden aria-label="Volver a la sala">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Sala
@@ -298,7 +313,7 @@ button { font: inherit; color: inherit; }
     <p>Una caja secreta que respira, te mira y no se deja abrir mientras te ve.</p>
     <button class="boton-texto" id="boton-continuar" type="button" hidden>Seguir</button>
     <button class="boton-texto" id="boton-entrar" type="button" disabled>Cargando la sala…</button>
-    <small>Con sonido · en horizontal o en vertical</small>
+    <small>Con sonido · en horizontal</small>
   </div>
 
   <div class="capa oculta" id="nota" hidden>
@@ -334,6 +349,12 @@ button { font: inherit; color: inherit; }
         <button class="boton-texto secundario" id="boton-otra" type="button">Volver a empezar</button>
       </div>
     </div>
+  </div>
+  <div id="girar-movil" role="alert">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="20" y="6" width="24" height="44" rx="4"/><path d="M29 44h6"/>
+      <path d="M52 30a20 20 0 0 1-12 22" opacity="0.6"/><path d="M38 47l2 5 5-2" opacity="0.6"/></svg>
+    <p>Gira el móvil: la caja se juega en horizontal.</p>
+    <small>Así se ve la sala entera</small>
   </div>
   <div id="aviso3d" hidden></div>
   <div id="cargando" hidden></div>

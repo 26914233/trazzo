@@ -645,14 +645,26 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
     cuenca.
   - Al terminar cada nivel, una tarjeta con la cara como marcador (sellos 角 目 声) y la partida guardada en el
     navegador; la portada ofrece seguir. `?nivel=2` empieza en el 2.
-  - Prueba del nivel 2: `prueba/jugar_nivel2.mjs <horizontal|vertical>`.
+  - Prueba del nivel 2: `prueba/jugar_nivel2.mjs horizontal`.
   - Siguen en propuesta: el nivel 3 (La caja del revés) y el final.
+- **Gestos y horizontal (pedidos por el usuario al probar el APK 0.1, 03-10-2026, noche; hechos, APK 0.2):**
+  - **El juego es horizontal:** la app siempre (`sensorLandscape`); la página, en un móvil en vertical, pide girarlo.
+  - **De cerca, la cámara se queda fija:** arrastrar no la mueve y tocar fuera no devuelve a la sala (se vuelve con
+    «Sala», atrás o pellizcando). Un cajón tocado de lejos solo acerca la cámara al costado.
+  - **Pellizcar** acerca o aleja alrededor de los dedos (una lupa sobre el encuadre, sin deformar la pintura);
+    alejarse del todo vuelve a la vista de antes.
+  - **Las acciones son gestos, no toques:** tirar de los cajones (y empujarlos), girar la llave en círculo en el
+    león, levantar la tapa hacia arriba, tirar de la trampilla hacia arriba, deslizar la tablilla que toca y tirar
+    del cajoncito. Un toque solo avisa y la pieza asoma. Detalle en `puzles/ilustrada/LEEME.md`.
+  - Las pruebas juegan con arrastres y pellizcos de verdad (CDP) en horizontal; `jugar.mjs B vertical` solo
+    comprueba el aviso de girar.
 - **APK de La caja viva (03-10-2026):** `puzles/ilustrada/apk/` (su `LEEME.md`). Es la página B dentro de un WebView
   nativo, sin conexión: Three.js r170 y las fuentes van dentro, comprobados con SHA-256.
   - `construir_apk.py` lo compila sin Gradle (aapt2, javac, d8 y apksigner). Necesita la plataforma de Android 35 en
     `/root/android-sdk/platforms/android-35`: 64 MB, descarga autorizada el 03-10-2026, SHA-1
     `0bb560a90a7a2cbd0dd8348224d518b638fe7949`.
-  - Paquete `com.thunderdarkness.cajaviva`, «La caja viva», SDK mínimo 24 y objetivo 34. La 0.1 pesa 5,3 MB.
+  - Paquete `com.thunderdarkness.cajaviva`, «La caja viva», SDK mínimo 24 y objetivo 34. La 0.1 pesa 5,3 MB; la
+    0.2 (código 2) trae los gestos y el horizontal.
   - **Firma:** la clave de RONIN no se usa (su contraseña quedó bloqueada por seguridad: no insistir). La caja viva
     tiene su propia clave de prueba, `caja-viva-prueba.keystore` con su contraseña en `clave.txt`, en
     `/root/.local/share/caja_viva/firma/`. Su copia, con permiso del usuario, está en Drive ›
@@ -687,8 +699,8 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
     APK).
   - Las esperas de la prueba van en tiempo real y comprobando el estado: sin tarjeta gráfica, un
     cuadro puede tardar segundos mientras compila sombreadores.
-- **APK de prueba:** el de hoy es `caja-viva-0.1-prueba.apk` (La caja viva ilustrada, arriba), en la raíz de Drive ›
-  `Respaldos Claude/puzles/`. El de los prototipos de Godot, `puzles-0.2.1-prueba.apk`, pasó el 03-10-2026 a
+- **APK de prueba:** el de hoy es `caja-viva-0.2-prueba.apk` (La caja viva ilustrada, arriba), en la raíz de Drive ›
+  `Respaldos Claude/puzles/`; la 0.1 pasó a «Versiones anteriores (puzles)». El de los prototipos de Godot, `puzles-0.2.1-prueba.apk`, pasó el 03-10-2026 a
   «Versiones anteriores (puzles)». Lo que sigue es del APK de Godot:
   - Paquete `com.thunderdarkness.puzles`, nombre «Cuatro cajas», 49,9 MB, código de versión 3.
   - Firmado con la misma clave de prueba de RONIN.

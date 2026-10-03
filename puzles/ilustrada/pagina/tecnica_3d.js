@@ -8,7 +8,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { aThree, crearProyector, rectanguloUV, cargarTextura, crearSala, crearMesa, crearObjetos, crearCajaPintada,
   crearCajonesPintados, materialPintura } from './escena3d.js';
-import { crearCajaHija, TABLILLAS, LADO as LADO_HIJA } from './caja_hija.js';
+import { crearCajaHija, TABLILLAS, LADO as LADO_HIJA, SALE_CAJONCITO } from './caja_hija.js';
 
 const ANCHO = 1376, ALTO = 768;
 const limitar = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -62,6 +62,19 @@ function siluetaEstrecha(op, nombre, radio, recortarMas = null) {
   return t;
 }
 
+// Sin la tapa (cuando el león la deja en la mesa), lo que había encima de la boca del incensario ya no es incensario:
+// la capa abierta pinta allí la pared, y en el cilindro se vería como un fantasma al mover la cámara. El cuerno de las
+// brasas, mientras está, sí cuenta
+function quitarTapa(op, c, conCuerno) {
+  const k = c.getContext('2d'), t = op.datos.capas.tapa, boca = 490;
+  k.save();
+  k.globalCompositeOperation = 'destination-out';
+  k.beginPath(); k.rect(t.x - 6, t.y - 40, t.w + 12, boca - (t.y - 40)); k.clip();
+  for (const [dx, dy] of [[0, 0], [-3, 0], [3, 0], [0, -3]]) k.drawImage(op.img.tapa, t.x + dx, t.y + dy);
+  k.restore();
+  if (conCuerno) { const h = op.datos.capas.cuerno_brasas; k.drawImage(op.img.cuerno_brasas, h.x, h.y); }
+}
+
 function prepararMundo(op) {
   if (mundo) return mundo;
   const render = new THREE.WebGLRenderer({ canvas: op.lienzo3d, antialias: true, powerPreference: 'high-performance' });
@@ -88,6 +101,8 @@ function prepararMundo(op) {
     salaVacia: texturaDeImagen(op.planchas.sala), mesaVacia: texturaDeImagen(op.planchas.mesa),
     detras: texturaDeImagen(op.img.sala_detras), frente, ojo,
     siluetaIncensario: siluetaEstrecha(op, 'silueta_incensario', 3),
+    siluetaIncensarioAbierto: siluetaEstrecha(op, 'silueta_incensario', 3, c => quitarTapa(op, c, false)),
+    siluetaIncensarioCuerno: siluetaEstrecha(op, 'silueta_incensario', 3, c => quitarTapa(op, c, true)),
     siluetaTe: siluetaEstrecha(op, 'silueta_te', 2, op.recortarTe),
   };
   const sala = crearSala(op.escena3d, proyector, tex), mesa = crearMesa(op.escena3d, proyector, tex);
@@ -150,17 +165,21 @@ function crearRig(op, limites) {
   const P0 = mundo.proyector.position.clone(), Q0 = mundo.proyector.quaternion.clone();
   const adelante0 = new THREE.Vector3(0, 0, -1).applyQuaternion(Q0);
   const distCaja = mundo.centroCaja.distanceTo(P0);
-  const puntoCara = rayoDelBoceto(860, 455).intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -0.11), new THREE.Vector3())
+  const puntoCara = rayoDelBoceto(862, 398).intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -0.11), new THREE.Vector3())
     || mundo.centroCaja.clone();
+  // el centro de la columna de cajones (en el costado, x = 0,11), con sitio debajo para los de abajo abiertos
+  const puntoCajones = rayoDelBoceto(1112, 412).intersectPlane(new THREE.Plane(new THREE.Vector3(1, 0, 0), -0.11), new THREE.Vector3())
+    || new THREE.Vector3(0.11, mundo.centroCaja.y, 0);
   const VISTAS = op.vistas;
   // qué mira cada vista: objetivo T, cuánto se acerca s (1 = donde se pintó) y alrededor de qué gira
   const definiciones = {
     sala: { T: P0.clone().add(adelante0.clone().multiplyScalar(distCaja)), s: 1, pivote: mundo.centroCaja },
-    caja: { T: mundo.centroCaja, s: 0.62, pivote: mundo.centroCaja },
+    // (un poco por encima del centro, para que se vea la trampilla de arriba)
+    caja: { T: mundo.centroCaja.clone().add(new THREE.Vector3(0, 0.008, 0)), s: 0.62, pivote: mundo.centroCaja },
     incensario: { T: mundo.centroIncensario, s: 0.56, pivote: mundo.centroIncensario },
     cara: { T: puntoCara, s: 0.5, pivote: mundo.centroCaja },
     // el costado de los cajones, de cerca
-    cajones: { T: new THREE.Vector3(0.11, mundo.centroCaja.y, 0), s: 0.46, pivote: mundo.centroCaja },
+    cajones: { T: puntoCajones, s: 0.46, pivote: mundo.centroCaja },
     // nivel 2: la caja hija sube de la trampilla (se ve la caja entera con aire encima) y baja a la mesa, donde se
     // mira de cerca con el ojo grande encima, vigilándola
     subida: { T: new THREE.Vector3(0, 0.2, 0.06), s: 0.78, pivote: mundo.centroCaja },
@@ -188,20 +207,51 @@ function crearRig(op, limites) {
   const rig = {
     vista: 'sala', transicion: null, intro: null,
     th: 0, ph: 0, zoom: 1, vth: 0, vph: 0, vzoom: 0, thObj: 0, phObj: 0, zoomObj: 1,
+    // la lupa de dos dedos: recorta el encuadre alrededor de los dedos (z < 1 acerca, z > 1 aleja) sin mover la
+    // cámara, así la pintura no se deforma; f es cuánto se ha corrido el recorte (en píxeles de la imagen)
+    lupa: { z: 1, zObj: 1, fx: 0, fy: 0, fxObj: 0, fyObj: 0 },
     actual: null,
     irA(nombre, duracion = 0.75) {
-      this.transicion = { desde: this.actual || encuadre(nombre), t: 0, duracion };
+      // la transición sale de lo que se ve ahora, con la lupa incluida, y la lupa vuelve a 1 sin saltos
+      const L = this.lupa, a = this.actual;
+      const desde = a ? { ...a, cx: a.cx + L.fx, cy: a.cy + L.fy, cw: a.cw * L.z, ch: a.ch * L.z } : encuadre(nombre);
+      this.transicion = { desde, t: 0, duracion };
       this.vista = nombre;
       this.thObj = 0; this.phObj = 0; this.zoomObj = 1;
+      this.quitarLupa();
     },
-    saltarA(nombre) { this.vista = nombre; this.transicion = null; this.actual = encuadre(nombre); this.th = this.ph = 0; this.zoom = 1; },
+    saltarA(nombre) { this.vista = nombre; this.transicion = null; this.actual = encuadre(nombre); this.th = this.ph = 0; this.zoom = 1; this.quitarLupa(); },
+    quitarLupa() { Object.assign(this.lupa, { z: 1, zObj: 1, fx: 0, fy: 0, fxObj: 0, fyObj: 0 }); },
     empezar(duracion) { this.saltarA('sala'); this.intro = { t: 0, duracion }; },
     arrastrar(dx, dy) {
       const l = limites[this.vista] || limites.sala;
       this.thObj = limitar(this.thObj - dx * 0.0042, -l.th, l.th);
       this.phObj = limitar(this.phObj + dy * 0.0032, l.ph[0], l.ph[1]);
     },
-    pellizcar(r) { this.zoomObj = limitar(this.zoomObj / r, limites.zoom[0], limites.zoom[1]); },
+    // pellizcar: r es cuánto se han separado los dedos; el punto que había bajo ellos (m0) queda bajo ellos (m1).
+    // Devuelve 'fuera' o 'dentro' si se ha querido pasar del margen de la vista (juego.js sale de la vista al alejarse)
+    pellizcar(r, m0, m1) {
+      const l = (limites[this.vista] || limites.sala).lupa || [0.6, 1], L = this.lupa, a = this.actual;
+      if (!a || this.transicion) return null;
+      m0 = m0 || { x: mundo.ancho / 2, y: mundo.alto / 2 }; m1 = m1 || m0;
+      const pedido = L.zObj / r, z1 = limitar(pedido, l[0], l[1]);
+      const cw0 = a.cw * L.zObj, ch0 = a.ch * L.zObj;
+      const ux = a.cx + L.fxObj - cw0 / 2 + m0.x / mundo.ancho * cw0, uy = a.cy + L.fyObj - ch0 / 2 + m0.y / mundo.alto * ch0;
+      const cw1 = a.cw * z1, ch1 = a.ch * z1;
+      L.zObj = z1;
+      L.fxObj = ux - m1.x / mundo.ancho * cw1 + cw1 / 2 - a.cx;
+      L.fyObj = uy - m1.y / mundo.alto * ch1 + ch1 / 2 - a.cy;
+      this.limitarLupa(true);
+      return pedido > l[1] + 1e-4 ? 'fuera' : pedido < l[0] - 1e-4 ? 'dentro' : null;
+    },
+    // el recorte no se sale del encuadre de la vista (al alejarse, se queda centrado)
+    limitarLupa(objetivo) {
+      const L = this.lupa, a = this.actual;
+      if (!a) return;
+      const z = objetivo ? L.zObj : L.z, mx = Math.max(0, (1 - z) * a.cw / 2), my = Math.max(0, (1 - z) * a.ch / 2);
+      if (objetivo) { L.fxObj = limitar(L.fxObj, -mx, mx); L.fyObj = limitar(L.fyObj, -my, my); }
+      else { L.fx = limitar(L.fx, -mx, mx); L.fy = limitar(L.fy, -my, my); }
+    },
     actualizar(dt) {
       const destino = encuadre(this.vista);
       if (this.transicion) {
@@ -219,6 +269,9 @@ function crearRig(op, limites) {
       [this.th, this.vth] = muelle(this.th, this.vth, this.thObj);
       [this.ph, this.vph] = muelle(this.ph, this.vph, this.phObj);
       [this.zoom, this.vzoom] = muelle(this.zoom, this.vzoom, this.zoomObj);
+      const L = this.lupa, e = 1 - Math.exp(-dt * 24);      // la lupa sigue a los dedos casi al instante
+      L.z += (L.zObj - L.z) * e; L.fx += (L.fxObj - L.fx) * e; L.fy += (L.fyObj - L.fy) * e;
+      this.limitarLupa(false);
       if (this.intro) { this.intro.t += dt; if (this.intro.t >= this.intro.duracion) this.intro = null; }
     },
     // coloca la cámara: el encuadre, la mirada, el vaivén de cámara en mano y la sacudida
@@ -245,10 +298,12 @@ function crearRig(op, limites) {
       cam.position.copy(a.pivote).add(rel);
       cam.quaternion.copy(q).premultiply(qY).premultiply(qX);
       cam.aspect = ANCHO / ALTO;
-      cam.setViewOffset(ANCHO, ALTO, a.cx - a.cw / 2, a.cy - a.ch / 2, a.cw, a.ch);
+      const L = this.lupa, cw = a.cw * L.z, ch = a.ch * L.z;
+      cam.setViewOffset(ANCHO, ALTO, a.cx + L.fx - cw / 2, a.cy + L.fy - ch / 2, cw, ch);
       cam.updateMatrixWorld(true);
     },
   };
+  rig.definiciones = definiciones;        // (para ajustar los encuadres a mano desde la consola)
   rig.saltarA('sala');
   return rig;
 }
@@ -484,16 +539,20 @@ export async function crearTecnica(letra, op) {
   const caja = new THREE.Group();          // gira (y respira) alrededor de la peana
   caja.name = 'caja';
   grupo.add(caja);
+  // th y ph: cuánto se mira alrededor al arrastrar (solo en la sala: de cerca, la cámara se queda fija); lupa: cuánto
+  // acerca y aleja el pellizco en cada vista (en la sala no aleja: fuera del boceto no hay pintura)
   const limites = esB
-    ? { sala: { th: 0.14, ph: [-0.05, 0.1] }, caja: { th: 0.38, ph: [-0.12, 0.22] }, incensario: { th: 0.32, ph: [-0.1, 0.22] },
-        cara: { th: 0.32, ph: [-0.1, 0.2] }, cajones: { th: 0.42, ph: [-0.1, 0.3] }, subida: { th: 0.2, ph: [-0.05, 0.15] },
-        hija: { th: 0.3, ph: [-0.05, 0.35] }, zoom: [0.62, 1.12] }
-    : { sala: { th: 0.24, ph: [-0.06, 0.14] }, caja: { th: 0.95, ph: [-0.15, 0.45] }, incensario: { th: 0.7, ph: [-0.12, 0.4] },
-        cara: { th: 0.55, ph: [-0.12, 0.3] }, cajones: { th: 0.7, ph: [-0.12, 0.4] }, zoom: [0.62, 1.15] };
+    ? { sala: { th: 0.14, ph: [-0.05, 0.1], lupa: [0.45, 1] }, caja: { th: 0.38, ph: [-0.12, 0.22], lupa: [0.45, 1.25] },
+        incensario: { th: 0.32, ph: [-0.1, 0.22], lupa: [0.45, 1.25] }, cara: { th: 0.32, ph: [-0.1, 0.2], lupa: [0.45, 1.25] },
+        cajones: { th: 0.42, ph: [-0.1, 0.3], lupa: [0.5, 1.25] }, subida: { th: 0.2, ph: [-0.05, 0.15], lupa: [1, 1] },
+        hija: { th: 0.3, ph: [-0.05, 0.35], lupa: [0.55, 1.2] } }
+    : { sala: { th: 0.24, ph: [-0.06, 0.14], lupa: [0.45, 1] }, caja: { th: 0.95, ph: [-0.15, 0.45], lupa: [0.45, 1.25] },
+        incensario: { th: 0.7, ph: [-0.12, 0.4], lupa: [0.45, 1.25] }, cara: { th: 0.55, ph: [-0.12, 0.3], lupa: [0.45, 1.25] },
+        cajones: { th: 0.7, ph: [-0.12, 0.4], lupa: [0.5, 1.25] } };
   const rig = crearRig(op, limites);
   const pistas = {};          // piezas que se animan (técnica C)
   let tintas = null, objetivosToque = [];
-  let pintada = null, cajonesB = null, carasB = [], rolloB = null, hija = null, sombraHija = null;
+  let pintada = null, cajonesB = null, carasB = [], rolloB = null, hija = null, sombraHija = null, incensarioB = null;
   // nivel 2: dónde sale la caja hija (la trampilla), dónde se posa y dónde está el ojo grande que la vigila
   const ZT = op.escena3d.z_tablero;
   const POS_HIJA = new THREE.Vector3(0, ZT + LADO_HIJA / 2, 0.245);          // en la mesa, delante de la caja
@@ -534,6 +593,7 @@ export async function crearTecnica(letra, op) {
     }
     const objetos = crearObjetos(op.escena3d, mundo.proyector, mundo.tex);
     for (const o of Object.values(objetos)) grupo.add(o);
+    incensarioB = objetos.incensario;
     // la sombra de la tetera y las tazas en la mesa (sus siluetas ya no traen la de la pintura)
     for (const [nombre, o] of Object.entries(op.escena3d.objetos)) {
       if (nombre === 'incensario') continue;
@@ -697,14 +757,48 @@ export async function crearTecnica(letra, op) {
       else rig.arrastrar(dx, dy);
     },
     soltar() {},
-    pellizcar(r) { rig.pellizcar(r); },
+    pellizcar(r, m0, m1) { return rig.pellizcar(r, m0, m1); },
+    lupa() { return rig.lupa.zObj; },
     abrirTrampilla(k) { trampilla = k; },
+    // el frente de un cajón del costado en la pantalla, abierto k (0 cerrado … 1 abierto): el dedo tira de él por
+    // esa línea
+    pantallaCajon(id, k) {
+      if (!cajonesB) return null;
+      const d = op.cajones.cajones.find(c => c.id === id);
+      caja.updateMatrixWorld();
+      rig.colocar(op.reloj(), 0);
+      const v = new THREE.Vector3(op.cajones.x + k * op.cajones.sale, (d.z[0] + d.z[1]) / 2, -(d.y[0] + d.y[1]) / 2);
+      const q = aPantalla(pintada.caja.localToWorld(v));
+      return { x: q.x, y: q.y };
+    },
     // nivel 2
     hayHija: () => !!hija,
     subirHija(duracion, fin) { if (hija) animHija.subida = { t: 0, duracion, fin }; else if (fin) fin(); },
     girarHija, soltarHija, tablillaVista,
-    correrTablilla(i, duracion = 0.45) { if (hija) animHija.tablillas.push({ i, t: 0, duracion, desde: hija.estado.tablillas[i], hasta: 1 }); },
-    abrirCajonHija(duracion = 0.6) { if (hija) animHija.cajon = { t: 0, duracion }; },
+    // una tablilla corre (o vuelve) desde donde esté hasta «hasta»; «asomo» la deja salir un poco y volver (un toque)
+    correrTablilla(i, duracion = 0.45, hasta = 1, asomo = 0) {
+      if (!hija) return;
+      animHija.tablillas = animHija.tablillas.filter(t => t.i !== i);
+      animHija.tablillas.push({ i, t: 0, duracion, desde: hija.estado.tablillas[i], hasta, asomo });
+    },
+    ponerTablilla(i, k) { if (!hija) return; animHija.tablillas = animHija.tablillas.filter(t => t.i !== i); hija.estado.tablillas[i] = k; },
+    abrirCajonHija(duracion = 0.6, hasta = 1, asomo = 0) { if (hija) animHija.cajon = { t: 0, duracion, desde: hija.estado.cajon, hasta, asomo }; },
+    ponerCajonHija(k) { if (!hija) return; animHija.cajon = null; hija.estado.cajon = k; },
+    // por dónde corre en la pantalla una parte de la caja hija: su centro cerrada (a) y abierta del todo (b)
+    ejeHija(parte, i) {
+      if (!hija) return null;
+      rig.colocar(op.reloj(), 0);
+      hija.grupo.updateMatrixWorld(true);
+      const h = LADO_HIJA / 2;
+      const punto = k => {
+        if (parte === 'cajon') return new THREE.Vector3(0, 0, -h - 0.0015 - k * LADO_HIJA * SALE_CAJONCITO);
+        const t = TABLILLAS[i];
+        return hija.tablillas[i].userData.reposo.clone().add(new THREE.Vector3(...t.normal).multiplyScalar(0.002))
+          .add(new THREE.Vector3(...t.corre).multiplyScalar(t.cuanto * LADO_HIJA * k));
+      };
+      const a = aPantalla(hija.cuerpo.localToWorld(punto(0))), b = aPantalla(hija.cuerpo.localToWorld(punto(1)));
+      return { a: { x: a.x, y: a.y }, b: { x: b.x, y: b.y } };
+    },
     // la caja hija en el boceto (para que el ojo grande la mire) y un punto suyo en 3D (para los vuelos)
     hijaEnBoceto() { return alBoceto(puntoHija()); },
     puntoHija(parte) {
@@ -753,6 +847,11 @@ export async function crearTecnica(letra, op) {
       if (esB) {
         actualizarCajonesB();
         actualizarHija(dt);
+        if (incensarioB) {           // la silueta del incensario, con su tapa o sin ella (y con el cuerno en las brasas)
+          const e = op.estado(), t = mundo.tex;
+          incensarioB.material.uniforms.uMascara.value = e.tapa !== 'abierta' ? t.siluetaIncensario
+            : e.cuerno === 'brasas' ? t.siluetaIncensarioCuerno : t.siluetaIncensarioAbierto;
+        }
         if (rolloB) { const r = op.decoracion.rollo; rolloB.rotation.set(r.a, 0, r.lift); }
       } else actualizarC(dt);
     },
@@ -877,13 +976,15 @@ export async function crearTecnica(letra, op) {
     // tablillas y cajoncito
     for (const t of animHija.tablillas) {
       t.t += dt; const k = limitar(t.t / t.duracion, 0, 1);
-      hija.estado.tablillas[t.i] = t.desde + (t.hasta - t.desde) * (1 - Math.pow(1 - k, 3));
+      hija.estado.tablillas[t.i] = t.desde + (t.hasta - t.desde) * (1 - Math.pow(1 - k, 3)) + (t.asomo || 0) * Math.sin(k * Math.PI);
+      if (k >= 1) hija.estado.tablillas[t.i] = t.hasta;
     }
     animHija.tablillas = animHija.tablillas.filter(t => t.t < t.duracion);
     if (animHija.cajon) {
       const c = animHija.cajon; c.t += dt; const k = limitar(c.t / c.duracion, 0, 1);
-      hija.estado.cajon = 1 - Math.pow(1 - k, 3) + 0.08 * Math.sin(k * Math.PI) * (1 - k);
-      if (k >= 1) { hija.estado.cajon = 1; animHija.cajon = null; }
+      const rebote = c.hasta > c.desde ? 0.08 * Math.sin(k * Math.PI) * (1 - k) : 0;
+      hija.estado.cajon = c.desde + (c.hasta - c.desde) * (1 - Math.pow(1 - k, 3)) + rebote + (c.asomo || 0) * Math.sin(k * Math.PI);
+      if (k >= 1) { hija.estado.cajon = c.hasta; animHija.cajon = null; }
     }
     hija.poner();
     hija.cajita.visible = h2.cajita === 'cajon';

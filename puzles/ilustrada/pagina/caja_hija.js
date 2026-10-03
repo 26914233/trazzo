@@ -7,6 +7,7 @@ import * as THREE from 'three';
 
 export const LADO = 0.075;                // 7,5 cm
 const GRUESO = 0.0034;                     // las tablillas
+export const SALE_CAJONCITO = 0.55;        // cuánto sale el cajoncito de detrás (en fracción del lado)
 
 // Las cinco tablillas, en el orden en que corren: su cara, su textura, hacia dónde corren (en ejes locales), cuánto
 // (en fracción del lado) y adónde apunta la flecha que dejan ver (la cara de la tablilla siguiente)
@@ -157,7 +158,7 @@ export function crearCajaHija(texturas) {
       m.position.copy(m.userData.reposo).add(v3(t.corre).multiplyScalar(t.cuanto * L * estado.tablillas[i]));
     });
     cajon.visible = estado.tablillas[4] > 0.5 || estado.cajon > 0;
-    cajon.position.z = -estado.cajon * L * 0.55;
+    cajon.position.z = -estado.cajon * L * SALE_CAJONCITO;
   }
   poner();
   return {

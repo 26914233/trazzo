@@ -1,7 +1,9 @@
-// Juega la caja viva de punta a punta con toques de móvil, comprueba cada paso y saca capturas.
+// Juega la caja viva de punta a punta con gestos de móvil (tocar, tirar, empujar, girar, levantar y pellizcar),
+// comprueba cada paso y saca capturas.
 //   python3 puzles/ilustrada/prueba/servir.py &
 //   node puzles/ilustrada/prueba/jugar.mjs [B|A] [horizontal|vertical] [carpeta de capturas]
 // B es el juego (DECISIÓN 29); A, el respaldo para móviles sin WebGL (se abre con «?tecnica=A»).
+// El juego es horizontal: en vertical, la prueba comprueba que el móvil pide girarse (y nada más).
 // Usa el Playwright global y el Chromium de /opt/pw-browsers (los del contenedor de Claude). La B necesita WebGL:
 // sin tarjeta gráfica se usa SwiftShader, que es lento; por eso las esperas van en tiempo de juego (el reloj de la
 // página) y comprobando el estado, no en segundos de verdad.
@@ -71,10 +73,14 @@ const cajon = id => pagina.evaluate(id => window.__prueba.cajon(id), id);
 const donde = (x, y, objeto) => pagina.evaluate(([x, y, o]) => {
   const p = window.__prueba.aPantalla(x, y, o);
   if (!p) return null;
-  const t = window.__tec(), v = o === 'sala' && t.nombre !== 'A' ? t.aPintura(p.x, p.y) : null;
-  // un botón o un mensaje encima del punto también lo tapa
-  const encima = document.elementFromPoint(p.x, p.y);
-  return { x: p.x, y: p.y, tapado: (v ? Math.hypot(v.x - x, v.y - y) > 25 : false) || (encima && encima.id !== 'lienzo') };
+  // (lo mismo con lo que hay en la mesa: en el borde de la pantalla, el dedo puede caer en el canto de su silueta)
+  const t = window.__tec(), comprobarlo = t.nombre !== 'A' && !/^caja/.test(o), v = comprobarlo ? t.aPintura(p.x, p.y) : null;
+  // un botón encima del punto también lo tapa, y uno muy cerca también: el móvil lleva el toque al botón más próximo
+  const cerca = [[0, 0], [-14, 0], [14, 0], [0, -14], [0, 14]].some(([dx, dy]) => {
+    const e = document.elementFromPoint(p.x + dx, p.y + dy);
+    return e && e.id !== 'lienzo';
+  });
+  return { x: p.x, y: p.y, tapado: (comprobarlo ? !v || Math.hypot(v.x - x, v.y - y) > 25 : false) || cerca };
 }, [x, y, objeto]);
 async function tocar(x, y, objeto = 'caja') {
   let p = await donde(x, y, objeto);
@@ -89,6 +95,36 @@ async function tocarCajon(id) {
   const c = await pagina.evaluate(id => window.__prueba.centroCajon(id), id);
   await tocar(c.x, c.y);
 }
+// arrastrar un dedo de un punto a otro (eventos táctiles de verdad: salen eventos de puntero)
+async function arrastrar(x0, y0, x1, y1, pasos = 12) {
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: x0, y: y0 }] });
+  for (let i = 1; i <= pasos; i++) {
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x0 + (x1 - x0) * i / pasos, y: y0 + (y1 - y0) * i / pasos }] });
+    await espera(0.02);
+  }
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+}
+// un dedo en círculo alrededor de un punto, desde el ángulo a0 y girando «giro» radianes
+async function enCirculo(cx, cy, radio, a0, giro, pasos = 16) {
+  const punto = a => ({ x: cx + Math.cos(a) * radio, y: cy + Math.sin(a) * radio });
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [punto(a0)] });
+  for (let i = 1; i <= pasos; i++) { await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [punto(a0 + giro * i / pasos)] }); await espera(0.02); }
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+}
+// pellizcar con dos dedos alrededor de un punto: de d0 a d1 píxeles de separación
+async function pellizcar(cx, cy, d0, d1, pasos = 10) {
+  const dedos = d => [{ x: cx - d / 2, y: cy, id: 1 }, { x: cx + d / 2, y: cy, id: 2 }];
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: dedos(d0) });
+  for (let i = 1; i <= pasos; i++) { await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: dedos(d0 + (d1 - d0) * i / pasos) }); await espera(0.02); }
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+}
+// tirar de un cajón del costado (o empujarlo, con «hacia» negativo): el dedo va por la línea por la que sale
+async function tirarCajon(id, hacia = 1.15) {
+  if ((await estado()).vista !== 'cajones') { await tocarCajon(id); await espera(1.1); }
+  const e = await pagina.evaluate(id => window.__prueba.ejeCajon(id), id);
+  const k = (await cajon(id)).k, desde = { x: e.a.x + (e.b.x - e.a.x) * k, y: e.a.y + (e.b.y - e.a.y) * k };
+  await arrastrar(desde.x, desde.y, desde.x + (e.b.x - e.a.x) * hacia, desde.y + (e.b.y - e.a.y) * hacia);
+}
 // mantener pulsado (toques de verdad, para que salgan eventos de puntero táctiles)
 async function mantener(selector, segundos) {
   const r = await pagina.locator(selector).boundingBox();
@@ -101,6 +137,19 @@ async function mantener(selector, segundos) {
 await pagina.goto(BASE + (tecnica === 'A' ? '?tecnica=A' : ''));
 await pagina.waitForFunction(() => !document.getElementById('boton-entrar').disabled, null, { timeout: 30000 });
 await foto('01_portada');
+if (vertical) {
+  // el juego es horizontal: en un móvil en vertical, un aviso pide girarlo y tapa el juego
+  comprobar('en vertical, el móvil pide girarse', await pagina.isVisible('#girar-movil')
+    && await pagina.evaluate(() => document.elementFromPoint(innerWidth / 2, innerHeight / 2).closest('#girar-movil') !== null));
+  await pagina.setViewportSize({ width: alto, height: ancho });
+  await pagina.waitForTimeout(400);
+  comprobar('al girarlo, el aviso se va', await pagina.isHidden('#girar-movil'));
+  comprobar('sin errores en la consola', errores.length === 0, errores.join(' | '));
+  console.log(`\n${bien} de ${total} (técnica ${tecnica}, vertical); capturas en ${carpeta}`);
+  await navegador.close();
+  process.exit(bien === total ? 0 : 1);
+}
+comprobar('en horizontal no hay aviso de girar el móvil', await pagina.isHidden('#girar-movil'));
 await pagina.tap('#boton-entrar');
 await hasta(() => window.__prueba.estado().fase === 'jugando' && window.__prueba.ojo().parpadoBase === 0);
 await espera(0.5);
@@ -112,16 +161,32 @@ await espera(1.1);
 await foto('03_caja');
 comprobar('tocar la caja la acerca', (await estado()).vista === 'caja');
 
-// los cajones del costado: cerrados; se abren deslizándose
+// los cajones del costado: cerrados; se abren tirando de ellos
 let e = await estado();
 comprobar('los nueve cajones del costado empiezan cerrados', Object.values(e.cajones).length === 9 && Object.values(e.cajones).every(v => v === 'cerrado'));
 await tocarCajon('c8');
+await espera(1.1);
+let c = await cajon('c8');
+comprobar('tocar un cajón de lejos solo acerca la cámara al costado', (await estado()).vista === 'cajones' && c.estado === 'cerrado', JSON.stringify(c));
+await tocarCajon('c8');
+await espera(0.8);
+c = await cajon('c8');
+comprobar('un toque no abre el cajón: asoma y vuelve, y dice que se tira de él', c.estado === 'cerrado' && c.k < 0.02 && /[Tt]ira/.test(await mensaje()), await mensaje());
+await tirarCajon('c8');
 await espera(0.9);
 await foto('04_cajon_abierto');
-let c = await cajon('c8');
-comprobar('el cajón de abajo se abre con su animación y la cámara se acerca al costado', c.estado === 'abierto' && c.k > 0.95
-  && (await estado()).vista === 'cajones', JSON.stringify(c));
+c = await cajon('c8');
+comprobar('tirando con el dedo, el cajón de abajo sale y se queda abierto', c.estado === 'abierto' && c.k > 0.95, JSON.stringify(c));
+const ejeAntes = await pagina.evaluate(() => window.__prueba.ejeCajon('c8'));
+// (la tetera: tocar el shoji no vale, su viento agita la llama y distrae al ojo)
+const tetera = await pagina.evaluate(() => window.__prueba.pantallaBoceto(1290, 540, 'te'));
+await pagina.touchscreen.tap(tetera.x, tetera.y);
+await espera(0.9);
+const ejeDespues = await pagina.evaluate(() => window.__prueba.ejeCajon('c8'));
+comprobar('de cerca, la cámara se queda fija: tocar otra cosa no vuelve a la sala',
+  (await estado()).vista === 'cajones' && Math.hypot(ejeAntes.a.x - ejeDespues.a.x, ejeAntes.a.y - ejeDespues.a.y) < 6);
 
+await pagina.evaluate(() => window.__prueba.calmarLampara());
 await tocarCajon('c8');
 await espera(0.5);
 await foto('05_resiste_llave');
@@ -129,32 +194,44 @@ e = await estado();
 comprobar('la llave no se deja coger mientras el ojo mira', e.llave === 'cajon' && /mientras te mira/.test(await mensaje()), await mensaje());
 
 await espera(1.5);
-await tocarCajon('c2');
+await tirarCajon('c2');
 await espera(0.7);
 await foto('06_cajon_cerradura');
 c = await cajon('c2');
-comprobar('un cajón con cerradura resiste sin moverse', c.estado === 'cerrado' && c.k === 0 && /cerradura|cede/.test(await mensaje()), await mensaje());
+comprobar('un cajón con cerradura resiste el tirón sin moverse', c.estado === 'cerrado' && c.k === 0 && /cerradura|cede|aliento/.test(await mensaje()), await mensaje());
 
-await espera(1.5);
+// pellizcar: acercarse con dos dedos y, al alejarse del todo, volver a la vista de antes
+await espera(1.2);
+await pellizcar(ancho * 0.55, alto * 0.5, 120, 230);
+await espera(0.5);
+const lupa = await pagina.evaluate(() => window.__prueba.lupa());
+comprobar('pellizcar acerca la vista', lupa < 0.8 && (await estado()).vista === 'cajones', `lupa ${lupa.toFixed(2)}`);
+await pellizcar(ancho * 0.55, alto * 0.5, 320, 80, 14);
+await espera(1.1);
+comprobar('alejarse del todo con los dedos vuelve a la caja', (await estado()).vista === 'caja', (await estado()).vista);
+
+await espera(0.5);
 await tocar(605, 320, 'sala');
 await espera(0.7);
 await foto('07_lampara');
 comprobar('la lámpara distrae al ojo', await pagina.evaluate(() => window.__prueba.ojo().distraidoHasta > window.__prueba.reloj()));
 await tocarCajon('c8');
+await espera(1.1);
+if ((await estado()).vista === 'cajones' && (await cajon('c8')).estado === 'abierto') await tocarCajon('c8');
 await espera(1.3);
 await foto('08_llave_cogida');
 e = await estado();
 comprobar('con el ojo en la lámpara, la llave se coge y va a la bandeja', e.llave === 'mano' && e.inventario.includes('llave') && await pagina.isVisible('#hueco-llave'), e.llave);
 
 await espera(1.0);
-await tocarCajon('c8');
-await espera(0.7);
+await tirarCajon('c8', -1.2);
+await espera(0.8);
 c = await cajon('c8');
-comprobar('el cajón vacío se cierra', c.estado === 'cerrado' && c.k < 0.02, JSON.stringify(c));
+comprobar('empujándolo, el cajón vacío se cierra', c.estado === 'cerrado' && c.k < 0.02, JSON.stringify(c));
 
-await tocarCajon('c9');
+await tirarCajon('c9');
 await espera(0.9);
-comprobar('el cajón de al lado se abre', (await cajon('c9')).estado === 'abierto');
+comprobar('el cajón de al lado se abre tirando', (await cajon('c9')).estado === 'abierto');
 await tocarCajon('c9');
 await hasta(() => !document.getElementById('nota').hidden && !document.getElementById('nota').classList.contains('oculta'));
 await espera(0.4);
@@ -198,18 +275,36 @@ comprobar('el incensario no se abre sin la llave', e.vista === 'incensario' && e
 await pagina.tap('#hueco-llave');
 await espera(0.4);
 await tocar(575, 540, 'incensario');
-await espera(1.5);
-await foto('13_abriendo');
+await hasta(() => window.__prueba.estado().llave === 'cerradura' && !window.__prueba.estado().ocupado);
+await espera(0.4);
+await foto('13_llave_metida');
+e = await estado();
+comprobar('la llave entra en la cerradura y se queda: hay que girarla', e.llave === 'cerradura' && e.tapa === 'puesta' && e.vista === 'incensario'
+  && !e.inventario.includes('llave') && /[Gg]ír/.test(await mensaje()), await mensaje());
+let cer = await pagina.evaluate(() => window.__prueba.pantallaBoceto(576, 508, 'incensario'));
+await enCirculo(cer.x, cer.y, 55, -Math.PI / 2, 0.45);
+await espera(0.6);
+e = await estado();
+comprobar('medio giro no basta: la llave vuelve', e.llave === 'cerradura' && (await pagina.evaluate(() => window.__prueba.llave().t)) < 0.05);
+await enCirculo(cer.x, cer.y, 55, -Math.PI / 2, 1.5);
+await hasta(() => window.__prueba.estado().tapa === 'suelta' && !window.__prueba.estado().ocupado);
+await espera(0.3);
+await foto('14_cerradura_abierta');
+comprobar('girando el dedo en círculo, la llave abre la cerradura', (await estado()).llave === 'usada');
+const tapa = await pagina.evaluate(() => window.__prueba.pantallaBoceto(575, 500, 'incensario'));
+await arrastrar(tapa.x, tapa.y, tapa.x + 4, tapa.y - 14, 6);
+await espera(0.6);
+comprobar('si se suelta enseguida, la tapa cae en su sitio', (await estado()).tapa === 'suelta');
+await arrastrar(tapa.x, tapa.y, tapa.x + 6, tapa.y - 110, 14);
 await hasta(() => window.__prueba.estado().tapaEnMesa && !window.__prueba.estado().ocupado);
 await espera(0.6);
-await foto('14_abierto');
+await foto('15_abierto');
 e = await estado();
-comprobar('la llave abre el incensario, la tapa queda en la mesa y la llave deja la bandeja',
-  e.tapa === 'abierta' && e.tapaEnMesa && e.llave === 'usada' && !e.inventario.includes('llave'));
+comprobar('arrastrando hacia arriba, la tapa se levanta y queda en la mesa', e.tapa === 'abierta' && e.tapaEnMesa);
 
 await tocar(593, 480, 'incensario');
 await espera(1.3);
-await foto('15_cuerno_cogido');
+await foto('16_cuerno_cogido');
 e = await estado();
 comprobar('el cuerno sale de las brasas', e.cuerno === 'mano' && await pagina.isVisible('#hueco-cuerno'), e.cuerno);
 
@@ -218,12 +313,12 @@ await pagina.tap('#hueco-cuerno');
 await espera(0.3);
 await tocar(912, 292);
 await espera(2.6);
-await foto('16_despertando');
+await foto('17_despertando');
 await espera(2.2);
-await foto('17_despierta');
+await foto('18_despierta');
 await hasta(() => window.__prueba.estado().fase === 'tarjeta');
 await espera(1.6);
-await foto('18_final');
+await foto('19_final');
 e = await estado();
 comprobar('el cuerno en la frente despierta la caja y cierra el nivel 1', e.cuerno === 'puesto' && e.fase === 'tarjeta'
   && await pagina.isVisible('#tarjeta') && await pagina.evaluate(() => document.querySelectorAll('.pieza.recuperada').length === 1));

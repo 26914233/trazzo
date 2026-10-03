@@ -15,10 +15,10 @@
     `tecnica_3d.js` como referencia, sin mantener, y sus modelos (`pagina/modelos/`) ya no se publican.
 
 **Para jugarla:** página privada https://claude.ai/artifact/7fC2cECS62soiVNBa2kMG3 (solo la puede abrir el
-usuario). Funciona en el móvil, en horizontal y en vertical, mejor con sonido.
+usuario). Se juega en el móvil **en horizontal** (en vertical pide girarlo), mejor con sonido.
 
-**En APK** (desde el 03-10-2026): `caja-viva-0.1-prueba.apk`, la misma página dentro de una app de Android, sin
-conexión. Cómo se construye y se firma: `apk/LEEME.md`.
+**En APK** (desde el 03-10-2026): `caja-viva-0.2-prueba.apk`, la misma página dentro de una app de Android, sin
+conexión y siempre en horizontal. Cómo se construye y se firma: `apk/LEEME.md`.
 
 **Es el juego** (DECISIONES 23 y 24, cerradas el 03-10-2026): una línea de niveles de la misma caja. El plan
 está en `NIVELES.md`; se juegan el nivel 1 y el 2. Al terminar cada nivel sale una tarjeta con la cara como
@@ -26,12 +26,13 @@ marcador (las piezas que ha recuperado: 角 cuerno, 目 ojo y 声 voz) y la part
 portada ofrece seguir. Con `?nivel=2` se empieza en el 2.
 
 **Nivel 1 · El cuerno (unos 3-4 minutos):**
-1. los nueve cajones del costado están cerrados: al tocar uno, la cámara se acerca y se abre deslizándose
-   (dos tienen cerradura y no ceden);
+1. los nueve cajones del costado están cerrados: al tocar uno, la cámara se acerca al costado y se queda allí;
+   se abren **tirando de ellos con el dedo** y se cierran empujándolos (dos tienen cerradura y no ceden);
 2. la llave está en el cajón de abajo, pero la caja no deja cogerla mientras el ojo te mira: la lámpara lo
    distrae;
 3. en el cajón de al lado está la nota: «Me falta un cuerno. Lo guarda el león que respira humo»;
-4. la llave abre el incensario y el león deja la tapa en la mesa;
+4. la llave entra en la cerradura del león y se **gira con el dedo en círculo**; luego la tapa se **levanta
+   arrastrando hacia arriba** y queda en la mesa;
 5. el cuerno de las brasas va al hueco de la frente;
 6. la caja despierta.
 
@@ -39,13 +40,50 @@ Detrás de la caja hay más cajones, un hueco con forma de ficha de shōgi y un 
 (para niveles futuros).
 
 **Nivel 2 · La caja de dentro (solo en la B):**
-1. la caja se calma y su trampilla sigue dando luz; al tocarla, sube de dentro una caja pequeña y baja a la mesa;
+1. la caja se calma y su trampilla sigue dando luz; **tirando de ella hacia arriba**, sube de dentro una caja
+   pequeña y baja a la mesa;
 2. de cerca se ve la caja pequeña con el ojo grande encima, vigilándola; arrastrar la gira en la mano;
-3. sus cinco tablillas corren en orden y la flecha de debajo de cada una dice cuál sigue;
+3. sus cinco tablillas corren en orden, **deslizándolas con el dedo**, y la flecha de debajo de cada una dice
+   cuál sigue;
 4. la cara que ve el ojo grande no se mueve (la lámpara ya no lo distrae): hay que esconderle cada tablilla;
-5. detrás de la tapa, un cajoncito con una cajita roja; examinada, su tapa gira hasta que su marca dorada toca
-   la del borde, y dentro hay un ojo de piedra de luna;
+5. detrás de la tapa, un cajoncito (se **tira de él**) con una cajita roja; examinada, su tapa gira hasta que su
+   marca dorada toca la del borde, y dentro hay un ojo de piedra de luna;
 6. el ojo va a la cuenca vacía y la caja abre los dos ojos.
+
+## Gestos y horizontal (03-10-2026, noche)
+
+**Qué pidió el usuario:** «El juego tiene que ser horizontal cuando entre, para que sea más vistoso el panorama
+también, permite que pellizque para acercar o alejar, para todo debe tener acción, me refiero que para abrir un
+cajón […] cuando se acerque se mantenga para que pueda interactuar, que quede fijo en esa parte, que tenga
+acción, es que jale el cajón, no solo tocar, ese tipo de movimientos».
+
+**Qué cambió:**
+- **Horizontal:** en un móvil en vertical, un aviso pide girarlo («Así se ve la sala entera»). Al entrar, la página
+  pide pantalla completa en horizontal si el navegador lo deja. El APK va siempre en horizontal
+  (`sensorLandscape`). Los encuadres de cerca se ajustaron al horizontal: el costado entero con los cajones de
+  abajo abiertos, la cara de la frente a la boca y la caja con su trampilla. De cerca de los cajones y de la caja
+  pequeña, los textos van a la derecha.
+- **La cámara se queda:** en las vistas de cerca (caja, cajones, cara, incensario y caja pequeña) arrastrar ya no
+  mueve la cámara y tocar fuera no devuelve a la sala. Se vuelve con «Sala», con el botón atrás o pellizcando. Un
+  cajón tocado de lejos solo acerca la cámara al costado. La caja grande se gira desde la sala o la vista de la
+  caja (y con «Girar»).
+- **Pellizcar acerca o aleja** alrededor de los dedos y se desplaza con ellos (también la rueda del ratón). Es una
+  lupa sobre el encuadre, sin mover la cámara, así la pintura no se deforma. Cada vista tiene su margen (hasta
+  unas 2,2 veces más cerca; de cerca, también un poco más lejos). Si se sigue alejando, se vuelve a la vista de
+  antes: de los cajones o de la cara a la caja, y de la caja o del incensario a la sala.
+- **Las acciones son gestos** (un toque solo avisa: la pieza asoma un poco y el mensaje dice qué hacer):
+
+  | Qué | Gesto |
+  |---|---|
+  | Cajón del costado | Tirar de él hacia fuera (por la línea por la que sale) y empujarlo para cerrarlo. Sigue al dedo y, al soltarlo, acaba de salir con un rebote o se cierra con un golpe seco. Los de cerradura no se mueven: la caja contiene el aliento |
+  | Llave en el león | Se mete con la llave del inventario y se gira con el dedo en círculo alrededor de la cerradura (en cualquier sentido); a tres cuartos de vuelta, clic. Si se suelta antes, vuelve |
+  | Tapa del incensario | Ya sin llave, se levanta arrastrando hacia arriba; arriba del todo, va a la mesa. Si se suelta pronto, cae en su sitio |
+  | Trampilla (nivel 2) | Tirar hacia arriba: sube la caja pequeña |
+  | Tablillas (nivel 2) | Deslizar con el dedo la que toca, por su línea; arrastrar en otra dirección (o cualquier otra tablilla) gira la caja pequeña. Si el ojo la ve, no se mueve |
+  | Cajoncito (nivel 2) | Tirar de él hacia fuera |
+
+- **Los cajones tienen física:** un muelle por cajón (cuánto ha salido, su velocidad y adónde va). Mientras el
+  dedo lo agarra va donde lo lleve; al soltarlo, la velocidad del dedo cuenta (un tirón rápido lo abre).
 
 ## Qué hay
 
@@ -119,9 +157,13 @@ Detrás de la caja hay más cajones, un hueco con forma de ficha de shōgi y un 
 - **La respiración, el humo y la luz:** la caja respira y, si la fuerzas, contiene el aliento; el humo sube
   en cintas con el borde a tinta; hay bocanadas por las juntas, la luz de la lámpara, las brasas, motas de
   polvo y, al despertar, los ojos rojos y la luz de la trampilla.
-- **Los cajones:** su forma en metros sale de `capas/cajones.json`. Cada uno se abre con un rebote y se
-  cierra con un golpe seco; los de cerradura resisten sin moverse; al despertar, todos traquetean. Al tocar
-  uno, la cámara va a la vista del costado.
+- **Los cajones:** su forma en metros sale de `capas/cajones.json`. Se abren tirando de ellos y se cierran
+  empujándolos (un muelle con rebote y golpe seco); los de cerradura resisten sin moverse; al despertar, todos
+  traquetean. Tocar uno de lejos lleva la cámara a la vista del costado.
+- **Los gestos** (`gestoEn`, `empezarGesto`, `moverGesto` y `soltarGesto`): al apoyar el dedo se mira qué hay
+  debajo; el gesto empieza cuando el dedo se mueve y, si no era para eso, el arrastre gira la caja o, en la sala,
+  mueve la cámara. Por dónde se tira de un cajón o se desliza una tablilla sale de su línea en la pantalla (dónde
+  está cerrada y dónde abierta).
 - **El inventario:** una bandeja lacada con cuatro huecos. Tocar un objeto dice su nombre y lo elige; tocarlo
   otra vez (o mantenerlo pulsado) lo examina en grande; arrastrarlo lo usa donde se suelte. La nota se
   guarda y se relee.
@@ -133,8 +175,9 @@ Detrás de la caja hay más cajones, un hueco con forma de ficha de shōgi y un 
   - el té hace ondas cuando algo golpea la mesa;
   - el dedo aparta el polvo y el humo.
 - **La cámara:** cinco vistas (sala, caja, costado de los cajones, incensario y la cara del final) con
-  transiciones, un vaivén lento de cámara en mano y sacudidas. Arrastrar mueve la cámara y pellizcar acerca.
-- **La caja gira:** con el botón «Girar» o arrastrándola con el dedo.
+  transiciones, un vaivén lento de cámara en mano y sacudidas. En la sala, arrastrar mira alrededor; de cerca, la
+  cámara se queda quieta. Pellizcar acerca o aleja alrededor de los dedos.
+- **La caja gira:** con el botón «Girar» o arrastrándola con el dedo desde la sala o la vista de la caja.
 
 **B · Pintura sobre 3D** (`tecnica_3d.js` y `escena3d.js`)
 - Cada superficie toma su color de la pintura vista desde la cámara del boceto (proyección).
@@ -179,36 +222,51 @@ python3 puzles/ilustrada/prueba/servir.py &          # http://localhost:8765/   
 # las capas del nivel 2 (si cambian sus ilustraciones de fuentes/nivel2/ o sala_dos_ojos.jpg)
 python3 puzles/ilustrada/herramientas/nivel2_capas.py
 
-# prueba automática: juega la partida entera con toques de móvil y saca capturas
+# prueba automática: juega la partida entera con gestos de móvil y saca capturas (el juego es horizontal; en
+# vertical solo comprueba el aviso de girar el móvil)
 node puzles/ilustrada/prueba/jugar.mjs B horizontal <carpeta de capturas>
-node puzles/ilustrada/prueba/jugar.mjs A vertical <carpeta de capturas>
-node puzles/ilustrada/prueba/jugar_nivel2.mjs vertical <carpeta de capturas>
+node puzles/ilustrada/prueba/jugar.mjs A horizontal <carpeta de capturas>
+node puzles/ilustrada/prueba/jugar.mjs B vertical <carpeta de capturas>
+node puzles/ilustrada/prueba/jugar_nivel2.mjs horizontal <carpeta de capturas>
 ```
 
-- **Resultado (03-10-2026, noche):** el nivel 1, 24 de 24 en la B y en la A, en horizontal y en vertical; el
-  nivel 2, 25 de 25 en horizontal y en vertical.
+- **Resultado (03-10-2026, noche, con los gestos):** el nivel 1, 34 de 34 en la B y en la A (en horizontal); el
+  aviso de girar el móvil en vertical, 3 de 3; el nivel 2, 28 de 28. La web del APK 0.2, sin red: 36 de 36 y 30 de
+  30. Antes de los gestos: 24 de 24 y 25 de 25.
 - **La prueba** usa Playwright y el Chromium del contenedor de Claude (`/opt/pw-browsers`). Comprueba esto:
-  - que los cajones empiezan cerrados, se abren con su animación y acercan la cámara;
-  - que la llave resiste mientras el ojo mira, que un cajón con cerradura no cede y que la lámpara distrae;
-  - la llave a la bandeja, el cajón vacío que se cierra y la nota (se lee, se guarda y queda en la bandeja);
+  - que en horizontal no hay aviso y en vertical sí (y que se va al girar);
+  - que los cajones empiezan cerrados, que tocar uno de lejos solo acerca la cámara, que un toque no lo abre y que
+    tirando con el dedo sí (arrastres de verdad por su línea);
+  - que de cerca la cámara se queda fija al tocar otra cosa;
+  - que la llave resiste mientras el ojo mira, que un cajón con cerradura no cede al tirón y que la lámpara distrae;
+  - pellizcar: acerca la vista y, alejándose del todo, vuelve a la caja;
+  - la llave a la bandeja, el cajón vacío que se cierra empujándolo y la nota (se lee, se guarda y queda en la
+    bandeja);
   - examinar un objeto manteniéndolo pulsado;
   - la espalda de la caja y su cajón largo;
-  - que el incensario no se abre sin la llave;
-  - la tapa en la mesa, el cuerno y el despertar;
+  - que el incensario no se abre sin la llave; la llave en la cerradura, medio giro que no basta y el giro entero
+    con el dedo en círculo;
+  - la tapa: soltada pronto cae en su sitio; arrastrada hacia arriba queda en la mesa; el cuerno y el despertar;
   - la tarjeta del nivel 1 (en la A, que el nivel 2 necesita 3D);
   - volver a empezar (cajones cerrados y bandeja vacía);
   - y que no haya errores en la consola.
-- **La prueba del nivel 2** empieza con «Seguir» en la portada y comprueba la subida de la caja hija, una
-  tablilla fuera de orden, la de arriba vista por el ojo, que la lámpara ya no distrae, las cinco tablillas
-  (cada una puesta de cara con arrastres de verdad), el cajoncito, la cajita, su tapa, el ojo en la cuenca, la
+- **La prueba del nivel 2** empieza con «Seguir» en la portada y comprueba que un toque en la trampilla solo avisa
+  y que tirando hacia arriba sube la caja hija; una tablilla fuera de orden; la de arriba vista por el ojo (ni
+  tocándola ni deslizándola se mueve); que la lámpara ya no distrae; que un toque en la tablilla que toca solo la
+  hace asomar; las cinco tablillas (cada una puesta de cara con arrastres de verdad al lado de la caja y deslizada
+  con el dedo); el cajoncito (asoma con un toque y sale tirando); la cajita, su tapa, el ojo en la cuenca, la
   tarjeta y la partida guardada.
 - **La B necesita WebGL.** Sin tarjeta gráfica se usa SwiftShader, que es lento (unos 3-11 cuadros por
   segundo). Por eso las esperas de la prueba van en tiempo de juego y comprobando el estado.
+- **Antes de tocar algo**, la prueba comprueba que bajo el dedo está de verdad (y no el canto de una silueta) y que
+  no hay un botón a menos de 14 px: el navegador del móvil lleva el toque al botón más cercano. Si no, vuelve antes
+  a la sala.
 - **Three.js** viene de jsDelivr: la prueba lo descarga con el `fetch` de Node y se lo pasa a la página.
 - **Ganchos para probarla:** la página deja `window.__prueba` (estado, ojo, reloj, técnica, cara de la caja,
-  ir a una vista, girar, dónde tocar para cada punto del boceto, el centro de cada cajón, cuánto está abierto
-  y el inventario; y, del nivel 2, la caja hija, dónde tocar cada parte, si el ojo ve una tablilla y la
-  cajita) y `window.__tec`.
+  ir a una vista, girar, dónde tocar para cada punto del boceto, el centro de cada cajón, cuánto está abierto,
+  por dónde se tira de él, cuánto ha girado la llave, la lupa del pellizco, apartar el temblor solo de la llama y
+  el inventario; y, del nivel 2, la caja hija, dónde tocar cada parte, por dónde se desliza, si el ojo ve una
+  tablilla y la cajita) y `window.__tec`.
 - **Para publicarla de nuevo** en la misma página privada: la herramienta Artifact, con `pagina/index.html`
   y, en `files`, los tres `.js` y todo `capas/` y `sonidos/`. La raíz es `pagina/`.
 

@@ -81,10 +81,12 @@ Lo que ya se juega en la B, con un final nuevo.
 
 1. **Introducción:** la sala de noche; la caja duerme y abre el ojo.
 2. **Exploración:** los cajones del costado, cerrados; la lámpara, el incensario, la tetera.
-3. **Primer descubrimiento:** un cajón se abre (antes de 20 s).
+3. **Primer descubrimiento:** un cajón se abre tirando de él con el dedo (antes de 20 s). Un toque solo lo hace
+   asomar y avisa de que se tira.
 4. **Aprendizaje:** la llave no se deja coger mientras el ojo mira; la lámpara lo distrae.
 5. **Combinación:** la nota del cajón de al lado dice dónde está el cuerno.
-6. **Desafío:** la llave abre el incensario; el cuerno está en las brasas.
+6. **Desafío:** la llave entra en la cerradura del león y se gira con el dedo en círculo; la tapa se levanta
+   arrastrando hacia arriba; el cuerno está en las brasas.
 7. **Clímax:** el cuerno en la frente; la caja despierta: ojos rojos, humo, la trampilla abierta con luz.
 8. **Recompensa:** la caja se calma y su trampilla sigue dando luz: la cara ya tiene su cuerno.
 9. **Transición:** tarjeta «Nivel 1 superado · El cuerno», con la cara como marcador (el sello 角 en
@@ -109,18 +111,19 @@ Hay que girarla en la mano para esconderle lo que haces: el punto ciego ya no lo
   pequeña está fuera: no hay atajo.
 
 **Las nueve fases:**
-1. **Introducción:** la trampilla da luz. Al tocarla, la caja hija sube despacio de dentro, flota y baja a
-   la mesa, delante de la grande. La cámara baja con ella (vista nueva: la caja en la mano).
+1. **Introducción:** la trampilla da luz. Al tirar de ella hacia arriba (un toque solo avisa), la caja hija sube
+   despacio de dentro, flota y baja a la mesa, delante de la grande. La cámara baja con ella (vista nueva: la caja
+   en la mano).
 2. **Exploración:** arrastrar gira la caja hija en todos los sentidos. Detrás, la cara grande mira.
 3. **Primer descubrimiento:** una tablilla de un costado tiene la muesca para el dedo. Si la intentas mover
    de cara al ojo grande, no se mueve: la caja grande contiene el aliento y el ojo mira tu mano.
-4. **Aprendizaje:** al girar la caja hija para que esa cara no la vea el ojo, la tablilla corre (clic). Es la
-   regla, aprendida haciendo.
+4. **Aprendizaje:** al girar la caja hija para que esa cara no la vea el ojo, la tablilla corre con el dedo
+   (clic). Es la regla, aprendida haciendo.
 5. **Combinación:** detrás de cada tablilla hay una flecha de marquetería que dice cuál corre después y
    hacia dónde. Algunas están en la cara de abajo: hay que volcar la caja.
 6. **Desafío:** la secuencia completa, de cinco tablillas, escondiéndoselas al ojo. La quinta es la tapa de
    atrás, la cara que el ojo grande ve de lleno: hay que darle la vuelta a la caja para correrla.
-7. **Clímax:** la tapa corre y sale un cajoncito con la cajita roja.
+7. **Clímax:** la tapa corre y aparece un cajoncito; tirando de él, sale con la cajita roja.
 8. **Recompensa:** la cajita es un puzle de bolsillo (se examina): su tapa gira a saltos de 30°, con un clic
    en cada uno, y solo se abre cuando su marca dorada coincide con la del borde. Dentro está el ojo, de piedra
    de luna, que aparta la vista de tu dedo.
@@ -136,6 +139,9 @@ Hay que girarla en la mano para esconderle lo que haces: el punto ciego ya no lo
 - La vista de cerca se encuadra distinta en horizontal y en vertical, para que quepan la caja y el ojo; en
   horizontal, los textos van a la derecha. Al coger el ojo nuevo, la cámara se vuelve hacia la cara (en vertical,
   la vista de cerca deja la cuenca fuera).
+- **Gestos (03-10-2026, noche):** la tablilla a la que le toca se desliza con el dedo por su línea; arrastrar en
+  otra dirección, o sobre cualquier otra tablilla, gira la caja pequeña. Un toque en una tablilla dice si está
+  trabada o la hace asomar. El juego es horizontal.
 - El ojo nuevo se anima como el viejo, con su propia almendra (`capas/nivel2.json`).
 - La prueba: `prueba/jugar_nivel2.mjs`.
 

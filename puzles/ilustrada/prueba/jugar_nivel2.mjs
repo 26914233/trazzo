@@ -1,16 +1,16 @@
-// Juega el nivel 2 de la caja viva («La caja de dentro») con toques de móvil, comprueba cada paso y saca capturas.
+// Juega el nivel 2 de la caja viva («La caja de dentro») con gestos de móvil, comprueba cada paso y saca capturas.
 //   python3 puzles/ilustrada/prueba/servir.py &
-//   node puzles/ilustrada/prueba/jugar_nivel2.mjs [horizontal|vertical] [carpeta de capturas]
+//   node puzles/ilustrada/prueba/jugar_nivel2.mjs [horizontal] [carpeta de capturas]
 // Empieza en el nivel 2 con «?nivel=2» (el botón «Seguir» de la portada). El nivel 2 solo existe en la B (3D): como
-// en jugar.mjs, sin tarjeta gráfica se usa SwiftShader y las esperas van en tiempo de juego.
-// La caja pequeña se gira con arrastres de verdad (unos 137 px son un cuarto de vuelta); para cada tablilla se busca
-// el giro que la pone de cara a la cámara y de espaldas al ojo grande, y se comprueba antes que, vista por el ojo, no
-// se mueve.
+// en jugar.mjs, sin tarjeta gráfica se usa SwiftShader y las esperas van en tiempo de juego. El juego es horizontal.
+// La caja pequeña sale de la trampilla tirando hacia arriba y se gira con arrastres de verdad al lado de ella (unos
+// 137 px son un cuarto de vuelta); para cada tablilla se busca el giro que la pone de cara a la cámara y de espaldas
+// al ojo grande, se comprueba antes que, vista por el ojo, no se mueve, y se desliza con el dedo por su línea.
 import { mkdirSync } from 'node:fs';
 import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
 
-const vertical = process.argv[2] === 'vertical';
-const [ancho, alto, sufijo] = vertical ? [390, 844, 'v'] : [844, 390, 'h'];
+if (process.argv[2] === 'vertical') console.log('(el juego es horizontal: el nivel 2 se prueba en horizontal)');
+const [ancho, alto, sufijo] = [844, 390, 'h'];
 const carpeta = (process.argv[3] || '/tmp/capturas_caja_viva').replace(/\/?$/, '/');
 mkdirSync(carpeta, { recursive: true });
 
@@ -69,11 +69,24 @@ async function arrastrar(x0, y0, dx, dy, pasos = 10) {
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   await espera(0.7);                     // que se asiente en su orientación
 }
-// un cuarto de vuelta de la caja pequeña: arrastrar en el centro de la pantalla
+// un cuarto de vuelta de la caja pequeña: arrastrar al lado de ella (sobre ella, el dedo podría deslizar una tablilla)
 const CUARTO = 137;
 const GIROS = { abajo: [0, CUARTO], arriba: [0, -CUARTO], derecha: [CUARTO, 0], izquierda: [-CUARTO, 0] };
 const CONTRARIO = { abajo: 'arriba', arriba: 'abajo', derecha: 'izquierda', izquierda: 'derecha' };
-async function girar(nombre) { const [dx, dy] = GIROS[nombre]; await arrastrar(ancho * 0.5, alto * 0.5, dx, dy); }
+async function girar(nombre) {
+  const [dx, dy] = GIROS[nombre];
+  const c = await pagina.evaluate(() => window.__prueba.pantallaHija('cuerpo'));
+  const x0 = Math.max(110, Math.min(ancho - 150, c.x - 190)), y0 = Math.max(80, Math.min(alto - 80, c.y + (dy ? -dy / 2 : 30)));
+  await arrastrar(x0, y0, dx, dy);
+}
+// deslizar con el dedo una parte de la caja pequeña por su línea, desde donde está cerrada hasta pasar de abierta
+// (si su línea se ve corta, el dedo recorre al menos 90 px: la pieza no se adelanta al dedo)
+async function deslizar(parte, i) {
+  const e = await pagina.evaluate(([parte, i]) => window.__prueba.ejeHija(parte, i), [parte, i]);
+  const ax = e.b.x - e.a.x, ay = e.b.y - e.a.y, largo = Math.hypot(ax, ay) || 1, f = Math.max(1.2, 90 / largo);
+  await arrastrar(e.a.x, e.a.y, ax * f, ay * f, 14);
+  await espera(0.3);
+}
 // ¿la tablilla i se puede tocar (de cara a la cámara) y el ojo no la ve?
 const lista = i => pagina.evaluate(i => window.__prueba.tablillaHaciaCamara(i) > 0.45 && !window.__prueba.tablillaVista(i), i);
 // busca hasta dos giros que la dejen así (deshaciendo los que no sirven)
@@ -108,26 +121,33 @@ await foto('01_calma');
 comprobar('la caja se calma y la trampilla sigue abierta', await pagina.evaluate(() => window.__prueba.ojo().visible > 0.95 && window.__prueba.hija().fase === 'dentro'));
 comprobar('en el nivel 2 no se gira la caja grande', await pagina.isHidden('#boton-girar'));
 
-// 1. la trampilla: sube la caja hija
-const t = await pagina.evaluate(() => window.__prueba.aPantalla(930, 196, 'caja'));
+// 1. la trampilla: un toque avisa; tirando hacia arriba sube la caja hija
+const t = await pagina.evaluate(() => window.__prueba.aPantalla(930, 200, 'caja'));
 await pagina.touchscreen.tap(t.x, t.y);
+await espera(0.6);
+comprobar('un toque en la trampilla no saca la caja: dice que se tira hacia arriba', (await hija()).fase === 'dentro' && /arriba/.test(await mensaje()), await mensaje());
+await arrastrar(t.x, t.y, 0, -70, 10);
 await espera(1.6);
 await foto('02_sube');
 await hasta(() => window.__prueba.hija().fase === 'mesa' && !window.__prueba.estado().ocupado);
 await espera(1);
 await foto('03_en_la_mesa');
-comprobar('la caja hija sube de la trampilla y baja a la mesa', (await hija()).fase === 'mesa' && await pagina.evaluate(() => window.__prueba.estado().vista) === 'hija');
+comprobar('tirando hacia arriba, la caja hija sube de la trampilla y baja a la mesa', (await hija()).fase === 'mesa' && await pagina.evaluate(() => window.__prueba.estado().vista) === 'hija');
 
-// 2. fuera de orden: la tablilla del costado no corre (no le toca)
+// 2. fuera de orden: la tablilla del costado no corre (no le toca); un toque lo dice
 await tocarHija('tablilla', 1);
-comprobar('una tablilla fuera de orden no corre', !(await hija()).tablillas[1], await mensaje());
+comprobar('una tablilla fuera de orden no corre', !(await hija()).tablillas[1] && /[Tt]rabada|[Ee]sta no/.test(await mensaje()), await mensaje());
 
-// 3. la de arriba, de cara al ojo grande: no se mueve
+
+// 3. la de arriba, de cara al ojo grande: no se mueve, ni tocándola ni deslizándola
+await pagina.evaluate(() => window.__prueba.calmarLampara());
 comprobar('el ojo grande ve la tablilla de arriba', await pagina.evaluate(() => window.__prueba.tablillaVista(0)));
 await tocarHija('tablilla', 0);
 await espera(0.4);
+await deslizar('tablilla', 0);
+await espera(0.4);
 await foto('04_la_mira');
-comprobar('lo que el ojo ve no se mueve', !(await hija()).tablillas[0], await mensaje());
+comprobar('lo que el ojo ve no se mueve, aunque se deslice con el dedo', !(await hija()).tablillas[0] && /ojo|no se mueve|[Gg]ira/.test(await mensaje()), await mensaje());
 
 // 4. la lámpara ya no lo distrae
 const l = await pagina.evaluate(() => window.__prueba.aPantalla(604, 302, 'sala'));
@@ -145,10 +165,15 @@ if (l && l.x > 0 && l.x < ancho && l.y > 0 && l.y < alto) {
 for (let i = 0; i < 5; i++) {
   const giros = await ponerDeCara(i);
   if (!giros) { comprobar(`la tablilla ${i + 1} se puede poner de cara`, false); break; }
-  await tocarHija('tablilla', i);
-  await espera(0.7);
+  if (i === 0) {
+    await tocarHija('tablilla', 0);
+    await espera(0.5);
+    comprobar('un toque en la tablilla que toca solo la hace asomar', !(await hija()).tablillas[0] && /[Dd]esl[ií]za/.test(await mensaje()), await mensaje());
+  }
+  await deslizar('tablilla', i);
+  await espera(0.5);
   const h = await hija();
-  comprobar(`la tablilla ${i + 1} corre, escondida del ojo`, h.tablillas[i], `giros: ${giros.join(', ') || 'ninguno'}`);
+  comprobar(`la tablilla ${i + 1} corre con el dedo, escondida del ojo`, h.tablillas[i], `giros: ${giros.join(', ') || 'ninguno'}`);
   if (i === 0) await foto('05_primera');
   if (i === 2) await foto('06_tercera');
 }
@@ -156,8 +181,11 @@ await foto('07_tapa');
 
 // 6. el cajoncito y la cajita roja
 await tocarHija('cajon');
+await espera(0.5);
+comprobar('un toque en el cajoncito solo lo hace asomar', (await hija()).cajon === 'cerrado' && /[Tt]ira/.test(await mensaje()), await mensaje());
+await deslizar('cajon');
 await espera(0.9);
-comprobar('detrás de la tapa sale un cajoncito', (await hija()).cajon === 'abierto');
+comprobar('detrás de la tapa, tirando, sale un cajoncito', (await hija()).cajon === 'abierto');
 await foto('08_cajoncito');
 await tocarHija('cajita');
 await espera(1.2);
