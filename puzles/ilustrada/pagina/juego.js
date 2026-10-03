@@ -449,6 +449,13 @@ function polvareda(x, y) {
       vy: azar(-10, -3), r0: azar(3, 5), r1: azar(12, 20), t: -i * 0.03, vida: azar(0.8, 1.3), alfa: 0.26, color: '214,196,170' });
   }
 }
+// polvo fino que sale de un cajón viejo al abrirlo: poco, del color de la madera, y se posa enseguida
+function polvoDeCajon(x, y) {
+  for (let i = 0; i < 6; i++) {
+    nubes.push({ x: x + azar(-6, 6), y: y + azar(-4, 4), ax: x, ay: y, objeto: 'caja', vx: azar(8, 22), vy: azar(-9, 2),
+      r0: azar(2, 3.5), r1: azar(8, 14), t: -i * 0.04, vida: azar(0.7, 1.1), alfa: 0.2, color: '214,196,170' });
+  }
+}
 function actualizarNubes(dt) {
   for (let i = nubes.length - 1; i >= 0; i--) {
     const n = nubes[i]; n.t += dt;
@@ -881,7 +888,7 @@ function abrirCajon(id, callado = false) {
   sonar('cajon', -5, azar(0.95, 1.06)); vibrar(12);
   const c = centroCajon(id);
   mirarA(c, 1.6);
-  setTimeoutReloj(0.3, () => bocanada(c.x + 14, c.y + 4, 1, -0.3, 0.2));
+  setTimeoutReloj(0.25, () => polvoDeCajon(c.x + 10, c.y + 2));
   setTimeoutReloj(0.35, () => mensaje(textoCajon(id)));
 }
 function cerrarCajon(id) {
