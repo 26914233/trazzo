@@ -485,7 +485,7 @@ func preparar_camara(camara: CamaraPuzle) -> void:
 # De la puerta del taller al escritorio
 func ruta_entrada() -> Dictionary:
 	var suelo: float = Taller.SUELO
-	return {"puntos": [Vector3(0.62, suelo + 1.62, 3.95), Vector3(0.6, suelo + 1.58, 2.7), Vector3(0.5, suelo + 1.35, 1.65)],
+	return {"puntos": [Vector3(0.48, suelo + 1.62, 3.95), Vector3(0.5, suelo + 1.58, 2.7), Vector3(0.45, suelo + 1.35, 1.65)],
 		"miradas": [Vector3(0.0, -0.05, 0.0), Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.05, 0.0)],
 		"duracion": 6.0, "fov": 54.0}
 

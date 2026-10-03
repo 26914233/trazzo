@@ -95,7 +95,7 @@ func _paredes() -> void:
 		Arquitectura.losa(Vector3(x, SUELO, Z1 - 0.06), Vector3(x + 0.07, SUELO + 2.28, Z1 + 0.02), marco, self, 0.006)
 	Arquitectura.losa(Vector3(PUERTA_X - 0.07, SUELO + 2.2, Z1 - 0.06), Vector3(PUERTA_X + PUERTA_ANCHO + 0.07, SUELO + 2.3, Z1 + 0.02), marco, self, 0.006)
 	puerta = Arquitectura.puerta(self, Vector3(PUERTA_X, SUELO, Z1 - 0.03), PUERTA_ANCHO, 2.2, marco, Materiales.laton(0.3))
-	puerta.rotation.y = PI
+	puerta.rotation.y = PI - 0.18      # entornada: por la rendija sale la luz del taller
 	puerta.position.x = PUERTA_X + PUERTA_ANCHO
 
 
@@ -230,5 +230,6 @@ func abrir_puerta(sonido) -> void:
 	if sonido:
 		sonido.sonar("puerta", -4.0)
 	var animacion := create_tween()
-	animacion.tween_interval(0.2)
-	animacion.tween_property(puerta, "rotation:y", PI - 1.75, 2.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	animacion.tween_interval(0.1)
+	# se abre del todo, casi hasta la pared, antes de que la cámara llegue al marco
+	animacion.tween_property(puerta, "rotation:y", PI - 1.95, 1.3).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)

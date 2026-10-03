@@ -100,6 +100,13 @@ func _probar(datos: Dictionary) -> void:
 	var medida := await _medir_fps(1.5)
 	_registrar(datos.id + ": FPS medidos (orientativo: esta máquina no tiene tarjeta gráfica)", true, "%.1f FPS" % medida)
 
+	# El primer aviso se ajusta a su texto (en la 0.2 salía un marco de miles de píxeles)
+	await _esperar_hasta(func() -> bool: return mesa.hud.aviso.modulate.a > 0.9, 6.0)
+	var alto_aviso: float = mesa.hud.aviso.size.y
+	_registrar(datos.id + ": el primer aviso se ajusta a su texto", mesa.hud.aviso.modulate.a > 0.9
+		and alto_aviso < get_viewport().get_visible_rect().size.y * 0.35, "%d px de alto" % int(alto_aviso))
+	await _capturar(datos.id + "_primer_aviso")
+
 	# Bloqueo: la pieza no se mueve, suena y lo cuenta
 	if puzle.has_method("bloqueo_de_prueba"):
 		# se mira respecto a su padre: la caja viva respira y la reliquia flota

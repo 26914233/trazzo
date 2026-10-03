@@ -418,14 +418,37 @@ func examinar(id: String) -> void:
 			return
 
 
-# Copia del objeto, sin rastro de su posición en la escena (para el icono y para examinarlo)
+# Copia del objeto, sin rastro de su posición en la escena (para el icono y para examinarlo).
+# Lo que brilla (cristales, glifos) se ve blanco fuera de la penumbra de su sala: en la copia brilla menos.
 func copia_de(modelo: Node3D) -> Node3D:
 	var copia: Node3D = modelo.duplicate(0)
 	copia.transform = Transform3D(modelo.global_basis.orthonormalized(), Vector3.ZERO)
 	copia.show()
 	for nodo in copia.find_children("*", "MeshInstance3D", true, false):
-		(nodo as MeshInstance3D).material_overlay = null
+		var malla := nodo as MeshInstance3D
+		malla.material_overlay = null
+		var material := malla.material_override as StandardMaterial3D
+		if material and material.emission_enabled:
+			material = material.duplicate()
+			material.emission_energy_multiplier *= 0.3
+			malla.material_override = material
 	return copia
+
+
+# Luz de estudio para ver un objeto suelto (examen e iconos). El cielo no se ve: solo da reflejos, sin
+# los que el latón y los metales salen negros.
+static func entorno_estudio() -> Environment:
+	var entorno := Environment.new()
+	Escena.cielo(entorno, {
+		"arriba": Color(0.62, 0.56, 0.5), "horizonte": Color(0.36, 0.33, 0.3), "abajo": Color(0.07, 0.06, 0.05),
+		"resplandor": Color(1.0, 0.86, 0.62), "direccion_resplandor": Vector3(-0.5, 0.6, 0.6), "apertura": 5.0,
+		"nubes": 0.0, "estrellas": 0.0}, false)
+	entorno.background_mode = Environment.BG_CLEAR_COLOR
+	entorno.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	entorno.ambient_light_color = Color(0.62, 0.6, 0.64)
+	entorno.ambient_light_energy = 0.75
+	entorno.tonemap_mode = Environment.TONE_MAPPER_ACES
+	return entorno
 
 
 # Dibuja el objeto en una vista aparte para usarlo de icono
@@ -448,10 +471,8 @@ func _icono(modelo: Node3D) -> Texture2D:
 	luz.light_energy = 1.6
 	vista.add_child(luz)
 	var ambiente := WorldEnvironment.new()
-	ambiente.environment = Environment.new()
-	ambiente.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	ambiente.environment.ambient_light_color = Color(0.7, 0.7, 0.75)
-	ambiente.environment.ambient_light_energy = 0.8
+	ambiente.environment = entorno_estudio()
+	ambiente.environment.ambient_light_energy = 0.85
 	vista.add_child(ambiente)
 	add_child(vista)
 	camara_icono.look_at_from_position(centro + Vector3(0.35, 0.45, 1.0).normalized() * tamano * 2.1, centro)

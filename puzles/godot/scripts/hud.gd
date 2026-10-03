@@ -171,6 +171,7 @@ func _crear_cartela(datos: Dictionary) -> void:
 	frase.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	frase.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	frase.custom_minimum_size = Vector2(minf(900.0, _ancho() - 120.0), 0)
+	frase.size = Vector2(frase.custom_minimum_size.x, 0.0)   # medir con su ancho (ver «mensaje»)
 	columna.add_child(frase)
 	var tamano := columna.get_combined_minimum_size()
 	colocar(columna, Control.PRESET_CENTER_BOTTOM, Vector2(-tamano.x / 2.0, -tamano.y - 70.0), tamano)
@@ -210,20 +211,26 @@ func mensaje(texto: String, segundos := 3.4, encabezado := "") -> void:
 	var natural := _ancho_texto(texto)
 	if encabezado != "":
 		natural = maxf(natural, _ancho_texto(encabezado))
-	# el alto se calcula aquí: la etiqueta con ajuste de línea aún no conoce su ancho en este cuadro
+	# Una etiqueta con ajuste de línea mide su alto con el ancho que tiene en ese momento. Vacía, el
+	# contenedor la dejó en 1 px de ancho: medida así, cada letra iría en su línea y el marco saldría
+	# de miles de píxeles. Por eso se le da el ancho antes de medir y se reajusta en el cuadro siguiente.
 	var ancho := minf(natural, maximo)
-	var fuente: Font = aviso_texto.get_theme_font("font")
-	var alto := fuente.get_multiline_string_size(texto, HORIZONTAL_ALIGNMENT_CENTER, ancho, Estilo.LETRA).y
-	aviso_texto.custom_minimum_size = Vector2(ancho, alto)
-	aviso.reset_size()
-	var tamano := aviso.get_combined_minimum_size()
-	colocar(aviso, Control.PRESET_CENTER_BOTTOM, Vector2(-tamano.x / 2.0, -tamano.y - MARGEN), tamano)
+	aviso_texto.custom_minimum_size = Vector2(ancho, 0.0)
+	aviso_texto.size = Vector2(ancho, aviso_texto.size.y)
+	_ajustar_aviso()
+	_ajustar_aviso.call_deferred()
 	if _aviso_animacion:
 		_aviso_animacion.kill()
 	_aviso_animacion = create_tween()
 	_aviso_animacion.tween_property(aviso, "modulate:a", 1.0, 0.25)
 	_aviso_animacion.tween_interval(segundos)
 	_aviso_animacion.tween_property(aviso, "modulate:a", 0.0, 0.6)
+
+
+func _ajustar_aviso() -> void:
+	aviso.reset_size()
+	var tamano := aviso.get_combined_minimum_size()
+	colocar(aviso, Control.PRESET_CENTER_BOTTOM, Vector2(-tamano.x / 2.0, -tamano.y - MARGEN), tamano)
 
 
 # Ancho que ocuparía el texto en una sola línea (para que los avisos cortos no salgan enormes)
@@ -447,12 +454,7 @@ func mostrar_examen(nombre: String, modelo: Node3D) -> void:
 	relleno.light_color = Color(0.7, 0.78, 1.0)
 	_vista_examen.add_child(relleno)
 	var ambiente := WorldEnvironment.new()
-	ambiente.environment = Environment.new()
-	ambiente.environment.background_mode = Environment.BG_CLEAR_COLOR
-	ambiente.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	ambiente.environment.ambient_light_color = Color(0.6, 0.6, 0.66)
-	ambiente.environment.ambient_light_energy = 0.7
-	ambiente.environment.tonemap_mode = Environment.TONE_MAPPER_ACES
+	ambiente.environment = mesa.entorno_estudio()
 	_vista_examen.add_child(ambiente)
 
 	var titulo := Estilo.sombra(Estilo.etiqueta(nombre, 46, acento.lightened(0.3), Estilo.FUENTE_NEGRITA), 8)

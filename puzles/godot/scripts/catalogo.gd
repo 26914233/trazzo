@@ -3,7 +3,7 @@
 # demás están selladas hasta que se decida cuál se convierte en juego (DECISIÓN 23).
 extends RefCounted
 
-const VERSION := "Cuatro cajas · prototipos 0.2"
+const VERSION := "Cuatro cajas · prototipos 0.2.1"
 
 const JUEGOS := [
 	{
