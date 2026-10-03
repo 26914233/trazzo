@@ -40,6 +40,9 @@ Si una descripción de vídeo y una guía no coinciden, manda la guía.
 - `referencia/the_room_1_y_2.md`;
 - `referencia/the_room_3_y_old_sins.md`.
 
+**Cómo se hizo (03-10-2026):** `referencia/como_se_hizo_the_room.md` recoge lo que contaron sus autores (motor,
+equipo, coste, método de diseño y técnica). El código fuente no es público.
+
 Este documento usa sus códigos: «1.4» es el puzle 4 del capítulo 1 de The Room; «S.6», el puzle 6
 del barco de The Room Two.
 

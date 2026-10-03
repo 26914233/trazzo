@@ -11,6 +11,8 @@ la versión 0.9 mientras tanto.
   `ANALISIS_THE_ROOM.md`.
   - Anexos con la reconstrucción completa y sus fuentes: `referencia/the_room_1_y_2.md` y
     `referencia/the_room_3_y_old_sins.md`.
+  - Cómo se hizo (motor, equipo, coste y método de sus autores; el código no es público):
+    `referencia/como_se_hizo_the_room.md`.
 - **Biblia de diseño** (el sistema propio: concepto, reglas, plantillas, progresión, pistas, sonido,
   arte, arquitectura, fichas para programar, banco de puzles y control de originalidad):
   `BIBLIA_DISENO.md`.
