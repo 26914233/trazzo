@@ -28,7 +28,7 @@ ANCHO, ALTO = 1376, 768
 LISTA_SONIDOS = ['noche', 'fuego', 'trabado', 'recoger', 'encajar', 'despertar', 'final_caja_viva',
                  'suspiro', 'ojo_abre', 'grunido', 'espiritu', 'papel', 'llave', 'candado_abre',
                  'tope_madera', 'clic_madera', 'acercar', 'pista', 'toque', 'mecanismo', 'racha', 'bisagra',
-                 'deslizar_madera']
+                 'deslizar_madera', 'cajon', 'trampilla', 'cristal', 'viento', 'clic_metal']
 
 
 # --- Utilidades ---------------------------------------------------------------------------------
@@ -122,6 +122,56 @@ def igualar_tono(img, ref, zona):
     return img * ganancia
 
 
+def igualar_lineal(img, ref, zona):
+    """Iguala por canal con una recta (ganancia y desplazamiento) ajustada en una zona que no cambia."""
+    m = zona > 0.5
+    salida = img.copy()
+    for k in range(3):
+        x, y = img[..., k][m], ref[..., k][m]
+        a, b = np.polyfit(x, y, 1)
+        salida[..., k] = a * img[..., k] + b
+    return salida
+
+
+def proyector_boceto():
+    """De metros (ejes de Blender) a píxeles del boceto, con la cámara calculada (pagina/capas/camara.json)."""
+    cam = json.load(open(os.path.join(CAPAS, 'camara.json')))
+    R, C, f = np.array(cam['mundo_a_camara']), np.array(cam['posicion']), cam['focal_px']
+
+    def proyectar(P):
+        c = (np.asarray(P, np.float64) - C) @ R.T
+        return np.stack([ANCHO / 2 + f * c[..., 0] / c[..., 2], ALTO / 2 + f * c[..., 1] / c[..., 2]], -1)
+    return cam, proyectar
+
+
+def envolvente(puntos):
+    """Envolvente convexa de una lista de puntos (x, y)."""
+    p = sorted(map(tuple, puntos))
+    cruz = lambda o, a, b: (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+    abajo, arriba = [], []
+    for q in p:
+        while len(abajo) >= 2 and cruz(abajo[-2], abajo[-1], q) <= 0:
+            abajo.pop()
+        abajo.append(q)
+    for q in reversed(p):
+        while len(arriba) >= 2 and cruz(arriba[-2], arriba[-1], q) <= 0:
+            arriba.pop()
+        arriba.append(q)
+    return abajo[:-1] + arriba[:-1]
+
+
+def caja_cerrada():
+    """El contorno de la caja (cuerpo y peana) visto desde la cámara del boceto."""
+    cam, proyectar = proyector_boceto()
+    escena = json.load(open(os.path.join(CAPAS, 'escena.json')))
+    alto = 0.21 * cam['alto_caja']
+    esquinas = [(x, y, z) for x in (-0.11, 0.11) for y in (-0.11, 0.11) for z in (0.034, 0.034 + alto)]
+    p = escena['peana']
+    esquinas += [(p['centro'][0] + sx * p['medio_x'], p['centro'][1] + sy * p['medio_y'], z)
+                 for sx in (-1, 1) for sy in (-1, 1) for z in (p['z_abajo'], p['z_arriba'])]
+    return [tuple(round(float(v), 1) for v in q) for q in envolvente(proyectar(np.array(esquinas)))]
+
+
 capas = {}
 
 
@@ -188,15 +238,32 @@ REGION_TRAMPILLA = [(735, 0), (1160, 0), (1160, 214), (1000, 222), (860, 222), (
 def principal():
     os.makedirs(CAPAS, exist_ok=True)
     os.makedirs(SONIDOS, exist_ok=True)
-    sala = cargar('sala.jpg')
-    sin_llave = cargar('sala_sin_llave.jpg')
+    sala_original = cargar('sala.jpg')
     abierto = cargar('incensario_abierto.jpg')
     vacio = cargar('incensario_vacio.jpg')
     despierta = cargar('despierta.jpg')
+    mesa_vacia = cargar('sala_mesa_vacia.jpg')
 
     print('Capas:')
-    # 1. La sala entera (fondo)
-    Image.fromarray(sala.astype(np.uint8)).save(os.path.join(CAPAS, 'sala.webp'), 'WEBP', quality=92, method=6)
+    # 1. La sala entera (fondo), con los cajones del costado cerrados: el costado sale del retoque
+    # sala_cajones_cerrados.jpg (igualado con la cara, que no cambia); donde sobresalían los cajones abiertos,
+    # la mesa vacía. El resto es el boceto original (Gemini aclaró las ventanas del retoque).
+    contorno = caja_cerrada()
+    capas_caja = poligono(contorno)
+    derecha = np.zeros((ALTO, ANCHO), np.float32)
+    derecha[:, 1006:] = 1.0
+    derecha = suave(derecha, 1.5)
+    del_retoque = suave(crecer(capas_caja, 2), 1.2) * derecha
+    cerrado = igualar_lineal(cargar('sala_cajones_cerrados.jpg'), sala_original, rectangulo(730, 250, 990, 540))
+    vieja = (diferencia(sala_original, mesa_vacia, 1.5) > 16) & (poligono(CAJA_SILUETA) > 0.5)
+    vieja = _sin_motas(ndimage.binary_fill_holes(ndimage.binary_closing(vieja, iterations=3)), 3000)
+    # solo donde estaban los cajones abiertos (más abajo están las tazas, que no se tocan)
+    zona_cajones = poligono([(1006, 172), (1216, 172), (1216, 586), (1006, 586)]) > 0.5
+    sobresalia = suave((vieja & zona_cajones & ~(crecer(capas_caja, 3) > 0.5)).astype(np.float32), 1.2)
+    sala = sala_original * (1 - del_retoque[..., None]) + cerrado * del_retoque[..., None]
+    sala = sala * (1 - sobresalia[..., None]) + mesa_vacia * sobresalia[..., None]
+    costado = np.clip(np.maximum(del_retoque, sobresalia), 0, 1)   # lo que cambió respecto al boceto
+    Image.fromarray(np.clip(sala, 0, 255).astype(np.uint8)).save(os.path.join(CAPAS, 'sala.webp'), 'WEBP', quality=92, method=6)
     capas['sala'] = {'x': 0, 'y': 0, 'w': ANCHO, 'h': ALTO}
     print(f"  sala.webp  {os.path.getsize(os.path.join(CAPAS, 'sala.webp')) // 1024} KB")
 
@@ -246,32 +313,38 @@ def principal():
     guardar('incensario_vacio', vacio, alfa_inc, caja=(caja['x'], caja['y'], caja['x'] + caja['w'], caja['y'] + caja['h']))
     guardar('cuerno_brasas', abierto, np.clip(suave(sin_rojo(abierto, cuerno_brasas).astype(np.float32), 0.5) * 1.2, 0, 1))
 
-    # 5. Llave de bambú (color oliva frente al bermellón del cajón) y el cajón vacío
-    rojo, verde = sala[..., 0], sala[..., 1]
+    # 5. Llave de bambú (color oliva frente al bermellón del cajón) y la nota doblada, del boceto original,
+    # donde estaban en sus cajones abiertos. Ahora van dentro de los cajones cerrados (la página los pinta
+    # al abrirlos).
+    rojo, verde = sala_original[..., 0], sala_original[..., 1]
     oliva = (verde / (rojo + 1) > 0.6) & (rojo > 40) & (poligono(FRANJA_LLAVE) > 0.5)
     llave = ndimage.binary_closing(oliva, iterations=1) & (poligono(FRANJA_LLAVE) > 0.5)
     etiquetas, n = ndimage.label(llave)
     tamanos = ndimage.sum(llave, etiquetas, range(1, n + 1))
     llave = np.isin(etiquetas, [i + 1 for i, t in enumerate(tamanos) if t > 25 or t == tamanos.max()])
     # más su contorno de tinta (lo oscuro que la toca), sin el bermellón del cajón
-    oscuro = sala.mean(2) < 58
+    oscuro = sala_original.mean(2) < 58
     llave = llave | (ndimage.binary_dilation(llave, iterations=1) & oscuro)
-    guardar('llave', sala, np.clip(suave(llave.astype(np.float32), 0.5) * 1.3, 0, 1))
-    zona_cajon = poligono([(1020, 455), (1125, 455), (1125, 520), (1020, 520)])
-    sin_llave = igualar_tono(sin_llave, sala, zona_cajon)
-    alfa_cajon = suave(crecer(llave.astype(np.float32), 6), 2.5) * zona_cajon
-    guardar('cajon_vacio', sin_llave, np.clip(alfa_cajon * 1.2, 0, 1))
+    guardar('llave', sala_original, np.clip(suave(llave.astype(np.float32), 0.5) * 1.3, 0, 1))
+    luz = sala_original.mean(2)
+    papel = (luz > 150) & (np.abs(sala_original[..., 0] - sala_original[..., 2]) < 45) & (rectangulo(1106, 434, 1170, 468) > 0)
+    papel = _sin_motas(ndimage.binary_fill_holes(ndimage.binary_closing(papel, iterations=2)), 80)
+    papel = papel | (ndimage.binary_dilation(papel, iterations=1) & (luz < 70))
+    guardar('nota', sala_original, np.clip(suave(papel.astype(np.float32), 0.5) * 1.3, 0, 1))
+    # la laca de un cajón abierto del boceto original: la página la usa de textura para las paredes de los
+    # cajones que se abren (y, más oscura, para su interior)
+    guardar('laca_pared', sala_original, rectangulo(1033, 515, 1073, 568), calidad=94)
 
     # 6. Cuerno de la frente: suelto (para llevarlo) y puesto (parche que tapa el hueco)
     zona_cuerno = poligono([(880, 225), (945, 225), (945, 325), (880, 325)])
-    despierta_t = igualar_tono(despierta, sala, poligono([(600, 420), (1250, 420), (1250, 720), (600, 720)]))
+    despierta_t = igualar_tono(despierta, sala_original, poligono([(600, 420), (1250, 420), (1250, 720), (600, 720)]))
     cuerno = poligono(CUERNO)
     guardar('cuerno', despierta_t, np.clip(suave(crecer(cuerno, 1), 0.5), 0, 1))
     alfa_puesto = np.maximum(crecer(cuerno, 2), elipse(*HUECO))
     guardar('cuerno_puesto', despierta_t, np.clip(suave(alfa_puesto, 1.5) * 1.25, 0, 1) * zona_cuerno)
 
     # 7. El despertar, por partes: ojos, trampilla con su luz y humo. Solo lo que cambia.
-    cambio = _sin_motas(diferencia(sala, despierta_t, 1.5) > 14, 150)
+    cambio = _sin_motas(diferencia(sala_original, despierta_t, 1.5) > 14, 150)
     alfa_desp = suave(crecer(cambio.astype(np.float32), 4), 4.0)
     alfa_desp = np.clip(alfa_desp * 1.3, 0, 1)
     fuera = np.maximum(suave(poligono(CUERNO_DE_MAS), 3.0), suave(crecer(alfa_puesto, 3), 2.0))
@@ -279,6 +352,8 @@ def principal():
     ojos = suave(poligono(REGION_OJOS), 8.0)
     trampilla = suave(poligono(REGION_TRAMPILLA), 8.0) * (1 - ojos)
     humo = np.clip(1 - ojos - trampilla, 0, 1)
+    # el costado del despertar tiene los cajones abiertos del boceto original: fuera
+    alfa_desp *= 1 - np.clip(suave(crecer(costado, 4), 3.0) * 1.3, 0, 1)
     guardar('despierta_ojos', despierta_t, alfa_desp * ojos)
     guardar('despierta_trampilla', despierta_t, alfa_desp * trampilla)
     guardar('despierta_humo', despierta_t, alfa_desp * humo)
@@ -320,7 +395,6 @@ def principal():
     guardar('caja_mascara', np.full((ALTO, ANCHO, 3), 255, np.float32), alfa_caja, calidad=80)
 
     # 10. Profundidad (técnicas A y B): las planchas sin caja y sin mesa, la caja de espaldas y las siluetas
-    mesa_vacia = cargar('sala_mesa_vacia.jpg')
     vacia = cargar('sala_vacia.jpg')
     detras = cargar('sala_detras.jpg')
     for nombre, img in (('sala_vacia', vacia), ('sala_mesa_vacia', mesa_vacia), ('sala_detras', detras)):
@@ -354,7 +428,7 @@ def principal():
     guardar('silueta_te', blanco, alfa_te, calidad=85)
 
     # Formas que usa la página (párpado, almendra)
-    datos = {'ancho': ANCHO, 'alto': ALTO, 'capas': capas, 'almendra': ALMENDRA, 'iris': IRIS}
+    datos = {'ancho': ANCHO, 'alto': ALTO, 'capas': capas, 'almendra': ALMENDRA, 'iris': IRIS, 'caja': contorno}
     with open(os.path.join(CAPAS, 'capas.json'), 'w', encoding='utf-8') as f:
         json.dump(datos, f, ensure_ascii=False, indent=1)
 

@@ -54,21 +54,74 @@ button { font: inherit; color: inherit; }
 }
 #volver svg { width: 18px; height: 18px; fill: none; stroke: var(--washi); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
-#inventario {
-  position: absolute; z-index: 3; display: flex; gap: 12px;
-  right: 16px; top: 50%; transform: translateY(-50%); flex-direction: column;
+/* El inventario: una bandeja de laca negra con remates de latón y cuatro huecos hundidos */
+#inventario { position: absolute; z-index: 3; left: 14px; top: 50%; transform: translateY(-50%); }
+.bandeja {
+  position: relative; display: flex; flex-direction: column; gap: 8px; padding: 12px 9px;
+  border-radius: 14px; background: linear-gradient(155deg, #251a13, #0d0806 55%, #170f0b);
+  border: 1px solid rgba(201, 164, 93, 0.6);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.65), inset 0 0 0 3px rgba(10, 6, 4, 0.9), inset 0 0 0 4px rgba(201, 164, 93, 0.22);
 }
+.bandeja::before, .bandeja::after {
+  content: ""; position: absolute; width: 16px; height: 16px; pointer-events: none;
+  border: 2px solid var(--laton); filter: drop-shadow(0 0 3px rgba(232, 190, 110, 0.35));
+}
+.bandeja::before { top: -2px; left: -2px; border-right: 0; border-bottom: 0; border-top-left-radius: 13px; }
+.bandeja::after { bottom: -2px; right: -2px; border-left: 0; border-top: 0; border-bottom-right-radius: 13px; }
+.bandeja .destello { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; }
+.bandeja .destello::before {
+  content: ""; position: absolute; inset: -40%; opacity: 0;
+  background: linear-gradient(115deg, rgba(255, 236, 190, 0) 40%, rgba(255, 236, 190, 0.45) 50%, rgba(255, 236, 190, 0) 60%);
+}
+.bandeja.brilla .destello::before { animation: barrido 0.9s ease-out; }
+@keyframes barrido { 0% { opacity: 1; transform: translate(-60%, -60%); } 100% { opacity: 0; transform: translate(60%, 60%); } }
 .hueco {
-  position: relative; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center;
-  background: radial-gradient(circle at 50% 40%, #2a1f17, #120d0a 70%);
-  border: 1.5px solid rgba(201, 164, 93, 0.6); cursor: grab; touch-action: none;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.55), inset 0 0 10px rgba(0, 0, 0, 0.6);
-  transition: box-shadow 0.25s, border-color 0.25s, transform 0.2s;
+  position: relative; width: 54px; height: 54px; border-radius: 11px; display: grid; place-items: center; padding: 0;
+  background: radial-gradient(circle at 50% 35%, #31241a, #130d09 72%);
+  border: 1px solid rgba(201, 164, 93, 0.38); cursor: grab; touch-action: none;
+  box-shadow: inset 0 3px 9px rgba(0, 0, 0, 0.85), 0 1px 0 rgba(255, 230, 180, 0.06);
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s, opacity 0.3s;
 }
-.hueco img { max-width: 42px; max-height: 42px; pointer-events: none; transition: opacity 0.2s, transform 0.3s; filter: brightness(1.3) drop-shadow(0 0 6px rgba(255, 220, 160, 0.35)); }
-.hueco.elegido { border-color: var(--laton); transform: scale(1.08); box-shadow: 0 0 0 3px rgba(201, 164, 93, 0.28), 0 0 22px rgba(232, 190, 110, 0.5); }
-.hueco.llega img { animation: llega 0.45s ease-out; }
-@keyframes llega { 0% { transform: scale(1.5); } 60% { transform: scale(0.9); } 100% { transform: scale(1); } }
+.hueco.vacio { cursor: default; opacity: 0.5; }
+.hueco.vacio::after {   /* un blasón pequeño en el fondo del hueco vacío */
+  content: ""; width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(201, 164, 93, 0.35);
+  box-shadow: inset 0 0 0 3px rgba(201, 164, 93, 0.08);
+}
+.hueco img { max-width: 42px; max-height: 42px; pointer-events: none; transition: opacity 0.2s, transform 0.3s;
+  filter: brightness(1.3) drop-shadow(0 0 6px rgba(255, 220, 160, 0.35)); }
+.hueco.elegido { border-color: var(--laton); transform: translateX(-7px) scale(1.07);
+  box-shadow: 0 0 0 2px rgba(201, 164, 93, 0.3), 0 0 20px rgba(232, 190, 110, 0.5), inset 0 3px 9px rgba(0, 0, 0, 0.6); }
+.hueco.llega img { animation: llega 0.5s ease-out; }
+@keyframes llega { 0% { transform: scale(1.6) rotate(-12deg); } 60% { transform: scale(0.9) rotate(4deg); } 100% { transform: scale(1); } }
+.hueco:focus-visible { outline: 2px solid var(--laton); outline-offset: 3px; }
+#etiqueta-objeto {
+  position: absolute; z-index: 4; left: var(--x, 50%); top: var(--y, 50%); transform: translate(46px, -50%) translateX(-8px);
+  margin: 0; padding: 6px 14px 7px; border-radius: 16px; white-space: nowrap; pointer-events: none;
+  background: rgba(14, 9, 6, 0.9); border: 1px solid rgba(201, 164, 93, 0.5);
+  font-family: var(--fuente-titulo); font-size: 15px; letter-spacing: 0.03em; color: var(--washi);
+  opacity: 0; transition: opacity 0.3s, transform 0.3s;
+}
+#etiqueta-objeto.visible { opacity: 1; transform: translate(46px, -50%); }
+
+/* Examinar un objeto: en grande, girando despacio bajo un barrido de luz */
+#examinar { background: radial-gradient(ellipse 60% 55% at 50% 44%, rgba(46, 32, 20, 0.78), rgba(6, 4, 3, 0.95) 72%); cursor: pointer; gap: 10px; }
+.vitrina { position: relative; width: min(52vmin, 280px); aspect-ratio: 1; display: grid; place-items: center; perspective: 700px; }
+.vitrina::before {
+  content: ""; position: absolute; inset: 12%; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 214, 150, 0.22), rgba(255, 214, 150, 0) 70%);
+}
+.vitrina img { position: relative; width: 78%; height: 78%; object-fit: contain; animation: gira-lento 5.5s ease-in-out infinite;
+  filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.75)) brightness(1.15); }
+.vitrina::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen;
+  background: linear-gradient(105deg, rgba(255, 240, 210, 0) 42%, rgba(255, 240, 210, 0.18) 50%, rgba(255, 240, 210, 0) 58%);
+  animation: barrido-luz 3.4s linear infinite;
+}
+@keyframes gira-lento { 0%, 100% { transform: rotateY(-24deg) rotateZ(-4deg); } 50% { transform: rotateY(24deg) rotateZ(4deg) translateY(-6px); } }
+@keyframes barrido-luz { 0% { transform: translateX(-60%); } 100% { transform: translateX(60%); } }
+#examinar h3 { margin: 0; font-family: var(--fuente-titulo); font-weight: 800; font-size: clamp(22px, 3.4vw, 30px); letter-spacing: 0.04em; }
+#examinar p { margin: 0; max-width: 34ch; font-family: var(--fuente-titulo); font-size: 16px; line-height: 1.5; color: var(--washi-tenue); text-wrap: balance; }
+#examinar small { font-size: 13px; letter-spacing: 0.06em; color: var(--washi-tenue); }
 
 #mensaje {
   position: absolute; z-index: 2; left: 50%; bottom: 20px; transform: translate(-50%, 8px);
@@ -124,7 +177,7 @@ button { font: inherit; color: inherit; }
 #final h2 { margin: 0; font-family: var(--fuente-titulo); font-weight: 800; font-size: clamp(24px, 4.4vw, 42px); letter-spacing: 0.04em; text-wrap: balance; }
 #final p { margin: 0; max-width: 46ch; font-family: var(--fuente-titulo); font-size: 15px; line-height: 1.45; color: var(--washi-tenue); text-wrap: balance; }
 #final .boton-texto { min-height: 44px; font-size: 16px; }
-/* el final deja tocar lo de arriba (cambiar de técnica, el sonido): solo su texto y su botón reciben toques */
+/* el final deja tocar lo de arriba (la pista, el sonido): solo su texto y su botón reciben toques */
 #final { pointer-events: none; }
 #final > * { pointer-events: auto; }
 #final.oculta > * { pointer-events: none; }
@@ -132,30 +185,10 @@ button { font: inherit; color: inherit; }
 #cargando { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); z-index: 6; font-size: 13px; letter-spacing: 0.08em; color: var(--washi-tenue); }
 #arrastre { position: absolute; z-index: 7; width: 54px; height: 54px; margin: -27px 0 0 -27px; object-fit: contain; pointer-events: none; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.7)); }
 
-/* Las tres técnicas: en la portada se elige; jugando, se cambia arriba */
-#tecnicas { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-.tecnica {
-  min-height: 44px; padding: 6px 16px 7px; border-radius: 22px; cursor: pointer; display: flex; align-items: baseline; gap: 8px;
-  background: rgba(20, 14, 10, 0.78); border: 1px solid rgba(201, 164, 93, 0.35); color: var(--washi-tenue);
-  font-size: 15px; letter-spacing: 0.03em; transition: border-color 0.2s, color 0.2s, background 0.2s;
-}
-.tecnica b { font-family: var(--fuente-titulo); font-size: 19px; font-weight: 800; color: var(--washi); }
-.tecnica[aria-pressed="true"] { border-color: var(--laton); color: var(--washi); background: rgba(52, 36, 22, 0.9); box-shadow: 0 0 18px rgba(201, 164, 93, 0.25); }
-.tecnica:focus-visible, .cambio:focus-visible, #boton-girar:focus-visible { outline: 2px solid var(--laton); outline-offset: 3px; }
-#portada #tecnica-texto { font-family: var(--fuente-ui); font-size: 14px; line-height: 1.45; max-width: 46ch; min-height: 2.9em; }
-
-#cambiar-tecnica {
-  position: absolute; z-index: 3; top: 12px; left: 50%; transform: translateX(-50%); display: flex; padding: 3px; gap: 2px;
-  border-radius: 23px; background: var(--sumi-velo); border: 1px solid rgba(201, 164, 93, 0.45); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
-}
-.cambio {
-  width: 40px; height: 38px; border-radius: 19px; border: 0; background: transparent; cursor: pointer;
-  font-family: var(--fuente-titulo); font-size: 18px; font-weight: 800; color: var(--washi-tenue);
-}
-.cambio[aria-pressed="true"] { background: rgba(201, 164, 93, 0.28); color: var(--washi); }
+#boton-girar:focus-visible { outline: 2px solid var(--laton); outline-offset: 3px; }
 
 #boton-girar {
-  position: absolute; z-index: 3; right: 16px; bottom: 16px; height: 46px; padding-inline: 14px 18px; border-radius: 23px;
+  position: absolute; z-index: 3; left: 16px; bottom: 16px; height: 46px; padding-inline: 14px 18px; border-radius: 23px;
   display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 15px; letter-spacing: 0.04em;
   background: var(--sumi-velo); border: 1px solid rgba(201, 164, 93, 0.55); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
 }
@@ -168,16 +201,19 @@ button { font: inherit; color: inherit; }
 }
 
 @media (orientation: portrait) {
-  #inventario { top: auto; right: auto; left: 50%; bottom: 18px; transform: translateX(-50%); flex-direction: row; }
-  #mensaje { bottom: 92px; }
-  #boton-girar { padding-inline: 13px; }
+  #inventario { top: auto; left: 50%; bottom: 14px; transform: translateX(-50%); }
+  .bandeja { flex-direction: row; padding: 8px 11px; }
+  .hueco { width: 50px; height: 50px; }
+  .hueco.elegido { transform: translateY(-7px) scale(1.07); }
+  #etiqueta-objeto, #etiqueta-objeto.visible { transform: translate(-50%, calc(-100% - 40px)); }
+  #mensaje { bottom: 96px; }
+  #boton-girar { left: auto; right: 16px; padding-inline: 13px; }
   #boton-girar span { display: none; }
 }
 @media (max-height: 520px) {
   #portada { gap: 10px; }
   #portada h1 { font-size: 40px; }
   #portada .sello { width: 34px; height: 34px; font-size: 20px; }
-  #portada > p:not(#tecnica-texto) { display: none; }
   #portada small { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -192,11 +228,6 @@ button { font: inherit; color: inherit; }
   <button id="volver" type="button" hidden aria-label="Volver a la sala">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Sala
   </button>
-  <div id="cambiar-tecnica" role="group" aria-label="Técnica" hidden>
-    <button class="cambio" type="button" data-tecnica="A" aria-pressed="true" aria-label="Técnica A: ilustración por capas">A</button>
-    <button class="cambio" type="button" data-tecnica="B" aria-pressed="false" aria-label="Técnica B: pintura sobre 3D">B</button>
-    <button class="cambio" type="button" data-tecnica="C" aria-pressed="false" aria-label="Técnica C: 3D con acuarela">C</button>
-  </div>
   <div id="arriba">
     <button class="boton-redondo" id="boton-pista" type="button" aria-label="Pista"><span aria-hidden="true">?</span></button>
     <button class="boton-redondo" id="boton-sonido" type="button" aria-label="Quitar el sonido" aria-pressed="true">
@@ -206,24 +237,24 @@ button { font: inherit; color: inherit; }
   <button id="boton-girar" type="button" hidden aria-label="Girar la caja">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 0 1 13-5.1"/><path d="M18 3.5v3.9h-3.9"/><path d="M19.5 12a7.5 7.5 0 0 1-13 5.1"/><path d="M6 20.5v-3.9h3.9"/></svg><span>Girar</span>
   </button>
-  <div id="inventario" aria-label="Lo que llevas">
-    <button class="hueco" id="hueco-llave" type="button" hidden aria-label="Llave de bambú"><img src="capas/llave.webp" alt=""></button>
-    <button class="hueco" id="hueco-cuerno" type="button" hidden aria-label="Cuerno de marfil"><img src="capas/cuerno.webp" alt=""></button>
+  <div id="inventario" role="group" aria-label="Lo que llevas" hidden>
+    <div class="bandeja" id="bandeja">
+      <span class="destello" aria-hidden="true"></span>
+      <button class="hueco vacio" type="button" aria-label="Hueco vacío" tabindex="-1"><img alt="" hidden></button>
+      <button class="hueco vacio" type="button" aria-label="Hueco vacío" tabindex="-1"><img alt="" hidden></button>
+      <button class="hueco vacio" type="button" aria-label="Hueco vacío" tabindex="-1"><img alt="" hidden></button>
+      <button class="hueco vacio" type="button" aria-label="Hueco vacío" tabindex="-1"><img alt="" hidden></button>
+    </div>
   </div>
+  <p id="etiqueta-objeto" aria-live="polite"></p>
   <p id="mensaje" aria-live="polite"></p>
 
   <div class="capa" id="portada">
     <span class="sello" aria-hidden="true">箱</span>
     <h1>La caja viva</h1>
     <p>Una caja secreta que respira, te mira y no se deja abrir mientras te ve.</p>
-    <div id="tecnicas" role="group" aria-label="Elige la técnica">
-      <button class="tecnica" type="button" data-tecnica="A" aria-pressed="true"><b>A</b>Capas</button>
-      <button class="tecnica" type="button" data-tecnica="B" aria-pressed="false"><b>B</b>Pintura en 3D</button>
-      <button class="tecnica" type="button" data-tecnica="C" aria-pressed="false"><b>C</b>Acuarela 3D</button>
-    </div>
-    <p id="tecnica-texto"></p>
     <button class="boton-texto" id="boton-entrar" type="button" disabled>Cargando la sala…</button>
-    <small>Tres técnicas de la misma caja · con sonido · mejor en horizontal</small>
+    <small>Con sonido · en horizontal o en vertical</small>
   </div>
 
   <div class="capa oculta" id="nota" hidden>
@@ -234,9 +265,16 @@ button { font: inherit; color: inherit; }
     </div>
   </div>
 
+  <div class="capa oculta" id="examinar" hidden>
+    <div class="vitrina"><img id="examinar-img" alt=""></div>
+    <h3 id="examinar-nombre"></h3>
+    <p id="examinar-texto"></p>
+    <small>Toca para guardarlo</small>
+  </div>
+
   <div class="capa oculta" id="final" hidden>
     <h2>La caja ya te ha visto</h2>
-    <p>Fin de la prueba. Arriba puedes cambiar de técnica (A, B o C) y volver a empezar para compararlas.</p>
+    <p>Fin de la prueba. La caja guarda más secretos: su espalda y sus cajones con cerradura esperan a las cajas que vienen.</p>
     <button class="boton-texto" id="boton-otra" type="button">Volver a empezar</button>
   </div>
   <div id="aviso3d" hidden></div>

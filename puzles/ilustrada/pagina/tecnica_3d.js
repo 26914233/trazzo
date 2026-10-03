@@ -6,11 +6,13 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
-import { aThree, crearProyector, rectanguloUV, texturaDeCapa, crearSala, crearMesa, crearObjetos, crearCajaPintada } from './escena3d.js';
+import { aThree, crearProyector, rectanguloUV, cargarTextura, crearSala, crearMesa, crearObjetos, crearCajaPintada,
+  crearCajonesPintados, materialPintura } from './escena3d.js';
 
 const ANCHO = 1376, ALTO = 768;
 const limitar = (v, a, b) => Math.min(b, Math.max(a, v));
 const mezclar = (a, b, k) => a + (b - a) * k;
+const suave = (a, b, x) => { const t = limitar((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 const curva = k => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
 const EJE_Y = new THREE.Vector3(0, 1, 0);
 const TAPA_ORIGEN = { x: 575, y: 519 }, TAPA_MESA = { x: 521, y: 642 };
@@ -43,7 +45,7 @@ function leerSilueta(op, nombre) {
 }
 
 // Una silueta algo más estrecha (la de la pintura incluye un borde de mesa que, al girar, parece un halo)
-function siluetaEstrecha(op, nombre, radio) {
+function siluetaEstrecha(op, nombre, radio, recortarMas = null) {
   const s = op.datos.capas[nombre];
   const base = document.createElement('canvas'); base.width = ANCHO; base.height = ALTO;
   base.getContext('2d').drawImage(op.img[nombre], s.x, s.y);
@@ -53,6 +55,7 @@ function siluetaEstrecha(op, nombre, radio) {
   k.globalCompositeOperation = 'destination-in';
   const d = Math.round(radio * 0.7);
   for (const [dx, dy] of [[-radio, 0], [radio, 0], [0, -radio], [0, radio], [-d, -d], [d, d], [-d, d], [d, -d]]) k.drawImage(base, dx, dy);
+  if (recortarMas) recortarMas(c);
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.NoColorSpace;
   return t;
@@ -84,8 +87,7 @@ function prepararMundo(op) {
     salaVacia: texturaDeImagen(op.planchas.sala), mesaVacia: texturaDeImagen(op.planchas.mesa),
     detras: texturaDeImagen(op.img.sala_detras), frente, ojo,
     siluetaIncensario: siluetaEstrecha(op, 'silueta_incensario', 3),
-    siluetaTe: siluetaEstrecha(op, 'silueta_te', 2),
-    siluetaCaja: texturaDeCapa(op.img.silueta_caja, capas.silueta_caja),
+    siluetaTe: siluetaEstrecha(op, 'silueta_te', 2, op.recortarTe),
   };
   const sala = crearSala(op.escena3d, proyector, tex), mesa = crearMesa(op.escena3d, proyector, tex);
   escena.add(sala, mesa);
@@ -101,7 +103,7 @@ function prepararMundo(op) {
   const centro = nombre => { const o = e.objetos[nombre]; return aThree(o.base[0], o.base[1], o.base[2] + o.alto * 0.45); };
   mundo = {
     op, render, escena, proyector, tex, sala, mesa, camara, ojo, ancho: 1, alto: 1, ppp: 1,
-    siluetas: { incensario: leerSilueta(op, 'silueta_incensario'), te: leerSilueta(op, 'silueta_te'), caja: leerSilueta(op, 'silueta_caja') },
+    siluetas: { incensario: leerSilueta(op, 'silueta_incensario'), te: leerSilueta(op, 'silueta_te') },
     centroCaja, cajasReposo, altoCaja, centroIncensario: centro('incensario'), centroTe: centro('tetera'),
     zTablero: e.z_tablero, raycaster: new THREE.Raycaster(),
   };
@@ -156,6 +158,8 @@ function crearRig(op, limites) {
     caja: { T: mundo.centroCaja, s: 0.62, pivote: mundo.centroCaja },
     incensario: { T: mundo.centroIncensario, s: 0.56, pivote: mundo.centroIncensario },
     cara: { T: puntoCara, s: 0.5, pivote: mundo.centroCaja },
+    // el costado de los cajones, de cerca
+    cajones: { T: new THREE.Vector3(0.11, mundo.centroCaja.y, 0), s: 0.46, pivote: mundo.centroCaja },
   };
   function encuadre(nombre) {
     const d = definiciones[nombre], v = VISTAS[nombre];
@@ -474,20 +478,55 @@ export async function crearTecnica(letra, op) {
   grupo.add(caja);
   const limites = esB
     ? { sala: { th: 0.14, ph: [-0.05, 0.1] }, caja: { th: 0.38, ph: [-0.12, 0.22] }, incensario: { th: 0.32, ph: [-0.1, 0.22] },
-        cara: { th: 0.32, ph: [-0.1, 0.2] }, zoom: [0.72, 1.12] }
+        cara: { th: 0.32, ph: [-0.1, 0.2] }, cajones: { th: 0.42, ph: [-0.1, 0.3] }, zoom: [0.62, 1.12] }
     : { sala: { th: 0.24, ph: [-0.06, 0.14] }, caja: { th: 0.95, ph: [-0.15, 0.45] }, incensario: { th: 0.7, ph: [-0.12, 0.4] },
-        cara: { th: 0.55, ph: [-0.12, 0.3] }, zoom: [0.62, 1.15] };
+        cara: { th: 0.55, ph: [-0.12, 0.3] }, cajones: { th: 0.7, ph: [-0.12, 0.4] }, zoom: [0.62, 1.15] };
   const rig = crearRig(op, limites);
   const pistas = {};          // piezas que se animan (técnica C)
   let tintas = null, objetivosToque = [];
+  let pintada = null, cajonesB = null, carasB = [], rolloB = null;
 
   if (esB) {
-    // la caja pintada (frente y espalda) y lo que hay en la mesa, pintado sobre cilindros
-    const pintada = crearCajaPintada(op.escena3d, mundo.proyector, mundo.tex);
+    // la caja pintada (frente y espalda, y los costados y la tapa también pintados de frente) y lo que hay en la
+    // mesa, pintado sobre cilindros
+    const [caraDerecha, caraIzquierda, caraArriba] = await Promise.all(['derecha', 'izquierda', 'arriba'].map(n => cargarTextura(`capas/cara_${n}.webp`)));
+    const tex = { ...mundo.tex, caraDerecha, caraIzquierda, caraArriba, lacaPared: op.img.laca_pared };
+    pintada = crearCajaPintada(op.escena3d, mundo.proyector, tex);
     caja.add(pintada.caja);
+    // cuánto se mezcla cada cara pintada de frente: según lo lejos que esté la cámara de la del boceto, vista desde
+    // la caja (la caja quieta es el espacio del mundo; la izquierda se pintó con la caja girada media vuelta)
+    const P0 = mundo.proyector.position, yMedio = 0.034 + pintada.alto / 2;
+    const cara = (centro, fuente, mezcla) => ({ centro, desde: fuente.clone().sub(centro).normalize(), mezcla });
+    carasB = [
+      cara(new THREE.Vector3(0.11, yMedio, 0), P0, pintada.mezclas.derecha),
+      cara(new THREE.Vector3(-0.11, yMedio, 0), new THREE.Vector3(-P0.x, P0.y, -P0.z), pintada.mezclas.izquierda),
+      cara(new THREE.Vector3(0, 0.034 + pintada.alto, 0), P0, pintada.mezclas.arriba),
+    ];
+    // los cajones del costado, con lo que guardan (la llave y la nota, tal como están pintadas)
+    cajonesB = crearCajonesPintados(op.cajones, pintada.alto, mundo.proyector, tex, pintada.mezclas.derecha);
+    for (const [id, c] of Object.entries(cajonesB)) {
+      pintada.caja.add(c.grupo, c.agujero, c.sombra);
+      const guarda = op.CAJONES[id].contiene;
+      if (!guarda) continue;
+      const imagen = op.img[guarda], t = new THREE.Texture(imagen);
+      t.colorSpace = THREE.SRGBColorSpace; t.needsUpdate = true;
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthWrite: false }));
+      const pxm = c.dentro.distanceTo(P0) / op.camaraBoceto.focal_px;     // metros por píxel del boceto a esa distancia
+      sprite.scale.set(imagen.width * pxm, imagen.height * pxm, 1);
+      sprite.position.copy(c.dentro).add(new THREE.Vector3(0, imagen.height * pxm * 0.42, 0));
+      sprite.userData.tipo = 'cajon'; sprite.userData.cajon = id;
+      c.grupo.add(sprite); c[guarda] = sprite;
+    }
     const objetos = crearObjetos(op.escena3d, mundo.proyector, mundo.tex);
     for (const o of Object.values(objetos)) grupo.add(o);
+    // la sombra de la tetera y las tazas en la mesa (sus siluetas ya no traen la de la pintura)
+    for (const [nombre, o] of Object.entries(op.escena3d.objetos)) {
+      if (nombre === 'incensario') continue;
+      const b = aThree(o.base[0], o.base[1], o.base[2]);
+      grupo.add(sombraBajo(b.x, b.z, o.radio * 1.15, mundo.zTablero + 0.0012));
+    }
     objetivosToque = [caja, ...Object.values(objetos)];
+    if (op.decoracion) crearDecoracionB(grupo);
   } else {
     tintas = crearTintas();
     const cargador = new GLTFLoader();
@@ -649,11 +688,14 @@ export async function crearTecnica(letra, op) {
       const b = op.aliento();
       caja.rotation.y = giro;
       caja.scale.set(1 + 0.0028 * b, 1 + 0.0065 * b, 1 + 0.0028 * b);
-      if (!esB) actualizarC(dt);
+      if (esB) {
+        actualizarCajonesB();
+        if (rolloB) { const r = op.decoracion.rollo; rolloB.rotation.set(r.a, 0, r.lift); }
+      } else actualizarC(dt);
     },
     dibujar() {
       rig.colocar(op.reloj(), op.sacudida());
-      if (esB) pintarOjoB();
+      if (esB) { pintarOjoB(); mezclarCaras(); }
       mundo.render.render(mundo.escena, mundo.camara);
     },
     // de la pantalla al boceto: qué se toca y en qué punto de la ilustración (frente o espalda)
@@ -664,6 +706,88 @@ export async function crearTecnica(letra, op) {
     ancla,
     pantallaDe,
   };
+
+  // La decoración viva de la B (juego.js la anima): las sombras del bambú, en un plano pegado a la pared del shoji que
+  // toma su dibujo con la cámara del boceto (detrás de la caja, que lo tapa), y el rollo colgado, un plano con su
+  // pintura en la pared del tokonoma que gira desde su gancho
+  function crearDecoracionB(destino) {
+    const d = op.decoracion, e = op.escena3d, [ex, ey] = e.esquina;
+    const pv = new THREE.Matrix4().multiplyMatrices(mundo.proyector.projectionMatrix, mundo.proyector.matrixWorldInverse);
+    // las sombras: el lienzo de juego.js, colocado en el rectángulo del shoji del boceto
+    const lienzo = d.sombrasBambu, [x0, y0, x1, y1] = d.VENTANAS;
+    const tex = new THREE.CanvasTexture(lienzo);
+    tex.colorSpace = THREE.NoColorSpace; tex.generateMipmaps = false; tex.minFilter = THREE.LinearFilter;
+    op.alPintarBambu = () => { tex.needsUpdate = true; };
+    const mat = new THREE.ShaderMaterial({
+      uniforms: { uSombra: { value: tex }, uProyector: { value: pv }, uRect: { value: new THREE.Vector4(x0 / ANCHO, y0 / ALTO, x1 / ANCHO, y1 / ALTO) } },
+      vertexShader: `uniform mat4 uProyector; varying vec4 vProy;
+        void main() { vProy = uProyector * modelMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+      fragmentShader: `uniform sampler2D uSombra; uniform vec4 uRect; varying vec4 vProy;
+        void main() {
+          vec2 uv = vProy.xy / vProy.w * 0.5 + 0.5;
+          vec2 q = (vec2(uv.x, 1.0 - uv.y) - uRect.xy) / (uRect.zw - uRect.xy);
+          if (q.x < 0.0 || q.x > 1.0 || q.y < 0.0 || q.y > 1.0) discard;
+          gl_FragColor = texture2D(uSombra, vec2(q.x, 1.0 - q.y));
+        }`,
+      transparent: true, depthWrite: false,
+    });
+    const esquinas = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]].map(([x, y]) => rayoDelBoceto(x, y).intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), ey), new THREE.Vector3()));
+    const xs = esquinas.map(v => v.x), ys = esquinas.map(v => v.y);
+    const ancho = Math.max(...xs) - Math.min(...xs) + 0.2, alto = Math.max(...ys) - Math.min(...ys) + 0.2;
+    const sombras = new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), mat);
+    sombras.position.set((Math.max(...xs) + Math.min(...xs)) / 2, (Math.max(...ys) + Math.min(...ys)) / 2, -ey + 0.004);
+    sombras.raycast = () => {};
+    destino.add(sombras);
+    // el rollo: la tela y el palo de abajo, cada uno con el trozo de pintura que le toca, colgando del gancho
+    const pared = new THREE.Plane(new THREE.Vector3(1, 0, 0), -(ex + 0.006));
+    const enPared = (x, y) => rayoDelBoceto(x, y).intersectPlane(pared, new THREE.Vector3());
+    const gancho = enPared(d.ROLLO.gancho.x, d.ROLLO.gancho.y);
+    rolloB = new THREE.Group(); rolloB.position.copy(gancho);
+    const [rx0, ry0, rx1, ry1] = d.ROLLO.rect;
+    for (const [a, b, c2, dd] of [[245, ry0, 407, 301], [rx0, 299, rx1, ry1]]) {
+      const v = [[a, b], [c2, b], [c2, dd], [a, dd]].map(([x, y]) => enPared(x, y).sub(gancho));
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(v.flatMap(q => [q.x, q.y, q.z]), 3));
+      geo.setAttribute('uv', new THREE.Float32BufferAttribute([0, 1, 1, 1, 1, 0, 0, 0], 2));
+      geo.setIndex([0, 3, 1, 1, 3, 2]);
+      const malla = new THREE.Mesh(geo, materialPintura(mundo.tex.frente, mundo.proyector,
+        { reposo: new THREE.Matrix4().makeTranslation(gancho.x, gancho.y, gancho.z), lado: THREE.DoubleSide, recorte: rectanguloUV([a, b, c2, dd]) }));
+      malla.userData.tipo = 'sala';
+      rolloB.add(malla);
+    }
+    destino.add(rolloB);
+  }
+  // los cajones de la B: cuánto ha salido cada uno (lo lleva juego.js), su hueco, su sombra y lo que guarda
+  function actualizarCajonesB() {
+    const est = op.estado();
+    for (const [id, c] of Object.entries(cajonesB)) {
+      const k = op.cajonAbertura(id), abierto = k > 0.002;
+      c.grupo.visible = c.agujero.visible = c.sombra.visible = abierto;
+      c.grupo.position.x = Math.max(0, k) * op.cajones.sale;
+      c.sombra.material.opacity = 0.55 * limitar(k * 2.5, 0, 1);
+      if (c.llave) c.llave.visible = est.llave === 'cajon';
+      if (c.nota) c.nota.visible = est.nota === 'cajon';
+    }
+  }
+  // la pintura de frente de los costados y la tapa: nada desde la cámara del boceto, del todo al girar la caja
+  const _camaraEnCaja = new THREE.Vector3(), _hacia = new THREE.Vector3();
+  function mezclarCaras() {
+    caja.updateMatrixWorld();
+    caja.worldToLocal(_camaraEnCaja.copy(mundo.camara.position));
+    for (const c of carasB) {
+      _hacia.copy(_camaraEnCaja).sub(c.centro).normalize();
+      c.mezcla.value = suave(0.1, 0.38, Math.acos(limitar(_hacia.dot(c.desde), -1, 1)));
+    }
+  }
+  // en qué cajón cae un punto del costado derecho (en metros de Blender), con los cajones cerrados
+  function cajonEnCostado(y, z) {
+    const d = op.cajones.cajones.find(c => y >= c.y[0] && y <= c.y[1] && z >= c.z[0] && z <= c.z[1]);
+    return d ? d.id : null;
+  }
+  function centroCajon(id) {
+    const p = op.cajones.cajones.find(c => c.id === id).poligono;
+    return { x: (p[0][0] + p[1][0] + p[2][0] + p[3][0]) / 4, y: (p[0][1] + p[1][1] + p[2][1] + p[3][1]) / 4 };
+  }
 
   function pintarOjoB() {
     const { lienzo, sitio: r, escala } = mundo.ojo, c = lienzo.getContext('2d');
@@ -723,10 +847,15 @@ export async function crearTecnica(letra, op) {
       const o = h.object;
       if (!esVisible(o) || o.userData.contorno) continue;
       const tipo = o.userData.tipo;
+      if (esB && tipo === 'cajon') return { malla: o, punto: { ...centroCajon(o.userData.cajon), cara: 'frente', cajon: o.userData.cajon } };
       if (esB && tipo === 'caja') {
         const local = caja.worldToLocal(h.point.clone());
-        if (o.userData.mascara === 'caja' && mundo.siluetas.caja(alBoceto(local).x, alBoceto(local).y) < 0.5) continue;
-        const detras = !o.userData.soloFrente && h.face && (h.face.materialIndex === 1 || h.face.materialIndex === 5);
+        const detras = h.face && (h.face.materialIndex === 1 || h.face.materialIndex === 5);
+        // el costado de los cajones: el cajón cerrado que hay en ese punto
+        if (o === pintada.cuerpo && h.face && h.face.materialIndex === 0) {
+          const id = cajonEnCostado(-local.z, local.y);
+          if (id) return { malla: o, punto: { ...centroCajon(id), cara: 'frente', cajon: id } };
+        }
         if (detras) local.set(-local.x, local.y, -local.z);
         return { malla: o, punto: { ...alBoceto(local), cara: detras ? 'detras' : 'frente' } };
       }

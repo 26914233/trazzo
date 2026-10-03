@@ -439,7 +439,7 @@ con el mismo recorrido; se elige la técnica en la portada y se cambia jugando (
 - **C** se mueve libre, pero parece un dibujo animado 3D y no el boceto. Además, cada objeto necesita un
   modelo bueno: el incensario de la prueba de Blender es tosco y se nota.
 
-### DECISIÓN 29 — Cómo se hace el juego con el aspecto de los bocetos · **abierta**
+### DECISIÓN 29 — Cómo se hace el juego con el aspecto de los bocetos · **cerrada: B (03-10-2026)**
 
 - **DECISIÓN:** con qué técnica se construye el juego para que se vea y se mueva como el boceto.
 - **OPCIONES:** A) ilustración por capas; B) pintura sobre 3D; C) 3D con acuarela. Las tres se pueden jugar
@@ -475,10 +475,50 @@ con el mismo recorrido; se elige la técnica en la portada y se cambia jugando (
   - La A se queda como reserva para móviles sin 3D.
   - La C solo si se prefiere explorar libremente aunque se pierda el aspecto del boceto.
   - Cambia la recomendación anterior (la A), porque ahora se ha visto la B funcionando.
+- **ELEGIDA: la B.** El usuario la jugó en el móvil y mandó dos capturas de la B con el costado de los cajones
+  marcado: «Solo [hay que] mejorar estos detalles porque del otro lado lo hace bien, vamos con [que] todo el
+  juego sea de esa manera». Lo marcado era lo que se estiraba al girar la caja; ya está arreglado (abajo).
+  - La página entra directa en la B. La A queda solo de respaldo para móviles sin WebGL.
+  - La C se retira: su código sigue en `ilustrada/pagina/tecnica_3d.js` como referencia, sin mantener, y sus
+    modelos no se publican.
 - **SIGUIENTE PASO:**
-  1. el usuario juega las tres en el móvil y elige;
-  2. si es la B: pintar los dos costados de la caja (con el mismo encuadre girado) y subir la resolución
-     del frente a 2K;
-  3. llevar los 19 pasos de la caja viva a la técnica elegida;
-  4. el APK: la página ya funciona en el móvil. Falta decidir si se empaqueta tal cual o se pasa a Godot,
+  1. subir la resolución del frente a 2K;
+  2. llevar los 19 pasos de la caja viva a la B;
+  3. el APK: la página ya funciona en el móvil. Falta decidir si se empaqueta tal cual o se pasa a Godot,
      y resolver la firma **[Propuesta: se decide después]**.
+
+### Cajones, inventario y decoración viva en la B (03-10-2026, noche) [Hecho]
+
+El usuario pidió: «Los cajones que están al lado sería bueno que se mantengan cerrados, que se puedan abrir,
+que tengan su animación de abrirse, que todo tenga su animación, el apartado del inventario crea uno mejor,
+también sería bueno que algunos objetos se muevan aunque sean decoraciones que se relacionen con el ambiente
+o el toque». Después eligió la B y marcó el costado que se estiraba.
+
+- **Los costados nítidos al girar:**
+  - los dos costados y la tapa se aplanaron desde los bocetos y Gemini los repintó de frente, sin mover nada
+    (comprobado: desplazamiento 0, 0);
+  - la B mezcla esa pintura con la proyección según el ángulo: desde la cámara del boceto se ve el boceto
+    exacto; al girar la caja o mover la cámara, la pintura de frente, nítida;
+  - coste: tres retoques más el de los cajones cerrados, unos 0,18 USD **[Estimación]**.
+- **Los cajones:** los nueve del costado empiezan cerrados (un retoque de Gemini del boceto con ellos
+  cerrados).
+  - Se abren deslizándose, con un rebote; tienen hueco oscuro, sombra y paredes de laca roja.
+  - Al tocar uno, la cámara se acerca al costado.
+  - Dos tienen cerradura y resisten sin moverse, como todo lo bloqueado.
+  - La llave está en el de abajo y la nota en el de al lado; los demás guardan pistas de ambiente (ceniza,
+    hilos de seda, un papel quemado). Al despertar, todos traquetean.
+- **El inventario:**
+  - una bandeja lacada con cuatro huecos y esquinas de latón, con un brillo al llegar cada objeto;
+  - su nombre al tocarlo; tocarlo otra vez, o mantenerlo pulsado, lo examina en grande;
+  - la nota se guarda para releerla;
+  - en horizontal va a la izquierda, para no tapar la tetera, las tazas ni los cajones.
+- **La decoración viva:**
+  - el viento sopla a ráfagas (o al tocar el shoji): mece las sombras del bambú en el papel, el rollo colgado,
+    la llama y el humo;
+  - tres polillas rondan la lámpara y se posan en el papel; la llama, el viento o el dedo las espantan;
+  - la tapa de la tetera tiembla con el vapor;
+  - el té hace ondas cuando algo golpea la mesa (la caja, un cajón que se cierra, el despertar);
+  - el dedo aparta el polvo y el humo.
+- **Arreglos de paso:** la tetera y las tazas ya no arrastran un rectángulo de mesa al mover la cámara (se
+  recortan con su forma) y llevan su sombra de contacto.
+- **Prueba automática:** 23 de 23 en la B y en la A, en horizontal y en vertical.

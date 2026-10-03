@@ -29,9 +29,11 @@ const vertice = /* glsl */`
   uniform mat4 uReposo;
   uniform float uUsarReposo;
   varying vec4 vProy;
+  varying vec2 vUvCara;
   void main() {
     vec4 mundoReposo = uUsarReposo > 0.5 ? uReposo * vec4(position, 1.0) : modelMatrix * vec4(position, 1.0);
     vProy = uProyector * mundoReposo;
+    vUvCara = uv;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }`;
 const fragmento = /* glsl */`
@@ -46,7 +48,11 @@ const fragmento = /* glsl */`
   uniform float uConOjo;
   uniform vec3 uTinte;
   uniform vec3 uPenumbra;
+  uniform sampler2D uFrontal;
+  uniform float uConFrontal;
+  uniform float uMezcla;
   varying vec4 vProy;
+  varying vec2 vUvCara;
   void main() {
     vec2 uv = vProy.xy / vProy.w * 0.5 + 0.5;
     if (uConMascara > 0.5 && texture2D(uMascara, uv).a < uUmbral) discard;
@@ -62,6 +68,8 @@ const fragmento = /* glsl */`
     vec2 fuera = max(vec2(0.0), max(-uv, uv - 1.0));
     float borde = smoothstep(0.0, 0.42, max(fuera.x * 1.78, fuera.y * 2.4));
     c = mix(c, uPenumbra, borde);
+    // la cara pintada de frente (costados y tapa): cuanto más de frente se ve, más nítida que la proyección
+    if (uConFrontal > 0.5 && uMezcla > 0.001) c = mix(c, texture2D(uFrontal, vUvCara).rgb, uMezcla);
     gl_FragColor = vec4(c * uTinte, 1.0);
   }`;
 
@@ -69,8 +77,10 @@ const fragmento = /* glsl */`
 export const rectanguloUV = ([x0, y0, x1, y1], ancho = 1376, alto = 768) =>
   new THREE.Vector4(x0 / ancho, 1 - y1 / alto, x1 / ancho, 1 - y0 / alto);
 
+// «frontal»: { textura, mezcla } con la cara pintada de frente (en las UV de la malla) y un uniforme compartido que
+// dice cuánto se ve (0 = la proyección del boceto, exacta desde su cámara; 1 = la pintura de frente)
 export function materialPintura(textura, proyector, { reposo = null, mascara = null, lado = THREE.FrontSide, umbral = 0.5,
-  recorte = null, ojo = null } = {}) {
+  recorte = null, ojo = null, frontal = null } = {}) {
   const pv = new THREE.Matrix4().multiplyMatrices(proyector.projectionMatrix, proyector.matrixWorldInverse);
   return new THREE.ShaderMaterial({
     uniforms: {
@@ -88,6 +98,9 @@ export function materialPintura(textura, proyector, { reposo = null, mascara = n
       uUsarReposo: { value: reposo ? 1 : 0 },
       uTinte: { value: new THREE.Color(1, 1, 1) },
       uPenumbra: { value: new THREE.Color(0.085, 0.062, 0.047) },
+      uFrontal: { value: frontal ? frontal.textura : null },
+      uConFrontal: { value: frontal ? 1 : 0 },
+      uMezcla: frontal ? frontal.mezcla : { value: 0 },
     },
     vertexShader: vertice,
     fragmentShader: fragmento,
@@ -193,7 +206,9 @@ export function crearObjetos(escena, proyector, texturas) {
 
 // La caja pintada (técnica B): cuerpo y peana. Lo que se ve en el boceto de frente (delante, derecha y
 // arriba) sale de la pintura de frente; lo de detrás y la izquierda, de la pintura de espaldas, que es la
-// misma caja girada media vuelta en su sitio.
+// misma caja girada media vuelta en su sitio. Los costados y la tapa se ven muy de lado en los bocetos: llevan
+// además su repintado de frente (capas/cara_*.webp, herramientas/caras_boceto.py), que tecnica_3d.js mezcla
+// cuando la caja gira o la cámara se mueve.
 export function crearCajaPintada(escena, proyector, texturas) {
   const caja = new THREE.Group();
   caja.name = 'caja';
@@ -201,14 +216,22 @@ export function crearCajaPintada(escena, proyector, texturas) {
   const p = escena.peana;
   const mFondo = new THREE.MeshBasicMaterial({ color: 0x0b0806 });
   const materiales = [];
+  const mezclas = { derecha: { value: 0 }, izquierda: { value: 0 }, arriba: { value: 0 } };
   // caras de BoxGeometry: +x (derecha), −x (izquierda), +y (arriba), −y (abajo), +z (delante), −z (detrás)
-  function pintar(malla, ojo = null) {
+  function pintar(malla, { ojo = null, caras = false } = {}) {
     malla.updateMatrix();
     const reposo = malla.matrix.clone();                                             // tal como se pintó
     const reposoDetras = new THREE.Matrix4().makeRotationY(Math.PI).multiply(malla.matrix);  // media vuelta
     const mF = materialPintura(texturas.frente, proyector, { reposo, ojo });
     const mD = materialPintura(texturas.detras, proyector, { reposo: reposoDetras });
-    malla.material = [mF, mD, mF, mFondo, mF, mD];
+    let mDer = mF, mIzq = mD, mArr = mF;
+    if (caras) {
+      mDer = materialPintura(texturas.frente, proyector, { reposo, frontal: { textura: texturas.caraDerecha, mezcla: mezclas.derecha } });
+      mIzq = materialPintura(texturas.detras, proyector, { reposo: reposoDetras, frontal: { textura: texturas.caraIzquierda, mezcla: mezclas.izquierda } });
+      mArr = materialPintura(texturas.frente, proyector, { reposo, frontal: { textura: texturas.caraArriba, mezcla: mezclas.arriba } });
+      materiales.push(mDer, mIzq, mArr);
+    }
+    malla.material = [mDer, mIzq, mArr, mFondo, mF, mD];
     malla.userData.tipo = 'caja';
     materiales.push(mF, mD);
   }
@@ -217,22 +240,129 @@ export function crearCajaPintada(escena, proyector, texturas) {
   const altoPeana = 0.034 - p.z_abajo;
   const peana = new THREE.Mesh(new THREE.BoxGeometry(p.medio_x * 2, altoPeana, p.medio_y * 2));
   peana.position.copy(aThree(p.centro[0], p.centro[1], p.z_abajo + altoPeana / 2));
-  pintar(cuerpo, texturas.ojo || null);
+  pintar(cuerpo, { ojo: texturas.ojo || null, caras: !!texturas.caraDerecha });
   pintar(peana);
   caja.add(cuerpo, peana);
-  // los cajones abiertos sobresalen unos 5 cm por la derecha: un bloque con la pintura de frente, recortado con
-  // la silueta de la caja (entre cajón y cajón se ve la sala)
-  if (texturas.siluetaCaja) {
-    const sobresale = 0.05;
-    const cajones = new THREE.Mesh(new THREE.BoxGeometry(sobresale, alto, 0.22));
-    cajones.position.set(0.11 + sobresale / 2, 0.034 + alto / 2, 0);
-    cajones.updateMatrix();
-    const m = materialPintura(texturas.frente, proyector, { reposo: cajones.matrix.clone(), mascara: texturas.siluetaCaja });
-    const nada = new THREE.MeshBasicMaterial({ visible: false });
-    cajones.material = [m, nada, m, nada, m, nada];
-    cajones.userData.tipo = 'caja'; cajones.userData.soloFrente = true; cajones.userData.mascara = 'caja';
-    caja.add(cajones);
-    materiales.push(m);
+  return { caja, cuerpo, peana, materiales, mezclas, alto };
+}
+
+// Texturas de laca para las paredes de los cajones, pintadas en un lienzo a partir de la laca del boceto (la pared
+// de un cajón abierto): fuera, roja con luz de lámpara; dentro y el fondo, en sombra; el canto, más claro. Con un
+// borde a tinta, como todo en el boceto.
+function texturasLaca(laca) {
+  const hacer = (ancho, alto, pintar) => {
+    const c = document.createElement('canvas'); c.width = ancho; c.height = alto;
+    const k = c.getContext('2d');
+    pintar(k, ancho, alto);
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;      // MeshBasicMaterial: entra en sRGB y sale igual
+    t.anisotropy = 4;
+    return t;
+  };
+  const vetas = (k, w, h, alfa) => {
+    for (let i = 0; i < 26; i++) {
+      const y = (i * 37 % 97) / 97 * h, g = 0.6 + (i % 3) * 0.5;
+      k.strokeStyle = i % 2 ? `rgba(40, 12, 6, ${alfa})` : `rgba(255, 190, 140, ${alfa * 0.6})`;
+      k.lineWidth = g; k.beginPath(); k.moveTo(0, y);
+      for (let x = 0; x <= w; x += 16) k.lineTo(x, y + Math.sin(x * 0.07 + i) * 1.4);
+      k.stroke();
+    }
+  };
+  const tinta = (k, w, h, a = 0.85, g = 3) => { k.strokeStyle = `rgba(26, 10, 6, ${a})`; k.lineWidth = g; k.strokeRect(g / 2, g / 2, w - g, h - g); };
+  const base = (k, w, h, luz, sombra) => {
+    if (laca) k.drawImage(laca, 0, 0, w, h); else { k.fillStyle = '#90402a'; k.fillRect(0, 0, w, h); }
+    const g = k.createLinearGradient(0, 0, w * 0.4, h);
+    g.addColorStop(0, luz); g.addColorStop(1, sombra);
+    k.globalCompositeOperation = 'soft-light'; k.fillStyle = g; k.fillRect(0, 0, w, h);
+    k.globalCompositeOperation = 'source-over';
+  };
+  return {
+    fuera: hacer(128, 64, (k, w, h) => {
+      base(k, w, h, 'rgba(255, 200, 150, 0.9)', 'rgba(60, 20, 10, 0.7)');
+      vetas(k, w, h, 0.16);
+      const g = k.createLinearGradient(0, 0, w, 0);          // más oscuro hacia dentro de la caja
+      g.addColorStop(0, 'rgba(20, 8, 4, 0.55)'); g.addColorStop(0.35, 'rgba(20, 8, 4, 0)');
+      k.fillStyle = g; k.fillRect(0, 0, w, h);
+      tinta(k, w, h);
+    }),
+    dentro: hacer(64, 64, (k, w, h) => {
+      base(k, w, h, 'rgba(120, 60, 40, 0.6)', 'rgba(20, 6, 3, 0.9)');
+      k.fillStyle = 'rgba(18, 7, 4, 0.55)'; k.fillRect(0, 0, w, h);
+      vetas(k, w, h, 0.1);
+      tinta(k, w, h, 0.6, 2);
+    }),
+    suelo: hacer(64, 64, (k, w, h) => {
+      base(k, w, h, 'rgba(140, 70, 45, 0.6)', 'rgba(20, 6, 3, 0.9)');
+      const g = k.createLinearGradient(0, 0, w, 0);          // en sombra al fondo del cajón
+      g.addColorStop(0, 'rgba(12, 5, 3, 0.85)'); g.addColorStop(0.7, 'rgba(12, 5, 3, 0.35)');
+      k.fillStyle = g; k.fillRect(0, 0, w, h);
+      tinta(k, w, h, 0.5, 2);
+    }),
+    canto: hacer(32, 16, (k, w, h) => {
+      base(k, w, h, 'rgba(255, 220, 170, 1)', 'rgba(200, 120, 80, 0.4)');
+      k.fillStyle = 'rgba(255, 210, 160, 0.25)'; k.fillRect(0, 0, w, h);
+      tinta(k, w, h, 0.7, 2);
+    }),
+  };
+}
+
+// Los cajones del costado (técnica B). Cerrados no se ven: los pinta la caja. Al abrirse, cada uno sale por +x con
+// su frente (la misma proyección y el mismo repintado que el costado, pegados a él), sus paredes de laca, el hueco
+// oscuro que deja y su sombra. Todo en metros, en el espacio de la caja; tecnica_3d.js mueve cada grupo.
+// Las paredes son más bajas que el frente para que se vea lo que guarda (como en el boceto).
+export function crearCajonesPintados(datos, alto, proyector, texturas, mezcla) {
+  const X = datos.x, fondo = datos.fondo, t = 0.0025, grueso = 0.006;
+  const laca = texturasLaca(texturas.lacaPared);
+  const m = Object.fromEntries(Object.entries(laca).map(([n, tex]) => [n, new THREE.MeshBasicMaterial({ map: tex })]));
+  const canto = new THREE.MeshBasicMaterial({ color: new THREE.Color().setRGB(0.3, 0.2, 0.12, THREE.SRGBColorSpace) });
+  const hueco = new THREE.MeshBasicMaterial({ color: new THREE.Color().setRGB(0.06, 0.035, 0.022, THREE.SRGBColorSpace) });
+  // la sombra que deja el cajón abierto en el costado, debajo de él
+  const cs = document.createElement('canvas'); cs.width = 4; cs.height = 32;
+  const ks = cs.getContext('2d'), gs = ks.createLinearGradient(0, 0, 0, 32);
+  gs.addColorStop(0, 'rgba(8, 4, 2, 0.75)'); gs.addColorStop(1, 'rgba(8, 4, 2, 0)');
+  ks.fillStyle = gs; ks.fillRect(0, 0, 4, 32);
+  const texSombra = new THREE.CanvasTexture(cs);
+  const caja3 = (sx, sy, sz, x, y, z, mats) => {
+    const malla = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), mats);
+    malla.position.set(x, y, z);
+    return malla;
+  };
+  const cajones = {};
+  for (const d of datos.cajones) {
+    const [y0, y1] = d.y, [z0, z1] = d.z;                // Blender: y del costado (delante → atrás), z arriba
+    const ancho = y1 - y0, altoC = z1 - z0, zc = -(y0 + y1) / 2, yc = (z0 + z1) / 2;
+    const grupo = new THREE.Group();
+    grupo.name = 'cajon_' + d.id;
+    // el frente: una tabla con la pintura del costado en su cara de fuera (+x) y las UV de su trozo de costado
+    const geo = new THREE.BoxGeometry(grueso, altoC, ancho);
+    const uv = geo.attributes.uv;
+    for (let i = 0; i < 4; i++) {                        // cara +x: u de delante (y0) a atrás, v de abajo arriba
+      uv.setXY(i, (y0 + 0.11 + uv.getX(i) * ancho) / 0.22, (z0 - 0.034 + uv.getY(i) * altoC) / alto);
+    }
+    const frente = new THREE.Mesh(geo);
+    frente.position.set(X - grueso / 2 + 0.0004, yc, zc);
+    frente.updateMatrix();
+    const mFrente = materialPintura(texturas.frente, proyector, { reposo: frente.matrix.clone(),
+      frontal: texturas.caraDerecha ? { textura: texturas.caraDerecha, mezcla } : null });
+    frente.material = [mFrente, canto, canto, canto, canto, canto];
+    // la caja del cajón: paredes bajas, el fondo y la trasera (dentro de la caja mientras no sale del todo)
+    const largo = fondo - grueso, xm = X - grueso - largo / 2, hw = altoC * 0.5;
+    const cerca = caja3(largo, hw, t, xm, z0 + hw / 2, -y0 - t / 2, [m.dentro, m.dentro, m.canto, m.fuera, m.fuera, m.dentro]);
+    const lejos = caja3(largo, hw, t, xm, z0 + hw / 2, -y1 + t / 2, [m.dentro, m.dentro, m.canto, m.fuera, m.dentro, m.fuera]);
+    const suelo = caja3(largo, t, ancho - 2 * t, xm, z0 + t / 2, zc, [m.dentro, m.dentro, m.suelo, m.fuera, m.fuera, m.fuera]);
+    const trasera = caja3(t, hw, ancho - 2 * t, X - fondo + t / 2, z0 + hw / 2, zc, [m.dentro, m.fuera, m.canto, m.fuera, m.fuera, m.fuera]);
+    grupo.add(frente, cerca, lejos, suelo, trasera);
+    // el hueco que deja en el costado y la sombra que hace debajo (no se mueven con el cajón)
+    const agujero = new THREE.Mesh(new THREE.PlaneGeometry(ancho, altoC), hueco);
+    agujero.rotation.y = Math.PI / 2; agujero.position.set(X + 0.0002, yc, zc);
+    const sombra = new THREE.Mesh(new THREE.PlaneGeometry(ancho, 0.02),
+      new THREE.MeshBasicMaterial({ map: texSombra, transparent: true, depthWrite: false, opacity: 0 }));
+    sombra.rotation.y = Math.PI / 2; sombra.position.set(X + 0.0003, z0 - 0.01, zc);
+    for (const o of [frente, cerca, lejos, suelo, trasera, agujero, sombra]) { o.userData.tipo = 'cajon'; o.userData.cajon = d.id; }
+    sombra.raycast = () => {};
+    cajones[d.id] = { grupo, agujero, sombra, materiales: [mFrente],
+      // dónde va lo que guarda: hacia el fondo del cajón (para que asome por encima de la pared baja)
+      dentro: new THREE.Vector3(X - grueso - 0.03, z0 + t, -(y0 + (y1 - y0) * 0.62)) };
   }
-  return { caja, cuerpo, peana, materiales };
+  return cajones;
 }

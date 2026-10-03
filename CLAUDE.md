@@ -598,31 +598,34 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
     https://claude.ai/artifact/7fC2cECS62soiVNBa2kMG3.
   - Lo que se mueve: el ojo sigue el dedo (y la regla «no deja tocar mientras te ve»), la caja respira y
     hay humo en cintas a tinta, luz de lámpara y motas.
-  - El recorrido: la llave (se coge distrayendo al ojo con la lámpara), el incensario, el cuerno y el
-    despertar. Detrás de la caja hay más cajones, un hueco de ficha de shōgi y un cajón largo con otra
-    cerradura.
-  - **Las tres técnicas de la DECISIÓN 29, jugables (pedidas por el usuario el 03-10-2026, hechas):** se
-    elige en la portada y se cambia jugando (A, B y C arriba). Todas con cámara que se mueve (arrastrar,
-    pellizcar, transiciones) y la caja que gira.
-    - A: ilustración por capas con profundidad; la caja gira como un teatro de papel.
-    - B: la pintura proyectada sobre una sala y una caja 3D sencillas (Three.js); la caja gira de verdad.
-    - C: el modelo de Blender (aligerado a 2,2 MB) con tinta y acuarela; la sala sigue pintada.
+  - El recorrido: la llave (en un cajón del costado; se coge distrayendo al ojo con la lámpara), la nota del
+    cajón de al lado, el incensario, el cuerno y el despertar. Detrás de la caja hay más cajones, un hueco de
+    ficha de shōgi y un cajón largo con otra cerradura.
   - Cómo se hace: la cámara del boceto se calculó a partir de la caja (`herramientas/camara_boceto.py`).
-    Hay siete retoques de Gemini con el mismo encuadre, entre ellos la caja de espaldas, la mesa vacía y la
-    sala sin mesa.
-  - Su prueba automática (`prueba/jugar.mjs <A|B|C> <horizontal|vertical>`, con `prueba/servir.py`) da
-    18 de 18 en A y 20 de 20 en B y C, en las dos orientaciones.
-    - B y C usan WebGL con SwiftShader: son lentas sin tarjeta gráfica, así que las esperas van en tiempo
+    Hay ocho retoques de Gemini con el mismo encuadre (entre ellos la caja de espaldas, la mesa vacía, la
+    sala sin mesa y los cajones cerrados) y tres repintados de frente de los costados y la tapa.
+  - Su prueba automática (`prueba/jugar.mjs <B|A> <horizontal|vertical>`, con `prueba/servir.py`) da
+    23 de 23 en la B y en la A, en las dos orientaciones.
+    - La B usa WebGL con SwiftShader: es lenta sin tarjeta gráfica, así que las esperas van en tiempo
       de juego.
     - Three.js viene de jsDelivr y la prueba lo baja con el `fetch` de Node.
-- **DECISIÓN 29 (abierta):** con qué técnica se hace el juego para que sea como el boceto (`puzles/PLAN.md` §7).
-  - Las opciones: A) ilustración por capas; B) pintura sobre 3D; C) 3D con acuarela. Las tres están
-    jugables.
-  - Recomendada ahora la **B**, con lo de la A dentro:
-    - da el giro real y la cámara que se pidieron sin perder el boceto;
-    - pide pintar los costados de cada caja;
-    - la A queda de reserva para móviles sin 3D.
-  - La C se aleja del boceto y necesita modelar bien cada objeto.
+- **DECISIÓN 29 (cerrada el 03-10-2026): la B**, la pintura del boceto proyectada sobre una caja y una sala
+  3D sencillas (`puzles/PLAN.md` §7).
+  - El usuario jugó las tres y mandó capturas de la B: «del otro lado lo hace bien, vamos con [que] todo el
+    juego sea de esa manera». Pidió mejorar el costado de los cajones, que se estiraba al girar.
+  - La página entra directa en la B. La A queda de respaldo para móviles sin WebGL (y con `?tecnica=A`).
+  - La C se retiró: su código sigue en `tecnica_3d.js` como referencia, sin mantener, y sus modelos no se
+    publican.
+- **Lo que pidió después (03-10-2026, noche, hecho en la B y en la A):**
+  - **Cajones del costado:** cerrados al empezar. Se abren deslizándose y la cámara se acerca al costado;
+    dos tienen cerradura y resisten sin moverse.
+  - **Costados nítidos al girar:** los costados y la tapa se repintaron de frente con Gemini (aplanados con
+    `herramientas/caras_boceto.py`). La B los mezcla con la proyección según el ángulo de la cámara.
+  - **Inventario:** una bandeja lacada con nombres. Tocar otra vez o mantener pulsado examina el objeto, y
+    la nota se guarda para releerla. En horizontal va a la izquierda.
+  - **Decoración viva:** viento a ráfagas (también al tocar el shoji) que mece las sombras del bambú, el
+    rollo, la llama y el humo; polillas en la lámpara; la tapa de la tetera tiembla; ondas en el té; el dedo
+    aparta el polvo y el humo.
 - **Resistencia creativa (pedida por el usuario el 03-10-2026, hecha):** lo bloqueado ni se mueve ni
   se marca (nada de destello rojo); el sonido «trabado» le gusta y se queda. Reacciona el objeto entero,
   cada uno a su manera, y va a más si se insiste (`BIBLIA_DISENO.md` §3.4):
