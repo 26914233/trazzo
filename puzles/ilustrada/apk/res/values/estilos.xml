@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- La penumbra de la sala desde el primer instante: sin barra de título, a pantalla completa y con el fondo
+         del juego (#0c0907), para que no haya un destello blanco al abrir -->
+    <style name="TemaCaja" parent="@android:style/Theme.Material.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@color/sumi</item>
+        <item name="android:colorBackground">@color/sumi</item>
+        <item name="android:statusBarColor">@color/sumi</item>
+        <item name="android:navigationBarColor">@color/sumi</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+    <color name="sumi">#0C0907</color>
+</resources>

@@ -1,0 +1,35 @@
+Prueba automática de RONIN 3D (Godot, cel-shading)
+OK     Los textos del capítulo 1 son los aprobados (shōgun Takeda, yōkai, cicatriz, Shiro, luna roja)  intro: 3 párrafos; cierre: 3
+OK     La intro da paso al juego  fase=jugando
+OK     Akira camina  recorrió 8.0 m
+OK     El HUD se ve entero en pantalla  vida, soldados y versión
+OK     Shiro sigue a Akira  a 1.7 m de Akira tras caminar
+OK     La cámara gira con E  giró 90°
+OK     La espada daña al soldado  derrotados=1
+OK     El soldado se defiende (resta vida o Akira gana antes)  vida de Akira 5 → 5
+OK     Los soldados derrotados sueltan monedas  1 derrotados, 4 monedas soltadas
+OK     El muro oeste detiene a Akira  x=-23.65 (el muro empieza en −24)
+OK     Llegar al portón cierra el capítulo  fase=cierre
+OK     ESC pausa el juego de verdad (soldados y Shiro quietos) y lo reanuda  pausado=true, el juego seguía=false, después=false
+OK     Tocar la pantalla sigue los textos  fase=jugando
+OK     El joystick táctil mueve a Akira  recorrió 7.2 m
+OK     El stick del mando mueve a Akira  recorrió 3.5 m
+OK     Iai perfecto: soltar justo al «!» desvía la lanza y derriba al soldado de un corte  derribado=true, vida de Akira=5, espíritu=0.5
+OK     Soltar a destiempo no sirve: la lanza alcanza a Akira  vida de Akira=4, soldado en pie=true
+OK     Corte de luna: con la barra llena derriba a los soldados cercanos  derribados 2 de 2, espíritu=0.0
+OK     Animación anime: 12 poses por segundo; T cambia a suave (cada paso)  anime=12, suave=60 poses en 1 s
+OK     La galería de criaturas se abre desde la pausa y reparte páginas  10 páginas; la tercera tiene 7 criaturas y 125 piezas
+OK     Al cerrar la galería se vuelve a la pausa y el juego sigue entero  en pausa=true, juego en el árbol=true
+OK     El catálogo del bestiario se carga y todos sus datos son válidos  929 criaturas (123 con modelo propio), 0 con datos no válidos
+OK     Todas las criaturas del catálogo se construyen dentro del presupuesto de piezas  929 criaturas (1163 construcciones con los rangos 2 y 3 de 1 de cada 8) en 468 ms; rango 1: media 20.5 piezas, máximo 42; máximo con rangos: 42
+OK     Los modelos detallados se cargan con textura y cel-shading (el Aka-oni, con sus tres rangos)  rango 1: 14024 triángulos, 1.91 m; rango 2: 14024 triángulos, 2.29 m; rango 3: 14024 triángulos, 1.91 m; modelo 353: 41471 triángulos; modelo 680: 2588 triángulos
+OK     Los cuatro aspectos de Akira llevan la cicatriz y el sastre los enseña en la pausa  triángulos: { "joven": 3546, "curtido": 3594, "veterano": 3623, "mujer": 3421 }
+OK     Los personajes son sprites pixel art: 6 hojas con todas sus poses y 8 direcciones  hojas bien: 6 de 6 · dirección 7 → 3 al girar la cámara 180°
+OK     Shiro olfatea, escarba y desentierra monedas  3 monedas desenterradas
+OK     Akira recoge las monedas al pasar y el HUD las cuenta  7 → 8
+OK     Shiro trae las monedas que Akira deja atrás  entregó 3 · monedas 9 → 12
+OK     Las skins están bloqueadas y se compran al sastre con monedas  bloqueada=true, comprada=true (quedan 70 mon), al salir=true
+OK     El jizō da +1 de vida máxima a cambio de monedas  aviso=true, vida máxima 6, monedas 70 → 30
+OK     La partida se guarda y se carga (monedas, skins y bendiciones)  [30, ["joven", "curtido"], 1] → [30, ["joven", "curtido"], 1]
+Resultado: 32 de 32 comprobaciones correctas
+FPS al caminar por el patio: 11.5 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)
