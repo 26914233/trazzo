@@ -24,6 +24,7 @@ propuesta que se aprueba o se cambia antes de programar.
 | `relojero.jpg` y `relojero_secuencia.jpg` | **El reloj sin corazón:** caja de caoba en el taller de 1891 y cómo se abre |
 | `reliquia.jpg` y `reliquia_secuencia.jpg` | **El corazón de cuatro pétalos:** la flor de piedra en el santuario y cómo se abre |
 | `farero.jpg` y `farero_secuencia.jpg` | **La lámpara de señales:** el cuarto del farero en la tormenta de 1903 y cómo se resuelve |
+| `caja_viva_ac.jpg` y `caja_viva_ac_detras.jpg` | **La elegida (DECISIÓN 27): la A con los cajones de la C**, de frente y por detrás. Son la referencia del modelo de Blender |
 
 ## Lectura de cada boceto [Opinión]
 

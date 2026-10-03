@@ -574,12 +574,22 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   - Se hicieron con Gemini (`gemini-3.1-flash-image`, unos 0,045 USD por imagen): el objeto en su
     sala y cómo se abre, por línea, más tres diseños de la caja viva.
   - **No se construye** hasta que elija. Su mecánica (19 pasos) ya funciona y se conserva.
-  - **DECISIÓN 27 (abierta):** el diseño de la caja viva. Recomendada la D: la A (mosaico *yosegi* y
-    máscara) con las piezas que se mueven en laca bermellón.
-  - **DECISIÓN 28 (abierta):** cómo se fabrican las piezas para llegar a los bocetos. Recomendado:
-    código más texturas pintadas con IA, con una prueba de calidad primero. Blender (descarga grande)
-    o IA 3D (créditos) solo con su permiso.
+  - **DECISIÓN 27 (cerrada el 03-10-2026):** la caja viva es **la A con los cajones de la C** (mosaico
+    *yosegi*, máscara incompleta y costados de cómoda *tansu* para explorar). La B y la C también le
+    gustaron: se guardan para otras cajas de la línea.
+  - **DECISIÓN 28 (cerrada el 03-10-2026):** **Blender** (4.5.14 LTS, descarga autorizada y verificada),
+    manejado por código en el contenedor, más texturas pintadas con IA donde hagan falta. Primero, una
+    prueba de calidad junto al boceto. IA 3D o artista solo si lo orgánico no llega, y con su permiso.
   - Las dos están en `puzles/PLAN.md` §6.
+- **Prueba de calidad en Blender (03-10-2026, hecha):** la caja viva A+C por código
+  (`puzles/herramientas/blender/caja_viva_ac.py`), con la cara en relieve sacada de un mapa de alturas de
+  Gemini (`preparar_cara.py`); sale en `puzles/godot/modelos/caja_viva/` y se ve con
+  `scripts/prueba_calidad.gd`. Comparación con los bocetos: `puzles/capturas/calidad_*.jpg`.
+  - Blender vive en `/root/herramientas/blender-4.5.14-linux-x64/`. El contenedor se borra: en otra
+    sesión hay que volver a bajarlo (378 MB, ya autorizado) y comprobar su SHA-256
+    `9ba871ff2ecd36526b77432745980b7e6664ecd0c7ca11c48849073dcfe06da3`.
+  - Falta para acercarse a The Room: luz horneada u oclusión, desgaste, herrajes grabados, un león mejor y
+    bajar el peso (9 MB) antes del APK.
 - **Resistencia creativa (pedida por el usuario el 03-10-2026, hecha):** lo bloqueado ni se mueve ni
   se marca (nada de destello rojo); el sonido «trabado» le gusta y se queda. Reacciona el objeto entero,
   cada uno a su manera, y va a más si se insiste (`BIBLIA_DISENO.md` §3.4):

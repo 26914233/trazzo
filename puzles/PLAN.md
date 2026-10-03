@@ -280,7 +280,12 @@ antes de seguir, para ver si se puede llegar al esmero de los entornos de The Ro
 La mecánica profunda de la caja viva ya funciona: 19 pasos, la cara incompleta, el incensario y el
 altar. Pasa su prueba (43 de 43). Se conserva; lo que cambia es el aspecto.
 
-### DECISIÓN 27 — El diseño de la caja viva · **abierta**
+### DECISIÓN 27 — El diseño de la caja viva · **CERRADA el 03-10-2026: la A con los cajones de la C**
+
+El usuario: «empecemos con la A con la C, que deje explorar bastante». También le gustaron la B y la
+C: se guardan para otras cajas de la línea **[Propuesta: se decide al diseñar cada una]**.
+
+Lo que se propuso:
 
 - **OPCIONES:**
   - A) mosaico *yosegi* y máscara de paulownia;
@@ -302,7 +307,14 @@ altar. Pasa su prueba (43 de 43). Se conserva; lo que cambia es el aspecto.
 - **RECOMENDACIÓN [Opinión]:** la **D**.
 - **SIGUIENTE PASO:** la prueba de calidad de la DECISIÓN 28 con el diseño elegido.
 
-### DECISIÓN 28 — Cómo se fabrican las piezas para llegar a los bocetos · **abierta**
+### DECISIÓN 28 — Cómo se fabrican las piezas para llegar a los bocetos · **CERRADA el 03-10-2026: Blender**
+
+El usuario quiere llegar a la calidad de The Room, cree que con Blender se puede y autorizó la
+descarga. Se usa **Blender 4.5.14 LTS** (378 MB, SHA-256 comprobada), en el contenedor de Claude y
+no en el PC, manejado por código. Las texturas pintadas con IA se suman donde hagan falta. La IA 3D o
+un artista, solo si la prueba de calidad dice que lo orgánico no llega, y con su permiso.
+
+Lo que se propuso:
 
 - **OPCIONES:**
   - A) todo por código, como ahora;
@@ -332,3 +344,26 @@ altar. Pasa su prueba (43 de 43). Se conserva; lo que cambia es el aspecto.
   para las piezas orgánicas.
 - **SIGUIENTE PASO:** la prueba de calidad. Con el resultado, se rehace la caja entera y después las
   otras tres.
+
+### Prueba de calidad (03-10-2026) [Hecho]
+
+La caja viva A+C, hecha en Blender por código y vista en el motor del juego, junto a sus bocetos:
+`capturas/calidad_frente.jpg`, `calidad_detras.jpg` y `calidad_cara.jpg`.
+
+- **Cómo se hizo:**
+  - la caja, con aristas biseladas, paneles de mosaico, cajones con anilla, interiores de laca
+    bermellón, herrajes dorados, zócalo con olas, la borla, el incensario con su león y el juego de té;
+  - la cara: Gemini dibujó un mapa de alturas de la máscara; `preparar_cara.py` lo convierte en relieve y
+    en la textura de paulownia, y Blender lo talla de verdad (sube 1,4 cm y los agujeros se hunden).
+- **Lo que ya llega [Opinión]:**
+  - el objeto se lee como el boceto;
+  - la cara tiene volumen y da inquietud;
+  - la madera, la laca y los cajones abiertos dan ganas de tocar.
+- **Lo que aún separa de The Room [Opinión]:**
+  - la luz de la habitación: dura y sin oclusión ambiental (se puede hornear en Blender);
+  - el desgaste y los matices de los materiales;
+  - los herrajes, planos, sin grabado;
+  - el león, demasiado simple;
+  - el peso: 9 MB la caja, que hay que bajar antes del APK.
+- **Conclusión [Opinión]:** Blender es la vía correcta. De momento no hace falta IA 3D ni un artista; quizá
+  para figuras como el león, más adelante.

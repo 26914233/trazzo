@@ -25,6 +25,11 @@ la versión 0.9 mientras tanto.
   - Texturas, sonidos e iconos hechos por código, sin créditos de imágenes.
   - `hojas_bocetos.py`: junta los bocetos en hojas para revisarlos en el móvil.
 - **Bocetos:** `bocetos/`.
+- **Arte de origen:** `arte/` (de momento, la cara de la caja viva: el mapa de alturas de Gemini y lo que
+  saca de él `herramientas/blender/preparar_cara.py`).
+- **Modelos de Blender:** se hacen por código con `herramientas/blender/` y salen en `godot/modelos/`.
+  Mientras la caja nueva no entre en el juego, `modelos/caja_viva/` queda fuera del APK (filtro de
+  exportación).
 - **Capturas:**
   - `capturas/gabinete.jpg`: el menú;
   - `capturas/entradas.jpg`: la cámara entrando en cada sala;
@@ -153,6 +158,15 @@ xvfb-run -a godot --path puzles/godot --rendering-driver opengl3 --fixed-fps 30 
 
 # Hojas de bocetos para el móvil
 python3 puzles/herramientas/hojas_bocetos.py <carpeta de salida>
+
+# Modelos de Blender (4.5.14 LTS, en /root/herramientas/): la caja viva A+C y lo de su mesa
+python3 puzles/herramientas/blender/preparar_cara.py
+/root/herramientas/blender-4.5.14-linux-x64/blender -b -P puzles/herramientas/blender/caja_viva_ac.py \
+  -- [--vista /ruta/vista.png]
+godot --headless --path puzles/godot --import
+# Prueba de calidad: la caja de Blender en su washitsu, con la luz del juego (no va en el APK)
+xvfb-run -a godot --path puzles/godot --rendering-driver opengl3 --fixed-fps 30 \
+  --script res://scripts/prueba_calidad.gd -- --salida=/ruta/
 
 # Volver a generar texturas, sonidos e iconos
 python3 puzles/herramientas/generar_texturas.py [nombre ...]

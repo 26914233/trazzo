@@ -96,3 +96,37 @@ Panel 3 (bottom left): the barometer's glass is open revealing a small brass gea
 Panel 4 (bottom right): the signal lamp is assembled and lit, its shutter blades open, a bright beam shines out of the window toward the ship, which turns away from the rocks; warm lamplight inside, blue storm outside.
 No text, no letters, no numbers, no people, no hands.
 ```
+
+## Segunda tanda (03-10-2026): la A con los cajones de la C y la cara
+
+### `caja_viva_ac.jpg`
+
+Referencia: `caja_viva_a.jpg`. Proporción 16:9.
+
+```text
+Concept art sketch for a premium tactile puzzle-box video game, in exactly the same hand-drawn digital painting style, room and lighting as the reference image (Japanese washitsu at night, low round lacquered table, paper andon lamp, shoji screens, hanging scroll, bronze incense burner with a lion lid, clay teapot and cups). The puzzle box is the same living himitsu-bako with the incomplete carved pale paulownia mask face on its front (one open red eye, an empty eye socket, a missing horn, no mouth), yosegi wood marquetry, black lacquer edges, gold corner fittings, red silk tassel and black lacquer plinth with gold seigaiha waves. NEW: its right side and its back are now built like a small Japanese tansu chest: many little drawers of different sizes with yosegi marquetry fronts, tiny dark iron ring pulls and vermilion lacquer insides; two of them are pulled slightly open, one shows a small bamboo key, another a folded paper. A small round hatch on the top edge. The box looks precious, layered and full of things to explore. Three-quarter view from the front right, slightly from above, so the face and the side of drawers are both clearly visible. No text, no labels, no people.
+```
+
+### `caja_viva_ac_detras.jpg`
+
+Referencia: `caja_viva_a.jpg`. Proporción 16:9.
+
+```text
+Concept art sketch for a premium tactile puzzle-box video game, in exactly the same hand-drawn digital painting style and washitsu room as the reference image. The same living Japanese himitsu-bako puzzle box seen from the back left, three-quarter view, slightly from above: the left side and the back are built like a small tansu chest with many little drawers of different sizes (yosegi marquetry fronts, tiny dark iron ring pulls, vermilion lacquer insides), one larger drawer at the bottom of the back with a small keyhole, and a slot shaped like a shogi piece on the back panel; black lacquer edges, gold corner fittings, the red silk tassel, the black lacquer plinth with gold seigaiha waves. On the table beside it, the bronze incense burner with a small guardian lion on its lid, a little thin smoke. Warm andon light from the left, cool moonlight from the shoji. No text, no labels, no people.
+```
+
+### `../arte/caja_viva/cara_gemini.png (variante elegida)`
+
+Proporción 1:1.
+
+```text
+Grayscale height map (displacement map) for a 3D bas-relief carving, front orthographic view, perfectly centered: a serene Japanese Noh-style mask face carved in wood, the face filling about 80 percent of the square. Pure white is the highest relief (tip of the nose), mid grays are the cheeks and forehead, pure black is the flat background around the face. The left eye (viewer's left) is a carved open almond eye with a rounded eyeball and soft eyelids. The right eye socket is an empty deep hole: pure black. A small round hole on the upper forehead where a horn was broken off: pure black. Two small broken irregular holes on the right cheek: pure black. Calm closed lips, gentle eyebrows. Smooth soft gradients like a depth map, no texture, no wood grain, no lighting, no shadows, no outlines, no text.
+```
+
+### variante descartada del mapa de alturas
+
+Proporción 1:1.
+
+```text
+A depth map image as used for 3D displacement: a carved wooden mask face of a Japanese tsukumogami spirit, seen straight from the front, centered on a pure black background. Brightness means height: the nose tip is pure white, the cheeks and forehead are light gray, the edge of the face falls off smoothly to black. One eye (on the viewer's left) is open and almond-shaped, with a rounded eyeball bulging softly. The other eye is missing: its socket is a pure black hole. A small pure black hole high on the forehead where a short horn used to be. Small black chipped holes on the right cheek. Closed calm lips. Smooth grayscale gradients only, no color, no texture, no lighting, no shading lines, no text.
+```

@@ -913,10 +913,13 @@ para tener color propio.
   - todo se hace por código: texturas con `generar_texturas.py`, iconos con `generar_iconos.py` y
     arquitectura con `arquitectura.gd`;
   - es coherente, barato y fácil de cambiar.
-- **Para lanzar [Propuesta]:**
-  - los objetos protagonistas, unas cuatro cajas por línea, con modelo y textura hechos a mano o con
-    las vías del CLAUDE.md (Higgsfield, SketchUp);
-  - las salas pueden seguir siendo por código, con mejor luz.
+- **Para lanzar [Hecho el método, 03-10-2026; DECISIÓN 28]:**
+  - los objetos protagonistas se modelan en **Blender por código** (`herramientas/blender/`): aristas
+    biseladas, piezas torneadas y relieves;
+  - las partes orgánicas, como la cara de la caja viva, salen de un **mapa de alturas** dibujado con IA
+    que Blender convierte en relieve;
+  - las salas pueden seguir siendo por código, con mejor luz;
+  - la IA 3D o un artista, solo si algo orgánico no llega (con permiso del usuario).
 - **Estilo de las ilustraciones** de historia y notas: el manga de tinta de la DECISIÓN 18A queda
   para la caja viva, si es la elegida. Las otras líneas necesitan el suyo, y eso se decide después
   de la 23.
