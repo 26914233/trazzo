@@ -81,6 +81,8 @@ var sala: Node3D
 var dormida := false
 var cara_completa := false
 var bloqueo_por_ojo := 0              # veces que el ojo frenó algo (lo mira la prueba)
+var piezas_del_ojo: Array = []        # las que no se dejan mientras el ojo te ve
+var alientos := 0                     # veces que la caja contuvo el aliento (lo mira la prueba)
 var _cierre := 1.0                    # párpados: 0 abiertos, 1 cerrados
 var _despierta := false
 var _enfado := 0.0
@@ -88,6 +90,10 @@ var _parpadeo := 4.0
 var _parpadeando := 0.0
 var _tiempo := 0.0
 var _avisado_ojo := false
+var _mirar_a := Vector3.ZERO          # adónde mira el ojo cuando algo no se deja (tu mano)
+var _mirada := 0.0
+var _aliento := 0.0                   # segundos que le quedan conteniendo el aliento
+var _respiracion := 1.0
 var _ruido := FastNoiseLite.new()
 
 var madera: Material
@@ -449,6 +455,7 @@ func _costados() -> void:
 		if lado_derecho.en(CORRE):
 			completar("costado_derecho"))
 	lado_izquierdo.permiso = func() -> bool: return tapa.en(TAPA_1) and not ve()
+	piezas_del_ojo.append(lado_izquierdo)
 	lado_izquierdo.rechazada.connect(func(_p):
 		if tapa.en(TAPA_1):
 			_quizas_enfadar())
@@ -479,6 +486,7 @@ func _disco_y_cajoncito() -> void:
 	_toro(radio - 0.0012, radio + 0.0014, laton, cara_disco).rotation = Vector3(PI / 2.0, 0.0, 0.0)
 	disco.colisor(_forma_cilindro(radio, 0.008), Transform3D(Basis(Vector3.FORWARD, PI / 2.0), Vector3.ZERO))
 	disco.permiso = func() -> bool: return lado_izquierdo.en(CORRE) and not ve()
+	piezas_del_ojo.append(disco)
 	disco.rechazada.connect(func(_p): _quizas_enfadar())
 	agregar(disco, caja)
 	disco.accionada.connect(func(_p):
@@ -717,6 +725,7 @@ func _hueco_cara(id_hueco: String, acepta: String, padre: Node3D, posicion: Vect
 	hueco.colisor_caja(Vector3(caja_hueco.size.x + 0.008, caja_hueco.size.y + 0.008, 0.006))
 	hueco.permiso = func() -> bool: return dormida
 	hueco.rechazada.connect(func(_p): _quizas_enfadar())
+	piezas_del_ojo.append(hueco)
 	agregar(hueco, padre)
 	hueco.accionada.connect(func(_p):
 		completar("cara_" + acepta)
@@ -1177,6 +1186,24 @@ func _quizas_enfadar() -> void:
 		mesa.mensaje("La caja te está mirando. Mientras te vea, no se deja tocar.", 4.5)
 
 
+# --- La resistencia: la caja contiene el aliento -------------------------------------------------
+
+# Cuando algo no se deja, ni se mueve ni se marca: la caja contiene el aliento. Un hilo de humo de
+# incienso se le escapa por la junta que tocaste y deja de respirar un momento. Si el ojo está
+# despierto, mira tu mano y lo entorna; si es él quien la frena, además gruñe (_quizas_enfadar).
+# Si insistes, resopla.
+func resistir(pieza: Pieza, punto: Vector3, veces: int) -> void:
+	var fuerza := mini(veces, 3)
+	Efectos.humo(self, punto, Color(0.86, 0.84, 0.8), 8 + 4 * fuerza, 0.9 + 0.25 * fuerza)
+	alientos += 1
+	_aliento = 1.2 + 0.3 * fuerza
+	if (_despierta and not dormida) or cara_completa:
+		_mirar_a = punto
+		_mirada = 1.5
+	if veces >= 3 and not (pieza in piezas_del_ojo and ve()):
+		mesa.sonido.sonar("suspiro", -10.0, 1.3)
+
+
 func _dormir() -> void:
 	dormida = true
 	mesa.sonido.sonar("suspiro", -2.0)
@@ -1232,9 +1259,11 @@ func animar_vitrina(delta: float, camara: Camera3D, activa: bool) -> void:
 func _animar(delta: float, posicion_camara: Vector3) -> void:
 	_tiempo += delta
 	_enfado = maxf(0.0, _enfado - delta)
+	_mirada = maxf(0.0, _mirada - delta)
+	_aliento = maxf(0.0, _aliento - delta)
 	var objetivo := 1.0
 	if (_despierta and not dormida) or cara_completa:
-		objetivo = 0.5 if _enfado > 0.0 else 0.0
+		objetivo = 0.5 if _enfado > 0.0 else (0.3 if _mirada > 0.0 else 0.0)
 		_parpadeo -= delta
 		if _parpadeo <= 0.0:
 			_parpadeo = randf_range(3.5, 8.0)
@@ -1248,13 +1277,15 @@ func _animar(delta: float, posicion_camara: Vector3) -> void:
 	material_iris.emission_energy_multiplier = lerpf(material_iris.emission_energy_multiplier, intensidad, minf(1.0, delta * 6.0))
 	if not dormida:
 		luz_ojo.light_energy = (0.22 + _enfado * 1.4) if (_despierta or cara_completa) else 0.0
-	# la pupila mira a la cámara
-	var hacia: Vector3 = ojo.global_basis.orthonormalized().inverse() * (posicion_camara - ojo.global_position).normalized()
+	# la pupila mira a la cámara o, si algo no se deja, a tu mano
+	var mira := _mirar_a if _mirada > 0.0 else posicion_camara
+	var hacia: Vector3 = ojo.global_basis.orthonormalized().inverse() * (mira - ojo.global_position).normalized()
 	var mirada := Vector2(hacia.x, hacia.y).limit_length(1.0) * 0.0042
 	pupila.position = Vector3(mirada.x, mirada.y, 0.0024)
 	pupila.scale = Vector3.ONE * (0.75 if _enfado > 0.0 else 1.0)
-	# respira: más despacio cuando duerme
-	var respiro := sin(_tiempo * (1.1 if dormida else 2.0)) * (0.004 if dormida else 0.0018)
+	# respira: más despacio cuando duerme; contiene el aliento cuando algo no se deja
+	_respiracion = move_toward(_respiracion, 0.0 if _aliento > 0.0 else 1.0, delta * 3.0)
+	var respiro := sin(_tiempo * (1.1 if dormida else 2.0)) * (0.004 if dormida else 0.0018) * _respiracion
 	caja.scale = Vector3.ONE * (1.0 + respiro)
 	if espiritu.visible:
 		espiritu.position.x += sin(_tiempo * 3.0) * delta * 0.01
@@ -1368,6 +1399,11 @@ func arrastre_de_prueba() -> Dictionary:
 
 
 # Una pieza bloqueada al empezar (la prueba comprueba que no se mueve al tocarla)
+# Para los clips de la resistencia: la cara y la tapa a la vez
+func encuadre_de_prueba() -> Dictionary:
+	return {"centro": Vector3(0.0, CENTRO_Y + 0.03, 0.02), "distancia": 0.62, "guinada": 0.45, "cabeceo": 0.55}
+
+
 func bloqueo_de_prueba() -> Pieza:
 	return tapa
 
@@ -1378,6 +1414,7 @@ func capturas_de_prueba() -> Array:
 
 func comprobaciones() -> Array:
 	return [["el ojo frena el costado izquierdo mientras te ve", bloqueo_por_ojo >= 1],
+		["si algo no se deja, la caja contiene el aliento (humo, sin destello)", alientos >= 1],
 		["la ficha duerme al ojo y la cara se deja tocar", hecho("dormir")],
 		["el incensario se abre cuando el león mira a la montaña", hecho("incensario")],
 		["con la cara completa, la caja despierta y abre la boca", cara_completa]]

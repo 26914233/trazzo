@@ -34,6 +34,7 @@ var sala: Node3D
 var en_marcha := false
 var cierre_suelto := false
 var cajon_bloqueado_antes := false    # para la prueba: el cajón no se abría antes de tiempo
+var meneos := 0                       # veces que el minutero dijo que no (lo mira la prueba)
 var _tiempo := 0.0
 var _ruido := FastNoiseLite.new()
 
@@ -243,8 +244,11 @@ func _aguja(id_aguja: String, posicion: Vector3, largo: float, ancho: float, ini
 	aguja.volumen_tope = -10.0
 	var forma := PackedVector2Array([Vector2(0.0, -largo * 0.18), Vector2(ancho / 2.0, 0.0), Vector2(0.0, largo),
 		Vector2(-ancho / 2.0, 0.0)])
+	# la malla va en un pivote propio: así la aguja puede menearse («no, no») sin cambiar la hora
+	var meneo := Escena.grupo(aguja, Vector3.ZERO, "Meneo")
+	aguja.set_meta("meneo", meneo)
 	var malla := Geometria.pieza(Geometria.extruir(forma, 0.0012), Materiales.liso(Color(0.05, 0.06, 0.1), 0.3, 0.6),
-		Vector3.ZERO, aguja)
+		Vector3.ZERO, meneo)
 	malla.rotation = Vector3(-PI / 2.0, 0.0, 0.0)
 	# solo la parte de fuera de cada aguja se puede agarrar, para no confundirlas
 	var desde := 0.012 if id_aguja == "aguja_hora" else 0.04
@@ -256,6 +260,34 @@ func _aguja(id_aguja: String, posicion: Vector3, largo: float, ancho: float, ini
 	agregar(aguja, tapa)
 	aguja.accionada.connect(func(_p): _comprobar_hora())
 	return aguja
+
+
+# --- La resistencia: el reloj dice que no -------------------------------------------------------------
+
+# Cuando algo no se deja, ni se mueve ni se marca: el minutero se menea como un dedo («no, no») y cae
+# polvo de latón de lo que tocaste. Si insistes, se menean las dos agujas. Si lo que no se deja son las
+# propias agujas, es que el reloj está parado y ni siquiera puede menearse: solo cae el polvo.
+func resistir(pieza: Pieza, punto: Vector3, veces: int) -> void:
+	Efectos.polvo(self, punto, Color(0.95, 0.78, 0.42), 18 + 6 * mini(veces, 3), 1.6)
+	if pieza == aguja_hora or pieza == aguja_minuto:
+		return
+	meneos += 1
+	_menear(aguja_minuto, 0.34)
+	if veces >= 3:
+		_menear(aguja_hora, 0.26)
+
+
+func _menear(aguja: PiezaGiratoria, amplitud: float) -> void:
+	var meneo: Node3D = aguja.get_meta("meneo")
+	if aguja.has_meta("animacion_meneo"):
+		var anterior: Tween = aguja.get_meta("animacion_meneo")
+		if anterior and anterior.is_valid():
+			anterior.kill()
+	var animacion := create_tween()
+	for angulo in [amplitud, -amplitud, amplitud * 0.6, -amplitud * 0.6, 0.0]:
+		animacion.tween_property(meneo, "rotation:y", angulo, 0.085).set_trans(Tween.TRANS_SINE)
+	aguja.set_meta("animacion_meneo", animacion)
+	mesa.sonido.sonar("clic_metal", -16.0, 1.6)
 
 
 func hora() -> int:
@@ -596,6 +628,11 @@ func arrastre_de_prueba() -> Dictionary:
 
 
 # Una pieza bloqueada al empezar (la prueba comprueba que no se mueve al tocarla)
+# Para los clips de la resistencia: la esfera del reloj y el cajón del costado a la vez
+func encuadre_de_prueba() -> Dictionary:
+	return {"centro": Vector3(-0.03, ALTO * 0.6, 0.0), "distancia": 0.6, "guinada": -0.85, "cabeceo": 0.6}
+
+
 func bloqueo_de_prueba() -> Pieza:
 	return cajon
 
@@ -605,4 +642,5 @@ func capturas_de_prueba() -> Array:
 
 func comprobaciones() -> Array:
 	return [["el cajón no se abre antes de la hora", cajon_bloqueado_antes],
+		["si algo no se deja, el minutero dice que no (sin destello)", meneos >= 1],
 		["la maquinaria completa gira", hecho("insertar")]]

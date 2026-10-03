@@ -29,7 +29,8 @@ la versión 0.9 mientras tanto.
   - `capturas/gabinete.jpg`: el menú;
   - `capturas/entradas.jpg`: la cámara entrando en cada sala;
   - `capturas/cuatro_prototipos.jpg`: las cuatro cajas en juego;
-  - `capturas/toques_y_examen.jpg`: el doble toque y el examen de objetos.
+  - `capturas/toques_y_examen.jpg`: el doble toque y el examen de objetos;
+  - `capturas/resistencia.jpg`: cómo se resiste cada caja (0.3).
 
   Las PNG que deja la prueba automática no se suben a git.
 
@@ -69,10 +70,14 @@ Cada caja dura unos 5-15 minutos **[Estimación, sin probar aún con jugadores]*
 - la puerta del taller tapaba la mitad de la entrada;
 - el engranaje se veía negro y el cristal, blanco, al examinarlos.
 
-**En el repositorio, todavía sin APK:** la caja viva profunda.
-- Tiene 19 pasos: la cara incompleta, el incensario de la mesa, el rollo de la pared y el altar del
-  final.
-- Su aspecto se rehace según la DECISIÓN 27 (`bocetos/` y `PLAN.md` §6).
+**La 0.3, en el repositorio (todavía sin APK):**
+- **La caja viva profunda:**
+  - tiene 19 pasos: la cara incompleta, el incensario de la mesa, el rollo de la pared y el altar del
+    final;
+  - su aspecto se rehace según la DECISIÓN 27 (`bocetos/` y `PLAN.md` §6).
+- **La resistencia creativa**, que pidió el usuario: lo bloqueado ni se mueve ni se marca, y el objeto
+  se resiste a su manera (`BIBLIA_DISENO.md` §3.4). Hoja con cuatro momentos de cada caja:
+  `capturas/resistencia.jpg`.
 
 ## Cómo se juega
 
@@ -83,7 +88,10 @@ Cada caja dura unos 5-15 minutos **[Estimación, sin probar aún con jugadores]*
 - **Un dedo sobre una pieza:**
   - arrastrarla: paneles, cajones, diales, manivela, anillos, tapas;
   - con un toque, la pieza avanza a su siguiente posición o se abre.
-- **Lo que está bloqueado no se mueve:** da una señal y, la primera vez, una línea de texto.
+- **Lo que está bloqueado ni se mueve ni se marca:** suena «trabado» y el objeto se resiste a su manera:
+  la caja viva contiene el aliento, el minutero dice que no, la luz de la reliquia se retira y la
+  tormenta responde en el faro. Si insistes, va a más. La primera vez, una línea de texto explica por
+  qué.
 - **Objetos:**
   - se tocan para guardarlos en la columna de la izquierda;
   - se elige uno y se toca donde se quiere usar;
@@ -111,16 +119,16 @@ Cada caja dura unos 5-15 minutos **[Estimación, sin probar aún con jugadores]*
     resumen final;
   - `sonido.gd` y `estilo.gd`, este con letras, iconos y botones;
   - `piezas/`: deslizante, giratoria, bisagra, pulsador, recogible, ranura, nota y punto de vista.
-    Todas tienen la señal de bloqueo;
-  - `puzle.gd`: la base de cada caja (pasos, pistas, zonas, entrada, vitrina y lo que necesita la
-    prueba);
+    Cuando están bloqueadas, ni se mueven ni se marcan: suenan y avisan a su caja;
+  - `puzle.gd`: la base de cada caja (pasos, pistas, zonas, entrada, vitrina, la resistencia de cada
+    objeto con `resistir()` y lo que necesita la prueba);
+  - `efectos.gd`: humo, polvo y motas de luz de un instante, para la resistencia;
   - `geometria.gd`, `materiales.gd`, `escena.gd` y `arquitectura.gd`: mallas, materiales, montaje de
     escenas y salas (paredes con huecos, puertas, ventanas, libros, relojes), todo por código.
 - **`salas/`:** `washitsu.gd`, `taller.gd` y `santuario.gd`. La torre del farero está en su propio
   guion.
 - **`prototipos/`:** `caja_viva.gd`, `relojero.gd`, `reliquia.gd` y `farero.gd`.
-- **`shaders/`:** cielo, resalte de ayuda, destello de bloqueo, surcos de luz, tormenta y niebla de
-  Londres.
+- **`shaders/`:** cielo, resalte de ayuda, surcos de luz, tormenta y niebla de Londres.
 - **`recursos/`:**
   - texturas, sonidos e iconos;
   - fuentes: Liberation Serif, con licencia OFL (`recursos/fuentes/LICENCIA_OFL.txt`).
@@ -130,7 +138,7 @@ Cada caja dura unos 5-15 minutos **[Estimación, sin probar aún con jugadores]*
 ```bash
 # Prueba automática: el gabinete y las cuatro cajas (entrada, bloqueo, doble toque, avisos,
 # pistas, un arrastre real, examen y final)
-xvfb-run -a godot --path puzles/godot --rendering-driver opengl3 -- --prueba        # 108 comprobaciones
+xvfb-run -a godot --path puzles/godot --rendering-driver opengl3 -- --prueba        # 116 comprobaciones
 xvfb-run -a godot --path puzles/godot --rendering-driver opengl3 -- --prueba --solo=farero
 
 # Revisar que todos los guiones compilan, sin abrir el juego
@@ -139,6 +147,9 @@ godot --headless --path puzles/godot --script res://scripts/comprobar_guiones.gd
 # Revisión visual: fotos de una caja desde sus zonas y en los pasos que se elijan (no va en el APK)
 xvfb-run -a godot --path puzles/godot --rendering-driver opengl3 --fixed-fps 30 \
   --script res://scripts/vistas.gd -- --ver=caja_viva --zonas=cara,incensario --pasos=ojo --salida=/ruta/
+# ...o un clip, cuadro a cuadro, de cómo se resiste a tres toques (en el farero, --resistencia=escritorio)
+xvfb-run -a godot --path puzles/godot --rendering-driver opengl3 --fixed-fps 30 \
+  --script res://scripts/vistas.gd -- --ver=relojero --resistencia --salida=/ruta/
 
 # Hojas de bocetos para el móvil
 python3 puzles/herramientas/hojas_bocetos.py <carpeta de salida>

@@ -9,9 +9,10 @@ Reliquia: zumbido (bucle), despertar, pulso, luz que fluye, cristal, despliegue 
 Farero: lluvia y viento (bucles), trueno, candado, libro, llave, trampilla, cerilla y el final.
 Salas (0.2): traba seca de «así no», viaje de la cámara, puerta corredera, puerta con bisagra, fuego
 de chimenea y péndulo (bucles) y el ambiente del gabinete del menú (bucle).
+Resistencia (0.3): la racha de viento con la que la tormenta responde en el farero.
 
 Uso:  python3 puzles/herramientas/generar_sonidos.py [grupo ...]   (sin grupos: todos)
-      grupos: comunes, caja_viva, relojero, reliquia, farero, salas
+      grupos: comunes, caja_viva, relojero, reliquia, farero, salas, resistencia
 """
 
 import sys
@@ -451,8 +452,24 @@ def salas():
     guardar("gabinete", bucle(x, 1.5), 0.55)
 
 
+# --- Resistencia (0.3) --------------------------------------------------------------------------
+
+def resistencia():
+    # Con su propia semilla, para que salga igual aunque se genere sola
+    global azar
+    azar = np.random.default_rng(303)
+    # Racha: el viento golpea la ventana del farero, silba y hace traquetear el marco
+    t = tiempo(1.5)
+    x = banda(blanco(1.5), 250, 1800) * envolvente(len(t), 0.12, 0.45)
+    x += np.sin(2 * np.pi * np.cumsum(620 + 260 * np.exp(-t / 0.5)) / FM) * 0.07 * envolvente(len(t), 0.15, 0.4)
+    for k, (inicio, ganancia) in enumerate(((0.09, 0.9), (0.17, 0.7), (0.26, 0.55), (0.4, 0.35))):
+        golpe = blanco(0.04) * envolvente(muestras(0.04), 0.0004, 0.006)
+        colocar(x, resonancia(golpe, 1500 + 350 * k, 20), inicio, ganancia)
+    guardar("racha", x, 0.6)
+
+
 def main():
-    grupos = {g.__name__: g for g in (comunes, caja_viva, relojero, reliquia, farero, salas)}
+    grupos = {g.__name__: g for g in (comunes, caja_viva, relojero, reliquia, farero, salas, resistencia)}
     for nombre in sys.argv[1:] or list(grupos):
         print(nombre)
         grupos[nombre]()

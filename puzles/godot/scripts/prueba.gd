@@ -1,8 +1,8 @@
 # Prueba automática: recorre el gabinete (portada, juegos, cajas) y abre cada caja jugable con su
-# entrada por la habitación. Comprueba el doble toque (acercar y volver), que una pieza bloqueada no
-# se mueve, que se puede examinar un objeto en 3D, las pistas, un arrastre de verdad con eventos de
-# toque, y la resuelve paso a paso con las mismas piezas que usa el jugador. Guarda capturas en
-# puzles/capturas/.
+# entrada por la habitación. Comprueba el doble toque (acercar y volver), que una pieza bloqueada ni
+# se mueve ni se marca (el objeto se resiste a su manera), que se puede examinar un objeto en 3D, las
+# pistas, un arrastre de verdad con eventos de toque, y la resuelve paso a paso con las mismas piezas
+# que usa el jugador. Guarda capturas en puzles/capturas/.
 #   xvfb-run -a godot --path puzles/godot --rendering-driver opengl3 -- --prueba [--solo=<id>]
 # Sale con código 0 si todo fue bien y 1 si algo falló.
 extends Node
@@ -107,21 +107,28 @@ func _probar(datos: Dictionary) -> void:
 		and alto_aviso < get_viewport().get_visible_rect().size.y * 0.35, "%d px de alto" % int(alto_aviso))
 	await _capturar(datos.id + "_primer_aviso")
 
-	# Bloqueo: la pieza no se mueve, suena y lo cuenta
+	# Bloqueo: la pieza ni se mueve ni se marca; suena, lo cuenta y el objeto se resiste a su manera
 	if puzle.has_method("bloqueo_de_prueba"):
 		# se mira respecto a su padre: la caja viva respira y la reliquia flota
 		var pieza: Pieza = puzle.bloqueo_de_prueba()
 		var antes: Transform3D = pieza.transform
 		var bloqueos_antes: int = mesa.bloqueos
+		var resistencias_antes: int = mesa.resistencias
 		pieza.tocar()
 		var se_movio := false
+		var marcada := false
 		var fin := Time.get_ticks_msec() + 600
 		while Time.get_ticks_msec() < fin:
 			await get_tree().process_frame
 			if not pieza.transform.is_equal_approx(antes):
 				se_movio = true
-		_registrar(datos.id + ": una pieza bloqueada no se mueve, pero avisa", not se_movio and mesa.bloqueos > bloqueos_antes
-			and "trabado" in mesa.sonido.sonados)
+			for malla in pieza.find_children("*", "MeshInstance3D", true, false):
+				if (malla as MeshInstance3D).material_overlay != null:
+					marcada = true
+		_registrar(datos.id + ": una pieza bloqueada no se mueve ni se marca, pero suena", not se_movio
+			and not marcada and mesa.bloqueos > bloqueos_antes and "trabado" in mesa.sonido.sonados)
+		_registrar(datos.id + ": el objeto se resiste a su manera", mesa.resistencias > resistencias_antes)
+		await _capturar(datos.id + "_resistencia")
 
 	# Doble toque: acerca la cámara y, sobre el vacío, la devuelve
 	await _probar_doble_toque(datos, mesa)

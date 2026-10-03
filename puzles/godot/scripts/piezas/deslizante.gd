@@ -1,6 +1,7 @@
 # Pieza que se desliza a lo largo de un eje y se queda en topes: paneles, cajones, libros.
 # Se arrastra con el dedo (el movimiento se proyecta sobre el eje tal como se ve en pantalla)
-# o se toca para ir al siguiente tope. Contra un límite bloqueado no se mueve: suena trabada y destella.
+# o se toca para ir al siguiente tope. Contra un límite bloqueado no pasa: suena trabada y el objeto se
+# resiste a su manera.
 class_name PiezaDeslizante
 extends Pieza
 

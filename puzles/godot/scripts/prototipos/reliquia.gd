@@ -45,6 +45,11 @@ var final_luz := -1
 var camino: Array = []                # [[anillo, surco]] por donde pasa la luz
 var _rellenos := {}                   # material -> relleno objetivo
 var sala: Node3D
+var energia_nucleo := 0.15            # brillo del núcleo y de su luz, antes de que se retire
+var energia_luz_nucleo := 0.0
+var retiradas := 0                    # veces que la luz se retiró al núcleo (lo mira la prueba)
+var _retraccion := 0.0
+var _sobresalto := 0.0                # dormida, el núcleo late un instante, como quien se revuelve
 var _tiempo := 0.0
 
 var metal: Material
@@ -228,8 +233,8 @@ func _tocar_nucleo() -> void:
 		mesa.sonido.sonar("despertar", -1.0)
 		mesa.sonido.bucle("zumbido", -10.0, 2.0)
 		var animacion := create_tween().set_parallel()
-		animacion.tween_property(material_nucleo, "emission_energy_multiplier", 2.2, 1.5)
-		animacion.tween_property(luz_nucleo, "light_energy", 1.4, 1.5)
+		animacion.tween_property(self, "energia_nucleo", 2.2, 1.5)
+		animacion.tween_property(self, "energia_luz_nucleo", 1.4, 1.5)
 		if sala:
 			sala.encender(1.0)
 		mesa.mensaje("La reliquia despierta. La luz sale del núcleo hacia arriba.", 3.6)
@@ -475,9 +480,33 @@ func actualizar(delta: float) -> void:
 			energia = 0.6 + 0.8 * (0.5 + 0.5 * sin(_tiempo * 4.0))
 		material.emission_energy_multiplier = energia
 	if hecho("glifo_2"):
-		material_nucleo.emission_energy_multiplier = 2.2 + sin(_tiempo * 9.0) * 1.0
+		energia_nucleo = 2.2 + sin(_tiempo * 9.0) * 1.0
+	# el núcleo y su luz: se apagan un instante si la luz se retira; dormida, laten al revolverse
+	_retraccion = move_toward(_retraccion, 0.0, delta * 1.3)
+	_sobresalto = move_toward(_sobresalto, 0.0, delta * 1.6)
+	var apagado := 1.0 - 0.85 * sin(_retraccion * PI / 2.0)
+	var latido := sin(_sobresalto * PI)
+	material_nucleo.emission_energy_multiplier = energia_nucleo * apagado + 2.4 * latido
+	luz_nucleo.light_energy = energia_luz_nucleo * apagado + 0.9 * latido
 	if holograma.visible:
 		holograma.rotation.y += delta * 0.15
+
+
+# --- La resistencia: la luz se retira ----------------------------------------------------------------
+
+# Cuando algo no se deja, ni se mueve ni se marca: la luz se retira. Unas motas salen de donde tocaste y
+# vuelven al núcleo, que se apaga un instante, como si contuviera la luz. Si la reliquia duerme, el
+# núcleo se revuelve en sueños: late una vez al recibirlas. Si insistes, late grave.
+func resistir(pieza: Pieza, punto: Vector3, veces: int) -> void:
+	retiradas += 1
+	var dispersion := 0.06 if pieza == nucleo else 0.02
+	Efectos.motas_hacia(self, punto, nucleo, color_luz, 9 + 3 * mini(veces, 3), dispersion, 1.8)
+	if despierta:
+		_retraccion = 1.0
+	else:
+		_sobresalto = 1.0
+	if veces >= 3:
+		mesa.sonido.sonar("pulso", -9.0, 0.6)
 
 
 # En el gabinete del menú: flota y el núcleo late más cuando la miras
@@ -548,6 +577,11 @@ func arrastre_de_prueba() -> Dictionary:
 
 
 # Una pieza bloqueada al empezar (la prueba comprueba que no se mueve al tocarla)
+# Para los clips de la resistencia: los anillos y el núcleo
+func encuadre_de_prueba() -> Dictionary:
+	return {"centro": Vector3(0.0, 0.0, 0.01), "distancia": 0.62, "guinada": 0.3, "cabeceo": 0.12}
+
+
 func bloqueo_de_prueba() -> Pieza:
 	return anillos[0]
 
@@ -557,4 +591,5 @@ func capturas_de_prueba() -> Array:
 
 func comprobaciones() -> Array:
 	return [["la luz llega al glifo de arriba a la derecha", final_luz == GLIFO_2],
+		["si algo no se deja, la luz se retira al núcleo (sin destello)", retiradas >= 1],
 		["el cristal cambió el color de la luz", color_luz == VIOLETA]]

@@ -580,6 +580,13 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
     código más texturas pintadas con IA, con una prueba de calidad primero. Blender (descarga grande)
     o IA 3D (créditos) solo con su permiso.
   - Las dos están en `puzles/PLAN.md` §6.
+- **Resistencia creativa (pedida por el usuario el 03-10-2026, hecha):** lo bloqueado ni se mueve ni
+  se marca (nada de destello rojo); el sonido «trabado» le gusta y se queda. Reacciona el objeto entero,
+  cada uno a su manera, y va a más si se insiste (`BIBLIA_DISENO.md` §3.4):
+  - la caja viva contiene el aliento: humo por la junta, deja de respirar y el ojo mira la mano;
+  - el minutero del relojero se menea como un dedo que dice que no;
+  - la luz de la reliquia se retira al núcleo (si duerme, el núcleo late una vez);
+  - en el farero responde la tormenta: racha y la llama del quinqué que se agacha.
 - **Decisiones abiertas que propone la biblia (03-10-2026)** (`PLAN.md` §5; ninguna tomada):
   - **24, cómo se organiza el juego:** recomendada la C, una línea completa de 4 cajas más la caja 1
     de las otras como muestras;
@@ -593,15 +600,19 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   - Arte y sonido por código: `puzles/herramientas/generar_texturas.py`, `generar_sonidos.py` y
     `generar_iconos.py`. Tras generar texturas, reimportar y revisar sus `.import`
     (`puzles/LEEME.md`).
-- **Lecciones técnicas de la 0.2:**
+- **Lecciones técnicas de la 0.2 y la 0.3:**
   - Una etiqueta con ajuste de línea mide su alto con el ancho que tiene: hay que dárselo antes de
     calcular el tamaño de su panel.
   - Los metales necesitan un cielo que reflejar, aunque no se vea (`entorno_estudio()` de `mesa.gd`).
   - Un guion nuevo con `class_name` pide reimportar el proyecto.
+  - En Compatibility, las partículas (`CPUParticles3D`) con `material_override` salen negras: el
+    material va en la malla (`quad.material`).
+  - `Mesa.caja_de(nodo)` da la caja en el espacio del padre del nodo, no en el suyo.
 - **Revisión visual:** `scripts/vistas.gd` saca fotos de una caja desde sus zonas y en los pasos
   elegidos; no va en el APK (`puzles/LEEME.md`, «Comandos»).
 - **Prueba automática:** `xvfb-run -a godot --path puzles/godot --rendering-driver opengl3 -- --prueba`.
-  - Da 95 de 95 en la 0.2.1 y 108 de 108 con la caja viva profunda (aún sin APK).
+  - Da 95 de 95 en la 0.2.1 y 116 de 116 con la caja viva profunda y la resistencia creativa (aún sin
+    APK).
   - Las esperas de la prueba van en tiempo real y comprobando el estado: sin tarjeta gráfica, un
     cuadro puede tardar segundos mientras compila sombreadores.
 - **APK de prueba:** `puzles-0.2.1-prueba.apk` en Drive › `Respaldos Claude/puzles/`.

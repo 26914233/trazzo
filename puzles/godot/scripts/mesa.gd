@@ -50,6 +50,9 @@ var tiempos := {}                     # paso -> segundos desde el inicio
 var pistas_por_paso := {}
 var pistas_total := 0
 var bloqueos := 0
+var resistencias := 0                 # veces que el objeto reaccionó a un bloqueo (lo mira la prueba)
+var pieza_tocada: Pieza               # la última pieza que tocó el dedo y dónde (para la resistencia)
+var punto_tocado := Vector3.ZERO
 var toques_total := 0
 var acabado := false
 
@@ -190,6 +193,8 @@ func _arrastre(evento: InputEventScreenDrag) -> void:
 		var recorrido := evento.position - _toque_inicio
 		if not _candidato.is_empty() and _candidato.pieza.arrastrable():
 			_agarre = _candidato.pieza
+			pieza_tocada = _agarre
+			punto_tocado = _candidato.punto
 			_agarre.empezar_arrastre(_candidato.punto, camara.camara)
 			_agarre.arrastrar(recorrido, evento.position, camara.camara)
 		else:
@@ -240,6 +245,8 @@ func _toque_simple(toque: Dictionary) -> void:
 		return
 	var candidato: Dictionary = toque.candidato
 	if not candidato.is_empty() and is_instance_valid(candidato.pieza) and candidato.pieza.interactiva():
+		pieza_tocada = candidato.pieza
+		punto_tocado = candidato.punto
 		candidato.pieza.tocar()
 	elif seleccionado != "":
 		seleccionar("")
@@ -345,6 +352,32 @@ func centrar() -> void:
 
 func registrar_bloqueo(_pieza: Pieza) -> void:
 	bloqueos += 1
+
+
+# Una pieza no se deja: el objeto se resiste a su manera donde la tocaste (si la pieza se rechaza
+# sin el dedo, desde la cara de la pieza que mira a la cámara). Cuenta las veces seguidas que se
+# insiste en la misma.
+func resistir(pieza: Pieza) -> void:
+	if puzle == null:
+		return
+	var punto := punto_tocado if pieza == pieza_tocada else _cara_visible(pieza)
+	resistencias += 1
+	puzle.resistir(pieza, punto, puzle.insistencia(pieza))
+
+
+# Punto de la caja de la pieza que mira a la cámara (si el efecto naciera en el centro, quedaría dentro)
+func _cara_visible(pieza: Pieza) -> Vector3:
+	var padre := pieza.get_parent() as Node3D
+	var caja := caja_de(pieza)                      # en el espacio del padre de la pieza
+	var centro := caja.get_center()
+	var hacia := (padre.global_transform.affine_inverse() * camara.camara.global_position - centro).normalized()
+	var distancia := INF
+	for eje in 3:
+		if absf(hacia[eje]) > 0.0001:
+			distancia = minf(distancia, caja.size[eje] / 2.0 / absf(hacia[eje]))
+	if distancia == INF:
+		distancia = 0.0
+	return padre.to_global(centro + hacia * (distancia + 0.002))
 
 
 func paso_hecho(id: String) -> void:

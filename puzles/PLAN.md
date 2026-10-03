@@ -156,6 +156,21 @@ La biblia compara la 0.2.1 con la referencia (anexo A). Su conclusión **[Opini�
 - pistas de 4 niveles (DECISIÓN 26);
 - prueba en un móvil de verdad (el rendimiento en el teléfono está por medir).
 
+### 2.2 La resistencia creativa (03-10-2026) [Hecho]
+
+El usuario, tras probar la 0.2.1: «La resistencia hay que hacerla creativa». No quería que lo
+bloqueado se marcara en rojo ni que se moviera; el sonido sí le gustaba.
+
+- **Lo que cambia:** la pieza bloqueada ya ni se mueve ni se marca; siguen el sonido «trabado» y la
+  vibración corta.
+- **Quién reacciona:** el objeto entero, cada uno a su manera (`BIBLIA_DISENO.md` §3.4):
+  - la caja viva contiene el aliento: humo por la junta, deja de respirar y el ojo mira tu mano;
+  - el minutero del relojero se menea como un dedo que dice que no;
+  - la luz de la reliquia se retira al núcleo (si duerme, el núcleo late una vez, como en sueños);
+  - en el farero responde la tormenta: una racha que agacha la llama del quinqué.
+- **Si insistes**, la reacción va a más.
+- **Prueba automática:** 116 de 116, con la caja viva profunda.
+
 ## 3. Cómo se valida (lo que pide la DECISIÓN 23)
 
 1. **Tú primero:** instala `puzles-0.2.1-prueba.apk` y juega los cuatro sin pistas al principio.

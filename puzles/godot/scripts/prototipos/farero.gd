@@ -37,6 +37,9 @@ var candado_abierto := false
 var encendido := false
 var _proximo_rayo := 6.0
 var _destello := 0.0
+var rachas := 0                       # veces que la tormenta respondió a un bloqueo (lo mira la prueba)
+var _racha := 0.0
+var _lado_racha := 1.0
 var _tiempo := 0.0
 var _ruido := FastNoiseLite.new()
 
@@ -669,8 +672,14 @@ func al_llegar() -> void:
 
 func actualizar(delta: float) -> void:
 	_tiempo += delta
-	quinque.light_energy = 1.6 + _ruido.get_noise_1d(_tiempo * 4.0) * 0.18
-	llama.scale = Vector3(1.0, 1.0 + _ruido.get_noise_1d(_tiempo * 6.0 + 9.0) * 0.15, 1.0)
+	# la llama del quinqué tiembla sola; con una racha se agacha y la habitación se apaga un instante
+	_racha = move_toward(_racha, 0.0, delta * 1.2)
+	var golpe := sin(_racha * PI / 2.0)
+	var temblor := sin(_tiempo * 38.0) * 0.25 * golpe
+	quinque.light_energy = (1.6 + _ruido.get_noise_1d(_tiempo * 4.0) * 0.18) * (1.0 - 0.75 * golpe + temblor)
+	llama.scale = Vector3(1.0 + 0.3 * golpe,
+		(1.0 + _ruido.get_noise_1d(_tiempo * 6.0 + 9.0) * 0.15) * (1.0 - 0.55 * golpe), 1.0)
+	llama.rotation.z = (golpe * 0.75 + temblor) * _lado_racha
 	for k in numeros.size():
 		(numeros[k] as Label3D).text = str(digito(ruedas[k]))
 	_proximo_rayo -= delta
@@ -685,6 +694,22 @@ func actualizar(delta: float) -> void:
 	if encendido:
 		haz.rotation.y += delta * 0.9
 		lampara.light_energy = 2.2 + _ruido.get_noise_1d(_tiempo * 5.0) * 0.2
+
+
+# --- La resistencia: la tormenta responde ---------------------------------------------------------
+
+# Cuando algo no se deja, ni se mueve ni se marca: la tormenta responde. Una racha golpea la ventana,
+# la llama del quinqué se agacha (la habitación se apaga un instante) y cae polvo de lo que tocaste.
+# Si insistes, truena.
+func resistir(_pieza: Pieza, punto: Vector3, veces: int) -> void:
+	rachas += 1
+	Efectos.polvo(self, punto, Color(0.85, 0.8, 0.72), 16 + 4 * mini(veces, 3), 4.5)
+	_racha = 1.0
+	_lado_racha = -_lado_racha
+	mesa.sonido.sonar("racha", -5.0)
+	if veces >= 3:
+		_destello = 1.0
+		_trueno()
 
 
 func _trueno() -> void:
@@ -782,4 +807,5 @@ func capturas_de_prueba() -> Array:
 
 
 func comprobaciones() -> Array:
-	return [["el candado se abrió con 1887", candado_abierto], ["la lámpara del faro está encendida", encendido]]
+	return [["el candado se abrió con 1887", candado_abierto], ["la lámpara del faro está encendida", encendido],
+		["si algo no se deja, la tormenta responde (sin destello)", rachas >= 1]]

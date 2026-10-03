@@ -14,6 +14,7 @@ var piezas := {}
 var zonas: Array = []                 # [{id, centro, distancia, guinada, cabeceo, radio}]
 var titulo_final := "Abierta"
 var texto_final := ""
+var _insistencia := {"pieza": null, "veces": 0, "ms": 0}
 
 
 # La habitación donde está la caja (no se monta en la vitrina del menú)
@@ -67,6 +68,26 @@ func resolver_paso(_id: String) -> void:
 # Animación del final (puede esperar con await); después se enseña el resumen
 func final() -> void:
 	pass
+
+
+# --- Resistencia ------------------------------------------------------------------------------
+
+# Cómo se resiste el objeto cuando una pieza no se deja (la pieza ni se mueve ni se marca). Cada caja
+# pone la suya; la de por defecto deja caer un poco de polvo de donde tocaste.
+# «veces»: intentos seguidos sobre la misma pieza (1, 2, 3...), para que la reacción vaya a más.
+func resistir(_pieza: Pieza, punto: Vector3, _veces: int) -> void:
+	Efectos.polvo(self, punto)
+
+
+# Cuenta los intentos seguidos sobre la misma pieza; se olvidan tras cinco segundos sin insistir
+func insistencia(pieza: Pieza) -> int:
+	var ahora := Time.get_ticks_msec()
+	if _insistencia.pieza == pieza and ahora - int(_insistencia.ms) < 5000:
+		_insistencia.veces += 1
+	else:
+		_insistencia = {"pieza": pieza, "veces": 1, "ms": ahora}
+	_insistencia.ms = ahora
+	return _insistencia.veces
 
 
 # --- Pasos -----------------------------------------------------------------------------------

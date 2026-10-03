@@ -111,7 +111,7 @@ Es la firma de cada línea. Cada puzle de esa línea usa la regla o la retuerce.
   | Riesgo | Remedio |
   |---|---|
   | Atascarse sin ayuda | Pistas en 4 niveles (§6) |
-  | No saber qué se toca | Materiales que lo dicen (§14) y señal de bloqueo |
+  | No saber qué se toca | Materiales que lo dicen (§14) y la resistencia de cada objeto (§3.4) |
   | Dianas pequeñas para el dedo | Zonas con doble toque (§10) |
   | Repetición | Tabla contra la repetición (§7) |
   | Perder la partida al salir | Guardado a mitad de caja (§11) |
@@ -216,7 +216,8 @@ Tres capas: un núcleo común, la regla de cada línea y unos sistemas transvers
 
 Todas comparten:
 - **permiso:** una condición que decide si la pieza se mueve;
-- **señal de bloqueo:** no se mueve, suena, vibra y destella;
+- **resistencia:** si está bloqueada, ni se mueve ni se marca; suena «trabado», vibra corto y el objeto
+  reacciona a su manera (§3.4);
 - **resalte**, para la última pista;
 - **aviso:** una línea de texto la primera vez que se bloquea.
 
@@ -255,6 +256,30 @@ Aparecen en cualquier línea, como mucho uno nuevo por caja:
 | Reversibilidad | Deshacer es una mecánica | Cerrar un cajón libera otro |
 | Memoria entre cajas | Un objeto de una caja anterior | El objeto guardado de la caja 1, en la caja 4 |
 
+### 3.4 La resistencia de cada objeto [Hecho, 0.3; pedido por el usuario el 03-10-2026]
+
+El usuario no quería que lo bloqueado se marcara en rojo ni que se moviera; el sonido sí le gustaba.
+Ahora la pieza tocada se queda quieta y sin marcas, y es el objeto entero el que se resiste, cada uno
+a su manera. Es la idea del juego en pequeño: objetos que no quieren abrirse.
+
+**Reglas:**
+1. La pieza tocada ni se mueve ni se marca.
+2. Suena el golpe seco «trabado» y vibra corto, como antes.
+3. Reacciona el objeto, con la regla de su línea: la reacción dice por qué no, nunca cuál es la
+   solución.
+4. Va a más si insistes: tres intentos sobre la misma pieza en menos de cinco segundos.
+5. La primera vez, una línea de texto lo explica.
+
+| Línea | Cómo se resiste | Si insistes |
+|---|---|---|
+| Caja viva | Contiene el aliento: se le escapa un hilo de humo de incienso por la junta que tocaste y deja de respirar un momento. Si el ojo está despierto, mira tu mano y lo entorna | Resopla. Si es el ojo quien la frena, gruñe |
+| Relojero | El minutero se menea como un dedo («no, no») y cae polvo de latón de lo que tocaste. Si lo que no se deja son las agujas, el reloj está parado y solo cae el polvo | Se menean las dos agujas |
+| Reliquia | La luz se retira: unas motas salen de donde tocaste y vuelven al núcleo, que se apaga un instante. Si la reliquia duerme, el núcleo late una vez, como quien se revuelve en sueños | El núcleo late grave |
+| Farero | La tormenta responde: una racha golpea la ventana, la llama del quinqué se agacha (la habitación se apaga un instante) y cae polvo de lo que tocaste | Truena |
+
+Cómo se programa: cada caja tiene su `resistir(pieza, punto, veces)` (`puzle.gd`); el humo, el polvo y
+las motas están en `efectos.gd`.
+
 ---
 
 ## 4. Interacciones
@@ -269,7 +294,7 @@ Aparecen en cualquier línea, como mucho uno nuevo por caja:
 | Botón «centrar» | Vuelve a la vista general | Viaje suave | Siempre visible |
 | Arrastrar una pieza | Desliza o gira por su carril | Roce, topes y clic | Una pieza solo de toque no se arrastra: el gesto gira la vista |
 | Tocar una pieza | Pulsa, abre, recoge, lee o cambia de punto de vista | Animación y sonido | — |
-| Tocar algo bloqueado | No se mueve | Golpe seco «trabado», vibración de 35 ms, destello cálido y, la primera vez, una línea | Nunca castiga |
+| Tocar algo bloqueado | Ni se mueve ni se marca | Golpe seco «trabado», vibración de 35 ms, el objeto se resiste a su manera (§3.4) y, la primera vez, una línea | Nunca castiga |
 | Objeto + hueco | Seleccionar en el inventario y tocar el hueco | Encaje con sonido, o «Eso no encaja aquí» | — |
 | Lupa | Examina el objeto en 3D | Pantalla propia | Girar con un dedo y pellizcar |
 
@@ -278,8 +303,8 @@ Aparecen en cualquier línea, como mucho uno nuevo por caja:
 1. **Un gesto imita una acción física:** deslizar desliza; girar gira.
 2. **Toda acción responde en menos de 100 ms** con movimiento, sonido o señal [Propuesta: medirlo en
    el móvil].
-3. **Lo que no se puede mover no se mueve** [Hecho, pedido por el usuario]. El objeto no tiembla: da
-   una señal.
+3. **Lo que no se puede mover ni se mueve ni se marca** [Hecho, pedido por el usuario]. Ni tiembla ni
+   destella: se resiste el objeto entero, a su manera (§3.4).
 4. **Dianas para el dedo:** al menos 48 dp, la medida mínima de la guía de Android [Hecho]. Las piezas
    más pequeñas se tocan desde una zona acercada (§10).
 5. **Nada de reflejos ni contrarreloj.** Si algo se mueve solo, espera al jugador.
@@ -574,7 +599,8 @@ pide el consejo para evitar la repetición.
    - debajo hay un cajoncito con un **espejo de mano** (*kagami*);
    - es el primer éxito, en menos de 20 segundos.
 4. **Aprendizaje:**
-   - la tapa no se mueve: los dos ojos la ven, y aparece la señal de bloqueo con el ojo entornado;
+   - la tapa no se mueve: los dos ojos la ven; la caja contiene el aliento y los dos ojos, entornados,
+     miran tu mano;
    - el jugador busca el punto ciego, que es más estrecho que en la caja 1;
    - desde ahí la tapa corre su primer tramo y deja ver dos cosas: un **dibujo de mosaico** pintado
      por dentro y una **ranura en la esquina** entre los dos ojos.
@@ -839,7 +865,7 @@ son comunes y la paleta es de cada línea.
 | Voluntad del objeto | Un único acento | El ojo | La esfera del reloj | El núcleo | La lámpara |
 
 **Señales visuales comunes:**
-- **bloqueado:** destello cálido (rojo anaranjado) en el borde de la pieza [Hecho];
+- **bloqueado:** ninguna marca en la pieza; el objeto se resiste a su manera (§3.4) [Hecho, 0.3];
 - **pista de nivel 4:** resalte de la pieza [Hecho];
 - [Propuesta] **recién desbloqueado:** un brillo suave que aparece en la pieza al quedar libre (es la
   pista visual de «ahora puedes»).
@@ -972,7 +998,7 @@ mecanismo, recompensa, objetivo intermedio y objetivo final. Más dos propios:
 |---|---|---|---|
 | **Interacción** | Toque, arrastre, doble toque y pellizco → la pieza bajo el dedo | [Hecho] | `mesa.gd` |
 | **Piezas** | Deslizante, giratoria, bisagra, pulsador, ranura, recogible, nota, punto de vista | [Hecho] | `scripts/piezas/` |
-| **Bloqueo y señal** | Permiso, sonido, vibración, destello y aviso | [Hecho] | `pieza.gd`, `shaders/destello.gdshader` |
+| **Bloqueo y resistencia** | Permiso, sonido, vibración, la reacción del objeto y aviso | [Hecho, 0.3] | `pieza.gd`, `puzle.gd` (`resistir`), `efectos.gd` |
 | **Cámara** | Órbita, zonas, viajes, entrada y modo habitación | [Hecho] | `camara_puzle.gd` |
 | **Inventario y examen** | Guardar, seleccionar, encajar, examinar en 3D, iconos | [Hecho] | `mesa.gd`, `hud.gd` |
 | **Pasos y pistas** | Orden de pasos, 3 pistas por paso, resalte | [Hecho]; 4 niveles [Propuesta] | `puzle.gd`, `mesa.gd` |
@@ -1355,7 +1381,7 @@ Las del diagrama de §8.2. En resumen:
 
 1. **Cada caja tiene una regla de resistencia, y cada puzle la usa o la retuerce.**
 2. **El objeto responde a todo en menos de 100 ms:** movimiento, sonido o señal.
-3. **Lo que no se puede mover no se mueve:** suena, vibra y destella.
+3. **Lo que no se puede mover ni se mueve ni se marca:** suena, vibra y el objeto se resiste a su manera.
 4. **La consecuencia siempre se ve.**
 5. **Una regla se presenta, se amplía, se invierte y se combina** (§7.1).
 6. **Como mucho una entrada de código por caja,** y cada código se encuentra de una forma nueva.
@@ -1480,11 +1506,12 @@ mejorar?** [Opinión del equipo, salvo lo marcado.]
 5. **Interacción**
    - **Referencia:** gestos físicos.
    - **0.2.1:** los mismos principios: arrastre, doble toque y pellizco.
-   - **Funciona:** el bloqueo sin movimiento y con señal, que pidió el usuario.
+   - **Funciona:** el bloqueo sin movimiento ni marcas, que pidió el usuario: desde la 0.3, el objeto se
+     resiste a su manera.
    - **Mejorar:** arrastrar desde el inventario como alternativa y tocar dentro del examen.
 6. **Feedback**
    - **Referencia:** peso, sonido y la cámara que va a la consecuencia.
-   - **0.2.1:** sonido, vibración y destello.
+   - **0.2.1:** sonido, vibración y destello. **0.3:** sonido, vibración y la resistencia del objeto.
    - **Mejorar:** el viaje a la consecuencia está a medias. Falta la señal de «recién libre».
 7. **Cámara**
    - **Referencia:** zonas y jerarquía sala → objeto → detalle.
@@ -1568,7 +1595,7 @@ mejorar?** [Opinión del equipo, salvo lo marcado.]
 | Candado de cuatro ruedas con un año | Código | Bajo: es genérico | No añadir más códigos en esa caja |
 | Doble toque y pellizco | Convención táctil | No: es la convención de los móviles | Mantener |
 | Inventario en columna a la izquierda | Convención de interfaz | Bajo: es igual que en la referencia | Mantener, con opción a la derecha |
-| No se mueve, suena seco y da una línea de texto | Feedback de error | El principio es de la referencia y del usuario; la expresión es nuestra (destello cálido, vibración, el ojo que se entorna) | Mantener |
+| No se mueve, suena seco y da una línea de texto | Feedback de error | El principio es de la referencia y del usuario; la expresión es nuestra: cada objeto se resiste a su manera (aliento, «no» del minutero, luz que se retira, racha) | Mantener |
 | Entrada de cámara por la sala | Presentar el espacio | Bajo: la referencia hace barridos al empezar | Mantener: cada sala tiene su puerta |
 | Una lente u ocular | Capa oculta | **Alto:** es la expresión central de la referencia | **No usar.** Nuestras capas ocultas salen de la regla de cada línea |
 | Miniaturas y entrar en lo pequeño | Escala | **Alto:** es la expresión central de The Room Three | **No usar** |
