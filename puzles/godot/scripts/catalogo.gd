@@ -14,7 +14,7 @@ const JUEGOS := [
 		"fondo": Color(0.07, 0.06, 0.1),
 		"unidad": "Caja",
 		"cajas": [
-			{"id": "caja_viva", "frase": "Tiene un ojo. Mientras te ve, no se deja tocar.",
+			{"id": "caja_viva", "frase": "Le quitaron la cara para que durmiera. Devuélvesela.",
 				"script": "res://scripts/prototipos/caja_viva.gd"},
 			{"id": "caja_viva_2"},
 			{"id": "caja_viva_3"},

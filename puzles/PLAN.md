@@ -252,3 +252,68 @@ El detalle de cada una, con el formato DECISIÓN, está al final de `BIBLIA_DISE
   - Opciones: A) 3 niveles a petición, como ahora; B) 4 niveles más un aviso suave tras 3 minutos
     sin avanzar; C) automáticas.
   - Recomendación: **B**.
+
+## 6. Bocetos antes de construir (03-10-2026)
+
+El usuario vio la caja viva profunda: le gusta la idea, pero no el diseño. Pidió bocetos de todo
+antes de seguir, para ver si se puede llegar al esmero de los entornos de The Room. Están en
+`bocetos/` (lectura de cada uno, prompts y coste en `bocetos/LEEME.md`).
+
+- **Por línea:** el objeto en su sala y una secuencia de cuatro viñetas que enseña cómo se abre.
+- **La caja viva:** además, tres diseños y una hoja con las piezas que se llevan de un sitio a otro.
+
+La mecánica profunda de la caja viva ya funciona: 19 pasos, la cara incompleta, el incensario y el
+altar. Pasa su prueba (43 de 43). Se conserva; lo que cambia es el aspecto.
+
+### DECISIÓN 27 — El diseño de la caja viva · **abierta**
+
+- **OPCIONES:**
+  - A) mosaico *yosegi* y máscara de paulownia;
+  - B) laca negra con oro y un oni;
+  - C) cómoda *tansu* de cajones;
+  - D) la A con las piezas que se mueven en laca bermellón, como los cajones de la B.
+- **VENTAJAS:**
+  - A: la más propia y auténtica (las cajas secretas de Hakone); la cara incompleta se entiende sola;
+    cumple la biblia (§14.2); casi todo sale por código;
+  - B: la más viva y la mejor miniatura para la tienda y los vídeos;
+  - C: la que más cosas tiene para explorar;
+  - D: la identidad de la A con la señal de «esto se mueve» de la B.
+- **RIESGOS:**
+  - A: puede parecer demasiado tranquila;
+  - B: parece un cofre con cara de oni más que una caja secreta;
+  - C: la cara se pierde y cuesta ver que está viva;
+  - D: cuidar que el rojo no le quite protagonismo a la cara.
+- **COSTE:** parecido en las cuatro. En todas, la pieza difícil es la cara tallada (DECISIÓN 28).
+- **RECOMENDACIÓN [Opinión]:** la **D**.
+- **SIGUIENTE PASO:** la prueba de calidad de la DECISIÓN 28 con el diseño elegido.
+
+### DECISIÓN 28 — Cómo se fabrican las piezas para llegar a los bocetos · **abierta**
+
+- **OPCIONES:**
+  - A) todo por código, como ahora;
+  - B) código más texturas pintadas con IA (Gemini) y relieves sacados de ellas;
+  - C) además, Blender en la nube (en el contenedor de Claude, no en el PC), también por código;
+  - D) además, IA de imagen a 3D para las pocas piezas orgánicas: la cara, el león y el pájaro;
+  - E) un artista 3D por encargo.
+- **VENTAJAS:**
+  - A: gratis y fácil de cambiar;
+  - B: el mayor salto por el menor coste (*maki-e*, pinturas, papel pintado, relieves);
+  - C: aristas biseladas que atrapan la luz, piezas torneadas y relieves de verdad;
+  - D: lo único que da caras y animales creíbles sin un artista;
+  - E: la mejor calidad y la más coherente.
+- **RIESGOS:**
+  - A: su techo ya se vio: lo orgánico sale hecho de bloques;
+  - B: de muy cerca, lo pintado se ve plano;
+  - C: es una descarga grande (unos 350 MB **[Estimación]**): necesita permiso y comprobar la suma;
+  - D: necesita créditos (Higgsfield: 1 por modelo y quedan unos 0,01) y limpiar las mallas;
+  - E: es lo más caro; habría que pedir presupuestos.
+- **COSTE:**
+  - A y C: 0 USD;
+  - B: unos 0,045 USD por imagen **[Estimación]**;
+  - D: según los créditos, y comprarlos lo decide el usuario;
+  - E: según presupuesto.
+- **RECOMENDACIÓN [Opinión]:** empezar por la **B** con una prueba de calidad: el frente de la caja
+  elegida con su mesa y su incensario, junto al boceto. Si la cara no llega, sumar la C o la D solo
+  para las piezas orgánicas.
+- **SIGUIENTE PASO:** la prueba de calidad. Con el resultado, se rehace la caja entera y después las
+  otras tres.

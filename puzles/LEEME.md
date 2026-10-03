@@ -14,12 +14,17 @@ la versión 0.9 mientras tanto.
 - **Biblia de diseño** (el sistema propio: concepto, reglas, plantillas, progresión, pistas, sonido,
   arte, arquitectura, fichas para programar, banco de puzles y control de originalidad):
   `BIBLIA_DISENO.md`.
+- **Bocetos de las cuatro cajas** (03-10-2026), antes de construir: `bocetos/`. Su `LEEME.md` tiene
+  la lectura de cada uno, el control de originalidad y si se pueden construir con esa calidad; los
+  prompts, en `bocetos/PROMPTS.md`. Las DECISIONES 27 y 28 están en `PLAN.md` §6.
 
 ## Carpetas
 
 - **Proyecto de Godot 4.7** (renderizador Compatibility, Android): `godot/`.
-- **Herramientas:** texturas, sonidos e iconos hechos por código, sin créditos de imágenes:
-  `herramientas/`.
+- **Herramientas:** `herramientas/`.
+  - Texturas, sonidos e iconos hechos por código, sin créditos de imágenes.
+  - `hojas_bocetos.py`: junta los bocetos en hojas para revisarlos en el móvil.
+- **Bocetos:** `bocetos/`.
 - **Capturas:**
   - `capturas/gabinete.jpg`: el menú;
   - `capturas/entradas.jpg`: la cámara entrando en cada sala;
@@ -63,6 +68,11 @@ Cada caja dura unos 5-15 minutos **[Estimación, sin probar aún con jugadores]*
 - el primer aviso de cada caja salía en un marco gigante que tapaba la pantalla;
 - la puerta del taller tapaba la mitad de la entrada;
 - el engranaje se veía negro y el cristal, blanco, al examinarlos.
+
+**En el repositorio, todavía sin APK:** la caja viva profunda.
+- Tiene 19 pasos: la cara incompleta, el incensario de la mesa, el rollo de la pared y el altar del
+  final.
+- Su aspecto se rehace según la DECISIÓN 27 (`bocetos/` y `PLAN.md` §6).
 
 ## Cómo se juega
 
@@ -120,11 +130,18 @@ Cada caja dura unos 5-15 minutos **[Estimación, sin probar aún con jugadores]*
 ```bash
 # Prueba automática: el gabinete y las cuatro cajas (entrada, bloqueo, doble toque, avisos,
 # pistas, un arrastre real, examen y final)
-xvfb-run -a godot --path puzles/godot --rendering-driver opengl3 -- --prueba        # 95 comprobaciones
+xvfb-run -a godot --path puzles/godot --rendering-driver opengl3 -- --prueba        # 108 comprobaciones
 xvfb-run -a godot --path puzles/godot --rendering-driver opengl3 -- --prueba --solo=farero
 
 # Revisar que todos los guiones compilan, sin abrir el juego
 godot --headless --path puzles/godot --script res://scripts/comprobar_guiones.gd
+
+# Revisión visual: fotos de una caja desde sus zonas y en los pasos que se elijan (no va en el APK)
+xvfb-run -a godot --path puzles/godot --rendering-driver opengl3 --fixed-fps 30 \
+  --script res://scripts/vistas.gd -- --ver=caja_viva --zonas=cara,incensario --pasos=ojo --salida=/ruta/
+
+# Hojas de bocetos para el móvil
+python3 puzles/herramientas/hojas_bocetos.py <carpeta de salida>
 
 # Volver a generar texturas, sonidos e iconos
 python3 puzles/herramientas/generar_texturas.py [nombre ...]

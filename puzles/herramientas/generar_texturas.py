@@ -706,7 +706,9 @@ def tex_fusuma():
 
 
 def tex_kakejiku():
-    """Rollo colgante: brocado oscuro alrededor y, en el centro, una rama de pino bajo la luna en tinta."""
+    """Rollo colgante: brocado oscuro alrededor y, en el papel, una montaña de dos picos en tinta bajo la
+    luna, con niebla en la falda y un sello rojo. Es la misma montaña que el símbolo «monte»: la pista
+    del incensario de la caja viva."""
     ancho, alto = 512, 1536
     color = np.zeros((alto, ancho, 3))
     brocado = ruido(ancho, alto, 64, 192, 841)
@@ -716,27 +718,73 @@ def tex_kakejiku():
     imagen = Image.fromarray(np.clip(color, 0, 255).astype(np.uint8))
     d = ImageDraw.Draw(imagen)
     d.rectangle([54, 224, ancho - 55, alto - 186], outline=(150, 120, 60), width=4)
-    tinta = Image.new("L", (ancho, alto), 0)
-    dt = ImageDraw.Draw(tinta)
-    dt.ellipse([300, 300, 420, 420], outline=200, width=6)
-    azar = np.random.default_rng(845)
-    x, y = 90.0, 980.0
-    for k in range(14):
-        largo = azar.uniform(50, 90)
-        angulo = -0.9 + azar.uniform(-0.35, 0.35)
-        pincelada(dt, azar, x, y, largo, angulo, 16 - k * 0.6, 235)
-        x += math.cos(angulo) * largo
-        y += math.sin(angulo) * largo
-        if k % 3 == 1:
-            for agujas in range(9):
-                a = azar.uniform(0, 2 * math.pi)
-                dt.line([(x, y), (x + math.cos(a) * 34, y + math.sin(a) * 22)], fill=210, width=3)
-    tinta = tinta.filter(ImageFilter.GaussianBlur(1.0))
-    imagen.paste(Image.new("RGB", (ancho, alto), (24, 20, 18)), (0, 0), tinta)
+    # la montaña: dos triángulos como los del símbolo, rellenos de una aguada más oscura arriba
+    forma = Image.new("L", (ancho, alto), 0)
+    df = ImageDraw.Draw(forma)
+    x0, ancho_m, base, alto_m = 82.0, 350.0, 1010.0, 560.0
+    def punto(u, v):
+        return (x0 + u * ancho_m, base - (0.82 - v) * alto_m)
+    df.polygon([punto(0.06, 0.82), punto(0.4, 0.2), punto(0.74, 0.82)], fill=255)
+    df.polygon([punto(0.46, 0.82), punto(0.7, 0.4), punto(0.94, 0.82)], fill=255)
+    forma = forma.filter(ImageFilter.GaussianBlur(2.2))
+    y = np.arange(alto)[:, None].astype(np.float64)
+    aguada = np.clip(1.0 - (y - 640.0) / 420.0, 0.18, 1.0) * np.clip((1000.0 - y) / 60.0, 0.0, 1.0)
+    grano = ruido(ancho, alto, 40, 120, 847) * 0.35 + 0.65
+    tinta = (np.asarray(forma, dtype=np.float64) / 255.0) * aguada * grano
+    # crestas: pinceladas más oscuras por las laderas
+    crestas = Image.new("L", (ancho, alto), 0)
+    dc = ImageDraw.Draw(crestas)
+    for a, b in ((punto(0.06, 0.82), punto(0.4, 0.2)), (punto(0.4, 0.2), punto(0.58, 0.5)),
+                 (punto(0.46, 0.82), punto(0.7, 0.4)), (punto(0.7, 0.4), punto(0.84, 0.62))):
+        dc.line([a, b], fill=230, width=7)
+    crestas = crestas.filter(ImageFilter.GaussianBlur(1.4))
+    tinta = np.maximum(tinta, np.asarray(crestas, dtype=np.float64) / 255.0 * 0.9)
+    # la luna, en tinta clara
+    luna = Image.new("L", (ancho, alto), 0)
+    ImageDraw.Draw(luna).ellipse([318, 330, 418, 430], outline=200, width=6)
+    tinta = np.maximum(tinta, np.asarray(luna.filter(ImageFilter.GaussianBlur(1.0)), dtype=np.float64) / 255.0)
+    base_color = np.asarray(imagen, dtype=np.float64)
+    negro = hexa("181412")
+    base_color = base_color + (negro - base_color) * np.clip(tinta, 0, 1)[..., None]
+    imagen = Image.fromarray(np.clip(base_color, 0, 255).astype(np.uint8))
+    d = ImageDraw.Draw(imagen)
     d.rectangle([ancho / 2 - 22, alto - 330, ancho / 2 + 22, alto - 286], fill=(176, 40, 30))
     d.rectangle([20, 0, ancho - 21, 30], fill=(60, 44, 30))
     d.rectangle([10, alto - 40, ancho - 11, alto - 1], fill=(60, 44, 30))
     guardar("kakejiku", imagen)
+
+
+def tex_seigaiha():
+    """Seigaiha (olas del mar azul): escamas de arcos concéntricos en oro sobre laca negra, talladas.
+    Es el zócalo de la caja viva; entre sus olas se esconde una cerradura. Se repite sin costura."""
+    tam = 1024
+    esc = 2
+    g = tam * esc
+    columnas = 4
+    r = g / (2 * columnas)
+    lineas = Image.new("L", (g, g), 0)
+    d = ImageDraw.Draw(lineas)
+    anillos = 4
+    grosor = int(r * 0.085)
+    # filas cada medio radio, alternando medio paso: de cada círculo solo queda el abanico de arriba
+    for j in range(-2, 4 * columnas + 4):
+        cy = j * r / 2.0
+        desplaza = r if j % 2 else 0.0
+        for i in range(-1, columnas + 2):
+            cx = i * 2 * r + desplaza
+            d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=0)
+            for k in range(anillos):
+                radio = r * (1.0 - k / anillos) - grosor * 0.5
+                if radio > grosor:
+                    d.ellipse([cx - radio, cy - radio, cx + radio, cy + radio], outline=255, width=grosor)
+    lineas = lineas.resize((tam, tam), Image.LANCZOS)
+    oro = np.asarray(lineas, dtype=np.float64) / 255.0
+    desgaste = fbm(tam, tam, 8, 8, 871, 4)
+    fondo = mezcla(hexa("1c100e"), hexa("2c1a16"), ruido(tam, tam, 90, 90, 873))
+    brillo = np.clip(oro * (0.75 + desgaste * 0.5), 0, 1)
+    color = fondo + (mezcla(hexa("8a6630"), hexa("caa45a"), desgaste) - fondo) * brillo[..., None]
+    altura = 0.6 - oro * 0.45 + (ruido(tam, tam, 120, 120, 875) - 0.5) * 0.06
+    guardar("seigaiha", color, altura, 2.6)
 
 
 def tex_yeso():
@@ -923,6 +971,7 @@ TODAS = {
     "shoji": tex_shoji,
     "fusuma": tex_fusuma,
     "kakejiku": tex_kakejiku,
+    "seigaiha": tex_seigaiha,
     "yeso": tex_yeso,
     "papel_pintado": tex_papel_pintado,
     "alfombra": tex_alfombra,

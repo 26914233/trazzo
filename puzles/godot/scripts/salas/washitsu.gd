@@ -127,6 +127,14 @@ func _tokonoma() -> void:
 	material.albedo_texture = Materiales.textura("kakejiku")
 	material.roughness = 0.85
 	Geometria.pieza(rollo, material, Vector3((x0 + x1) / 2.0, suelo_toko + 1.02, fondo + 0.012), self)
+	# el rollo es una pista de la caja: se puede mirar de cerca con un doble toque
+	var cuerpo := StaticBody3D.new()
+	var forma := CollisionShape3D.new()
+	forma.shape = BoxShape3D.new()
+	(forma.shape as BoxShape3D).size = Vector3(0.46, 1.34, 0.02)
+	cuerpo.add_child(forma)
+	cuerpo.position = Vector3((x0 + x1) / 2.0, suelo_toko + 1.02, fondo + 0.02)
+	add_child(cuerpo)
 	var varilla := CylinderMesh.new()
 	varilla.top_radius = 0.012
 	varilla.bottom_radius = 0.012

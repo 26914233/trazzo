@@ -568,6 +568,18 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   - **El cuarto del farero:** habitación de escape por puntos de vista.
 - **DECISIÓN 23 (abierta):** cuál se convierte en juego, según la prueba con jugadores (`PLAN.md` §3).
   Recomendación previa: la caja viva. Manda la prueba.
+- **Bocetos antes de construir (03-10-2026):** `puzles/bocetos/`.
+  - El usuario aprobó la idea de la caja viva profunda, pero no su diseño, y pidió bocetos de todo
+    antes de construir.
+  - Se hicieron con Gemini (`gemini-3.1-flash-image`, unos 0,045 USD por imagen): el objeto en su
+    sala y cómo se abre, por línea, más tres diseños de la caja viva.
+  - **No se construye** hasta que elija. Su mecánica (19 pasos) ya funciona y se conserva.
+  - **DECISIÓN 27 (abierta):** el diseño de la caja viva. Recomendada la D: la A (mosaico *yosegi* y
+    máscara) con las piezas que se mueven en laca bermellón.
+  - **DECISIÓN 28 (abierta):** cómo se fabrican las piezas para llegar a los bocetos. Recomendado:
+    código más texturas pintadas con IA, con una prueba de calidad primero. Blender (descarga grande)
+    o IA 3D (créditos) solo con su permiso.
+  - Las dos están en `puzles/PLAN.md` §6.
 - **Decisiones abiertas que propone la biblia (03-10-2026)** (`PLAN.md` §5; ninguna tomada):
   - **24, cómo se organiza el juego:** recomendada la C, una línea completa de 4 cajas más la caja 1
     de las otras como muestras;
@@ -586,8 +598,10 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
     calcular el tamaño de su panel.
   - Los metales necesitan un cielo que reflejar, aunque no se vea (`entorno_estudio()` de `mesa.gd`).
   - Un guion nuevo con `class_name` pide reimportar el proyecto.
+- **Revisión visual:** `scripts/vistas.gd` saca fotos de una caja desde sus zonas y en los pasos
+  elegidos; no va en el APK (`puzles/LEEME.md`, «Comandos»).
 - **Prueba automática:** `xvfb-run -a godot --path puzles/godot --rendering-driver opengl3 -- --prueba`.
-  - Da 95 de 95 en la 0.2.1.
+  - Da 95 de 95 en la 0.2.1 y 108 de 108 con la caja viva profunda (aún sin APK).
   - Las esperas de la prueba van en tiempo real y comprobando el estado: sin tarjeta gráfica, un
     cuadro puede tardar segundos mientras compila sombreadores.
 - **APK de prueba:** `puzles-0.2.1-prueba.apk` en Drive › `Respaldos Claude/puzles/`.
