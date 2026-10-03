@@ -590,6 +590,24 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
     `9ba871ff2ecd36526b77432745980b7e6664ecd0c7ca11c48849073dcfe06da3`.
   - Falta para acercarse a The Room: luz horneada u oclusión, desgaste, herrajes grabados, un león mejor y
     bajar el peso (9 MB) antes del APK.
+  - **Al usuario no le convenció (03-10-2026):** «no se parece nada al boceto». Le gusta el boceto, con
+    su toque tétrico y misterioso, y quiere el juego en ese estilo animado e interactivo. Lo que más le
+    falla es la calidad de imagen y el tipo de animación.
+- **La caja viva ilustrada (03-10-2026, hecha):** `puzles/ilustrada/` (método en su `LEEME.md`).
+  - Es el boceto de la A+C, animado por capas y jugable en el móvil. Página privada:
+    https://claude.ai/artifact/7fC2cECS62soiVNBa2kMG3.
+  - Lo que se mueve: el ojo sigue el dedo (y la regla «no deja tocar mientras te ve»), la caja respira y
+    hay humo en cintas a tinta, luz de lámpara y motas.
+  - El recorrido: la llave (se coge distrayendo al ojo con la lámpara), el incensario, el cuerno y el
+    despertar.
+  - Las capas salen de cuatro retoques de Gemini con el mismo encuadre (`preparar_capas.py`).
+  - Su prueba automática (`prueba/jugar.mjs`, con `prueba/servir.py`) da 14 de 14 en horizontal y en
+    vertical.
+- **DECISIÓN 29 (abierta):** con qué técnica se hace el juego para que sea como el boceto (`puzles/PLAN.md` §7).
+  - Las opciones: A) 2D ilustrado por capas, como la prueba; B) 3D con la ilustración proyectada;
+    C) 3D con un sombreado de acuarela.
+  - Recomendada la **A**: más vistas pintadas a 2K-4K y Blender solo como maqueta para que encajen.
+    Después, pasar el núcleo a Godot 2D para el APK.
 - **Resistencia creativa (pedida por el usuario el 03-10-2026, hecha):** lo bloqueado ni se mueve ni
   se marca (nada de destello rojo); el sonido «trabado» le gusta y se queda. Reacciona el objeto entero,
   cada uno a su manera, y va a más si se insiste (`BIBLIA_DISENO.md` §3.4):

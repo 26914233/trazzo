@@ -367,3 +367,85 @@ La caja viva A+C, hecha en Blender por código y vista en el motor del juego, ju
   - el peso: 9 MB la caja, que hay que bajar antes del APK.
 - **Conclusión [Opinión]:** Blender es la vía correcta. De momento no hace falta IA 3D ni un artista; quizá
   para figuras como el león, más adelante.
+
+**El usuario, al verla (03-10-2026):** «no se parece nada al boceto». Le gustó la imagen del boceto, con
+ese toque tétrico y misterioso, y pidió que el juego tenga ese estilo animado y sea interactivo. Lo que
+más le falla al jugar es la calidad de imagen y el tipo de animación. Por eso se abre la DECISIÓN 29.
+
+## 7. El juego con el aspecto del boceto (03-10-2026)
+
+**Prueba jugable [Hecho]:** `ilustrada/`, publicada como página privada en
+https://claude.ai/artifact/7fC2cECS62soiVNBa2kMG3 (solo la puede abrir el usuario).
+
+- **Qué es:** la ilustración del boceto (la A+C de frente), animada por capas y jugable en el móvil.
+- **Lo que se mueve:**
+  - el ojo sigue el dedo, parpadea, se entorna y mira la lámpara cuando la llama tiembla;
+  - la caja respira;
+  - el humo sube en cintas con el borde a tinta, como en la ilustración;
+  - la luz de la lámpara tiembla y hay motas de polvo en el aire.
+- **El recorrido:**
+  1. coger la llave del cajón (no te deja mientras el ojo te mira: hay que distraerlo con la lámpara);
+  2. abrir el incensario, cuyo león levanta la tapa y la deja en la mesa;
+  3. sacar el cuerno de las brasas y ponerlo en la frente;
+  4. el despertar: ojos rojos, humo por las juntas y la trampilla que se abre con luz dorada.
+- **La resistencia creativa sigue:** sin marcas ni movimiento; la caja contiene el aliento, echa humo por
+  la junta, el ojo mira la mano y, si se insiste, gruñe.
+- **Cómo se hizo** (detalle en `ilustrada/LEEME.md`):
+  - cuatro retoques de Gemini con el mismo encuadre (incensario abierto y vacío, cajón sin llave, caja
+    despierta), unos 0,18 USD **[Estimación]**;
+  - `preparar_capas.py` recorta las piezas y los parches de cada estado;
+  - la página dibuja todo en un lienzo, a unos 40 cuadros por segundo en el Chromium de pruebas, y pesa
+    unos 2 MB con los sonidos.
+
+### DECISIÓN 29 — Cómo se hace el juego con el aspecto de los bocetos · **abierta**
+
+- **DECISIÓN:** con qué técnica se construye el juego para que se vea y se mueva como el boceto.
+- **OPCIONES:**
+  - A) **2D ilustrado por capas**, como la prueba:
+    - cada vista es una ilustración pintada;
+    - lo que se mueve va recortado en capas;
+    - cada estado es la misma ilustración retocada;
+    - el humo, la luz, la respiración y el ojo, por código;
+    - para cambiar de vista, la cámara se acerca a la ilustración.
+  - B) **3D con la ilustración proyectada encima** (2.5D): un modelo sencillo de la caja con la pintura
+    puesta desde el ángulo del boceto; deja girarla un poco.
+  - C) **3D con un sombreado de acuarela y tinta** sobre el modelo de Blender.
+- **VENTAJAS:**
+  - A:
+    - es el boceto mismo, con su luz y su tinta;
+    - la animación es orgánica, no piezas rígidas;
+    - pesa poco: la prueba ocupa 2 MB y va bien en un móvil y en un PC modesto;
+    - cada estado nuevo es una edición de imagen.
+  - B: algo de giro real, más cerca de la sensación de The Room.
+  - C: cámara libre y puzles mecánicos en 3D.
+- **RIESGOS:**
+  - A:
+    - la caja no se gira libremente: cada ángulo es otra ilustración;
+    - la IA cambia detalles entre imágenes (en el despertar puso un cuerno de más y se quitó al recortar);
+    - la resolución: la herramienta de hoy da 1376 × 768 y, al acercarse en el móvil, se ve algo blando.
+      Para la versión final hay que pintar a 2K o 4K, o ampliar las imágenes.
+  - B: costuras y estiramientos en cuanto se gira; doble trabajo (modelo y pintura).
+  - C: se aleja del boceto, que es justo lo que no gustó; es el camino más caro en técnica.
+- **COSTE:**
+  - A:
+    - unos 0,045 USD por imagen **[Estimación]**;
+    - una caja completa, con 3 a 5 vistas y sus estados, son unas 30 a 50 imágenes: de 1,5 a 2,5 USD,
+      más el retoque **[Estimación]**;
+    - el precio de las imágenes en 2K o 4K hay que mirarlo antes de usarlas **[Supuesto]**;
+    - la técnica ya está hecha (el guion de capas y el motor de la página).
+  - B: medio-alto en tiempo.
+  - C: alto en tiempo.
+- **RECOMENDACIÓN [Opinión]:** la **A**.
+  - Es literalmente el estilo que le gustó y ya se puede jugar.
+  - La profundidad de The Room se consigue con más vistas pintadas (la cara de cerca, el costado de los
+    cajones, la parte de atrás) y transiciones animadas entre ellas.
+  - Blender no se tira: puede servir de maqueta. Se renderiza el ángulo que haga falta y Gemini lo pinta en
+    el estilo del boceto, para que todas las vistas encajen.
+  - Para el APK, el núcleo se pasaría a Godot 2D (el proyecto, la exportación y la prueba automática ya
+    existen) **[Propuesta: se decide después]**.
+- **SIGUIENTE PASO:**
+  1. el usuario juega la prueba y dice qué le convence y qué no;
+  2. si elige la A, se pintan la vista de frente en más resolución y dos vistas más (la cara de cerca y el
+     costado de los cajones);
+  3. se pasa el núcleo a Godot 2D con los 19 pasos de la caja viva;
+  4. el APK, cuando se resuelva la firma.
