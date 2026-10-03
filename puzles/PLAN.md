@@ -194,7 +194,13 @@ bloqueado se marcara en rojo ni que se moviera; el sonido sí le gustaba.
    publicar [Hecho; [Google](https://support.google.com/googleplay/android-developer/answer/14151465)].
    Esas 12 personas pueden ser, más adelante, los probadores del juego elegido.
 
-### DECISIÓN 23 — Cuál de los cuatro se convierte en juego · **pendiente de la prueba**
+### DECISIÓN 23 — Cuál de los cuatro se convierte en juego · **CERRADA el 03-10-2026: la caja viva**
+
+**Lo que eligió el usuario** (03-10-2026, noche, después de elegir la B): «vamos a concentrarnos en mejorar uno
+primero, que va a ser el juego de la caja del ojo, y los demás se pueden hacer en otras entregas en el futuro».
+Se eligió antes de la prueba con jugadores, que sigue sirviendo para medir los niveles (§8). Lo que se escribió
+antes de elegir sigue aquí abajo como registro.
+
 
 - **OPCIONES:**
   - la caja viva;
@@ -253,12 +259,14 @@ bloqueado se marcara en rojo ni que se moviera; el sonido sí le gustaba.
 ## 5. Decisiones abiertas que propone la biblia (03-10-2026)
 
 El detalle de cada una, con el formato DECISIÓN, está al final de `BIBLIA_DISENO.md`.
-**Ninguna está tomada.**
+La 24 se cerró el 03-10-2026 (abajo); la 25 y la 26 siguen abiertas.
 
-- **DECISIÓN 24, cómo se organiza el juego.**
-  - Opciones: A) una línea de 4 cajas; B) 4 líneas de 2 cajas; C) una línea completa más la caja 1
+- **DECISIÓN 24, cómo se organiza el juego. CERRADA el 03-10-2026: una línea, la de la caja viva.** Las
+  otras cajas (el relojero, la reliquia y el farero) quedan para entregas futuras. Es la A, con una diferencia:
+  la línea no son cuatro cajas sueltas, sino niveles de la misma caja, cada uno con su caja dentro (§8).
+  - Opciones que había: A) una línea de 4 cajas; B) 4 líneas de 2 cajas; C) una línea completa más la caja 1
     de las otras tres como muestras.
-  - Recomendación: **C**.
+  - Se recomendaba la **C**; el usuario prefirió concentrarse en una.
 - **DECISIÓN 25, el marco de la historia.**
   - Opciones: A) sin marco; B) un coleccionista desaparecido (se parece a la referencia); C) heredas
     el gabinete de tu abuela (o abuelo).
@@ -522,3 +530,44 @@ o el toque». Después eligió la B y marcó el costado que se estiraba.
 - **Arreglos de paso:** la tetera y las tazas ya no arrastran un rectángulo de mesa al mover la cámara (se
   recortan con su forma) y llevan su sombra de contacto.
 - **Prueba automática:** 23 de 23 en la B y en la A, en horizontal y en vertical.
+
+## 8. Los niveles de la caja viva (03-10-2026, noche)
+
+**Qué pidió el usuario:** «empieza a hacer los niveles… crea varios niveles buenos y complejos como en The Room
+1, 2 y 3, que toman muchas ideas: puntos de vista diferentes, cambio de una caja grande a pequeña, cambio total
+de la caja, el tipo de vistas, diferentes secciones, un puzle más grande en donde tienes que pasar niveles para
+entrar al nivel final».
+
+**El plan** está en `ilustrada/NIVELES.md`:
+- La idea en una frase: **la caja no te deja tocar mientras te mira; devuélvele la cara (el cuerno, el ojo y la
+  voz) y te abrirá su corazón.**
+- Cuatro niveles: 1 · El cuerno, 2 · La caja de dentro, 3 · La caja del revés y el final, El corazón.
+- La cara es el puzle grande: cada nivel le devuelve una pieza y el final solo se abre con las tres.
+
+**Hecho [en la página privada]:**
+- **El paso de nivel:**
+  - al terminar cada nivel sale una tarjeta con la cara como marcador: tres sellos (角 cuerno, 目 ojo y 声 voz)
+    que se estampan en bermellón según se recuperan;
+  - la partida se guarda al terminar cada nivel (en el navegador) y la portada ofrece seguir en el siguiente.
+- **Nivel 1 · El cuerno:** el recorrido de siempre, que ahora termina en su tarjeta.
+- **Nivel 2 · La caja de dentro** (solo en la B):
+  1. la caja se calma y su trampilla sigue dando luz;
+  2. al tocarla, sube de dentro una caja pequeña (yosegi, con un párpado tallado), flota y baja a la mesa;
+  3. la cámara se acerca: la caja pequeña delante y el ojo grande encima, vigilándola;
+  4. arrastrar la gira en la mano; al soltarla se asienta con una cara hacia cada lado;
+  5. sus cinco tablillas corren en orden, y la flecha de marquetería que destapa cada una dice cuál sigue;
+  6. **la regla, ampliada:** la cara que ve el ojo grande no se mueve, y la lámpara ya no lo distrae; hay que
+     girar la caja pequeña para esconderle cada tablilla (la de arriba, de entrada, la está mirando);
+  7. la quinta es la tapa de atrás; detrás, un cajoncito con una cajita de laca roja;
+  8. la cajita es un puzle de bolsillo: su tapa gira a saltos y se suelta cuando su marca dorada toca la del
+     borde; dentro hay un ojo de piedra de luna, que aparta la vista de tu dedo;
+  9. el ojo va a la cuenca vacía: la caja cierra el ojo viejo y abre los dos; el nuevo es claro y mira hacia
+     otro lado.
+- **Pistas del nivel 2:** de vagas a claras, una escalera por paso.
+- **Prueba automática:** `prueba/jugar_nivel2.mjs` juega el nivel 2 con toques y arrastres de verdad, y
+  `prueba/jugar.mjs` sigue jugando el nivel 1.
+
+**Siguiente:**
+- Nivel 3 · La caja del revés y el nivel final, en las próximas entregas (diseño en `NIVELES.md` §6 y §7).
+- Medir los niveles con jugadores, como dice el §3: el tiempo, las pistas y las ganas de seguir.
+

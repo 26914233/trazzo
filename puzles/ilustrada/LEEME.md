@@ -17,7 +17,12 @@
 **Para jugarla:** página privada https://claude.ai/artifact/7fC2cECS62soiVNBa2kMG3 (solo la puede abrir el
 usuario). Funciona en el móvil, en horizontal y en vertical, mejor con sonido.
 
-**Recorrido (unos 3-4 minutos):**
+**Es el juego** (DECISIONES 23 y 24, cerradas el 03-10-2026): una línea de niveles de la misma caja. El plan
+está en `NIVELES.md`; se juegan el nivel 1 y el 2. Al terminar cada nivel sale una tarjeta con la cara como
+marcador (las piezas que ha recuperado: 角 cuerno, 目 ojo y 声 voz) y la partida se guarda en el navegador; la
+portada ofrece seguir. Con `?nivel=2` se empieza en el 2.
+
+**Nivel 1 · El cuerno (unos 3-4 minutos):**
 1. los nueve cajones del costado están cerrados: al tocar uno, la cámara se acerca y se abre deslizándose
    (dos tienen cerradura y no ceden);
 2. la llave está en el cajón de abajo, pero la caja no deja cogerla mientras el ojo te mira: la lámpara lo
@@ -28,7 +33,16 @@ usuario). Funciona en el móvil, en horizontal y en vertical, mejor con sonido.
 6. la caja despierta.
 
 Detrás de la caja hay más cajones, un hueco con forma de ficha de shōgi y un cajón largo con otra cerradura
-(para cajas futuras).
+(para niveles futuros).
+
+**Nivel 2 · La caja de dentro (solo en la B):**
+1. la caja se calma y su trampilla sigue dando luz; al tocarla, sube de dentro una caja pequeña y baja a la mesa;
+2. de cerca se ve la caja pequeña con el ojo grande encima, vigilándola; arrastrar la gira en la mano;
+3. sus cinco tablillas corren en orden y la flecha de debajo de cada una dice cuál sigue;
+4. la cara que ve el ojo grande no se mueve (la lámpara ya no lo distrae): hay que esconderle cada tablilla;
+5. detrás de la tapa, un cajoncito con una cajita roja; examinada, su tapa gira hasta que su marca dorada toca
+   la del borde, y dentro hay un ojo de piedra de luna;
+6. el ojo va a la cuenca vacía y la caja abre los dos ojos.
 
 ## Qué hay
 
@@ -45,9 +59,12 @@ Detrás de la caja hay más cajones, un hueco con forma de ficha de shōgi y un 
 | `pagina/index.html` | La página: la interfaz, el estilo y el mapa de módulos (Three.js r170 desde jsDelivr) |
 | `pagina/juego.js` | Todo lo común: estado y recorrido, cajones, inventario, ojo, respiración, humo, luz, decoración viva, sonido, toques y la técnica A |
 | `pagina/tecnica_3d.js` | La técnica B (y la C retirada); se carga mientras se ve la portada |
+| `pagina/caja_hija.js` | La caja hija del nivel 2: el cubo con sus tablillas, sus flechas, el cajoncito y la cajita |
+| `herramientas/nivel2_capas.py` | Las capas del nivel 2: las caras de la caja hija, la cajita y el ojo nuevo (`capas/nivel2.json`) |
+| `NIVELES.md` | El plan de niveles: la cara como puzle grande y los cuatro niveles |
 | `pagina/escena3d.js` | La sala del boceto en 3D, el material que proyecta la pintura, la caja pintada y sus cajones |
 | `pagina/capas/`, `pagina/sonidos/` | Lo que generan los guiones |
-| `prueba/` | `servir.py` (servidor local) y `jugar.mjs` (prueba automática) |
+| `prueba/` | `servir.py` (servidor local), `jugar.mjs` (prueba del nivel 1) y `jugar_nivel2.mjs` (del nivel 2) |
 
 ### Las fuentes
 
@@ -65,6 +82,11 @@ Detrás de la caja hay más cajones, un hueco con forma de ficha de shōgi y un 
 | `planos/derecha_gemini.jpg` | El costado de los cajones, repintado de frente | `295b1d19` |
 | `planos/izquierda_gemini.jpg` | El costado de la borla, repintado de frente | `9180ca1a` |
 | `planos/arriba_gemini.jpg` | La tapa con la trampilla, repintada de frente | `5d7cc4ba` |
+| `sala_dos_ojos.jpg` | Nivel 2: el ojo de piedra de luna puesto en la cuenca (para animarlo como el viejo) | `02d5f0f3` |
+| `nivel2/cara_asanoha.jpg` | Nivel 2: una cara de la caja hija, de frente (mosaico asanoha) | `c0a6a9ca` |
+| `nivel2/cara_kikko.jpg` | Nivel 2: otra cara de la caja hija (mosaico kikko) | `e0f23490` |
+| `nivel2/cara_frente_ojo.jpg` | Nivel 2: el frente de la caja hija, con el párpado tallado | `6e9bd230` |
+| `nivel2/cajita.jpg` | Nivel 2: la cajita de laca roja vista desde arriba | `32af5ae5` |
 
 **Cómo se hicieron:** Gemini (`gemini-3.1-flash-image`) editando la anterior.
 - El prompt siempre empieza igual: «Edit this exact image and keep everything identical: same composition,
@@ -75,6 +97,8 @@ Detrás de la caja hay más cajones, un hueco con forma de ficha de shōgi y un 
 - Salen alineadas al píxel con la original. Se comprobó con correlación de fase: desplazamiento 0, 0.
 - Salen unos 2 niveles más oscuras o con más contraste; los guiones lo igualan.
 - Coste de los once retoques: unos 0,50 USD **[Estimación]**.
+- Las del nivel 2 (cinco más) siguen la misma receta; `herramientas/nivel2_capas.py` las prepara. Unos 0,25 USD
+  **[Estimación]**.
 
 ## Cómo funciona
 
@@ -148,12 +172,17 @@ python3 puzles/ilustrada/herramientas/caras_boceto.py
 # probarla en local (la página es un fragmento: el servidor le pone doctype y head, como al publicarla)
 python3 puzles/ilustrada/prueba/servir.py &          # http://localhost:8765/   (la A: /?tecnica=A)
 
+# las capas del nivel 2 (si cambian sus ilustraciones de fuentes/nivel2/ o sala_dos_ojos.jpg)
+python3 puzles/ilustrada/herramientas/nivel2_capas.py
+
 # prueba automática: juega la partida entera con toques de móvil y saca capturas
 node puzles/ilustrada/prueba/jugar.mjs B horizontal <carpeta de capturas>
 node puzles/ilustrada/prueba/jugar.mjs A vertical <carpeta de capturas>
+node puzles/ilustrada/prueba/jugar_nivel2.mjs vertical <carpeta de capturas>
 ```
 
-- **Resultado (03-10-2026, noche):** 23 de 23 en la B y en la A, en horizontal y en vertical.
+- **Resultado (03-10-2026, noche):** el nivel 1, 24 de 24 en la B y en la A, en horizontal y en vertical; el
+  nivel 2, 25 de 25 en horizontal y en vertical.
 - **La prueba** usa Playwright y el Chromium del contenedor de Claude (`/opt/pw-browsers`). Comprueba esto:
   - que los cajones empiezan cerrados, se abren con su animación y acercan la cámara;
   - que la llave resiste mientras el ojo mira, que un cajón con cerradura no cede y que la lámpara distrae;
@@ -162,14 +191,20 @@ node puzles/ilustrada/prueba/jugar.mjs A vertical <carpeta de capturas>
   - la espalda de la caja y su cajón largo;
   - que el incensario no se abre sin la llave;
   - la tapa en la mesa, el cuerno y el despertar;
+  - la tarjeta del nivel 1 (en la A, que el nivel 2 necesita 3D);
   - volver a empezar (cajones cerrados y bandeja vacía);
   - y que no haya errores en la consola.
+- **La prueba del nivel 2** empieza con «Seguir» en la portada y comprueba la subida de la caja hija, una
+  tablilla fuera de orden, la de arriba vista por el ojo, que la lámpara ya no distrae, las cinco tablillas
+  (cada una puesta de cara con arrastres de verdad), el cajoncito, la cajita, su tapa, el ojo en la cuenca, la
+  tarjeta y la partida guardada.
 - **La B necesita WebGL.** Sin tarjeta gráfica se usa SwiftShader, que es lento (unos 3-11 cuadros por
   segundo). Por eso las esperas de la prueba van en tiempo de juego y comprobando el estado.
 - **Three.js** viene de jsDelivr: la prueba lo descarga con el `fetch` de Node y se lo pasa a la página.
 - **Ganchos para probarla:** la página deja `window.__prueba` (estado, ojo, reloj, técnica, cara de la caja,
   ir a una vista, girar, dónde tocar para cada punto del boceto, el centro de cada cajón, cuánto está abierto
-  y el inventario) y `window.__tec`.
+  y el inventario; y, del nivel 2, la caja hija, dónde tocar cada parte, si el ojo ve una tablilla y la
+  cajita) y `window.__tec`.
 - **Para publicarla de nuevo** en la misma página privada: la herramienta Artifact, con `pagina/index.html`
   y, en `files`, los tres `.js` y todo `capas/` y `sonidos/`. La raíz es `pagina/`.
 
@@ -177,6 +212,6 @@ node puzles/ilustrada/prueba/jugar.mjs A vertical <carpeta de capturas>
 
 - **Más resolución:** la herramienta de hoy da 1376 × 768. Al acercarse en un móvil se ve algo blando, y
   la versión final pide 2K o 4K.
-- **La mecánica completa** de la caja viva (19 pasos) sobre la B.
+- **Los niveles 3 y final** (`NIVELES.md` §6 y §7).
 - **El APK:** la página ya funciona en el móvil. Falta decidir si se empaqueta tal cual o se pasa a Godot,
   y la firma sigue pendiente.

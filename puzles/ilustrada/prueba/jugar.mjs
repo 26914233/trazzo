@@ -215,11 +215,16 @@ await espera(2.6);
 await foto('16_despertando');
 await espera(2.2);
 await foto('17_despierta');
-await hasta(() => window.__prueba.estado().fase === 'fin');
-await espera(1);
+await hasta(() => window.__prueba.estado().fase === 'tarjeta');
+await espera(1.6);
 await foto('18_final');
 e = await estado();
-comprobar('el cuerno en la frente despierta la caja', e.cuerno === 'puesto' && e.fase === 'fin' && await pagina.isVisible('#final'));
+comprobar('el cuerno en la frente despierta la caja y cierra el nivel 1', e.cuerno === 'puesto' && e.fase === 'tarjeta'
+  && await pagina.isVisible('#tarjeta') && await pagina.evaluate(() => document.querySelectorAll('.pieza.recuperada').length === 1));
+// en la B, la tarjeta deja seguir en el nivel 2 (jugar_nivel2.mjs lo juega); en la A, que no tiene 3D, lo explica
+comprobar(tecnica === 'A' ? 'en la A, la tarjeta dice que el nivel 2 necesita 3D' : 'la tarjeta ofrece seguir en el nivel 2',
+  tecnica === 'A' ? await pagina.isHidden('#boton-seguir') : await pagina.isVisible('#boton-seguir'),
+  await pagina.evaluate(() => document.getElementById('tarjeta-siguiente').textContent));
 
 await pagina.tap('#boton-otra');
 await hasta(() => window.__prueba.estado().fase === 'jugando' && window.__prueba.ojo().parpadoBase === 0);

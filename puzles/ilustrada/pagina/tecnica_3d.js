@@ -8,6 +8,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { aThree, crearProyector, rectanguloUV, cargarTextura, crearSala, crearMesa, crearObjetos, crearCajaPintada,
   crearCajonesPintados, materialPintura } from './escena3d.js';
+import { crearCajaHija, TABLILLAS, LADO as LADO_HIJA } from './caja_hija.js';
 
 const ANCHO = 1376, ALTO = 768;
 const limitar = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -73,7 +74,7 @@ function prepararMundo(op) {
   frente.colorSpace = THREE.NoColorSpace; frente.minFilter = THREE.LinearMipmapLinearFilter; frente.anisotropy = 4;
   op.alHornear.push(() => { frente.needsUpdate = true; });
   // el ojo de la pintura: un lienzo pequeño, del tamaño de la almendra, que se repinta en cada cuadro
-  const A = op.datos.almendra, xs = A.map(p => p[0]), ys = A.map(p => p[1]);
+  const A = [...op.datos.almendra, ...((op.nivel2 && op.nivel2.almendra2) || [])], xs = A.map(p => p[0]), ys = A.map(p => p[1]);
   const sitio = { x: Math.floor(Math.min(...xs) - 10), y: Math.floor(Math.min(...ys) - 13) };
   sitio.w = Math.ceil(Math.max(...xs) + 10) - sitio.x; sitio.h = Math.ceil(Math.max(...ys) + 10) - sitio.y;
   const escalaOjo = 4, lienzoOjo = document.createElement('canvas');
@@ -160,10 +161,17 @@ function crearRig(op, limites) {
     cara: { T: puntoCara, s: 0.5, pivote: mundo.centroCaja },
     // el costado de los cajones, de cerca
     cajones: { T: new THREE.Vector3(0.11, mundo.centroCaja.y, 0), s: 0.46, pivote: mundo.centroCaja },
+    // nivel 2: la caja hija sube de la trampilla (se ve la caja entera con aire encima) y baja a la mesa, donde se
+    // mira de cerca con el ojo grande encima, vigilándola
+    subida: { T: new THREE.Vector3(0, 0.2, 0.06), s: 0.78, pivote: mundo.centroCaja },
+    // (cerca y con más ángulo, para que la pequeña se vea grande sin perder el ojo; en vertical cabe más)
+    hija: { T: new THREE.Vector3(-0.01, 0.04, 0.17), s: 0.35, Tv: new THREE.Vector3(-0.03, 0.055, 0.19), sv: 0.35,
+      pivote: new THREE.Vector3(0, op.escena3d.z_tablero + 0.0375, 0.245) },
   };
   function encuadre(nombre) {
-    const d = definiciones[nombre], v = VISTAS[nombre];
+    const v = VISTAS[nombre];
     const vertical = mundo.alto > mundo.ancho * 1.05;
+    const def = definiciones[nombre], d = vertical && def.Tv ? { ...def, T: def.Tv, s: def.sv } : def;
     const [x0, y0, x1, y1] = vertical ? v.v : v.h;
     const rw = (x1 - x0) / d.s, rh = (y1 - y0) / d.s;
     const sc = Math.min(mundo.ancho / rw, mundo.alto / rh);
@@ -478,13 +486,20 @@ export async function crearTecnica(letra, op) {
   grupo.add(caja);
   const limites = esB
     ? { sala: { th: 0.14, ph: [-0.05, 0.1] }, caja: { th: 0.38, ph: [-0.12, 0.22] }, incensario: { th: 0.32, ph: [-0.1, 0.22] },
-        cara: { th: 0.32, ph: [-0.1, 0.2] }, cajones: { th: 0.42, ph: [-0.1, 0.3] }, zoom: [0.62, 1.12] }
+        cara: { th: 0.32, ph: [-0.1, 0.2] }, cajones: { th: 0.42, ph: [-0.1, 0.3] }, subida: { th: 0.2, ph: [-0.05, 0.15] },
+        hija: { th: 0.3, ph: [-0.05, 0.35] }, zoom: [0.62, 1.12] }
     : { sala: { th: 0.24, ph: [-0.06, 0.14] }, caja: { th: 0.95, ph: [-0.15, 0.45] }, incensario: { th: 0.7, ph: [-0.12, 0.4] },
         cara: { th: 0.55, ph: [-0.12, 0.3] }, cajones: { th: 0.7, ph: [-0.12, 0.4] }, zoom: [0.62, 1.15] };
   const rig = crearRig(op, limites);
   const pistas = {};          // piezas que se animan (técnica C)
   let tintas = null, objetivosToque = [];
-  let pintada = null, cajonesB = null, carasB = [], rolloB = null;
+  let pintada = null, cajonesB = null, carasB = [], rolloB = null, hija = null, sombraHija = null;
+  // nivel 2: dónde sale la caja hija (la trampilla), dónde se posa y dónde está el ojo grande que la vigila
+  const ZT = op.escena3d.z_tablero;
+  const POS_HIJA = new THREE.Vector3(0, ZT + LADO_HIJA / 2, 0.245);          // en la mesa, delante de la caja
+  const TRAMPILLA_3D = new THREE.Vector3(0.0005, 0.255, -0.005);
+  const OJO_3D = new THREE.Vector3(-0.0431, 0.1588, 0.11);                     // el ojo grande, en el frente
+  const animHija = { subida: null, qObjetivo: new THREE.Quaternion(), tablillas: [], cajon: null };
 
   if (esB) {
     // la caja pintada (frente y espalda, y los costados y la tapa también pintados de frente) y lo que hay en la
@@ -527,6 +542,10 @@ export async function crearTecnica(letra, op) {
     }
     objetivosToque = [caja, ...Object.values(objetos)];
     if (op.decoracion) crearDecoracionB(grupo);
+    if (op.nivel2) {
+      await crearHijaB(grupo);
+      objetivosToque.push(hija.grupo);
+    }
   } else {
     tintas = crearTintas();
     const cargador = new GLTFLoader();
@@ -680,7 +699,50 @@ export async function crearTecnica(letra, op) {
     soltar() {},
     pellizcar(r) { rig.pellizcar(r); },
     abrirTrampilla(k) { trampilla = k; },
-    reiniciar() { giro = giroObj = vGiro = 0; trampilla = 0; },
+    // nivel 2
+    hayHija: () => !!hija,
+    subirHija(duracion, fin) { if (hija) animHija.subida = { t: 0, duracion, fin }; else if (fin) fin(); },
+    girarHija, soltarHija, tablillaVista,
+    correrTablilla(i, duracion = 0.45) { if (hija) animHija.tablillas.push({ i, t: 0, duracion, desde: hija.estado.tablillas[i], hasta: 1 }); },
+    abrirCajonHija(duracion = 0.6) { if (hija) animHija.cajon = { t: 0, duracion }; },
+    // la caja hija en el boceto (para que el ojo grande la mire) y un punto suyo en 3D (para los vuelos)
+    hijaEnBoceto() { return alBoceto(puntoHija()); },
+    puntoHija(parte) {
+      if (!hija) return null;
+      if (parte === 'cajita') return hija.cajita.getWorldPosition(new THREE.Vector3());
+      return puntoHija();
+    },
+    // cuánto mira la tablilla i a la cámara (1 de frente, 0 de canto, negativo si no se ve) y dónde tocar cada parte
+    tablillaHaciaCamara(i) {
+      if (!hija) return -1;
+      const n = normalObjetivo(i), c = POS_HIJA.clone().add(n.clone().multiplyScalar(LADO_HIJA / 2));
+      return n.dot(mundo.camara.position.clone().sub(c).normalize());
+    },
+    pantallaHija(parte, i) {
+      if (!hija) return null;
+      let v;
+      if (parte === 'tablilla') v = hija.centroMundo(i).add(hija.normalMundo(i).multiplyScalar(0.002));
+      else if (parte === 'cajita') v = hija.cajita.getWorldPosition(new THREE.Vector3());
+      else if (parte === 'cajon') v = hija.cajon.localToWorld(new THREE.Vector3(0, 0, -LADO_HIJA / 2 - 0.0015));
+      else v = puntoHija();
+      rig.colocar(op.reloj(), 0);
+      const q = aPantalla(v);
+      return { x: q.x, y: q.y };
+    },
+    ponerHija(h2) {
+      if (!hija || !h2) return;
+      TABLILLAS.forEach((_, i) => { hija.estado.tablillas[i] = h2.tablillas[i] ? 1 : 0; });
+      hija.estado.cajon = h2.cajon === 'abierto' ? 1 : 0;
+      animHija.subida = null; animHija.tablillas = []; animHija.cajon = null;
+      hija.poner();
+    },
+    reiniciar() {
+      giro = giroObj = vGiro = 0; trampilla = 0;
+      if (hija) {
+        hija.estado.tablillas.fill(0); hija.estado.cajon = 0; animHija.subida = null; animHija.tablillas = []; animHija.cajon = null;
+        animHija.qObjetivo.identity(); hija.cuerpo.quaternion.identity(); hija.grupo.position.copy(TRAMPILLA_3D); hija.poner();
+      }
+    },
     actualizar(dt) {
       rig.actualizar(dt);
       const kk = 30, am = 2 * Math.sqrt(kk) * 0.95;
@@ -690,6 +752,7 @@ export async function crearTecnica(letra, op) {
       caja.scale.set(1 + 0.0028 * b, 1 + 0.0065 * b, 1 + 0.0028 * b);
       if (esB) {
         actualizarCajonesB();
+        actualizarHija(dt);
         if (rolloB) { const r = op.decoracion.rollo; rolloB.rotation.set(r.a, 0, r.lift); }
       } else actualizarC(dt);
     },
@@ -757,6 +820,111 @@ export async function crearTecnica(letra, op) {
     }
     destino.add(rolloB);
   }
+  // ---- Nivel 2: la caja hija ----------------------------------------------------------------
+  // Sale de la trampilla, baja a la mesa delante de la grande y se gira en la mano. Las tablillas que mira el ojo
+  // grande no se mueven (lo decide juego.js con tablillaVista()).
+  async function crearHijaB(destino) {
+    const cargar = n => new Promise((ok, mal) => new THREE.TextureLoader().load(`capas/${n}.webp`, t => {
+      t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; ok(t);
+    }, undefined, mal));
+    const [asanoha, kikko, frente, cajita] = await Promise.all(['hija_asanoha', 'hija_kikko', 'hija_frente', 'cajita'].map(cargar));
+    hija = crearCajaHija({ asanoha, kikko, frente, cajita });
+    hija.grupo.visible = false;
+    hija.grupo.position.copy(TRAMPILLA_3D);
+    destino.add(hija.grupo);
+    // luz para la caja hija (lo pintado no la necesita: solo le afecta a ella). Con las luces físicas de Three, una
+    // cara iluminada de lleno devuelve (ambiente + directa) / π de su color: así queda como la pintura de alrededor
+    const ambiente = new THREE.AmbientLight(0xfff0dc, 1.9);
+    const lampara = new THREE.DirectionalLight(0xffd2a0, 1.5); lampara.position.set(-1, 0.6, 0.35);      // el andon
+    const luna = new THREE.DirectionalLight(0x9fb4de, 0.7); luna.position.set(0.8, 0.5, -0.8);           // el shoji
+    destino.add(ambiente, lampara, luna);
+    // su sombra en la mesa
+    sombraHija = sombraBajo(POS_HIJA.x, POS_HIJA.z, 0.05, ZT + 0.0012);
+    sombraHija.visible = false;
+    destino.add(sombraHija);
+  }
+  const curvaSuave = k => k * k * (3 - 2 * k);
+  // dónde está la caja hija ahora (mundo) y en el boceto
+  function puntoHija() { return hija ? hija.grupo.getWorldPosition(new THREE.Vector3()) : POS_HIJA.clone(); }
+  function actualizarHija(dt) {
+    if (!hija) return;
+    const est = op.estado(), h2 = est.hija;
+    if (!h2) { hija.grupo.visible = false; sombraHija.visible = false; return; }     // nivel 1 (o vuelta a empezar)
+    const fuera = h2.fase !== 'dentro';
+    hija.grupo.visible = fuera || !!animHija.subida;
+    sombraHija.visible = fuera && !animHija.subida;
+    // la subida: de la trampilla hacia arriba, flota y baja a la mesa
+    if (animHija.subida) {
+      const a = animHija.subida; a.t += dt;
+      const k = limitar(a.t / a.duracion, 0, 1);
+      const alto = TRAMPILLA_3D.clone().add(new THREE.Vector3(0, 0.1, 0.03));
+      let p;
+      if (k < 0.45) p = TRAMPILLA_3D.clone().lerp(alto, curvaSuave(k / 0.45));
+      else {
+        const q = curvaSuave((k - 0.45) / 0.55);
+        p = alto.clone().lerp(POS_HIJA, q);
+        p.y += Math.sin(q * Math.PI) * 0.05;
+      }
+      hija.grupo.position.copy(p);
+      hija.cuerpo.rotation.y = (1 - curvaSuave(k)) * 1.6;
+      if (k >= 1) { animHija.subida = null; hija.cuerpo.rotation.set(0, 0, 0); animHija.qObjetivo.identity(); hija.cuerpo.quaternion.identity(); if (a.fin) a.fin(); }
+    } else if (fuera) {
+      hija.grupo.position.copy(POS_HIJA);
+      // un leve vaivén, como si respirara también
+      hija.grupo.position.y += 0.0012 * Math.sin(op.reloj() * 1.3);
+      hija.cuerpo.quaternion.slerp(animHija.qObjetivo, 1 - Math.exp(-dt * 11));
+    }
+    // tablillas y cajoncito
+    for (const t of animHija.tablillas) {
+      t.t += dt; const k = limitar(t.t / t.duracion, 0, 1);
+      hija.estado.tablillas[t.i] = t.desde + (t.hasta - t.desde) * (1 - Math.pow(1 - k, 3));
+    }
+    animHija.tablillas = animHija.tablillas.filter(t => t.t < t.duracion);
+    if (animHija.cajon) {
+      const c = animHija.cajon; c.t += dt; const k = limitar(c.t / c.duracion, 0, 1);
+      hija.estado.cajon = 1 - Math.pow(1 - k, 3) + 0.08 * Math.sin(k * Math.PI) * (1 - k);
+      if (k >= 1) { hija.estado.cajon = 1; animHija.cajon = null; }
+    }
+    hija.poner();
+    hija.cajita.visible = h2.cajita === 'cajon';
+  }
+  // el giro en la mano: arrastrar gira la caja hija alrededor del eje vertical y del eje de la derecha de la cámara
+  function girarHija(dx, dy) {
+    if (!hija) return;
+    const derecha = new THREE.Vector3(1, 0, 0).applyQuaternion(mundo.camara.quaternion); derecha.y = 0; derecha.normalize();
+    const qy = new THREE.Quaternion().setFromAxisAngle(EJE_Y, dx * 0.0115);
+    const qx = new THREE.Quaternion().setFromAxisAngle(derecha, dy * 0.0115);
+    animHija.qObjetivo.premultiply(qy).premultiply(qx).normalize();
+  }
+  // al soltar, se asienta en la orientación de cubo más cercana (una cara mirando a cada eje)
+  const ORIENTACIONES = (() => {
+    const r = [], ejes = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]].map(a => new THREE.Vector3(...a));
+    for (const x of ejes) for (const y of ejes) {
+      if (Math.abs(x.dot(y)) > 0.5) continue;
+      const z = new THREE.Vector3().crossVectors(x, y);
+      r.push(new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(x, y, z)));
+    }
+    return r;
+  })();
+  function soltarHija() {
+    if (!hija) return;
+    let mejor = null, d = -1;
+    for (const q of ORIENTACIONES) { const p = Math.abs(q.dot(animHija.qObjetivo)); if (p > d) { d = p; mejor = q; } }
+    animHija.qObjetivo.copy(mejor);
+  }
+  // la normal de la tablilla i con la caja hija ya asentada (al soltarla gira unos instantes hasta su sitio)
+  function normalObjetivo(i) { return new THREE.Vector3(...TABLILLAS[i].normal).applyQuaternion(animHija.qObjetivo); }
+  // ¿ve el ojo grande la cara de esta tablilla? (su cara mira hacia el ojo, y la caja grande no está de espaldas)
+  function tablillaVista(i) {
+    if (!hija) return false;
+    caja.updateMatrixWorld();
+    const ojo = caja.localToWorld(OJO_3D.clone());
+    const n = normalObjetivo(i), centro = POS_HIJA.clone().add(n.clone().multiplyScalar(LADO_HIJA / 2));
+    const frenteCaja = new THREE.Vector3(0, 0, 1).applyQuaternion(caja.quaternion);
+    if (frenteCaja.dot(centro.clone().sub(ojo)) <= 0) return false;
+    return n.dot(ojo.sub(centro).normalize()) > 0.3;
+  }
+
   // los cajones de la B: cuánto ha salido cada uno (lo lleva juego.js), su hueco, su sombra y lo que guarda
   function actualizarCajonesB() {
     const est = op.estado();
@@ -847,6 +1015,11 @@ export async function crearTecnica(letra, op) {
       const o = h.object;
       if (!esVisible(o) || o.userData.contorno) continue;
       const tipo = o.userData.tipo;
+      if (esB && tipo === 'hija') {
+        const d = o.userData;
+        return { malla: o, punto: { ...alBoceto(h.point), cara: 'frente', hija: d.parte, tablilla: d.tablilla,
+          caraHija: h.face ? h.face.materialIndex : null } };
+      }
       if (esB && tipo === 'cajon') return { malla: o, punto: { ...centroCajon(o.userData.cajon), cara: 'frente', cajon: o.userData.cajon } };
       if (esB && tipo === 'caja') {
         const local = caja.worldToLocal(h.point.clone());

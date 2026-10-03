@@ -22,6 +22,7 @@
   --fuente-ui: "Zen Kaku Gothic New", "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
   color-scheme: dark;
 }
+[hidden] { display: none !important; }      /* las capas (.capa) son flex: «hidden» tiene que poder con eso */
 html, body { height: 100%; }
 body {
   background: var(--sumi); color: var(--washi); font-family: var(--fuente-ui);
@@ -119,6 +120,9 @@ button { font: inherit; color: inherit; }
 }
 @keyframes gira-lento { 0%, 100% { transform: rotateY(-24deg) rotateZ(-4deg); } 50% { transform: rotateY(24deg) rotateZ(4deg) translateY(-6px); } }
 @keyframes barrido-luz { 0% { transform: translateX(-60%); } 100% { transform: translateX(60%); } }
+.vitrina.grande { width: min(66vmin, 340px); }
+.vitrina canvas { position: relative; width: 100%; height: 100%; touch-action: none; cursor: grab; border-radius: 50%; }
+.vitrina canvas:focus-visible { outline: 2px solid var(--laton); outline-offset: 4px; }
 #examinar h3 { margin: 0; font-family: var(--fuente-titulo); font-weight: 800; font-size: clamp(22px, 3.4vw, 30px); letter-spacing: 0.04em; }
 #examinar p { margin: 0; max-width: 34ch; font-family: var(--fuente-titulo); font-size: 16px; line-height: 1.5; color: var(--washi-tenue); text-wrap: balance; }
 #examinar small { font-size: 13px; letter-spacing: 0.06em; color: var(--washi-tenue); }
@@ -132,6 +136,12 @@ button { font: inherit; color: inherit; }
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9); opacity: 0; transition: opacity 0.45s, transform 0.45s; pointer-events: none;
 }
 #mensaje.visible { opacity: 1; transform: translate(-50%, 0); }
+/* de cerca de la caja pequeña, en horizontal, el texto va a la derecha para no taparla */
+@media (orientation: landscape) {
+  #juego.vista-hija #mensaje { left: auto; right: 14px; bottom: auto; top: 50%; width: auto; max-width: min(300px, 36%);
+    transform: translate(8px, -50%); text-align: left; padding-inline: 18px; }
+  #juego.vista-hija #mensaje.visible { transform: translate(0, -50%); }
+}
 
 .capa {
   position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -173,14 +183,42 @@ button { font: inherit; color: inherit; }
 .papel .sello { position: absolute; right: 18px; bottom: 16px; width: 36px; height: 36px; font-size: 21px; }
 .papel small { display: block; margin-top: 14px; font-family: var(--fuente-ui); font-size: 13px; color: #6b5640; }
 
-#final { justify-content: flex-end; padding-block: 0 22px; background: linear-gradient(to top, rgba(10, 7, 5, 0.94), rgba(10, 7, 5, 0.55) 26%, rgba(10, 7, 5, 0) 46%); gap: 8px; }
-#final h2 { margin: 0; font-family: var(--fuente-titulo); font-weight: 800; font-size: clamp(24px, 4.4vw, 42px); letter-spacing: 0.04em; text-wrap: balance; }
-#final p { margin: 0; max-width: 46ch; font-family: var(--fuente-titulo); font-size: 15px; line-height: 1.45; color: var(--washi-tenue); text-wrap: balance; }
-#final .boton-texto { min-height: 44px; font-size: 16px; }
-/* el final deja tocar lo de arriba (la pista, el sonido): solo su texto y su botón reciben toques */
-#final { pointer-events: none; }
-#final > * { pointer-events: auto; }
-#final.oculta > * { pointer-events: none; }
+.boton-texto.secundario { background: rgba(20, 14, 10, 0.55); border-color: rgba(201, 164, 93, 0.45); box-shadow: none; font-size: 16px; min-height: 44px; }
+
+/* La tarjeta de cada nivel: una bandeja lacada como la del inventario, con la cara como marcador (las piezas que ya
+   ha recuperado, selladas en bermellón) y el paso al siguiente */
+#tarjeta { background: radial-gradient(ellipse 80% 70% at 50% 50%, rgba(10, 7, 5, 0.5), rgba(10, 7, 5, 0.9)); }
+.tarjeta {
+  position: relative; width: min(440px, 100%); padding: 20px 22px 20px; border-radius: 16px;
+  display: flex; flex-direction: column; align-items: center; gap: 9px;
+  background: linear-gradient(155deg, #251a13, #0d0806 55%, #170f0b);
+  border: 1px solid rgba(201, 164, 93, 0.6);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.7), inset 0 0 0 3px rgba(10, 6, 4, 0.9), inset 0 0 0 4px rgba(201, 164, 93, 0.22);
+}
+.tarjeta::before, .tarjeta::after {
+  content: ""; position: absolute; width: 18px; height: 18px; pointer-events: none;
+  border: 2px solid var(--laton); filter: drop-shadow(0 0 3px rgba(232, 190, 110, 0.35));
+}
+.tarjeta::before { top: -2px; left: -2px; border-right: 0; border-bottom: 0; border-top-left-radius: 15px; }
+.tarjeta::after { bottom: -2px; right: -2px; border-left: 0; border-top: 0; border-bottom-right-radius: 15px; }
+#tarjeta-hecho { font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--laton); }
+#tarjeta h2 { margin: 0; font-family: var(--fuente-titulo); font-weight: 800; font-size: clamp(26px, 5vw, 38px); letter-spacing: 0.04em; line-height: 1.1; text-wrap: balance; }
+#tarjeta-texto { margin: 0; max-width: 34ch; font-family: var(--fuente-titulo); font-size: 16px; line-height: 1.45; color: var(--washi-tenue); text-wrap: balance; }
+.marcador { display: flex; gap: 16px; margin: 4px 0 2px; }
+.pieza { display: grid; justify-items: center; gap: 5px; }
+.pieza b {
+  width: 46px; height: 46px; border-radius: 6px; display: grid; place-items: center;
+  font-family: var(--fuente-titulo); font-weight: 800; font-size: 25px; line-height: 1;
+  color: rgba(201, 164, 93, 0.38); border: 1.5px dashed rgba(201, 164, 93, 0.38);
+}
+.pieza.recuperada b { background: var(--bermellon); color: #f6e9d6; border: 0; box-shadow: inset 0 0 0 2px rgba(246, 233, 214, 0.35); transform: rotate(-4deg); }
+.pieza.nueva b { animation: sellar 0.7s 0.6s both cubic-bezier(0.2, 1.4, 0.4, 1); }
+@keyframes sellar { 0% { transform: scale(1.9) rotate(-16deg); opacity: 0; } 100% { transform: scale(1) rotate(-4deg); opacity: 1; } }
+.pieza small { font-size: 12px; letter-spacing: 0.08em; color: var(--washi-tenue); }
+.pieza.recuperada small { color: var(--washi); }
+#tarjeta-siguiente { margin: 2px 0 0; font-family: var(--fuente-titulo); font-size: 16px; color: var(--washi); text-wrap: balance; }
+.botones { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 4px; }
+.botones .boton-texto { margin-top: 0; }
 
 #cargando { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); z-index: 6; font-size: 13px; letter-spacing: 0.08em; color: var(--washi-tenue); }
 #arrastre { position: absolute; z-index: 7; width: 54px; height: 54px; margin: -27px 0 0 -27px; object-fit: contain; pointer-events: none; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.7)); }
@@ -211,6 +249,10 @@ button { font: inherit; color: inherit; }
   #boton-girar span { display: none; }
 }
 @media (max-height: 520px) {
+  .tarjeta { padding: 14px 18px; gap: 6px; }
+  #tarjeta h2 { font-size: 26px; }
+  #tarjeta-texto { font-size: 14px; }
+  .pieza b { width: 38px; height: 38px; font-size: 21px; }
   #portada { gap: 10px; }
   #portada h1 { font-size: 40px; }
   #portada .sello { width: 34px; height: 34px; font-size: 20px; }
@@ -218,6 +260,7 @@ button { font: inherit; color: inherit; }
 }
 @media (prefers-reduced-motion: reduce) {
   .capa, #mensaje, .hueco { transition-duration: 0.01s; }
+  .pieza.nueva b { animation: none; }
 }
 </style>
 
@@ -253,6 +296,7 @@ button { font: inherit; color: inherit; }
     <span class="sello" aria-hidden="true">箱</span>
     <h1>La caja viva</h1>
     <p>Una caja secreta que respira, te mira y no se deja abrir mientras te ve.</p>
+    <button class="boton-texto" id="boton-continuar" type="button" hidden>Seguir</button>
     <button class="boton-texto" id="boton-entrar" type="button" disabled>Cargando la sala…</button>
     <small>Con sonido · en horizontal o en vertical</small>
   </div>
@@ -266,16 +310,30 @@ button { font: inherit; color: inherit; }
   </div>
 
   <div class="capa oculta" id="examinar" hidden>
-    <div class="vitrina"><img id="examinar-img" alt=""></div>
+    <div class="vitrina"><img id="examinar-img" alt=""><canvas id="bolsillo" hidden tabindex="0"
+      aria-label="La cajita en la mano: gira su tapa con el dedo o con las flechas del teclado"></canvas></div>
     <h3 id="examinar-nombre"></h3>
     <p id="examinar-texto"></p>
-    <small>Toca para guardarlo</small>
+    <small id="examinar-ayuda">Toca para guardarlo</small>
   </div>
 
-  <div class="capa oculta" id="final" hidden>
-    <h2>La caja ya te ha visto</h2>
-    <p>Fin de la prueba. La caja guarda más secretos: su espalda y sus cajones con cerradura esperan a las cajas que vienen.</p>
-    <button class="boton-texto" id="boton-otra" type="button">Volver a empezar</button>
+  <div class="capa oculta" id="tarjeta" hidden>
+    <div class="tarjeta" role="dialog" aria-labelledby="tarjeta-titulo">
+      <span id="tarjeta-hecho">Nivel 1 superado</span>
+      <h2 id="tarjeta-titulo">El cuerno</h2>
+      <p id="tarjeta-texto"></p>
+      <div class="marcador" role="img" aria-label="La cara: 1 de 3 piezas">
+        <span class="pieza" data-pieza="cuerno"><b aria-hidden="true">角</b><small>cuerno</small></span>
+        <span class="pieza" data-pieza="ojo"><b aria-hidden="true">目</b><small>ojo</small></span>
+        <span class="pieza" data-pieza="voz"><b aria-hidden="true">声</b><small>voz</small></span>
+      </div>
+      <p id="tarjeta-siguiente"></p>
+      <div class="botones">
+        <button class="boton-texto" id="boton-seguir" type="button">Seguir</button>
+        <button class="boton-texto" id="boton-quedarse" type="button" hidden>Quedarse en la sala</button>
+        <button class="boton-texto secundario" id="boton-otra" type="button">Volver a empezar</button>
+      </div>
+    </div>
   </div>
   <div id="aviso3d" hidden></div>
   <div id="cargando" hidden></div>

@@ -566,8 +566,11 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   - **La caja del relojero:** misterio victoriano; el reloj es la llave.
   - **La reliquia:** artefacto de otro mundo; anillos que guían la luz.
   - **El cuarto del farero:** habitación de escape por puntos de vista.
-- **DECISIÓN 23 (abierta):** cuál se convierte en juego, según la prueba con jugadores (`PLAN.md` §3).
-  Recomendación previa: la caja viva. Manda la prueba.
+- **DECISIÓN 23 (cerrada el 03-10-2026): el juego es la caja viva.** El usuario: «vamos a concentrarnos en
+  mejorar uno primero, que va a ser el juego de la caja del ojo, y los demás se pueden hacer en otras entregas en
+  el futuro». La prueba con jugadores (`PLAN.md` §3) sigue sirviendo para medir los niveles.
+- **DECISIÓN 24 (cerrada el 03-10-2026): una línea, la de la caja viva**, hecha de niveles de la misma caja; el
+  relojero, la reliquia y el farero quedan para entregas futuras (`PLAN.md` §5).
 - **Bocetos antes de construir (03-10-2026):** `puzles/bocetos/`.
   - El usuario aprobó la idea de la caja viva profunda, pero no su diseño, y pidió bocetos de todo
     antes de construir.
@@ -633,9 +636,18 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   - el minutero del relojero se menea como un dedo que dice que no;
   - la luz de la reliquia se retira al núcleo (si duerme, el núcleo late una vez);
   - en el farero responde la tormenta: racha y la llama del quinqué que se agacha.
-- **Decisiones abiertas que propone la biblia (03-10-2026)** (`PLAN.md` §5; ninguna tomada):
-  - **24, cómo se organiza el juego:** recomendada la C, una línea completa de 4 cajas más la caja 1
-    de las otras como muestras;
+- **Los niveles de la caja viva (03-10-2026, noche):** plan en `puzles/ilustrada/NIVELES.md`; estado en
+  `PLAN.md` §8. La cara es el puzle grande: cada nivel le devuelve una pieza (cuerno, ojo y voz) y el final, «El
+  corazón», solo se abre con las tres.
+  - Hechos en la página: el nivel 1 (El cuerno) y el **nivel 2 (La caja de dentro, solo en la B)**: una caja
+    pequeña sale de la trampilla, se gira en la mano y sus cinco tablillas corren en orden; la cara que ve el
+    ojo grande no se mueve; dentro, una cajita roja (puzle de bolsillo) con un ojo de piedra de luna para la
+    cuenca.
+  - Al terminar cada nivel, una tarjeta con la cara como marcador (sellos 角 目 声) y la partida guardada en el
+    navegador; la portada ofrece seguir. `?nivel=2` empieza en el 2.
+  - Prueba del nivel 2: `prueba/jugar_nivel2.mjs <horizontal|vertical>`.
+  - Siguen en propuesta: el nivel 3 (La caja del revés) y el final.
+- **Decisiones abiertas que propone la biblia (03-10-2026)** (`PLAN.md` §5):
   - **25, el marco de la historia:** recomendada la C, heredas el gabinete de tu abuela (o abuelo);
   - **26, las pistas:** recomendada la B, 4 niveles más un aviso suave a los 3 minutos.
 - **Proyecto:** `puzles/godot/` (Godot 4.7.2, Compatibility).
