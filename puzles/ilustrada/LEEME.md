@@ -17,6 +17,9 @@
 **Para jugarla:** página privada https://claude.ai/artifact/7fC2cECS62soiVNBa2kMG3 (solo la puede abrir el
 usuario). Funciona en el móvil, en horizontal y en vertical, mejor con sonido.
 
+**En APK** (desde el 03-10-2026): `caja-viva-0.1-prueba.apk`, la misma página dentro de una app de Android, sin
+conexión. Cómo se construye y se firma: `apk/LEEME.md`.
+
 **Es el juego** (DECISIONES 23 y 24, cerradas el 03-10-2026): una línea de niveles de la misma caja. El plan
 está en `NIVELES.md`; se juegan el nivel 1 y el 2. Al terminar cada nivel sale una tarjeta con la cara como
 marcador (las piezas que ha recuperado: 角 cuerno, 目 ojo y 声 voz) y la partida se guarda en el navegador; la
@@ -62,6 +65,7 @@ Detrás de la caja hay más cajones, un hueco con forma de ficha de shōgi y un 
 | `pagina/caja_hija.js` | La caja hija del nivel 2: el cubo con sus tablillas, sus flechas, el cajoncito y la cajita |
 | `herramientas/nivel2_capas.py` | Las capas del nivel 2: las caras de la caja hija, la cajita y el ojo nuevo (`capas/nivel2.json`) |
 | `NIVELES.md` | El plan de niveles: la cara como puzle grande y los cuatro niveles |
+| `apk/` | El APK de Android: la página dentro de un WebView, sin conexión (`apk/LEEME.md`) |
 | `pagina/escena3d.js` | La sala del boceto en 3D, el material que proyecta la pintura, la caja pintada y sus cajones |
 | `pagina/capas/`, `pagina/sonidos/` | Lo que generan los guiones |
 | `prueba/` | `servir.py` (servidor local), `jugar.mjs` (prueba del nivel 1) y `jugar_nivel2.mjs` (del nivel 2) |
@@ -213,5 +217,5 @@ node puzles/ilustrada/prueba/jugar_nivel2.mjs vertical <carpeta de capturas>
 - **Más resolución:** la herramienta de hoy da 1376 × 768. Al acercarse en un móvil se ve algo blando, y
   la versión final pide 2K o 4K.
 - **Los niveles 3 y final** (`NIVELES.md` §6 y §7).
-- **El APK:** la página ya funciona en el móvil. Falta decidir si se empaqueta tal cual o se pasa a Godot,
-  y la firma sigue pendiente.
+- **El APK:** hecho, la página empaquetada tal cual (`apk/`). Para Google Play faltaría subir el SDK objetivo a
+  35 y el AAB firmado con una clave de publicación.

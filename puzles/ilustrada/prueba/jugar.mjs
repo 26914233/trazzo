@@ -21,7 +21,13 @@ const navegador = await chromium.launch({ headless: true, executablePath: '/opt/
 const contexto = await navegador.newContext({ viewport: { width: ancho, height: alto }, deviceScaleFactor: con3d ? 1 : 2,
   isMobile: true, hasTouch: true });
 const cache = new Map();
-await contexto.route('https://cdn.jsdelivr.net/**', async ruta => {
+// CAJA_VIVA_URL prueba otra copia de la página (por ejemplo, la web del APK: apk/LEEME.md); con SIN_RED=1, cualquier
+// petición fuera de localhost falla, para comprobar que no le hace falta internet
+const BASE = process.env.CAJA_VIVA_URL || 'http://localhost:8765/';
+const SIN_RED = process.env.SIN_RED === '1';
+const fuera = [];
+if (SIN_RED) await contexto.route(url => !url.href.startsWith('http://localhost'), ruta => { fuera.push(ruta.request().url()); ruta.abort(); });
+else await contexto.route('https://cdn.jsdelivr.net/**', async ruta => {
   const url = ruta.request().url();
   if (!cache.has(url)) {
     const r = await fetch(url);
@@ -31,7 +37,7 @@ await contexto.route('https://cdn.jsdelivr.net/**', async ruta => {
   await ruta.fulfill({ status: c.estado, body: c.cuerpo, headers: { 'content-type': c.tipo || 'text/javascript', 'access-control-allow-origin': '*' } });
 });
 // las fuentes de Google no cargan detrás del proxy del contenedor: se cortan (no es un fallo de la página)
-await contexto.route('https://fonts.*/**', ruta => ruta.abort());
+if (!SIN_RED) await contexto.route('https://fonts.*/**', ruta => ruta.abort());
 const pagina = await contexto.newPage();
 const cdp = await contexto.newCDPSession(pagina);
 const errores = [];
@@ -92,7 +98,7 @@ async function mantener(selector, segundos) {
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
 }
 
-await pagina.goto('http://localhost:8765/' + (tecnica === 'A' ? '?tecnica=A' : ''));
+await pagina.goto(BASE + (tecnica === 'A' ? '?tecnica=A' : ''));
 await pagina.waitForFunction(() => !document.getElementById('boton-entrar').disabled, null, { timeout: 30000 });
 await foto('01_portada');
 await pagina.tap('#boton-entrar');
@@ -233,6 +239,14 @@ const cerrados = await pagina.evaluate(() => Object.keys(window.__prueba.estado(
 comprobar('volver a empezar deja la caja como al principio', e.fase === 'jugando' && e.llave === 'cajon' && e.nota === 'cajon' && e.tapa === 'puesta'
   && e.cuerno === 'brasas' && e.inventario.length === 0 && cerrados);
 
+if (SIN_RED) {
+  comprobar('sin internet: nada sale de la página', fuera.length === 0, fuera.slice(0, 3).join(' | '));
+  comprobar('sin internet: las fuentes del juego están cargadas', await pagina.evaluate(async () => {
+    await document.fonts.ready;
+    return ['800 30px "Shippori Mincho"', '400 16px "Shippori Mincho"', '400 15px "Zen Kaku Gothic New"']
+      .every(f => document.fonts.check(f, 'Caja')) && [...document.fonts].some(f => f.family.includes('Shippori') && f.status === 'loaded');
+  }));
+}
 comprobar('sin errores en la consola', errores.length === 0, errores.join(' | '));
 console.log(`\n${bien} de ${total} (técnica ${tecnica}, ${vertical ? 'vertical' : 'horizontal'}); capturas en ${carpeta}`);
 await navegador.close();

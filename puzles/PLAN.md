@@ -492,8 +492,9 @@ con el mismo recorrido; se elige la técnica en la portada y se cambia jugando (
 - **SIGUIENTE PASO:**
   1. subir la resolución del frente a 2K;
   2. llevar los 19 pasos de la caja viva a la B;
-  3. el APK: la página ya funciona en el móvil. Falta decidir si se empaqueta tal cual o se pasa a Godot,
-     y resolver la firma **[Propuesta: se decide después]**.
+  3. el APK: **hecho el 03-10-2026**. El usuario pidió «pasarlo a APK con la misma calidad que el enlace»: la
+     página va empaquetada tal cual en un WebView, sin conexión, con una clave de prueba propia
+     (`ilustrada/apk/LEEME.md`).
 
 ### Cajones, inventario y decoración viva en la B (03-10-2026, noche) [Hecho]
 
@@ -566,6 +567,9 @@ entrar al nivel final».
 - **Pistas del nivel 2:** de vagas a claras, una escalera por paso.
 - **Prueba automática:** `prueba/jugar_nivel2.mjs` juega el nivel 2 con toques y arrastres de verdad, y
   `prueba/jugar.mjs` sigue jugando el nivel 1.
+
+**El APK (03-10-2026) [Hecho]:** `caja-viva-0.1-prueba.apk` (5,3 MB), la misma página en una app de Android sin
+conexión: paquete `com.thunderdarkness.cajaviva`, Android 7 o más. Detalle en `ilustrada/apk/LEEME.md`.
 
 **Siguiente:**
 - Nivel 3 · La caja del revés y el nivel final, en las próximas entregas (diseño en `NIVELES.md` §6 y §7).

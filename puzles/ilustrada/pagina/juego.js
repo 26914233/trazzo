@@ -2896,6 +2896,21 @@ if (caliente && caliente.snapshot) caliente.snapshot(() => ({ estado: { ...estad
 requestAnimationFrame(cuadro);
 if (caliente && caliente.ready) caliente.ready(arrancar); else arrancar((caliente && caliente.data) || {});
 
+// En el APK (apk/): el botón «atrás» de Android cierra lo que esté abierto o vuelve a la sala, y devuelve si hizo algo
+// (si no, la app pasa a segundo plano); al salir de la app el sonido se para y al volver sigue
+window.__atras = () => {
+  if (!el.examinar.hidden) { cerrarExaminar(); return true; }
+  if (!el.nota.hidden) { cerrarNota(); return true; }
+  if (estado.fase === 'jugando' && !estado.ocupado && estado.vista !== 'sala') { irA('sala'); return true; }
+  return false;
+};
+window.__pausa = pausada => {
+  if (!audio.ctx) return;
+  if (pausada) audio.ctx.suspend().catch(() => {});
+  else audio.ctx.resume().catch(() => {});
+  ultimo = performance.now();
+};
+
 // Para la prueba automática (no hace nada si nadie la usa)
 window.__prueba = {
   estado: () => estado, ojo: () => ojo, tecnica: () => tec.nombre, cara: () => tec.cara(), reloj: () => reloj,
