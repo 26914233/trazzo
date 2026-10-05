@@ -323,18 +323,52 @@ function mirarA(p, segundos = 2.5) { ojo.punto = p; ojo.ultimoToque = reloj + se
 function entornar(segundos = 1.6) { ojo.entornadoHasta = reloj + segundos; }
 function parpadear(lento = false) { ojo.parpadeo = { t: 0, cierre: lento ? 0.16 : 0.075, pausa: lento ? 0.12 : 0.04, apertura: lento ? 0.3 : 0.14 }; }
 
+// El vistazo (la pista de dentro del mundo, el escalón 0 de genero/jugadores_y_principios.md §2): si pasa un rato
+// sin avanzar, el ojo mira de reojo, un instante, hacia lo que más teme que encuentres. Nunca mientras tocas algo.
+const PRIMER_VISTAZO = 35;
+const progreso = { firma: '', desde: 0, proximoVistazo: 0 };
+function firmaAvance() {
+  const h = estado.hija;
+  return [estado.nivel, estado.llave, estado.nota, estado.tapa, estado.cuerno, estado.inventario.length,
+    Object.values(estado.cajones).join(''), h ? [h.fase, h.tablillas.join(''), h.cajon, h.cajita, h.ojo].join('') : ''].join('|');
+}
+// lo que la caja teme: el frente abierto ahora mismo (o nada, si ya lo vigila)
+function frenteAbierto() {
+  const h = estado.hija;
+  if (estado.nivel === 2 && h) {
+    if (h.fase === 'dentro') return TRAMPILLA;
+    if (h.ojo === 'mano') return CUENCA;
+    return null;                                          // la caja pequeña ya la vigila
+  }
+  if (estado.llave === 'cajon') return estado.cajones.c8 === 'abierto' ? LAMPARA : centroCajon('c8');
+  if (estado.nota === 'cajon' && estado.llave === 'mano') return centroCajon('c9');
+  if (estado.cuerno === 'brasas') return { x: 575, y: 520 };
+  if (estado.cuerno === 'mano') return { x: HUECO_FRENTE.x, y: HUECO_FRENTE.y - 140 };  // hacia su propia frente
+  return null;
+}
+function actualizarVistazo() {
+  const f = firmaAvance();
+  if (f !== progreso.firma) { progreso.firma = f; progreso.desde = reloj; progreso.proximoVistazo = reloj + PRIMER_VISTAZO; ojo.vistazo = null; }
+  if (estado.fase !== 'jugando' || estado.ocupado || puntero || reloj < progreso.proximoVistazo) return;
+  if (reloj - ojo.ultimoToque < 3 || reloj < ojo.distraidoHasta || ojo.parpadoBase > 0.5) return;
+  const punto = frenteAbierto();
+  progreso.proximoVistazo = reloj + azar(15, 24);
+  if (punto) ojo.vistazo = { punto, hasta: reloj + azar(0.9, 1.3) };
+}
 function actualizarOjo(dt) {
+  actualizarVistazo();
   let objetivo = { x: 0, y: 0 };
   const haciaPunto = p => ({ x: 13.5 * Math.tanh((p.x - OJO.x) / 240), y: 3.4 * Math.tanh((p.y - OJO.y) / 200) });
   // en el nivel 2 vigila la caja pequeña desde que asoma por la trampilla
   const vigilada = estado.nivel === 2 && estado.hija && estado.hija.fase !== 'dentro' && estado.hija.ojo !== 'puesto' && tec.hijaEnBoceto
     ? tec.hijaEnBoceto() : null;
-  if (reloj < ojo.distraidoHasta) objetivo = haciaPunto(LAMPARA);
+  if (reloj < ojo.distraidoHasta) objetivo = haciaPunto(ojo.distraidoPor || LAMPARA);
   else if (ojo.punto && reloj - ojo.ultimoToque < 2.5) objetivo = haciaPunto(ojo.punto);
+  else if (ojo.vistazo && reloj < ojo.vistazo.hasta) objetivo = haciaPunto(ojo.vistazo.punto);
   else if (vigilada) objetivo = haciaPunto(vigilada);
   else {
     if (reloj >= ojo.proximoVagar) {
-      ojo.vagar = elegir([null, null, null, LAMPARA, { x: 60, y: 260 }, { x: 1000, y: 70 }, { x: 575, y: 540 }, { x: 1290, y: 560 }, { x: 700, y: 700 }]);
+      ojo.vagar = elegir([null, null, null, { x: 60, y: 260 }, { x: 1000, y: 70 }, { x: 1100, y: 40 }, { x: 1290, y: 560 }, { x: 700, y: 700 }]);
       ojo.proximoVagar = reloj + azar(1.4, 3.8);
     }
     if (ojo.vagar) objetivo = haciaPunto(ojo.vagar);
@@ -605,6 +639,8 @@ function humoDelIncienso() {
 // Luz: lámpara andon, brasas, motas de polvo, ojos rojos y la trampilla
 // ---------------------------------------------------------------------------------------------
 const lampara = { agitadaHasta: 0, fuerza: 0, intensidad: 1, apagada: 0, proxima: 16 };
+// en el nivel 2, mientras la caja pequeña está en la mesa sin su ojo, el ojo grande no se deja distraer
+const vigilaLaPequena = () => !!(estado.nivel === 2 && estado.hija && estado.hija.fase === 'mesa' && estado.hija.ojo !== 'puesto');
 function agitarLampara(segundos, fuerza) { lampara.agitadaHasta = reloj + segundos; lampara.fuerza = fuerza; }
 function actualizarLampara() {
   let i = 1 + 0.035 * Math.sin(reloj * 7.3) + 0.025 * Math.sin(reloj * 11.9 + 1) + 0.02 * Math.sin(reloj * 23.1);
@@ -614,7 +650,7 @@ function actualizarLampara() {
   if (estado.fase === 'jugando' && reloj >= lampara.proxima) {
     lampara.proxima = reloj + azar(14, 24);
     agitarLampara(0.9, 0.6);
-    if (reloj > ojo.distraidoHasta) ojo.distraidoHasta = reloj + 1.3;
+    if (reloj > ojo.distraidoHasta && !vigilaLaPequena()) { ojo.distraidoPor = LAMPARA; ojo.distraidoHasta = reloj + 1.3; }
   }
 }
 const motas = [];
@@ -762,7 +798,10 @@ function actualizarDecoracion(dt) {
   rollo.lift = mezclar(rollo.lift, 0.05 * viento.rafaga, 1 - Math.exp(-dt * 2));
   // la tetera
   if (tetera.t < tetera.duracion) tetera.t += dt;
-  if (estado.fase === 'jugando' && reloj > tetera.proxima) { tetera.proxima = reloj + azar(26, 46); vaporTetera(azar(0.5, 0.8)); }
+  if (estado.fase === 'jugando' && reloj > tetera.proxima) {
+    tetera.proxima = reloj + azar(26, 46); vaporTetera(azar(0.5, 0.8));
+    if (reloj > ojo.distraidoHasta && !vigilaLaPequena() && ojo.parpadoBase < 0.5) { ojo.distraidoPor = TAPA_TETERA; ojo.distraidoHasta = reloj + 1.1; }
+  }
   for (let i = ondas.length - 1; i >= 0; i--) { ondas[i].t += dt; if (ondas[i].t > 1.5) ondas.splice(i, 1); }
   actualizarPolillas(dt);
   bambuAcum += dt;
@@ -2112,7 +2151,7 @@ const ZONAS = [
   { grupo: 'incensario', forma: INCENSARIO, tocar: tocarIncensario },
   // la sala: desde cualquier vista
   { grupo: 'sala', forma: ['rect', 535, 212, 676, 434], tocar: tocarLampara },
-  { grupo: 'sala', forma: ['rect', 1206, 476, 1376, 626], tocar: () => { vaporTetera(1); mensaje('Té verde. La tapa tiembla: todavía está caliente.'); } },
+  { grupo: 'sala', forma: ['rect', 1206, 476, 1376, 626], tocar: tocarTetera },
   { grupo: 'sala', forma: ['rect', 1140, 592, 1336, 698], tocar: () => { agitarTe(0.8); mensaje('Dos tazas servidas. Nadie vino a beberlas.'); } },
   { grupo: 'sala', forma: ['rect', 236, 0, 416, 336], tocar: tocarRollo },
   { grupo: 'sala', forma: ['rect', 0, 0, 138, 500], tocar: () => { sonar('tope_madera', -16, 0.8); mensaje('La puerta no se abre. Primero, la caja.'); } },
@@ -2232,9 +2271,23 @@ function tocarLampara() {
     mensaje(primeraVez('lampara2') ? 'La llama tiembla, pero el ojo no se aparta de la caja pequeña.' : 'Ya no se deja engañar por la llama.');
     return;
   }
-  ojo.distraidoHasta = reloj + 5;
+  ojo.distraidoPor = LAMPARA; ojo.distraidoHasta = reloj + 5;
   ojo.punto = null;
   mensaje(primeraVez('lampara') ? 'La llama tiembla y el ojo se va hacia ella.' : 'La llama tiembla.');
+}
+// La caja también oye: el tintineo de la tapa de la tetera le aparta el ojo un momento. Es otra forma de distraerlo,
+// además de la llama (genero/juegos_A y juegos_B: la regla del ojo crece con otro sentido). Mientras vigila la caja
+// pequeña, no se deja
+function tocarTetera() {
+  vaporTetera(1);
+  if (estado.fase !== 'jugando' || ojo.parpadoBase > 0.5) { mensaje('Té verde. La tapa tiembla: todavía está caliente.'); return; }
+  if (vigilaLaPequena()) {
+    mensaje(primeraVez('tetera2') ? 'La tapa tintinea, pero el ojo no se aparta de la caja pequeña.' : 'Tintinea. El ojo no se aparta.');
+    return;
+  }
+  ojo.distraidoPor = TAPA_TETERA; ojo.distraidoHasta = reloj + 4.5;
+  ojo.punto = null;
+  mensaje(primeraVez('tetera') ? 'La tapa de la tetera tintinea y el ojo se va hacia el ruido.' : 'La tapa tintinea.');
 }
 function tocarOjo() { parpadear(true); entornar(1.2); sonar('suspiro', -16, 1.4); mensaje('Parpadea. No le gusta que la toquen.'); }
 function tocarCuenca() {
@@ -2356,6 +2409,27 @@ function tocarHija(p) {
 }
 // ¿la ve el ojo grande? (si te mira y esa cara está vuelta hacia él)
 const laVeElOjo = i => laCajaMira() && tec.tablillaVista && tec.tablillaVista(i);
+// La tablilla a la que le toca se afloja un poco cuando el ojo grande no la ve y se aprieta cuando la mira: la regla del
+// ojo, a la vista y sin texto. Al aflojarse suena la holgura
+const HOLGURA_TABLILLA = 0.05;
+const holguraHija = { i: -1, suelta: false, proxima: 0 };
+function actualizarHolguraHija() {
+  const h2 = estado.hija;
+  if (estado.nivel !== 2 || !h2 || h2.fase !== 'mesa' || estado.fase !== 'jugando' || !tec.tablilla) return;
+  const i = h2.tablillas.indexOf(false);
+  if (i < 0 || reloj < holguraHija.proxima) return;
+  const g = puntero && puntero.gesto;
+  if (g && g.tipo === 'tablilla' && g.i === i && g.estado === 'activo') return;     // la lleva el dedo
+  const t = tec.tablilla(i);
+  if (!t || t.moviendo) return;
+  const suelta = !laVeElOjo(i), meta = suelta ? HOLGURA_TABLILLA : 0;
+  if (Math.abs(t.k - meta) > 0.002) {
+    tec.correrTablilla(i, suelta ? 0.35 : 0.16, meta);
+    if (suelta && !(holguraHija.i === i && holguraHija.suelta)) sentir('holgura', { db: -5, tono: 1.25, sinVibrar: true });
+    holguraHija.proxima = reloj + 0.2;
+  }
+  holguraHija.i = i; holguraHija.suelta = suelta;
+}
 // un toque en una tablilla no la corre: si le toca y el ojo no la ve, asoma un poco hacia donde corre (el gesto es
 // deslizarla con el dedo)
 function tocarTablilla(i) {
@@ -2731,6 +2805,7 @@ function actualizar(dt) {
   for (let i = destellos.length - 1; i >= 0; i--) { destellos[i].t += dt; if (destellos[i].t >= destellos[i].duracion) destellos.splice(i, 1); }
   actualizarCajones(dt);
   if (puntero && puntero.gesto) actualizarGesto(puntero.gesto, dt);
+  actualizarHolguraHija();
   actualizarOjo(dt);
   actualizarOjo2(dt);
   actualizarAliento(dt);
@@ -2952,7 +3027,9 @@ function empezarGesto(g, dx, dy) {
         if (h2.cajon === 'abierto') return false;
         if (laVeElOjo(4)) { resistirMirada(); g.estado = 'bloqueado'; return true; }
       }
-      g.k = 0; g.v = 0; g.t = performance.now(); g.visto = 0; g.asentado = true;
+      // empieza donde esté (la que toca puede estar ya aflojada)
+      g.base = g.tipo === 'tablilla' && tec.tablilla ? Math.min(0.2, tec.tablilla(g.i)?.k || 0) : 0;
+      g.k = g.base; g.v = 0; g.t = performance.now(); g.visto = g.base; g.asentado = true;
       break;
     }
     case 'llave': {
@@ -3013,7 +3090,7 @@ function moverGesto(g, q) {
       let avance = avanceEnEje(g.eje, dx, dy);
       if (g.asentado && avance >= 0.07) { g.asentado = false; sentir('holgura', { tono: 1.15 }); sentir('roce', { tono: 1.6, db: 2 }); }
       if (g.asentado) avance *= 0.2;
-      const k = limitar(avance, 0, 1);
+      const k = limitar(Math.max(avance, g.base || 0), 0, 1);
       g.v = mezclar(g.v, (k - g.k) / paso, 0.5); g.k = k; g.t = ahora;
       break;
     }
@@ -3432,7 +3509,8 @@ window.__prueba = {
   usarTecnica: letra => usarTecnica(letra), girar: () => girarCaja(), irA: nombre => irA(nombre),
   distraer: () => { ojo.distraidoHasta = reloj + 5; },
   // la llama tiembla sola cada 14-24 s y distrae al ojo un momento: para comprobar algo con el ojo mirando, se aparta
-  calmarLampara: () => { lampara.proxima = reloj + 30; if (ojo.distraidoHasta > reloj) ojo.distraidoHasta = reloj; },
+  calmarLampara: () => { lampara.proxima = reloj + 30; tetera.proxima = Math.max(tetera.proxima, reloj + 30); if (ojo.distraidoHasta > reloj) ojo.distraidoHasta = reloj; },
+  distraidoPor: () => (reloj < ojo.distraidoHasta ? { ...(ojo.distraidoPor || LAMPARA) } : null),
   centroCajon: id => centroCajon(id), cajon: id => ({ estado: estado.cajones[id], k: cajonAnim[id].k }),
   // los gestos: por dónde se tira de un cajón, dónde está la cerradura y la tapa, cuánto ha girado la llave, la lupa
   ejeCajon: id => { const e = ejeCajon(id); return { a: { x: e.a.x, y: e.a.y }, b: { x: e.b.x, y: e.b.y } }; },
@@ -3449,6 +3527,10 @@ window.__prueba = {
   bolsillo: () => ({ angulo: bolsillo.angulo, encajada: bolsillo.encajada, abierta: bolsillo.abierta, activo: bolsillo.activo }),
   ojo2: () => ojo2,
   examinar: objeto => examinar(objeto),
+  // las señales sin texto: el vistazo del ojo hacia el frente abierto y la holgura de la tablilla que toca
+  adelantarVistazo: () => { progreso.proximoVistazo = reloj; },
+  vistazo: () => (ojo.vistazo && reloj < ojo.vistazo.hasta ? { ...ojo.vistazo.punto } : null),
+  tablillaPos: i => (tec.tablilla ? tec.tablilla(i) : null),
   usar: (objeto, x, y, o = 'caja') => { const m = tec.ancla({ x, y }, o); usarObjeto(objeto, tec.aPintura(m.x, m.y), null); },
 };
 window.__tec = () => tec;

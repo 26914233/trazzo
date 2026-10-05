@@ -142,6 +142,9 @@ comprobar('una tablilla fuera de orden no corre', !(await hija()).tablillas[1] &
 // 3. la de arriba, de cara al ojo grande: no se mueve, ni tocándola ni deslizándola
 await pagina.evaluate(() => window.__prueba.calmarLampara());
 comprobar('el ojo grande ve la tablilla de arriba', await pagina.evaluate(() => window.__prueba.tablillaVista(0)));
+await espera(0.4);
+comprobar('vista por el ojo, la tablilla que toca está apretada', (await pagina.evaluate(() => window.__prueba.tablillaPos(0))).k < 0.01,
+  JSON.stringify(await pagina.evaluate(() => window.__prueba.tablillaPos(0))));
 await tocarHija('tablilla', 0);
 await espera(0.4);
 await deslizar('tablilla', 0);
@@ -166,6 +169,9 @@ for (let i = 0; i < 5; i++) {
   const giros = await ponerDeCara(i);
   if (!giros) { comprobar(`la tablilla ${i + 1} se puede poner de cara`, false); break; }
   if (i === 0) {
+    await espera(0.6);
+    const pos = await pagina.evaluate(() => window.__prueba.tablillaPos(0));
+    comprobar('escondida del ojo, la tablilla que toca se afloja un poco (holgura)', pos.k > 0.03 && pos.k < 0.08, JSON.stringify(pos));
     await tocarHija('tablilla', 0);
     await espera(0.5);
     comprobar('un toque en la tablilla que toca solo la hace asomar', !(await hija()).tablillas[0] && /[Dd]esl[ií]za/.test(await mensaje()), await mensaje());

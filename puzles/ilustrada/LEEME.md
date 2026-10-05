@@ -128,6 +128,27 @@ sonido, las señales sin texto y la causa → efecto visible. Son lo que define 
 - **«Girar» va arriba**, junto a la pista y el sonido. Abajo a la izquierda tapaba el pie del incensario y se llevaba
   sus toques (fallo 1 de la auditoría).
 
+## Señales sin texto sacadas de la investigación (0.4, 05-10-2026)
+
+**Por qué:** la investigación del género (`../genero/`) coincide en tres cosas: la queja n.º 1 de los jugadores es no saber
+qué se puede tocar ni hacia dónde, perderse *entre* puzles duele más que atascarse en uno, y la mejor pista es la que da
+el propio mundo (`../genero/jugadores_y_principios.md` §1-§2). Tres bloques distintos propusieron, cada uno por su lado,
+que el ojo mire de reojo lo que protege.
+
+**Qué cambió:**
+- **El vistazo del ojo** (`actualizarVistazo` y `frenteAbierto`): si pasan 35 segundos sin avanzar, el ojo mira de
+  reojo, un instante, hacia lo que más teme que encuentres: el cajón de la llave, la lámpara (si la llave está a la
+  vista), el cajón de la nota, el incensario, su propia frente con el cuerno en la mano, la trampilla o la cuenca vacía.
+  Se repite cada 15-24 segundos y nunca mientras tocas algo. Para que el gesto signifique algo, el ojo ya no mira al
+  azar la lámpara ni el incensario. Es el «escalón 0» de las pistas, dentro del mundo (la DECISIÓN 26 sigue abierta
+  para los demás escalones).
+- **La holgura de la tablilla que toca** (nivel 2, `actualizarHolguraHija`): cuando el ojo grande no la ve, se afloja un
+  poco (asoma un 5 % y suena la holgura); cuando la mira, se aprieta. La regla del ojo se ve sin leerla.
+- **La caja también oye** (`tocarTetera`): en el nivel 1, el tintineo de la tapa de la tetera aparta el ojo unos
+  segundos, como la llama. Es otra forma de distraerlo, con el sonido en vez de la luz. Cuando la tapa tintinea sola, el
+  ojo la mira un instante (así se aprende, igual que con la llama). Mientras vigila la caja pequeña (nivel 2), ni la
+  llama ni la tetera lo distraen: antes, la llama que temblaba sola aún lo distraía un momento pese al mensaje.
+
 ## Qué hay
 
 | Ruta | Qué es |
@@ -276,6 +297,9 @@ node puzles/ilustrada/prueba/jugar.mjs B vertical <carpeta de capturas>
 node puzles/ilustrada/prueba/jugar_nivel2.mjs horizontal <carpeta de capturas>
 ```
 
+- **Resultado (05-10-2026, 0.4, con las señales sin texto):** el nivel 1, 36 de 36 en la B y en la A (en horizontal); el
+  nivel 2, 30 de 30. Las pruebas comprueban el vistazo hacia el cajón de la llave, la tetera que distrae al ojo y la
+  tablilla que se aprieta vista y se afloja escondida.
 - **Resultado (05-10-2026, 0.3, con el tacto y el vocabulario de sonido):** el nivel 1, 34 de 34 en la B y en la A
   (en horizontal); el nivel 2, 28 de 28. La web del APK 0.3, sin red: 36 de 36 y 30 de 30.
 - **Resultado (03-10-2026, noche, con los gestos):** el nivel 1, 34 de 34 en la B y en la A (en horizontal); el

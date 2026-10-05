@@ -800,6 +800,8 @@ export async function crearTecnica(letra, op) {
       animHija.tablillas.push({ i, t: 0, duracion, desde: hija.estado.tablillas[i], hasta, asomo });
     },
     ponerTablilla(i, k) { if (!hija) return; animHija.tablillas = animHija.tablillas.filter(t => t.i !== i); hija.estado.tablillas[i] = k; },
+    // dónde está la tablilla i (0 cerrada … 1 corrida) y si se está moviendo sola
+    tablilla(i) { return hija ? { k: hija.estado.tablillas[i], moviendo: animHija.tablillas.some(t => t.i === i) } : null; },
     abrirCajonHija(duracion = 0.6, hasta = 1, asomo = 0) { if (hija) animHija.cajon = { t: 0, duracion, desde: hija.estado.cajon, hasta, asomo }; },
     ponerCajonHija(k) { if (!hija) return; animHija.cajon = null; hija.estado.cajon = k; },
     // por dónde corre en la pantalla una parte de la caja hija: su centro cerrada (a) y abierta del todo (b)

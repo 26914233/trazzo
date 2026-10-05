@@ -155,6 +155,12 @@ await hasta(() => window.__prueba.estado().fase === 'jugando' && window.__prueba
 await espera(0.5);
 await foto('02_sala');
 comprobar(`entra en la sala con el ojo abierto y la técnica ${tecnica}`, await pagina.evaluate(() => window.__prueba.tecnica()) === tecnica);
+// el vistazo: si pasa un rato sin avanzar, el ojo mira de reojo hacia lo que teme (al principio, el cajón de la llave)
+await pagina.evaluate(() => window.__prueba.adelantarVistazo());
+await espera(0.3);
+const vistazo = await pagina.evaluate(() => window.__prueba.vistazo()), cajonLlave = await pagina.evaluate(() => window.__prueba.centroCajon('c8'));
+comprobar('sin avanzar, el ojo mira de reojo hacia el cajón de la llave', !!vistazo && Math.hypot(vistazo.x - cajonLlave.x, vistazo.y - cajonLlave.y) < 2,
+  JSON.stringify(vistazo));
 
 await tocar(900, 420);
 await espera(1.1);
@@ -178,7 +184,8 @@ await foto('04_cajon_abierto');
 c = await cajon('c8');
 comprobar('tirando con el dedo, el cajón de abajo sale y se queda abierto', c.estado === 'abierto' && c.k > 0.95, JSON.stringify(c));
 const ejeAntes = await pagina.evaluate(() => window.__prueba.ejeCajon('c8'));
-// (la tetera: tocar el shoji no vale, su viento agita la llama y distrae al ojo)
+// (la tetera: su tintineo también distrae al ojo, pero calmarLampara lo deshace; el shoji no vale, su viento agita la
+// llama y distrae al ojo)
 const tetera = await pagina.evaluate(() => window.__prueba.pantallaBoceto(1290, 540, 'te'));
 await pagina.touchscreen.tap(tetera.x, tetera.y);
 await espera(0.9);
@@ -192,6 +199,13 @@ await espera(0.5);
 await foto('05_resiste_llave');
 e = await estado();
 comprobar('la llave no se deja coger mientras el ojo mira', e.llave === 'cajon' && /mientras te mira/.test(await mensaje()), await mensaje());
+// la caja también oye: el tintineo de la tapa de la tetera le aparta el ojo un momento (otra forma de distraerlo)
+await pagina.touchscreen.tap(tetera.x, tetera.y);
+await espera(0.4);
+const oido = await pagina.evaluate(() => window.__prueba.distraidoPor());
+comprobar('la caja también oye: el tintineo de la tetera le aparta el ojo', !!oido && Math.hypot(oido.x - 1301, oido.y - 508) < 2,
+  `${JSON.stringify(oido)} · ${await mensaje()}`);
+await pagina.evaluate(() => window.__prueba.calmarLampara());
 
 await espera(1.5);
 await tirarCajon('c2');

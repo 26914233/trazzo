@@ -15,7 +15,10 @@ todo de lo que se tarde en dar con buenos puzles y de las pruebas con jugadores.
 - **Fase:** prototipo jugable. Dos niveles (El cuerno y La caja de dentro), unos 10-15 minutos.
 - **Lo que ya es bueno:** la regla del ojo («no deja tocar mientras te ve»), esconderle cosas al ojo, la resistencia
   creativa, el estilo pintado del boceto, la cara como puzle grande y, desde la 0.3, el tacto con peso y un
-  vocabulario de sonido fijo.
+  vocabulario de sonido fijo. Desde la 0.4, tres señales sin texto: el ojo mira de reojo el frente abierto, la tablilla
+  que toca se afloja cuando el ojo no la ve y la caja también oye (la tetera lo distrae).
+- **Dónde está frente a The Room** [Interpretación, `the_room_interaccion_y_camara.md` b.4]: entre The Room y Two. Un
+  objeto central en una sala que participa, con vistas fijas.
 - **Lo que más falta:** contenido (horas, no minutos), variedad de familias de puzle, información cruzada larga,
   menos texto y una historia contada (el marco, DECISIÓN 25, sigue abierto).
 
@@ -39,8 +42,10 @@ todo de lo que se tarde en dar con buenos puzles y de las pruebas con jugadores.
 - pistas (DECISIÓN 26) y guardado.
 
 **Must Have, para lanzar:**
-- **contenido:** 5-6 niveles y el final, con unas 2 horas de juego [Supuesto: un precio de pago único pide horas, no
-  minutos; la investigación lo contrasta con The Room];
+- **contenido:** 5-6 niveles y el final, con unas 2-3 horas de juego [Supuesto]. Como referencia, The Room Three dura
+  de 5 a 7 horas y Old Sins unas 5 [Hecho, `the_room_interaccion_y_camara.md` b.1]; la duración del primer The Room no
+  consta en nuestras fuentes. En las reseñas, «demasiado fácil» y «corto» pesan más que «demasiado difícil» [Hecho,
+  `jugadores_y_principios.md` §1.8];
 - **variedad:** al menos 8 de las 12 familias de la biblia, con luz, sonido, deducir y transformarse;
 - **información cruzada:** cada nivel siembra una marca y cosecha otra de antes (`05` §7);
 - **la caja se transforma** al menos una vez por nivel, con su animación de revelación;
@@ -60,6 +65,7 @@ todo de lo que se tarde en dar con buenos puzles y de las pruebas con jugadores.
 Por impacto, como pide el método (prioridades del punto 34):
 
 1. **[Hecho, 0.3]** Tacto con peso, vocabulario de sonido, causa → efecto en la cerradura del león y menos texto.
+   **[Hecho, 0.4]** Señales sin texto: el vistazo del ojo, la holgura de la tablilla y la caja que oye.
 2. **Nivel 3, «La caja del revés»** (`../ilustrada/NIVELES.md` §6): la mayor falta es contenido y variedad. Trae luz
    (el ojo nuevo alumbra), transformación (la caja se da la vuelta y se despliega) y cosecha las dos semillas de la
    espalda (el hueco de la ficha y el cajón largo). **Necesita arte** (6-10 imágenes con Gemini, unos 0,05 USD cada
@@ -92,6 +98,10 @@ puzles, la finalización y las reseñas importan más que la retención D1/D7/D3
 | **Contenido corto** | 10-15 minutos no se pueden vender | Niveles con la gramática y los sistemas (`05`): muchos puzles con pocas piezas |
 | **Coste del arte por nivel** | Cada nivel pide 6-10 imágenes y retoques | Reutilizar la sala; repintados con el mismo encuadre; la caja pequeña en 3D con texturas pintadas |
 | **Parecido con The Room** | Reseñas que lo llamen copia | El control de originalidad (anexo B de la biblia) y la DECISIÓN 30 |
+| **Parecido con Old Sins en lo que ya existe** | Old Sins pone una talla en la frente de una cara (OS-J5) y ojos de piedra en una cuenca (OS-M3, OS-J3) [Hecho, `the_room_puzles.csv`]; nuestro cuerno y nuestro ojo de piedra de luna se parecen | Que la vuelta de cada pieza sea propia: la pieza vuelve a un cuerpo vivo, que la recibe y reacciona (respira, abre el ojo), no se encaja en una maqueta. No repetir la acción «encajar en la cara» en más niveles. Riesgo medio |
+| **Precedente de la regla del ojo** | Boxes: Lost Fragments tiene un puzle de «luz roja, luz verde» [Hecho, `juegos_A_puzle_box_y_misterio.md`] | Nuestra regla es de todo el juego y crece (esconder, oír, alumbrar); allí es un puzle suelto. Riesgo medio-bajo |
+| **Cierres y fallos en el móvil** | El 17 % de las reseñas de 1-2 estrellas de la App Store habla de cierres y fallos [Hecho, `jugadores_y_principios.md` tabla 3] | Prueba automática antes de cada APK y medir memoria en el móvil del usuario |
+| **Monetización mal vista** | El 28,9 % de las de 1-2 estrellas habla de precio, pagos o anuncios [Hecho, ídem] | Nunca pistas de pago ni anuncios (ya es regla de la biblia) |
 | **Rendimiento** | Móviles modestos a pocos cuadros por segundo | Medir en el móvil del usuario; la técnica A de respaldo |
 | **Constancia del estilo** | Imágenes de IA que no casan | La receta de los bocetos y un solo encuadre por vista |
 | **Visibilidad** | Sin escaparate de la tienda, nadie lo encuentra | Página de la tienda pronto, vídeos cortos del ojo (es el gancho) y una primera parte gratis [Hipótesis] |
@@ -131,6 +141,7 @@ puzles, la finalización y las reseñas importan más que la retención D1/D7/D3
   - C: un modelo pequeño de la sala y una semana.
   - D: no se valora.
 - **RECOMENDACIÓN [Opinión]:** **B** para el final, con A en los niveles de en medio. C se puede probar en un nivel
-  tardío si la B gusta.
+  tardío si la B gusta. La investigación de The Room aconseja crecer «hacia dentro del cuerpo de la caja» y no hacia más
+  habitaciones [Interpretación, `the_room_interaccion_y_camara.md` b.4]: la B no añade salas, transforma la que ya hay.
 - **SIGUIENTE PASO:** si elige la B, diseñar con la plantilla de la biblia el nivel en que la sala se abre (el 5 o
   el final) y pedir permiso para su arte.

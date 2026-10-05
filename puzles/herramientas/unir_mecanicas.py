@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Une las tablas de mecánicas de la investigación del género (puzles/genero/*_mecanicas.csv) en un catálogo.
+"""Une las tablas de mecánicas de la investigación del género en un catálogo: `the_room_mecanicas.csv` y
+`juegos_*_mecanicas.csv`, en puzles/genero/.
 
 Cada tabla tiene las columnas del encargo, separadas por punto y coma:
     ID;Juego;Mecánica;Tipo;Dificultad;Habilidad requerida;Feedback;Cómo podría adaptarse
@@ -24,7 +25,7 @@ TIPOS = {
     'RUEDAS', 'DIALES', 'LLAVES', 'CERRADURAS', 'SÍMBOLOS', 'LUCES', 'SONIDOS', 'PESO', 'FÍSICA', 'PERSPECTIVA',
     'ESCALA', 'REFLEJOS', 'SOMBRAS', 'TIEMPO', 'MEMORIA', 'OBSERVACIÓN', 'ORDEN', 'CONEXIONES', 'TRANSFORMACIÓN',
     'CONSTRUCCIÓN', 'DESMONTAJE', 'RECONSTRUCCIÓN', 'COMBINACIÓN DE OBJETOS', 'INFORMACIÓN CRUZADA', 'MULTIZONA',
-    'MULTIOBJETO',
+    'MULTIOBJETO', 'TACTO', 'LÓGICA', 'PISTAS', 'COMUNICACIÓN', 'LABERINTO',
 }
 LETRAS = {
     'A': 'el principio tal cual', 'B': 'modificado', 'C': 'combinado con otra', 'D': 'invertido',
@@ -47,9 +48,10 @@ def tipos_de(texto):
 
 
 def principal():
-    rutas = sorted(glob.glob(os.path.join(GENERO, '*_mecanicas.csv')))
+    # solo las tablas de la investigación (no el catálogo que escribe este guion ni el banco de ideas propias)
+    rutas = sorted(glob.glob(os.path.join(GENERO, 'the_room_mecanicas.csv')) + glob.glob(os.path.join(GENERO, 'juegos_*_mecanicas.csv')))
     if not rutas:
-        print('No hay tablas *_mecanicas.csv en', os.path.normpath(GENERO))
+        print('No hay tablas de mecánicas de la investigación en', os.path.normpath(GENERO))
         return
     salida, problemas, vistos = [], [], set()
     por_tipo, por_juego, por_letra, por_dificultad = Counter(), Counter(), Counter(), Counter()
@@ -82,7 +84,9 @@ def principal():
                 por_letra[letra] += 1
             else:
                 notas.append('adaptación sin letra A-H')
-            por_juego[juego] += 1
+            for j in (x.strip() for x in juego.split(',')):
+                if j:
+                    por_juego[j] += 1
             if notas:
                 problemas.append(f'  {nombre}:{n} {ident}: ' + '; '.join(notas))
             salida.append(fila + [nombre, '; '.join(notas)])
@@ -91,7 +95,7 @@ def principal():
         w = csv.writer(f, delimiter=';')
         w.writerow(COLUMNAS + ['Tabla', 'Nota'])
         w.writerows(salida)
-    print(f'\n{len(salida)} mecánicas de {len(por_juego)} juegos → {os.path.normpath(destino)}')
+    print(f'\n{len(salida)} mecánicas de {len(por_juego)} juegos (una fila puede citar varios) → {os.path.normpath(destino)}')
     print('\nPor tipo:', ', '.join(f'{t} {n}' for t, n in por_tipo.most_common()))
     print('\nPor adaptación:', ', '.join(f'{l} ({LETRAS[l]}) {n}' for l, n in sorted(por_letra.items())))
     print('\nPor dificultad:', ', '.join(f'{d}: {n}' for d, n in sorted(por_dificultad.items())))
