@@ -167,6 +167,42 @@ await espera(1.1);
 await foto('03_caja');
 comprobar('tocar la caja la acerca', (await estado()).vista === 'caja');
 
+// la vista hacia arriba (técnica B): sobre la caja, arrastrar hacia abajo la inclina para verla por encima, sin girarla;
+// de lado, la gira sin inclinarla; y desde la sala, arrastrarla hacia abajo acerca la caja ya inclinada
+if (tecnica === 'B') {
+  // (el centro de la caja en la pantalla: los arrastres van en píxeles de la pantalla)
+  const centroCaja = () => pagina.evaluate(() => window.__prueba.aPantalla(927, 430, 'caja'));
+  let cc = await centroCaja();
+  const giro0 = await pagina.evaluate(() => window.__prueba.giroCaja());
+  await arrastrar(cc.x, cc.y - 60, cc.x + 4, cc.y + 120, 16);
+  await espera(0.9);
+  const m1 = await pagina.evaluate(() => window.__prueba.mirada()), giro1 = await pagina.evaluate(() => window.__prueba.giroCaja());
+  await foto('03b_caja_por_encima');
+  comprobar('sobre la caja, arrastrar hacia abajo la enseña por encima, sin girarla',
+    (await estado()).vista === 'caja' && m1.phObj > 0.4 && Math.abs(giro1 - giro0) < 0.06, JSON.stringify({ ph: m1.phObj, giro: giro1 - giro0 }));
+  comprobar('la primera vez, un aviso dice cómo verla por encima', /por encima/.test(await mensaje()), await mensaje());
+  await arrastrar(cc.x, cc.y + 60, cc.x + 4, cc.y - 120, 16);
+  await espera(0.6);
+  const m2 = await pagina.evaluate(() => window.__prueba.mirada());
+  await arrastrar(cc.x - 70, cc.y, cc.x + 70, cc.y + 4, 12);
+  await espera(0.4);
+  const m3 = await pagina.evaluate(() => window.__prueba.mirada()), giro3 = await pagina.evaluate(() => window.__prueba.giroCaja());
+  comprobar('hacia arriba vuelve, y de lado la gira sin inclinarla', m2.phObj < 0.05 && Math.abs(m3.phObj - m2.phObj) < 0.02 && Math.abs(giro3 - giro1) > 0.5,
+    JSON.stringify({ ph2: m2.phObj, ph3: m3.phObj, giro: giro3 - giro1 }));
+  // la caja vuelve de frente y a la sala
+  await pagina.evaluate(() => window.__prueba.enderezarCaja());
+  await espera(1);
+  await pagina.tap('#volver'); await espera(1.1);
+  cc = await centroCaja();
+  await arrastrar(cc.x, cc.y - 20, cc.x + 2, cc.y + 90, 14);
+  await espera(1.1);
+  const m4 = await pagina.evaluate(() => window.__prueba.mirada());
+  await foto('03c_de_la_sala_por_encima');
+  comprobar('desde la sala, arrastrar la caja hacia abajo la acerca vista desde arriba', (await estado()).vista === 'caja' && m4.phObj > 0.25,
+    JSON.stringify({ vista: (await estado()).vista, ph: m4.phObj }));
+  await espera(0.5);
+}
+
 // los cajones del costado: cerrados; se abren tirando de ellos
 let e = await estado();
 comprobar('los nueve cajones del costado empiezan cerrados', Object.values(e.cajones).length === 9 && Object.values(e.cajones).every(v => v === 'cerrado'));

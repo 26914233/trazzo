@@ -608,6 +608,8 @@ cerca y que el incensario no desapareciera.
   la tetera que se vuelca; y la campanilla al ritmo de la respiración, hasta que la caja abre los labios y canta.
 - **Final · El corazón** (`NIVELES.md` §7): sube por la trampilla con tres anillos que se resuelven con lo que la caja
   ha recuperado (el ojo viejo señala, el nuevo alumbra, la voz avisa); la caja pequeña del nivel 2 es la última llave.
+- **La vista hacia arriba:** arrastrar la caja hacia abajo la enseña por encima (la tapa y su trampilla); de lado, la
+  gira. Hasta la 0.4 el arrastre vertical sobre la caja se perdía.
 - **La cámara de cerca gira** sin salir de la vista y se asoma a los cajones al abrirlos; el incensario ya no
   desaparece al destaparlo.
 - Sin imágenes nuevas (dibujo por código y sonidos sintetizados): coste 0.

@@ -800,8 +800,10 @@ export async function crearTecnica(letra, op) {
       giroObj = this.cara() === 'frente' ? Math.round((giro - Math.PI) / vuelta) * vuelta + Math.PI : Math.round(giro / vuelta) * vuelta;
       if (inmediato) { giro = giroObj; vGiro = 0; }
     },
+    // sobre la caja grande, de lado la gira y hacia abajo (o arriba) inclina la vista para verla por encima, como una
+    // caja que se coge con las manos; fuera de ella, la vista gira alrededor de lo que mira
     arrastrar(dx, dy, enCaja) {
-      if (enCaja) giroObj += dx * 0.011;
+      if (enCaja) { giroObj += dx * 0.011; if (dy) rig.arrastrar(0, dy); }
       else rig.arrastrar(dx, dy);
     },
     // soltada con impulso, la caja grande sigue girando un poco (pesa) y el muelle la frena
@@ -810,6 +812,9 @@ export async function crearTecnica(letra, op) {
     lupa() { return rig.lupa.zObj; },
     inclinar(th, ph) { rig.inclinar(th, ph); },
     mirada() { return { th: rig.th, ph: rig.ph, thObj: rig.thObj, phObj: rig.phObj }; },
+    giroCaja() { return giroObj; },
+    // (para las pruebas) la caja vuelve de frente
+    enderezar() { giroObj = Math.round(giroObj / (2 * Math.PI)) * 2 * Math.PI; },
     // cuánto se ve el incensario en (x, y) del boceto con la máscara de ahora (para las pruebas)
     alfaIncensario(x, y) {
       const imagen = incensarioB && incensarioB.material.uniforms.uMascara.value.image;

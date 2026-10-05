@@ -2384,6 +2384,20 @@ const ZONAS_DETRAS = [
   { forma: ['rect', 715, 233, 990, 495], tocar: () => cajonCerrado('detras', 900, 330, 0.4, -1, null, 'caja_detras') },
 ];
 
+// de la sala a la caja: la primera vez, cómo se mira por encima (la tapa y su trampilla)
+function acercarCaja() {
+  irA('caja');
+  if (tec.nombre !== 'A' && estado.nivel !== 4 && primeraVez('vista-arriba')) {
+    // (si hay otro mensaje a la vista, espera a que se vaya)
+    const avisar = (intentos) => {
+      if (estado.vista !== 'caja' || estado.fase !== 'jugando') return;
+      if (reloj < mensajeHasta && intentos > 0) { setTimeoutReloj(1.5, () => avisar(intentos - 1)); return; }
+      mensaje('Desliza la caja hacia abajo para verla por encima; de lado, para girarla.', 4.5);
+    };
+    setTimeoutReloj(0.9, () => avisar(4));
+  }
+}
+
 function tocarEscena(sx, sy) {
   if (estado.fase !== 'jugando' || estado.ocupado) return;
   const p = tec.aPintura(sx, sy);
@@ -2393,7 +2407,7 @@ function tocarEscena(sx, sy) {
   if (p.hija) { tocarHija(p); return; }
   if (p.corazon) { sonar('toque', -14); tocarCorazon(p, { x: sx, y: sy }); return; }
   if (p.cara === 'detras') {
-    if (!deCerca) { irA('caja'); return; }
+    if (!deCerca) { acercarCaja(); return; }
     if (p.largo) { sonar('toque', -14); tocarLargo(p); return; }          // el cajón largo abierto (o lo que guarda)
     for (const z of ZONAS_DETRAS) if (dentro(z.forma, p)) { sonar('toque', -14); z.tocar(p); return; }
     sonar('toque', -14); mensaje('La espalda de la caja: más cajones y un hueco extraño.');
@@ -2412,14 +2426,14 @@ function tocarEscena(sx, sy) {
   for (const z of ZONAS) {
     if (z.si && !z.si()) continue;
     if (!dentro(z.forma, p)) continue;
-    if (z.grupo === 'caja' && !deCerca) { irA('caja'); return; }
+    if (z.grupo === 'caja' && !deCerca) { acercarCaja(); return; }
     if (z.grupo === 'incensario' && v !== 'incensario') { irA('incensario'); return; }
     sonar('toque', -14);
     z.tocar(p);
     return;
   }
   if (dentro(['poli', CAJA], p)) {
-    if (!deCerca) irA('caja');
+    if (!deCerca) acercarCaja();
     else { sonar('toque', -14); mensaje(elegir(['La madera está tibia, como si respirara.', 'Mosaico de maderas claras y oscuras. Ni una junta se mueve.'])); }
   }
 }
@@ -3836,10 +3850,20 @@ lienzo.addEventListener('pointermove', e => {
   if (puntero.gesto && moverGesto(puntero.gesto, q)) { puntero.x = q.x; puntero.y = q.y; return; }
   if (puntero.movido > 10 && estado.fase !== 'portada' && !estado.ocupado) {
     if (puntero.enHija) tec.girarHija(dx, dy);
-    else if (puntero.enCaja) tec.arrastrar(dx, dy, true);
+    else if (puntero.enCaja) {
+      // sobre la caja grande: de lado la gira; hacia abajo, la vista se inclina para verla por encima (la tapa y su
+      // trampilla), y hacia arriba vuelve. El primer tramo decide el eje, para que al girarla no se incline sin querer
+      const tx = Math.abs(q.x - puntero.x0), ty = Math.abs(q.y - puntero.y0);
+      if (!puntero.eje && puntero.movido > 16) puntero.eje = ty > tx * 1.3 ? 'v' : tx > ty * 1.3 ? 'h' : 'libre';
+      // desde la sala, arrastrarla hacia abajo acerca la caja y la enseña desde arriba
+      if (puntero.eje === 'v' && estado.vista === 'sala' && q.y - puntero.y0 > 36 && tec.nombre !== 'A') {
+        irA('caja'); tec.inclinar(0, 0.3);
+      }
+      tec.arrastrar(puntero.eje === 'v' ? 0 : dx, puntero.eje === 'h' ? 0 : dy, true);
+    }
     // en la sala se mira alrededor; de cerca, la vista sigue anclada a su sitio, pero gira a su alrededor
     else if (estado.vista !== 'subida') tec.arrastrar(dx, dy, false);
-    if (tec.nombre !== 'A' && (puntero.enCaja || puntero.enHija) && !puntero.sonoGiro && puntero.movido > 24) {
+    if (tec.nombre !== 'A' && (puntero.enCaja || puntero.enHija) && puntero.eje !== 'v' && !puntero.sonoGiro && puntero.movido > 24) {
       puntero.sonoGiro = true; sonar('deslizar_madera', puntero.enHija ? -17 : -14, puntero.enHija ? 1.5 : 1.1);
     }
   }
@@ -3861,7 +3885,7 @@ function finToque(e) {
   else if (puntero.movido < 16 && performance.now() - puntero.inicio < 900 && e.type === 'pointerup') tocarEscena(q.x, q.y);
   else {
     if (puntero.enHija && tec.soltarHija) { tec.soltarHija(); if (puntero.movido >= 16) sentir('tope', { db: -9, tono: 1.6, sinVibrar: true }); }
-    const conImpulso = puntero.enCaja && performance.now() - (puntero.tMov || 0) < 80;
+    const conImpulso = puntero.enCaja && puntero.eje !== 'v' && performance.now() - (puntero.tMov || 0) < 80;
     tec.soltar(conImpulso ? puntero.vx : 0, puntero.enCaja);
   }
   puntero = null;
@@ -4442,7 +4466,7 @@ async function entrar(nivel = 1) {
   animar(0.6, k => { ojo.parpadoBase = 0.6 * (1 - salida(k)); }, null, 1.25);
   await esperar(1.9);
   ojo.parpadoBase = 0;
-  if (estado.vista === 'sala') mensaje('Toca la caja para acercarte. Pellizca para acercar o alejar; desliza la caja para girarla.', 5);
+  if (estado.vista === 'sala') mensaje('Toca la caja para acercarte. Deslízala de lado para girarla, o hacia abajo para verla por encima. Pellizca para acercar.', 6);
 }
 function reiniciar(nivel = 1) {
   estado = estadoInicial();
@@ -4634,7 +4658,7 @@ window.__prueba = {
   adelantarVistazo: () => { progreso.proximoVistazo = reloj; },
   vistazo: () => (ojo.vistazo && reloj < ojo.vistazo.hasta ? { ...ojo.vistazo.punto } : null),
   tablillaPos: i => (tec.tablilla ? tec.tablilla(i) : null),
-  mirada: () => (tec.mirada ? tec.mirada() : null),
+  mirada: () => (tec.mirada ? tec.mirada() : null), giroCaja: () => (tec.giroCaja ? tec.giroCaja() : 0), enderezarCaja: () => tec.enderezar && tec.enderezar(),
   // ¿el incensario se ve en (x, y) del boceto? (la máscara de su silueta en la técnica B)
   incensarioVisible: (x, y) => (tec.alfaIncensario ? tec.alfaIncensario(x, y) : 1),
   usar: (objeto, x, y, o = 'caja') => { const m = tec.ancla({ x, y }, o); usarObjeto(objeto, tec.aPintura(m.x, m.y), null); },

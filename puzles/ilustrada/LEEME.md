@@ -157,6 +157,11 @@ final con todo incluido, que el incensario se volvía invisible al destaparlo y 
 pegada: anclada a su sitio sí, pero que se pudiera girar en la misma vista para ver la llave del cajón abierto.
 
 **Qué cambió:**
+- **La vista hacia arriba:** sobre la caja, arrastrar hacia abajo la inclina para verla por encima (la tapa y su
+  trampilla) sin girarla, y hacia arriba vuelve; de lado, la gira. El primer tramo del arrastre decide el eje. Desde la
+  sala, arrastrar la caja hacia abajo la acerca ya inclinada. Hasta la 0.4, el arrastre vertical sobre la caja se perdía
+  (solo se podía inclinar arrastrando fuera de ella, y en el móvil la caja llena casi toda la pantalla); la primera vez
+  que se acerca la caja, un aviso lo enseña.
 - **La cámara de cerca gira:** en las vistas de cerca, arrastrar en vacío gira la vista alrededor de lo que mira, sin
   salir de ella, también hacia arriba (límites por vista en `tecnica_3d.js`). Al abrir el cajón que guarda la llave o
   la nota, la cámara se asoma sola para que se vea dentro.
@@ -330,7 +335,22 @@ node puzles/ilustrada/prueba/jugar_final.mjs horizontal <carpeta de capturas>
 python3 puzles/ilustrada/herramientas/sonidos_nivel3.py
 ```
 
-- **Resultado (05-10-2026, 0.5, el juego completo):** RESULTADOS_05
+- **Resultado (05-10-2026, 0.5, el juego completo):** en la página, el nivel 1, 43 de 43 en la B y 37 de 37 en la A (en
+  horizontal); el aviso en vertical, 3 de 3; el nivel 2, 31 de 31; el nivel 3, 31 de 31; el final, 17 de 17. La web del
+  APK 0.5, sin red: el nivel 1, 45 de 45; el 2, 33 de 33; el 3, 32 de 32; el final, 18 de 18 (las tres últimas, con la web
+  de antes del arreglo de la vista hacia arriba, que solo toca el arrastre sobre la caja grande). Lo nuevo que comprueban:
+  - **la vista hacia arriba:** sobre la caja, arrastrar hacia abajo la inclina sin girarla; hacia arriba vuelve; de lado
+    la gira sin inclinarla; desde la sala, arrastrarla hacia abajo acerca la caja ya inclinada; y el aviso de la primera
+    vez;
+  - **la cámara de cerca:** arrastrar en vacío gira la vista sin salir de ella, y al abrir el cajón de la llave se asoma;
+  - **el incensario destapado** se sigue viendo (el cuenco y el cuerno en las brasas);
+  - **el nivel 3** (`jugar_nivel3.mjs`): la nota de la boca, la luz fría al otro lado del dedo, las tres tintas, el rollo
+    mecido hasta que cae la ficha, la ficha que el hueco devuelve por la cara del peón y acepta coronada, el cajón largo,
+    la campanilla muda, la tetera volcada y el badajo, juntar los dos en la bandeja, la caja que no contesta mientras toma
+    aire y sí tres veces mientras lo suelta, los labios y el canto;
+  - **el final** (`jugar_final.mjs`): el corazón que sube, la caja que no se gira, los tres anillos (cada uno solo encaja
+    en su sitio: el que mira el ojo viejo, la marca que alumbra el nuevo y donde suena la voz), el hueco del centro, la caja
+    pequeña como llave y la tarjeta del final, sin siguiente nivel.
 
 - **Resultado (05-10-2026, 0.4, con las señales sin texto):** el nivel 1, 36 de 36 en la B y en la A (en horizontal); el
   nivel 2, 30 de 30. Las pruebas comprueban el vistazo hacia el cajón de la llave, la tetera que distrae al ojo y la
