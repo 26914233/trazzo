@@ -9,6 +9,7 @@ import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { aThree, crearProyector, rectanguloUV, cargarTextura, crearSala, crearMesa, crearObjetos, crearCajaPintada,
   crearCajonesPintados, materialPintura } from './escena3d.js';
 import { crearCajaHija, TABLILLAS, LADO as LADO_HIJA, SALE_CAJONCITO } from './caja_hija.js';
+import { dibujarFicha, dibujarCampanilla } from './nivel3_arte.js';
 
 const ANCHO = 1376, ALTO = 768;
 const limitar = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -191,6 +192,12 @@ function crearRig(op, limites) {
   const puntoCajones = rayoDelBoceto(1112, 412).intersectPlane(new THREE.Plane(new THREE.Vector3(1, 0, 0), -0.11), new THREE.Vector3())
     || new THREE.Vector3(0.11, mundo.centroCaja.y, 0);
   const VISTAS = op.vistas;
+  // la tetera y la taza de la izquierda (nivel 3), en el plano que mira a la cámara por el centro de la tetera
+  // (un poco a la izquierda de la tetera: a la derecha se acaba la pintura)
+  const puntoTe = rayoDelBoceto(1222, 585).intersectPlane(planoFrontal(mundo.centroTe), new THREE.Vector3()) || mundo.centroTe.clone();
+  // el cajón largo de la espalda, con la caja de espaldas: el boceto de espaldas pinta la espalda donde está el frente
+  const puntoLargo = rayoDelBoceto(854, 517).intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -0.11), new THREE.Vector3())
+    || new THREE.Vector3(0, mundo.centroCaja.y - 0.05, 0.11);
   // qué mira cada vista: objetivo T, cuánto se acerca s (1 = donde se pintó) y alrededor de qué gira
   const definiciones = {
     sala: { T: P0.clone().add(adelante0.clone().multiplyScalar(distCaja)), s: 1, pivote: mundo.centroCaja },
@@ -206,6 +213,9 @@ function crearRig(op, limites) {
     // (cerca y con más ángulo, para que la pequeña se vea grande sin perder el ojo; en vertical cabe más)
     hija: { T: new THREE.Vector3(-0.01, 0.04, 0.17), s: 0.35, Tv: new THREE.Vector3(-0.03, 0.055, 0.19), sv: 0.35,
       pivote: new THREE.Vector3(0, op.escena3d.z_tablero + 0.0375, 0.245) },
+    // nivel 3: la tetera, de cerca, para volcarla en la taza
+    te: { T: puntoTe, s: 0.56, pivote: puntoTe },
+    largo: { T: puntoLargo.clone().add(new THREE.Vector3(0, 0.012, 0.02)), s: 0.42, pivote: puntoLargo },
   };
   function encuadre(nombre) {
     const v = VISTAS[nombre];
@@ -572,7 +582,8 @@ export async function crearTecnica(letra, op) {
     ? { sala: { th: 0.14, ph: [-0.05, 0.1], lupa: [0.45, 1] }, caja: { th: 0.5, ph: [-0.12, 0.55], lupa: [0.45, 1.25] },
         incensario: { th: 0.42, ph: [-0.1, 0.45], lupa: [0.45, 1.25] }, cara: { th: 0.36, ph: [-0.1, 0.35], lupa: [0.45, 1.25] },
         cajones: { th: 0.5, ph: [-0.1, 0.6], lupa: [0.5, 1.25] }, subida: { th: 0.2, ph: [-0.05, 0.15], lupa: [1, 1] },
-        hija: { th: 0.3, ph: [-0.05, 0.35], lupa: [0.55, 1.2] } }
+        hija: { th: 0.3, ph: [-0.05, 0.35], lupa: [0.55, 1.2] }, te: { th: 0.35, ph: [-0.08, 0.4], lupa: [0.5, 1.2] },
+        largo: { th: 0.45, ph: [-0.1, 0.6], lupa: [0.5, 1.25] } }
     : { sala: { th: 0.24, ph: [-0.06, 0.14], lupa: [0.45, 1] }, caja: { th: 0.95, ph: [-0.15, 0.45], lupa: [0.45, 1.25] },
         incensario: { th: 0.7, ph: [-0.12, 0.4], lupa: [0.45, 1.25] }, cara: { th: 0.55, ph: [-0.12, 0.3], lupa: [0.45, 1.25] },
         cajones: { th: 0.7, ph: [-0.12, 0.4], lupa: [0.5, 1.25] } };
@@ -580,6 +591,10 @@ export async function crearTecnica(letra, op) {
   const pistas = {};          // piezas que se animan (técnica C)
   let tintas = null, objetivosToque = [];
   let pintada = null, cajonesB = null, carasB = [], rolloB = null, hija = null, sombraHija = null, incensarioB = null;
+  // nivel 3: el cajón largo de la espalda, la ficha en su hueco y la tetera que se vuelca (en el boceto de espaldas, el
+  // frente del cajón largo y el hueco de la ficha)
+  let largoB = null, fichaB = null, teteraB = null;
+  const RECT_LARGO = [719, 476, 989, 558], RECT_HUECO = [816, 334, 876, 404];
   // nivel 2: dónde sale la caja hija (la trampilla), dónde se posa y dónde está el ojo grande que la vigila
   const ZT = op.escena3d.z_tablero;
   const POS_HIJA = new THREE.Vector3(0, ZT + LADO_HIJA / 2, 0.245);          // en la mesa, delante de la caja
@@ -633,6 +648,8 @@ export async function crearTecnica(letra, op) {
       await crearHijaB(grupo);
       objetivosToque.push(hija.grupo);
     }
+    crearNivel3B();
+    prepararTetera(objetos);
   } else {
     tintas = crearTintas();
     const cargador = new GLTFLoader();
@@ -796,6 +813,18 @@ export async function crearTecnica(letra, op) {
       return imagen.getContext('2d').getImageData(Math.round(x), Math.round(y), 1, 1).data[3] / 255;
     },
     abrirTrampilla(k) { trampilla = k; },
+    // nivel 3: el cajón largo de la espalda (dónde está su frente en la pantalla, abierto k), la campanilla de dentro y
+    // la tetera que se vuelca (0 de pie … 1 del todo)
+    pantallaLargo(k) {
+      if (!largoB) return null;
+      caja.updateMatrixWorld();
+      rig.colocar(op.reloj(), 0);
+      const v = largoB.centro.clone().add(new THREE.Vector3(0, 0, -0.004 - k * largoB.sale));
+      const q = aPantalla(pintada.caja.localToWorld(v));
+      return { x: q.x, y: q.y };
+    },
+    puntoCampanillaLargo() { return largoB ? largoB.campanilla.getWorldPosition(new THREE.Vector3()) : null; },
+    inclinarTetera,
     // el frente de un cajón del costado en la pantalla, abierto k (0 cerrado … 1 abierto): el dedo tira de él por
     // esa línea
     pantallaCajon(id, k) {
@@ -892,6 +921,7 @@ export async function crearTecnica(letra, op) {
             : e.cuerno === 'brasas' ? t.siluetaIncensarioCuerno : t.siluetaIncensarioAbierto;
         }
         if (rolloB) { const r = op.decoracion.rollo; rolloB.rotation.set(r.a, 0, r.lift); }
+        actualizarNivel3B();
       } else actualizarC(dt);
     },
     dibujar() {
@@ -1065,6 +1095,98 @@ export async function crearTecnica(letra, op) {
     return n.dot(ojo.sub(centro).normalize()) > 0.3;
   }
 
+  // ---- Nivel 3: el cajón largo de la espalda (con la campanilla), la ficha en su hueco y la tetera que se vuelca ----
+  // Todo en el espacio de la caja pintada, como los cajones del costado. Lo de la espalda se pinta con el boceto de
+  // espaldas, que es la caja girada media vuelta en su sitio: un píxel de ese boceto cae en la cara de delante de la caja
+  // quieta (z = 0,11) y, girado, en la de detrás (x y z cambiados de signo)
+  function enEspalda(x, y) {
+    const q = rayoDelBoceto(x, y).intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -0.11), new THREE.Vector3());
+    return q ? new THREE.Vector3(-q.x, q.y, -0.11) : new THREE.Vector3(0, mundo.centroCaja.y, -0.11);
+  }
+  function crearNivel3B() {
+    const [x0, y0, x1, y1] = RECT_LARGO, a = enEspalda(x0, y0), c = enEspalda(x1, y1);
+    const ancho = Math.abs(a.x - c.x), alto = Math.abs(a.y - c.y), grueso = 0.006, fondo = 0.1;
+    const centro = new THREE.Vector3((a.x + c.x) / 2, (a.y + c.y) / 2, -0.11);
+    const cajon = new THREE.Group(); cajon.position.copy(centro);
+    // el frente: una tabla con la pintura de espaldas, que se mueve con ella
+    const frente = new THREE.Mesh(new THREE.BoxGeometry(ancho, alto, grueso));
+    frente.position.set(0, 0, grueso / 2 - 0.0006);
+    cajon.updateMatrix(); frente.updateMatrix();
+    const reposo = new THREE.Matrix4().makeRotationY(Math.PI).multiply(cajon.matrix.clone().multiply(frente.matrix));
+    const color = (r, g, b) => new THREE.MeshBasicMaterial({ color: new THREE.Color().setRGB(r, g, b, THREE.SRGBColorSpace) });
+    const canto = color(0.3, 0.19, 0.11), dentro = color(0.22, 0.09, 0.05), borde = color(0.48, 0.24, 0.14), suelo = color(0.14, 0.055, 0.03);
+    // caras de BoxGeometry: +x, −x, +y, −y, +z (hacia dentro de la caja), −z (fuera)
+    frente.material = [canto, canto, canto, canto, canto, materialPintura(mundo.tex.detras, mundo.proyector, { reposo })];
+    // paredes bajas, el suelo y la trasera, de laca oscura por dentro
+    const t = 0.0025, hw = alto * 0.62, largo = fondo - grueso, zm = grueso + largo / 2, yb = -alto / 2;
+    const tabla = (sx, sy, sz, x, y, z, m) => { const malla = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), m); malla.position.set(x, y, z); return malla; };
+    const piezas = [frente,
+      tabla(t, hw, largo, -ancho / 2 + t / 2, yb + hw / 2, zm, [dentro, dentro, borde, dentro, dentro, dentro]),
+      tabla(t, hw, largo, ancho / 2 - t / 2, yb + hw / 2, zm, [dentro, dentro, borde, dentro, dentro, dentro]),
+      tabla(ancho - 2 * t, t, largo, 0, yb + t / 2, zm, suelo),
+      tabla(ancho - 2 * t, hw, t, 0, yb + hw / 2, fondo - t / 2, [dentro, dentro, borde, dentro, dentro, dentro])];
+    for (const p of piezas) { p.userData.tipo = 'largo'; cajon.add(p); }
+    // la campanilla, tumbada dentro (como la llave y la nota de los cajones del costado: un dibujo que mira a la cámara)
+    const tex = new THREE.CanvasTexture(dibujarCampanilla(false, 96, 120));
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const campanilla = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+    const altoC = 0.032;
+    campanilla.scale.set(altoC * 0.8, altoC, 1);
+    // (hacia el frente del cajón: lo que sale de la caja al abrirlo)
+    campanilla.position.set(-ancho * 0.1, yb + t + altoC * 0.45, grueso + 0.022);
+    campanilla.userData = { tipo: 'largo', parte: 'campanilla' };
+    cajon.add(campanilla);
+    // el hueco que deja en la espalda (no se mueve con el cajón)
+    const agujero = new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), color(0.05, 0.03, 0.02));
+    agujero.rotation.y = Math.PI; agujero.position.set(centro.x, centro.y, -0.1101);
+    agujero.userData.tipo = 'largo';
+    pintada.caja.add(cajon, agujero);
+    cajon.visible = agujero.visible = false;
+    largoB = { grupo: cajon, agujero, campanilla, centro, sale: 0.075 };
+    // la ficha coronada, en su hueco (sale al ponerla)
+    const [hx0, hy0, hx1, hy1] = RECT_HUECO, h0 = enEspalda(hx0, hy0), h1 = enEspalda(hx1, hy1);
+    const texF = new THREE.CanvasTexture(dibujarFicha('promovida', 120, 140));
+    texF.colorSpace = THREE.SRGBColorSpace;
+    fichaB = new THREE.Mesh(new THREE.PlaneGeometry(Math.abs(h0.x - h1.x) * 0.92, Math.abs(h0.y - h1.y) * 0.95),
+      new THREE.MeshBasicMaterial({ map: texF, transparent: true }));
+    fichaB.position.set((h0.x + h1.x) / 2, (h0.y + h1.y) / 2, -0.1104);
+    fichaB.rotation.y = Math.PI;                         // mira hacia fuera, a la espalda
+    fichaB.visible = false;
+    pintada.caja.add(fichaB);
+  }
+  function actualizarNivel3B() {
+    if (!largoB) return;
+    const n3 = op.estado().n3, k = op.cajonAbertura('largo');
+    const abierto = k > 0.002;
+    largoB.grupo.visible = largoB.agujero.visible = abierto;
+    largoB.grupo.position.z = largoB.centro.z - Math.max(0, k) * largoB.sale;
+    largoB.campanilla.visible = !!n3 && n3.campanilla === 'cajon';
+    fichaB.visible = !!n3 && n3.ficha === 'puesta';
+  }
+  // la tetera se vuelca hacia la taza de la izquierda: gira alrededor del centro de su cuerpo, sobre el eje que mira a
+  // la cámara del boceto, y se levanta un poco (la sostiene una mano). La pintura va con ella; la máscara deja fuera
+  // las tazas (si no, se llevaría el borde de la de delante)
+  function prepararTetera(objetos) {
+    const t = objetos.tetera;
+    if (!t) return;
+    t.updateMatrixWorld(true);
+    const o = op.escena3d.objetos.tetera, base = aThree(o.base[0], o.base[1], o.base[2]);
+    const eje = mundo.proyector.position.clone().sub(base); eje.y = 0; eje.normalize();
+    const u = t.material.uniforms;
+    u.uReposo.value.copy(t.matrixWorld); u.uUsarReposo.value = 1;
+    if (op.recortarTetera) u.uMascara.value = siluetaEstrecha(op, 'silueta_te', 2, c => op.recortarTetera(c));
+    teteraB = { malla: t, pos0: t.position.clone(), q0: t.quaternion.clone(), eje, pivote: base.clone().add(new THREE.Vector3(0, o.alto * 0.5, 0)),
+      M0inv: t.matrixWorld.clone().invert() };
+  }
+  function inclinarTetera(k) {
+    if (!teteraB) return;
+    const T = teteraB, q = new THREE.Quaternion().setFromAxisAngle(T.eje, 0.46 * k);
+    T.malla.position.copy(T.pos0).sub(T.pivote).applyQuaternion(q).add(T.pivote);
+    T.malla.position.y += 0.026 * Math.min(1, k * 1.6);
+    T.malla.quaternion.copy(T.q0).premultiply(q);
+    T.malla.updateMatrixWorld(true);
+  }
+
   // los cajones de la B: cuánto ha salido cada uno (lo lleva juego.js), su hueco, su sombra y lo que guarda
   function actualizarCajonesB() {
     const est = op.estado();
@@ -1161,6 +1283,7 @@ export async function crearTecnica(letra, op) {
           caraHija: h.face ? h.face.materialIndex : null } };
       }
       if (esB && tipo === 'cajon') return { malla: o, punto: { ...centroCajon(o.userData.cajon), cara: 'frente', cajon: o.userData.cajon } };
+      if (esB && tipo === 'largo') return { malla: o, punto: { x: 852, y: 516, cara: 'detras', largo: o.userData.parte || 'cajon' } };
       if (esB && tipo === 'caja') {
         const local = caja.worldToLocal(h.point.clone());
         const detras = h.face && (h.face.materialIndex === 1 || h.face.materialIndex === 5);
@@ -1226,6 +1349,17 @@ export async function crearTecnica(letra, op) {
   // un punto del boceto (con su objeto) o un punto 3D ya calculado, en la pantalla de ahora
   function ancla(p, objeto = 'caja') {
     if (p.isVector3) { const s = aPantalla(p); return { x: s.x, y: s.y, k: 1, visible: s.z > -1 && s.z < 1 }; }
+    // un punto de la tetera, que se mueve con ella al volcarla
+    if (objeto === 'tetera') {
+      const r = puntoReposo(p.x, p.y, 'te');
+      if (!r) return null;
+      const profundidad = r.distanceTo(mundo.proyector.position);
+      const actual = teteraB ? r.clone().applyMatrix4(teteraB.M0inv).applyMatrix4(teteraB.malla.matrixWorld) : r;
+      const a = aPantalla(actual);
+      _derecha.set(1, 0, 0).applyQuaternion(mundo.camara.quaternion).multiplyScalar(profundidad / op.camaraBoceto.focal_px);
+      const b = aPantalla(actual.clone().add(_derecha));
+      return { x: a.x, y: a.y, k: Math.hypot(b.x - a.x, b.y - a.y), visible: a.z > -1 && a.z < 1 };
+    }
     const reposo = puntoReposo(p.x, p.y, objeto);
     if (!reposo) return null;
     const profundidad = reposo.distanceTo(mundo.proyector.position);

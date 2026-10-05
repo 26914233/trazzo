@@ -4,6 +4,7 @@
 //   C · el modelo de Blender con tinta y acuarela: retirada; su código sigue en tecnica_3d.js como referencia.
 // Aquí está todo lo que no depende de la técnica: el estado y el recorrido, el ojo, la respiración, el humo y
 // la luz, los sonidos, la interfaz, los toques y la técnica A.
+import { dibujarFicha, dibujarCampanilla, dibujarBadajo, tintaRollo, tintaTe, tintaSuelo, icono } from './nivel3_arte.js';
 
 // ---------------------------------------------------------------------------------------------
 // Datos de la ilustración (píxeles del boceto de 1376 × 768; ver preparar_capas.py)
@@ -17,7 +18,8 @@ const CAPAS_NIVEL2 = ['cajita', 'ojo2', 'iris2'];       // la cajita roja y el o
 const SONIDOS = ['noche', 'fuego', 'trabado', 'recoger', 'encajar', 'despertar', 'final_caja_viva', 'suspiro', 'ojo_abre',
   'grunido', 'espiritu', 'papel', 'llave', 'candado_abre', 'tope_madera', 'clic_madera', 'acercar', 'pista', 'toque',
   'mecanismo', 'racha', 'bisagra', 'deslizar_madera', 'cajon', 'trampilla', 'cristal', 'viento', 'clic_metal',
-  'holgura', 'clac', 'pestillo', 'desbloqueo'];                // el vocabulario (herramientas/sonidos_vocabulario.py)
+  'holgura', 'clac', 'pestillo', 'desbloqueo',                 // el vocabulario (herramientas/sonidos_vocabulario.py)
+  'campanilla', 'campanilla_muda', 'tin', 'vertido', 'tarareo', 'canto', 'latido', 'anillo'];   // niveles 3 y final
 
 // Encuadres de la técnica A: [x0, y0, x1, y1] de lo que debe verse en horizontal (h) y en vertical (v)
 const VISTAS = {
@@ -29,6 +31,10 @@ const VISTAS = {
   // nivel 2 (solo en la B): la caja hija sube de la trampilla y se mira de cerca en la mesa, con el ojo grande encima
   subida:     { h: [560, 0, 1300, 700],   v: [620, 40, 1240, 720] },
   hija:       { h: [240, 270, 1268, 745],  v: [618, 270, 903, 745] },     // solo cuenta su tamaño (ver tecnica_3d.js)
+  // nivel 3 (solo en la B): la tetera y las tazas, de cerca, para volcar el té
+  te:         { h: [1110, 430, 1376, 705], v: [1130, 400, 1376, 720] },
+  // nivel 3: el cajón largo de la espalda, de cerca (con sitio delante para cuando sale)
+  largo:      { h: [690, 380, 1020, 640], v: [700, 360, 1010, 660] },
 };
 const OJO = { x: 784.5, y: 369 };            // iris en reposo
 const CUENCA = { x: 905, y: 378 };
@@ -60,9 +66,34 @@ const CAJONES = {
 const NIVELES = {
   1: { titulo: 'El cuerno', pieza: 'cuerno', texto: 'La caja tiene otra vez su cuerno… y ya te ha visto.' },
   2: { titulo: 'La caja de dentro', pieza: 'ojo', texto: 'Ya tiene sus dos ojos. El nuevo mira donde el viejo no mira.' },
-  3: { titulo: 'La caja del revés', pieza: 'voz' },
+  3: { titulo: 'La voz', pieza: 'voz', texto: 'Canta, muy bajo. Ya tiene su cara entera: el cuerno, los ojos y la voz.' },
+  4: { titulo: 'El corazón', texto: 'Te ha abierto su corazón.' },
 };
+const ULTIMO_NIVEL = 4;
+const nombreNivel = n => (n >= ULTIMO_NIVEL ? 'Nivel final' : `Nivel ${n}`);
 const CLAVE_PARTIDA = 'caja_viva_partida';
+// Nivel 3 · La voz (NIVELES.md §6): la luz fría del ojo de piedra de luna, la ficha del rollo, el cajón largo de la
+// espalda, la tetera y la boca. En píxeles del boceto (los de la espalda, en el boceto de espaldas)
+const HUECO_FICHA = { x: 846, y: 368 };              // el hueco con forma de ficha, en la espalda
+const LARGO = ['rect', 715, 474, 990, 558];           // el cajón largo, en la espalda
+const BOCA = { x: 848, y: 483, ang: 0.135, ancho: 82 };    // la raya entre los labios
+const VARILLA_ROLLO = { x: 414, y: 322 };             // el extremo de la varilla del rollo, por donde sale la ficha
+const FICHA_SUELO = { x: 386, y: 474 };               // donde cae, en el tatami
+const PICO_TETERA = { x: 1207, y: 511 };
+const UMBRAL_ROLLO = 0.1;                              // cuánto tiene que mecerse el rollo para que caiga la ficha (rad)
+const NOTAS = {
+  1: 'Me falta un cuerno.<br>Lo guarda el león<br>que respira humo.',
+  3: 'Me falta la voz.<br>Duerme a mi espalda,<br>sin lengua.',
+};
+// las tintas que solo se ven a la luz fría (nivel3_arte.js): dónde están y qué dicen al descubrirlas
+const TINTAS = {
+  rollo: { x: 326, y: 196, objeto: 'sala', escala: 0.85, dibujar: tintaRollo,
+    texto: 'A la luz fría, en el rollo: una ficha de shōgi en rojo… y una flecha que baja a la varilla.' },
+  te: { x: 1306, y: 392, objeto: 'sala', escala: 0.78, dibujar: tintaTe,
+    texto: 'En la madera, junto a la tetera: alguien vierte el té, y algo pequeño cae en la taza.' },
+  suelo: { x: 250, y: 562, objeto: 'sala', escala: 0.9, dibujar: tintaSuelo,
+    texto: 'En el tatami, tres trazos como una respiración. La campanilla está en el que baja.' },
+};
 const MARCA_BORDE = -Math.PI / 2;            // la cajita: la marca dorada del borde, arriba
 const PASO_TAPA = Math.PI / 6;               // su tapa gira a saltos de 30°
 
@@ -160,6 +191,10 @@ function estadoInicial() {
     // en el nivel 2: { fase: dentro | subiendo | mesa, tablillas: [5 × sí/no], cajon: cerrado | abierto,
     //                  cajita: cajon | mano | abierta, ojo: cajita | mano | puesto }
     hija: null,
+    // en el nivel 3: { nota: boca | mano, tintas: {rollo, te, suelo}, ficha: rollo | cayendo | suelo | mano | puesta,
+    //                  fichaCara: peon | promovida, largo: cerrado | suelto | abierto, campanilla: cajon | mano | puesta,
+    //                  badajo: tetera | taza | mano | puesto, completa, toques (respuestas de la caja), labios (0…1) }
+    n3: null,
     pistasPaso: {},
     intentosMirada: 0,
   };
@@ -328,13 +363,22 @@ function parpadear(lento = false) { ojo.parpadeo = { t: 0, cierre: lento ? 0.16 
 const PRIMER_VISTAZO = 35;
 const progreso = { firma: '', desde: 0, proximoVistazo: 0 };
 function firmaAvance() {
-  const h = estado.hija;
+  const h = estado.hija, n3 = estado.n3;
   return [estado.nivel, estado.llave, estado.nota, estado.tapa, estado.cuerno, estado.inventario.length,
-    Object.values(estado.cajones).join(''), h ? [h.fase, h.tablillas.join(''), h.cajon, h.cajita, h.ojo].join('') : ''].join('|');
+    Object.values(estado.cajones).join(''), h ? [h.fase, h.tablillas.join(''), h.cajon, h.cajita, h.ojo].join('') : '',
+    n3 ? [n3.nota, Object.keys(n3.tintas).join(''), n3.ficha, n3.fichaCara, n3.largo, n3.campanilla, n3.badajo, n3.toques].join('') : ''].join('|');
 }
 // lo que la caja teme: el frente abierto ahora mismo (o nada, si ya lo vigila)
 function frenteAbierto() {
-  const h = estado.hija;
+  const h = estado.hija, n3 = estado.n3;
+  if (estado.nivel === 3 && n3) {
+    if (n3.nota === 'boca') return null;                  // (se lo ofrece ella)
+    if (n3.ficha === 'rollo') return VARILLA_ROLLO;
+    if (n3.ficha === 'suelo') return FICHA_SUELO;
+    if (n3.badajo === 'tetera' && n3.campanilla !== 'cajon') return TAPA_TETERA;
+    if (n3.badajo === 'taza') return TAZAS[0];
+    return null;                                          // lo demás está a su espalda, o en su boca
+  }
   if (estado.nivel === 2 && h) {
     if (h.fase === 'dentro') return TRAMPILLA;
     if (h.ojo === 'mano') return CUENCA;
@@ -407,10 +451,13 @@ function actualizarOjo2(dt) {
   if (ojo2.visible <= 0.001 || !nivel2) return;
   const ir = nivel2.iris2;
   if (reloj >= ojo2.proximoVagar) {
-    ojo2.punto = elegir([{ x: 1100, y: 40 }, { x: 1250, y: 120 }, { x: 330, y: 160 }, { x: 60, y: 300 }, { x: 960, y: 10 }, { x: 1376, y: 360 }]);
+    // (desde el nivel 3 su mirada da luz: vaga por sitios donde no hay tinta, para que la descubras tú)
+    ojo2.punto = elegir(estado.nivel >= 3
+      ? [{ x: 1100, y: 40 }, { x: 1250, y: 120 }, { x: 330, y: 70 }, { x: 60, y: 300 }, { x: 960, y: 10 }, { x: 560, y: 120 }]
+      : [{ x: 1100, y: 40 }, { x: 1250, y: 120 }, { x: 330, y: 160 }, { x: 60, y: 300 }, { x: 960, y: 10 }, { x: 1376, y: 360 }]);
     ojo2.proximoVagar = reloj + azar(2.2, 5.5);
   }
-  const p = ojo2.punto || { x: 1100, y: 40 };
+  const p = (reloj < luzFria.guiadaHasta && luzFria.punto) || ojo2.punto || { x: 1100, y: 40 };
   const objetivo = { x: 11.5 * Math.tanh((p.x - ir.cx) / 260), y: 3 * Math.tanh((p.y - ir.cy) / 200) };
   const k = 300, amort = 2 * Math.sqrt(k) * 0.85;
   for (let r = dt; r > 0; r -= 1 / 120) {
@@ -482,24 +529,120 @@ function dibujarParpado(c, p, geo) {
 }
 
 // ---------------------------------------------------------------------------------------------
+// La luz fría (nivel 3): el ojo de piedra de luna alumbra lo que mira, y su luz descubre tinta que no se ve. Como no te
+// mira, va al revés de tu dedo: para que alumbre algo, pon el dedo al otro lado de la cara (la regla, invertida: ahora
+// conviene que mire). Sin dedo, la luz vaga con su mirada.
+// ---------------------------------------------------------------------------------------------
+const luzFria = { x: 1100, y: 40, vx: 0, vy: 0, fuerza: 0, guiadaHasta: 0, punto: null };
+const espejoLuz = p => ({ x: limitar(CUENCA.x + (CUENCA.x - p.x) * 1.6, 10, ANCHO - 10), y: limitar(CUENCA.y + (CUENCA.y - p.y) * 1.6, 10, ALTO - 10) });
+const luzActiva = () => estado.nivel === 3 && estado.fase === 'jugando' && ojo2.visible > 0.5 && caraVisible() === 'frente';
+function guiarLuz(p) {
+  if (!luzActiva() || !p || p.cara === 'detras' || p.hija) return;
+  luzFria.punto = espejoLuz(p);
+  luzFria.guiadaHasta = reloj + 4;
+  ojo2.proximoVagar = Math.max(ojo2.proximoVagar, reloj + 4);
+  if (primeraVez('luz-guiada')) setTimeoutReloj(1.2, () => { if (!mensajeHasta) mensaje('La luz fría se va al otro lado de tu dedo.', 3.2); });
+}
+// dónde cae la luz: en qué se ancla (la tetera, el incensario, la caja o la sala)
+function objetoBajo(p) {
+  if (dentro(['rect', 1140, 470, 1376, 700], p)) return 'te';
+  if (dentro(INCENSARIO, p)) return 'incensario';
+  if (dentro(['poli', CAJA], p)) return 'caja';
+  return 'sala';
+}
+function actualizarLuzFria(dt) {
+  luzFria.fuerza = mezclar(luzFria.fuerza, luzActiva() ? 1 : 0, 1 - Math.exp(-dt * 3));
+  const guiada = reloj < luzFria.guiadaHasta && luzFria.punto;
+  const p = guiada ? luzFria.punto : (ojo2.punto || { x: 1100, y: 40 });
+  const k = 30, am = 2 * Math.sqrt(k) * 0.92;
+  for (let r = dt; r > 0; r -= 1 / 120) {
+    const h = Math.min(r, 1 / 120);
+    luzFria.vx += ((p.x - luzFria.x) * k - luzFria.vx * am) * h;
+    luzFria.vy += ((p.y - luzFria.y) * k - luzFria.vy * am) * h;
+    luzFria.x += luzFria.vx * h; luzFria.y += luzFria.vy * h;
+  }
+  const n3 = estado.n3, f = luzFria.fuerza * (1 - ojo2.cerrado);
+  for (const [id, t] of Object.entries(TINTAS)) {
+    const d = Math.hypot(luzFria.x - t.x, luzFria.y - t.y);
+    const alumbrada = limitar(1 - (d - 45) / 85, 0, 1) * f;
+    t.vis = Math.max(alumbrada, n3 && n3.tintas[id] ? 0.16 : 0);
+    // se descubre si la luz se queda encima (guiada por ti) un momento
+    t.acum = alumbrada > 0.6 && guiada ? (t.acum || 0) + dt : Math.max(0, (t.acum || 0) - dt);
+    if (n3 && !n3.tintas[id] && t.acum > 1.1) revelarTinta(id);
+  }
+}
+function revelarTinta(id) {
+  estado.n3.tintas[id] = true;
+  sonar('cristal', -14, 0.8); sonar('espiritu', -20, 1.5);
+  mensaje(TINTAS[id].texto, 5.5);
+}
+// en la B, encima de la escena: las tintas (con su visibilidad) y la luz, del ojo a donde mira
+function dibujarTintas(conAncla) {
+  for (const [id, t] of Object.entries(TINTAS)) {
+    if (!t.lienzo || !(t.vis > 0.01)) continue;
+    conAncla(t.x, t.y, t.objeto, () => {
+      ctx.save();
+      if (id === 'rollo') { const g = ROLLO.gancho; ctx.translate(g.x, g.y); ctx.rotate(rollo.a); ctx.translate(-g.x, -g.y); }
+      const w = t.lienzo.width * t.escala, h = t.lienzo.height * t.escala;
+      ctx.globalAlpha = t.vis;
+      ctx.drawImage(t.lienzo, t.x - w / 2, t.y - h / 2, w, h);
+      ctx.restore();
+    });
+  }
+}
+function dibujarLuzFria(conAncla) {
+  const f = luzFria.fuerza * (1 - ojo2.cerrado);
+  if (f < 0.01) return;
+  const objeto = objetoBajo(luzFria);
+  const a = tec.ancla(CUENCA, 'caja'), b = tec.ancla({ x: luzFria.x, y: luzFria.y }, objeto);
+  if (!a || !b || !a.visible || !b.visible) return;
+  const dx = b.x - a.x, dy = b.y - a.y, L = Math.hypot(dx, dy) || 1, nx = -dy / L, ny = dx / L, w0 = 3 * a.k, w1 = 46 * b.k;
+  ctx.setTransform(ppp, 0, 0, ppp, 0, 0);
+  const g = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+  g.addColorStop(0, `rgba(185, 212, 255, ${0.34 * f})`); g.addColorStop(1, `rgba(170, 200, 255, ${0.1 * f})`);
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.moveTo(a.x + nx * w0, a.y + ny * w0); ctx.lineTo(b.x + nx * w1, b.y + ny * w1);
+  ctx.lineTo(b.x - nx * w1, b.y - ny * w1); ctx.lineTo(a.x - nx * w0, a.y - ny * w0); ctx.closePath(); ctx.fill();
+  conAncla(luzFria.x, luzFria.y, objeto, () => { brillo(ctx, luzFria.x, luzFria.y, 84, '150,190,255', 0.5 * f); brillo(ctx, luzFria.x, luzFria.y, 30, '225,238,255', 0.4 * f); });
+}
+
+// ---------------------------------------------------------------------------------------------
 // Respiración de la caja (contiene el aliento cuando la fuerzan)
 // ---------------------------------------------------------------------------------------------
-const aliento = { fase: 0, valor: 0, contenidoHasta: 0, soltando: 0 };
+const aliento = { fase: 0, valor: 0, contenidoHasta: 0, soltando: 0, soplo: 0, seno: 0 };
 function contenerAliento(segundos = 1.8) {
   if (reloj >= aliento.contenidoHasta) atenuarAmbiente(segundos);
   aliento.contenidoHasta = reloj + segundos;
 }
+// ¿está soltando el aire? (en el nivel 3, es cuando contesta a la campanilla)
+const exhalando = () => reloj >= aliento.contenidoHasta && (aliento.soltando > 0 || Math.sin(aliento.fase) < -0.05);
 function actualizarAliento(dt) {
+  const antes = aliento.valor;
   if (reloj < aliento.contenidoHasta) {
     aliento.valor = mezclar(aliento.valor, 1, 1 - Math.exp(-dt * 6));
     aliento.soltando = 0.6;
   } else if (aliento.soltando > 0) {
     aliento.soltando -= dt;
     aliento.valor = mezclar(aliento.valor, 0, 1 - Math.exp(-dt * 9));
-    if (aliento.soltando <= 0) aliento.fase = Math.PI;
+    if (aliento.soltando <= 0) aliento.fase = 0;            // vuelve a tomar aire desde vacía (sin saltos)
   } else {
     aliento.fase += dt * (Math.PI * 2 / 4.8) * (1 + 0.15 * Math.sin(reloj * 0.21));
     aliento.valor = 0.5 - 0.5 * Math.cos(aliento.fase);
+  }
+  // cuánto aire mueve (positivo al tomarlo): en el nivel 3 tira del humo del incienso, y al empezar a soltarlo sale vaho
+  aliento.soplo = mezclar(aliento.soplo, (aliento.valor - antes) / Math.max(dt, 1e-3), 1 - Math.exp(-dt * 6));
+  const seno = Math.sin(aliento.fase), n3 = estado.n3;
+  if (estado.nivel === 3 && n3 && n3.labios < 1 && estado.fase === 'jugando' && aliento.seno >= 0 && seno < 0 && reloj >= aliento.contenidoHasta) {
+    vaho();
+    if (n3.completa) sonar('suspiro', -26, 1.3);
+  }
+  aliento.seno = seno;
+}
+// un poco de vaho entre los labios: la caja suelta el aire
+function vaho() {
+  for (let i = 0; i < 4; i++) {
+    nubes.push({ x: BOCA.x + azar(-14, 14), y: BOCA.y + 4, ax: BOCA.x, ay: BOCA.y, objeto: 'caja', vx: azar(-8, 8), vy: azar(4, 12),
+      r0: azar(3, 5), r1: azar(16, 26), t: -i * 0.1, vida: azar(1.4, 2), alfa: 0.2, color: '236,236,240' });
   }
 }
 
@@ -533,6 +676,8 @@ class Cinta {
       n.e += dt;
       const empuje = Math.sin(n.y * 0.034 + reloj * 0.8 + this.semilla) * 10 + Math.sin(n.y * 0.012 - reloj * 0.37 + this.semilla * 2) * 7;
       n.vx += empuje * this.rizo * dt - viento.rafaga * 16 * dt;
+      // en el nivel 3 la caja respira más hondo y el humo del incienso va hacia ella al tomar aire (y se aparta al soltarlo)
+      if (this.objeto === 'incensario' && estado.nivel === 3) n.vx += aliento.soplo * 40 * dt;
       apartarDelDedo(n, 55, 1500, dt);
       n.vy -= this.flota * dt;
       n.vx *= 1 - 0.7 * dt; n.vy *= 1 - 0.22 * dt;
@@ -767,10 +912,15 @@ function soplar(fuerza = 1, conSonido = true) {
 }
 // la tapa de la tetera: el vapor la levanta a golpecitos
 function vaporTetera(fuerza = 1) {
+  if (tetera3.inclinacion > 0.02) return;                 // volcada, la tapa no salta
   tetera.t = 0; tetera.fuerza = fuerza;
   for (let i = 0; i < 3; i++) setTimeoutReloj(i * 0.11, () => sonar('clic_metal', -21 + 3 * fuerza, azar(1.45, 1.8)));
   setTimeoutReloj(0.08, () => bocanada(TAPA_TETERA.x - 8, TAPA_TETERA.y - 10, -0.2, -1, 0.15, 'te'));
+  // nivel 3: con la tapa, dentro tintinea el badajo
+  if (estado.nivel === 3 && estado.n3 && estado.n3.badajo === 'tetera') setTimeoutReloj(0.17, () => sonar('tin', -21 + 4 * fuerza, 1.45));
 }
+// nivel 3: la tetera volcada con el dedo (0 de pie … 1 del todo) y el té que cae
+const tetera3 = { inclinacion: 0, vertido: 0, chorro: 0, sonandoHasta: 0 };
 // ondas en el té: algo ha golpeado la mesa
 function agitarTe(fuerza = 1) {
   TAZAS.forEach((_, i) => ondas.push({ i, t: -i * 0.05, f: Math.min(1, fuerza) }));
@@ -1008,6 +1158,7 @@ let cajonesDatos = null;
 // Cada cajón: cuánto ha salido (k: 0 cerrado … 1 abierto), su velocidad y adónde va. Un muelle lo lleva a su sitio
 // (con un rebote al abrirse y un golpe seco al cerrarse); mientras el dedo lo agarra, va donde lo lleve el dedo.
 const cajonAnim = Object.fromEntries(Object.keys(CAJONES).map(id => [id, { k: 0, v: 0, objetivo: 0, agarrado: false, golpe: 0 }]));
+cajonAnim.largo = { k: 0, v: 0, objetivo: 0, agarrado: false, golpe: 0 };      // el cajón largo de la espalda (nivel 3)
 function actualizarCajones(dt) {
   for (const a of Object.values(cajonAnim)) {
     if (a.agarrado) continue;
@@ -1285,11 +1436,12 @@ const FORMAS_TE = {
   ],
   elipses: [[1297, 556, 80, 62], [1302, 487, 16, 14]],
 };
-function mascaraTe(dx = 0, dy = 0, ancho = ANCHO, alto = ALTO) {
+// (soloTetera: sin las tazas, para la tetera que se vuelca en el nivel 3)
+function mascaraTe(dx = 0, dy = 0, ancho = ANCHO, alto = ALTO, soloTetera = false) {
   const m = document.createElement('canvas'); m.width = ancho; m.height = alto;
   const k = m.getContext('2d');
   k.translate(-dx, -dy); k.fillStyle = '#fff'; k.strokeStyle = '#fff'; k.lineWidth = 3; k.lineJoin = 'round';
-  for (const poli of FORMAS_TE.polis) {
+  for (const poli of soloTetera ? FORMAS_TE.polis.slice(2) : FORMAS_TE.polis) {
     k.beginPath(); poli.forEach(([x, y], i) => (i ? k.lineTo(x, y) : k.moveTo(x, y))); k.closePath(); k.fill(); k.stroke();
   }
   for (const [x, y, rx, ry] of FORMAS_TE.elipses) { k.beginPath(); k.ellipse(x, y, rx + 1.5, ry + 1.5, 0, 0, Math.PI * 2); k.fill(); }
@@ -1304,10 +1456,10 @@ function sombrasTe(c) {
     c.fillStyle = g; c.fillRect(-rx, -rx, rx * 2, rx * 2); c.restore();
   }
 }
-function recortarTe(lienzo, dx = 0, dy = 0) {
+function recortarTe(lienzo, dx = 0, dy = 0, soloTetera = false) {
   const k = lienzo.getContext('2d');
   k.globalCompositeOperation = 'destination-in';
-  k.drawImage(mascaraTe(dx, dy, lienzo.width, lienzo.height), 0, 0);
+  k.drawImage(mascaraTe(dx, dy, lienzo.width, lienzo.height, soloTetera), 0, 0);
   k.globalCompositeOperation = 'source-over';
 }
 let alHornear = [];     // las técnicas 3D se apuntan para actualizar sus texturas
@@ -1689,7 +1841,8 @@ function irA(nombre, duracion = 0.75) {
   if (estado.vista === nombre && !(tec.transicion)) { /* ya está */ }
   estado.vista = nombre;
   tec.irA(nombre, duracion);
-  $('juego').classList.toggle('mensaje-al-lado', nombre === 'hija' || nombre === 'cajones');
+  // (de cerca, el mensaje va a un lado para no tapar lo que se toca: la boca, los cajones, la tetera…)
+  $('juego').classList.toggle('mensaje-al-lado', ['hija', 'cajones', 'te', 'largo', 'corazon'].includes(nombre) || (nombre === 'cara' && estado.nivel >= 3));
   el.volver.hidden = nombre === 'sala' || estado.fase !== 'jugando';
   if (nombre !== 'sala') sonar('acercar', -16, nombre === 'incensario' ? 1.1 : 1);
   if (mensajeHasta) mensajeHasta = Math.min(mensajeHasta, reloj + 0.3);
@@ -1715,11 +1868,13 @@ function dibujarEncima3D() {
   c.setTransform(ppp, 0, 0, ppp, 0, 0);
   for (const n of nubes) conAncla(n.ax, n.ay, n.objeto, () => dibujarNube(ctx, n));
   for (const lista of [humos.incienso, humos.te, humos.sueltos]) for (const h of lista) conAncla(h.x, h.y, h.objeto, () => h.dibujar(ctx));
+  if (estado.nivel === 3) { dibujarNivel3Encima(conAncla); c.setTransform(ppp, 0, 0, ppp, 0, 0); }
   if (despertar.oscuridad > 0) {
     c.setTransform(ppp, 0, 0, ppp, 0, 0);
     c.fillStyle = `rgba(6, 4, 8, ${despertar.oscuridad})`; c.fillRect(0, 0, ancho, alto);
   }
   c.globalCompositeOperation = 'lighter';
+  if (estado.nivel === 3) { dibujarLuzFria(conAncla); c.setTransform(ppp, 0, 0, ppp, 0, 0); }
   for (const objeto of ['sala', 'incensario', 'caja']) {
     if (objeto === 'caja' && tec.cara() !== 'frente') continue;
     for (const [x, y, r, col, a] of luces(objeto)) conAncla(x, y, objeto, () => brillo(ctx, x, y, r, col, a));
@@ -1756,6 +1911,10 @@ const OBJETOS = {
   cuerno: { nombre: 'Cuerno de marfil', texto: 'Todavía está tibio. Le falta su sitio.', icono: 'capas/cuerno.webp', capa: 'cuerno' },
   cajita: { nombre: 'Cajita de laca roja', texto: 'Cabe en la palma. En la tapa, un ojo cerrado entre olas.', icono: 'capas/cajita.webp', capa: 'cajita' },
   ojo: { nombre: 'Ojo de piedra de luna', texto: 'Frío y muy claro. Parece que mira hacia otro lado.', icono: '', capa: 'ojo_luna' },
+  // nivel 3 (los iconos se dibujan por código: prepararNivel3)
+  ficha: { nombre: 'Ficha de shōgi', texto: 'Un peón de madera, 歩. Por detrás tiene otra cara.', icono: '', capa: 'ficha' },
+  campanilla: { nombre: 'Campanilla de bronce', texto: 'Pequeña y pesada. No tiene badajo: no suena.', icono: '', capa: 'campanilla' },
+  badajo: { nombre: 'Badajo de bronce', texto: 'Mojado de té. La lengua de una campanilla.', icono: '', capa: 'badajo' },
 };
 const huecosBandeja = () => [...el.bandeja.querySelectorAll('.hueco')];
 const huecoDe = objeto => huecosBandeja().find(h => h.dataset.objeto === objeto) || null;
@@ -1821,11 +1980,19 @@ function examinar(objeto) {
   if (objeto === 'nota') { leerNota(); return; }
   const o = OBJETOS[objeto];
   el.examinarImg.src = o.icono; el.examinarNombre.textContent = o.nombre; el.examinarTexto.textContent = o.texto;
-  const bolsilloSi = objeto === 'cajita' && estado.hija && estado.hija.ojo === 'cajita';
+  // en la mano se mueven: la cajita (su tapa gira) y la ficha de shōgi (se le da la vuelta)
+  const cajitaSi = objeto === 'cajita' && estado.hija && estado.hija.ojo === 'cajita';
+  const fichaSi = objeto === 'ficha' && !!estado.n3;
+  const bolsilloSi = cajitaSi || fichaSi;
+  bolsillo.modo = fichaSi ? 'ficha' : 'cajita';
   el.examinarImg.hidden = bolsilloSi; el.bolsillo.hidden = !bolsilloSi;
   el.bolsillo.parentElement.classList.toggle('grande', bolsilloSi);
-  el.examinarAyuda.textContent = bolsilloSi ? 'Gira la tapa con el dedo · toca fuera para guardarla' : 'Toca para guardarlo';
-  if (bolsilloSi) abrirBolsillo();
+  el.examinarAyuda.textContent = cajitaSi ? 'Gira la tapa con el dedo · toca fuera para guardarla'
+    : fichaSi ? 'Deslízala de lado para darle la vuelta · toca fuera para guardarla' : 'Toca para guardarlo';
+  el.bolsillo.setAttribute('aria-label', fichaSi ? 'La ficha en la mano: deslízala de lado o usa las flechas para darle la vuelta'
+    : 'La cajita en la mano: gira su tapa con el dedo o con las flechas del teclado');
+  if (cajitaSi) abrirBolsillo();
+  if (fichaSi) { bolsillo.activo = true; fichaGiro.giro = fichaGiro.objetivo = 0; fichaGiro.inicio = null; medirBolsillo(); }
   // lo de detrás no se lee a través del velo
   el.mensaje.classList.remove('visible'); mensajeHasta = 0;
   el.etiqueta.classList.remove('visible'); etiquetaHasta = 0;
@@ -1920,11 +2087,20 @@ el.bolsillo.addEventListener('pointerdown', e => {
   if (!bolsillo.activo) return;
   el.bolsillo.setPointerCapture(e.pointerId);
   const q = puntoBolsillo(e);
+  if (bolsillo.modo === 'ficha') { fichaGiro.inicio = { id: e.pointerId, x0: q.x, y0: q.y, volteada: false, movido: 0 }; return; }
   bolsillo.dedo = q;
   bolsillo.arrastre = { id: e.pointerId, a0: Math.atan2(q.y, q.x), angulo0: bolsillo.angulo, movido: 0, x0: q.x, y0: q.y };
 });
 el.bolsillo.addEventListener('pointermove', e => {
   const q = puntoBolsillo(e);
+  if (bolsillo.modo === 'ficha') {
+    // la ficha se voltea deslizándola de lado (hacia donde vaya el dedo)
+    const f = fichaGiro.inicio;
+    if (!f || e.pointerId !== f.id) return;
+    f.movido = Math.max(f.movido, Math.hypot(q.x - f.x0, q.y - f.y0));
+    if (!f.volteada && Math.abs(q.x - f.x0) > 0.28) { f.volteada = true; voltearFicha(Math.sign(q.x - f.x0)); }
+    return;
+  }
   bolsillo.dedo = q;
   const a = bolsillo.arrastre;
   if (!a || e.pointerId !== a.id || bolsillo.encajada) return;
@@ -1937,6 +2113,12 @@ el.bolsillo.addEventListener('pointermove', e => {
   if (salto !== bolsillo.ultimoSalto) { bolsillo.ultimoSalto = salto; sonar('clic_madera', -16, 1.9); vibrar(6); }
 });
 function soltarTapa(e) {
+  if (bolsillo.modo === 'ficha') {
+    const f = fichaGiro.inicio;
+    if (f && e.pointerId === f.id && !f.volteada && f.movido < 0.08 && e.type === 'pointerup') voltearFicha(1);   // un toque también la voltea
+    fichaGiro.inicio = null;
+    return;
+  }
   const a = bolsillo.arrastre;
   if (!a || e.pointerId !== a.id) return;
   bolsillo.arrastre = null;
@@ -1950,6 +2132,10 @@ el.bolsillo.addEventListener('pointerup', e => { e.stopPropagation(); soltarTapa
 el.bolsillo.addEventListener('pointercancel', soltarTapa);
 el.bolsillo.addEventListener('keydown', e => {
   if (!bolsillo.activo) return;
+  if (bolsillo.modo === 'ficha') {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); voltearFicha(e.key === 'ArrowLeft' ? -1 : 1); }
+    return;
+  }
   if (bolsillo.abierta > 0.95 && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); tomarOjoLuna(); return; }
   if (bolsillo.encajada || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
   e.preventDefault();
@@ -1989,6 +2175,7 @@ async function tomarOjoLuna() {
 function dibujarBolsillo(dt) {
   if (!bolsillo.activo || el.examinar.hidden) return;
   medirBolsillo();
+  if (bolsillo.modo === 'ficha') { dibujarFichaEnMano(dt); return; }
   // la tapa se asienta en su salto con un muelle
   if (!bolsillo.arrastre) {
     const k = 120, am = 2 * Math.sqrt(k) * 0.7;
@@ -2098,6 +2285,7 @@ function pista() {
   sonar('pista', -8);
   const n = estado.pistas++;
   if (estado.nivel === 2) return pistaNivel2();
+  if (estado.nivel === 3) return pistaNivel3();
   if (estado.llave === 'cajon') {
     if (caraVisible() !== 'frente') return mensaje('Los cajones están junto a la cara. Gira la caja.');
     if (estado.cajones.c8 !== 'abierto') return mensaje(n % 2 ? 'Los cajones del costado se abren tirando de ellos. Prueba los de abajo.' : 'Algunos cajones tienen cerradura y otros no. Tira de ellos y mira dentro.');
@@ -2146,7 +2334,7 @@ const ZONAS = [
   { grupo: 'caja', forma: ['elipse', 905, 378, 36, 21], tocar: tocarCuenca },
   { grupo: 'caja', forma: ['elipse', 912, 291, 30, 30], tocar: tocarFrente },
   { grupo: 'caja', forma: ['rect', 800, 250, 870, 318], tocar: () => mensaje('Un cuerno de marfil. Le falta su pareja.') },
-  { grupo: 'caja', forma: ['elipse', 842, 484, 52, 24], tocar: () => mensaje('Los labios están tallados, pero parecen tibios.') },
+  { grupo: 'caja', forma: ['elipse', 842, 484, 52, 24], tocar: tocarLabios },
   { grupo: 'caja', forma: ['elipse', 930, 196, 66, 18], tocar: tocarTrampilla },
   // el incensario: de cerca
   { grupo: 'incensario', forma: ['rect', 566, 444, 620, 516], si: () => estado.tapa === 'abierta' && estado.cuerno === 'brasas', tocar: cogerCuerno },
@@ -2155,7 +2343,9 @@ const ZONAS = [
   // la sala: desde cualquier vista
   { grupo: 'sala', forma: ['rect', 535, 212, 676, 434], tocar: tocarLampara },
   { grupo: 'sala', forma: ['rect', 1206, 476, 1376, 626], tocar: tocarTetera },
-  { grupo: 'sala', forma: ['rect', 1140, 592, 1336, 698], tocar: () => { agitarTe(0.8); mensaje('Dos tazas servidas. Nadie vino a beberlas.'); } },
+  { grupo: 'sala', forma: ['rect', 1140, 592, 1336, 698], tocar: tocarTazas },
+  // nivel 3: la ficha caída en el tatami
+  { grupo: 'sala', forma: ['elipse', FICHA_SUELO.x, FICHA_SUELO.y, 46, 34], si: () => !!estado.n3 && estado.n3.ficha === 'suelo', tocar: cogerFicha },
   { grupo: 'sala', forma: ['rect', 236, 0, 416, 336], tocar: tocarRollo },
   { grupo: 'sala', forma: ['rect', 0, 0, 138, 500], tocar: () => { sonar('tope_madera', -16, 0.8); mensaje('La puerta no se abre. Primero, la caja.'); } },
   { grupo: 'sala', forma: ['rect', 664, 0, 1376, 172], tocar: tocarVentana },
@@ -2164,8 +2354,8 @@ const ZONAS = [
 // la espalda de la caja (en el boceto de espaldas)
 const ZONAS_DETRAS = [
   { forma: ['rect', 687, 300, 787, 368], tocar: () => mensaje('Vacío. En el fondo, una muesca con forma de ficha.') },
-  { forma: ['rect', 815, 328, 878, 408], tocar: () => mensaje('Un hueco con forma de ficha de shōgi. Falta la ficha.') },
-  { forma: ['rect', 715, 474, 990, 558], tocar: () => cajonCerrado('largo', 860, 478, 0.2, -1, 'Tiene cerradura, pero no es la de la llave de bambú.', 'caja_detras') },
+  { forma: ['rect', 815, 328, 878, 408], tocar: tocarHuecoFicha },
+  { forma: LARGO, tocar: tocarLargo },
   { forma: ['rect', 1050, 195, 1122, 552], tocar: () => mensaje('Una borla de seda roja. El nudo está muy apretado.') },
   { forma: ['rect', 715, 233, 990, 495], tocar: () => cajonCerrado('detras', 900, 330, 0.4, -1, null, 'caja_detras') },
 ];
@@ -2175,10 +2365,11 @@ function tocarEscena(sx, sy) {
   const p = tec.aPintura(sx, sy);
   if (!p) return;                        // de cerca, la cámara se queda: se vuelve con «Sala», atrás o pellizcando
   if (estado.seleccion) { usarObjeto(estado.seleccion, p, null); return; }
-  const v = estado.vista, deCerca = v === 'caja' || v === 'cara' || v === 'cajones' || v === 'hija';
+  const v = estado.vista, deCerca = v === 'caja' || v === 'cara' || v === 'cajones' || v === 'hija' || v === 'largo';
   if (p.hija) { tocarHija(p); return; }
   if (p.cara === 'detras') {
     if (!deCerca) { irA('caja'); return; }
+    if (p.largo) { sonar('toque', -14); tocarLargo(p); return; }          // el cajón largo abierto (o lo que guarda)
     for (const z of ZONAS_DETRAS) if (dentro(z.forma, p)) { sonar('toque', -14); z.tocar(p); return; }
     sonar('toque', -14); mensaje('La espalda de la caja: más cajones y un hueco extraño.');
     return;
@@ -2260,6 +2451,15 @@ async function cogerNota(id = 'c9') {
 function tocarRollo() {
   rollo.v += 0.11 * (rollo.v >= 0 ? 1 : -1) + 0.02;
   sonar('papel', -17, 0.8);
+  // nivel 3: dentro de la varilla de abajo hay algo suelto que golpea la madera
+  if (estado.nivel === 3 && estado.n3 && estado.n3.ficha === 'rollo') {
+    setTimeoutReloj(0.18, () => sonar('clic_madera', -12, 0.75));
+    setTimeoutReloj(0.42, () => sonar('clic_madera', -16, 0.7));
+    const n = insistir('rollo3');
+    mensaje(n === 1 ? (primeraVez('rollo3') ? 'El rollo se mece… y dentro de la varilla de abajo algo suelto golpea la madera.' : 'Algo suelto golpea dentro de la varilla.')
+      : n === 2 ? 'Se mece más. Lo de dentro golpea más fuerte.' : 'Más… ');
+    return;
+  }
   mensaje(primeraVez('rollo') ? 'Una montaña entre la niebla, pintada a tinta. El rollo se mece.' : 'Una montaña entre la niebla.');
 }
 function tocarVentana() {
@@ -2282,6 +2482,20 @@ function tocarLampara() {
 // además de la llama (genero/juegos_A y juegos_B: la regla del ojo crece con otro sentido). Mientras vigila la caja
 // pequeña, no se deja
 function tocarTetera() {
+  // nivel 3: la tetera se mira de cerca, para volcarla (dentro tintinea algo)
+  if (estado.nivel === 3 && estado.n3 && tec.inclinarTetera) {
+    if (estado.vista !== 'te') {
+      irA('te', 0.85);
+      if (estado.n3.badajo === 'tetera') vaporTetera(0.8);
+      ojo.distraidoPor = TAPA_TETERA; ojo.distraidoHasta = reloj + 3;
+      return;
+    }
+    vaporTetera(1);
+    if (estado.n3.badajo === 'tetera') {
+      mensaje(primeraVez('tetera3') ? 'La tapa tiembla y, dentro, algo pequeño tintinea contra la porcelana. Vuélcala: arrastra hacia abajo.' : 'Dentro tintinea algo. Arrastra hacia abajo para volcarla.', 4.5);
+    } else mensaje('Té verde. Ya no tintinea nada.');
+    return;
+  }
   vaporTetera(1);
   if (estado.fase !== 'jugando' || ojo.parpadoBase > 0.5) { mensaje('Té verde. La tapa tiembla: todavía está caliente.'); return; }
   if (vigilaLaPequena()) {
@@ -2401,6 +2615,7 @@ async function subirCajaHija() {
 function tocarHija(p) {
   const h2 = estado.hija;
   if (!h2 || h2.fase !== 'mesa') return;
+  if (estado.nivel >= 3) { sonar('toque', -14); mensaje('La caja pequeña, abierta. Ya no guarda nada… por ahora.'); return; }
   if (estado.vista !== 'hija') { irA('hija'); return; }
   sonar('toque', -14);
   if (p.hija === 'tablilla') return tocarTablilla(p.tablilla);
@@ -2533,17 +2748,502 @@ async function ponerOjo(desde) {
 }
 
 // ---------------------------------------------------------------------------------------------
+// Nivel 3 · La voz (solo en la B). La caja ya ve con dos ojos, pero no puede hablar: le falta la voz, una campanilla de
+// bronce sin badajo que duerme en el cajón largo de su espalda. La regla se invierte: ahora conviene que mire, porque
+// la luz fría del ojo nuevo descubre tinta que no se ve (en el rollo, junto a la tetera y en el tatami). Pasos:
+//   la nota entre los labios → la tinta del rollo → mecer el rollo hasta que caiga la ficha → coger la ficha → darle la
+//   vuelta (coronada, と) → meterla en el hueco de la espalda → tirar del cajón largo → la campanilla → la tinta de la
+//   tetera → volcar la tetera → el badajo de la taza → el badajo en la campanilla → la tinta del tatami → tocar la
+//   campanilla cuando la caja suelta el aire, tres veces → los labios se abren → la campanilla en la boca: canta.
+// ---------------------------------------------------------------------------------------------
+const fichaCae = { t: 0, x: VARILLA_ROLLO.x, y: VARILLA_ROLLO.y, ang: 0 };
+let notaSale = 0;                    // el papel entre los labios, al salir (0 … 1)
+let labiosTiemblan = 0;
+function prepararNivel3() {
+  for (const [id, t] of Object.entries(TINTAS)) { t.lienzo = t.dibujar(); t.id = id; }
+  img.ficha_peon = dibujarFicha('peon', 120, 140); img.ficha = img.ficha_suelo = img.ficha_peon;
+  img.ficha_promovida = dibujarFicha('promovida', 120, 140);
+  img.campanilla_muda = dibujarCampanilla(false, 96, 120); img.campanilla_completa = dibujarCampanilla(true, 96, 120);
+  img.campanilla = img.campanilla_muda;
+  img.badajo = dibujarBadajo(60, 90);
+  // su tamaño en el boceto: la ficha, del tamaño del hueco; en el tatami, más lejos, más pequeña
+  datos.capas.ficha = { x: HUECO_FICHA.x - 27, y: HUECO_FICHA.y - 32, w: 54, h: 64 };
+  datos.capas.ficha_suelo = { x: FICHA_SUELO.x - 11, y: FICHA_SUELO.y - 13, w: 22, h: 26 };
+  datos.capas.campanilla = { x: BOCA.x - 17, y: BOCA.y - 21, w: 34, h: 42 };
+  datos.capas.badajo = { x: TAZAS[0].x - 8, y: TAZAS[0].y - 18, w: 16, h: 24 };
+  OBJETOS.ficha.icono = icono(img.ficha); OBJETOS.ficha.iconoPromovida = icono(img.ficha_promovida);
+  OBJETOS.campanilla.icono = icono(img.campanilla); OBJETOS.campanilla.iconoCompleta = icono(img.campanilla_completa);
+  OBJETOS.badajo.icono = icono(img.badajo);
+  OBJETOS.ficha.iconoPeon = OBJETOS.ficha.icono; OBJETOS.campanilla.iconoMuda = OBJETOS.campanilla.icono;
+}
+// la ficha, el icono y el texto según la cara que mira hacia arriba; la campanilla, con badajo o sin él
+function ponerCaraFicha(cara) {
+  estado.n3.fichaCara = cara;
+  const o = OBJETOS.ficha;
+  o.icono = cara === 'promovida' ? o.iconoPromovida : o.iconoPeon;
+  o.texto = cara === 'promovida' ? 'Por esta cara, と en rojo: el peón coronado.' : 'Un peón de madera, 歩. Por detrás tiene otra cara.';
+  img.ficha = cara === 'promovida' ? img.ficha_promovida : img.ficha_peon;
+  pintarInventario();
+}
+function ponerCampanillaCompleta(si) {
+  const o = OBJETOS.campanilla;
+  o.icono = si ? o.iconoCompleta : o.iconoMuda;
+  o.nombre = 'Campanilla de bronce';
+  o.texto = si ? 'Con su badajo. Suena clara y larga.' : 'Pequeña y pesada. No tiene badajo: no suena.';
+  img.campanilla = si ? img.campanilla_completa : img.campanilla_muda;
+  pintarInventario();
+}
+function ponerTextoNota(n) { const t = $('nota-texto'); if (t) t.innerHTML = NOTAS[n]; OBJETOS.nota.texto = '«' + NOTAS[n].replace(/<br>/g, ' ') + '»'; }
+
+// el estado al final del nivel 2, para empezar el 3 sin jugarlo (seguir una partida guardada, o «?nivel=3»)
+function estadoTrasNivel2() {
+  estado.hija = { fase: 'mesa', tablillas: [true, true, true, true, true], cajon: 'abierto', cajita: 'abierta', ojo: 'puesto' };
+  Object.assign(despertar, { ojos: 0, humo: 0, trampilla: 1, oscuridad: 0.16 });
+  lampara.apagada = 0.1;
+  ojo.visible = 1; ojo.parpadoBase = 0;
+  Object.assign(ojo2, { visible: 1, parpadoBase: 0, cerrado: 0 });
+  if (tec.ponerHija) tec.ponerHija(estado.hija);
+  hornear();
+}
+async function empezarNivel3() {
+  ocultarTarjeta();
+  estado.nivel = 3;
+  estado.n3 = { nota: 'boca', tintas: {}, ficha: 'rollo', fichaCara: 'peon', largo: 'cerrado', campanilla: 'cajon', badajo: 'tetera',
+    completa: false, toques: 0, labios: 0 };
+  estado.pistasPaso = {}; estado.intentosMirada = 0; estado.insistencia = {};
+  estado.fase = 'jugando';
+  el.girar.hidden = false; el.inventario.hidden = false;
+  for (const id of Object.keys(CAJONES)) if (estado.cajones[id] === 'abierto') cerrarCajon(id);
+  ponerCaraFicha('peon'); ponerCampanillaCompleta(false);
+  cajonAnim.largo.k = cajonAnim.largo.objetivo = 0;
+  notaSale = 0;
+  ojo.punto = null; ojo.distraidoHasta = 0; ojo.parpadoBase = 0; ojo.entornado = 0;
+  Object.assign(ojo2, { visible: 1, parpadoBase: 0 });
+  luzFria.x = 1100; luzFria.y = 40; luzFria.guiadaHasta = 0;
+  // la trampilla se apaga poco a poco: la caja pequeña ya está fuera
+  const tr0 = despertar.trampilla;
+  animar(2.2, k => { despertar.trampilla = tr0 * (1 - suave(k)); hornear(); if (tec.abrirTrampilla) tec.abrirTrampilla(1 - suave(k)); });
+  bucle('noche', -13, 2);
+  if (tec.cara() !== 'frente') tec.girar();
+  irA('cara', 1.6);
+  await esperar(2.2);
+  // la caja suelta el aire y, entre los labios, asoma un papel
+  vaho(); sonar('suspiro', -9, 0.9); sonar('papel', -12, 1.1);
+  animar(1.2, k => { notaSale = salida(k); });
+  mirarA(BOCA, 2);
+  await esperar(1.3);
+  mensaje('Abre los dos ojos y te mira con el viejo. Entre sus labios asoma un papel.', 4.5);
+}
+async function cogerNota3() {
+  const n3 = estado.n3;
+  n3.nota = 'mano';
+  ponerTextoNota(3);
+  sonar('papel', -4);
+  await alInventario('nota', 'nota', 'caja', { x: BOCA.x + 8, y: BOCA.y + 10 });
+  leerNota();
+  // la primera vez, la luz fría del ojo nuevo se deja ver: barre la sala un momento
+  setTimeoutReloj(2.5, () => { if (estado.nivel === 3) { ojo2.punto = { x: 560, y: 120 }; ojo2.proximoVagar = reloj + 3; } });
+}
+function tocarLabios() {
+  const n3 = estado.n3;
+  if (estado.nivel === 3 && n3) {
+    if (n3.nota === 'boca') { cogerNota3(); return; }
+    if (n3.campanilla === 'puesta') { sonar('campanilla', -12, 1.02); mensaje('La campanilla, en su boca. Canta bajito.'); return; }
+    if (n3.labios >= 1) { mensaje('Los labios, entreabiertos. Dentro, un hueco oscuro y tibio, del tamaño de una campanilla.'); return; }
+    if (n3.toques > 0) { labiosTiemblan = reloj + 0.8; mensaje('Los labios tiemblan, pero siguen cerrados.'); return; }
+  }
+  mensaje('Los labios están tallados, pero parecen tibios.');
+}
+// ---- la ficha del rollo ----
+function actualizarNivel3(dt) {
+  const n3 = estado.n3;
+  if (estado.nivel !== 3 || !n3) return;
+  actualizarLuzFria(dt);
+  // con el rollo muy mecido, la ficha se sale de la varilla
+  if (n3.ficha === 'rollo' && estado.fase === 'jugando' && Math.abs(rollo.a) > UMBRAL_ROLLO) caerFicha();
+  // lo de dentro de la varilla golpea en cada vaivén
+  if (n3.ficha === 'rollo') {
+    const signo = Math.sign(rollo.v);
+    if (signo !== rollo.signo && Math.abs(rollo.a) > 0.035) sonar('clic_madera', -24 + 120 * Math.abs(rollo.a), 0.72);
+    rollo.signo = signo;
+  }
+}
+function caerFicha() {
+  const n3 = estado.n3;
+  n3.ficha = 'cayendo';
+  sonar('clic_madera', -6, 0.8); vibrar(10);
+  const a = VARILLA_ROLLO, b = FICHA_SUELO;
+  animar(0.55, k => {
+    // cae (con un poco de impulso del vaivén), da un bote y rueda un poco
+    if (k < 0.7) { const q = k / 0.7; fichaCae.x = mezclar(a.x, b.x + 6, q); fichaCae.y = a.y + (b.y - a.y) * q * q; fichaCae.ang = q * 4.2; }
+    else { const q = (k - 0.7) / 0.3; fichaCae.x = mezclar(b.x + 6, b.x, q); fichaCae.y = b.y - Math.sin(q * Math.PI) * 9; fichaCae.ang = 4.2 + q * 2.08; }
+  }, () => {
+    n3.ficha = 'suelo'; fichaCae.x = b.x; fichaCae.y = b.y; fichaCae.ang = 2 * Math.PI;
+    sentir('tope', { db: -2, tono: 1.4 }); sonar('clac', -12, 1.4);
+    polvareda(b.x, b.y + 2);
+    mirarA(b, 2.5);
+    mensaje('De la varilla del rollo cae algo pequeño al tatami: una ficha de shōgi.', 4);
+  });
+  setTimeoutReloj(0.38, () => sentir('tope', { db: -8, tono: 1.6, sinVibrar: true }));
+}
+function cogerFicha() {
+  const n3 = estado.n3;
+  if (n3.ficha !== 'suelo') return;
+  n3.ficha = 'mano';
+  sonar('recoger', -3, 1.1);
+  alInventario('ficha', 'ficha_suelo', 'sala', FICHA_SUELO);
+  mensaje(primeraVez('ficha') ? 'Una ficha de shōgi: un peón, 歩. Tócala dos veces en la bandeja para mirarla.' : 'La ficha de shōgi.', 4.5);
+}
+// darle la vuelta a la ficha, en la mano (examinar): en el shōgi, una pieza que corona se vuelve del revés
+const fichaGiro = { giro: 0, objetivo: 0, inicio: null };
+function voltearFicha(sentido = 1) {
+  if (Math.abs(fichaGiro.objetivo - fichaGiro.giro) > 0.01) return;      // ya está girando
+  fichaGiro.objetivo = fichaGiro.giro + Math.PI * sentido;
+  sonar('deslizar_madera', -14, 1.6); vibrar(8);
+}
+function dibujarFichaEnMano(dt) {
+  const n3 = estado.n3;
+  const c = el.bolsillo.getContext('2d'), W = el.bolsillo.width;
+  const antes = fichaGiro.giro;
+  fichaGiro.giro += (fichaGiro.objetivo - fichaGiro.giro) * (1 - Math.exp(-dt * 9));
+  if (Math.abs(fichaGiro.objetivo - fichaGiro.giro) < 0.004) fichaGiro.giro = fichaGiro.objetivo;
+  // al pasar de canto, cambia la cara que se ve
+  const vueltas = g => Math.round(g / Math.PI);
+  if (vueltas(antes) !== vueltas(fichaGiro.giro)) {
+    ponerCaraFicha(n3.fichaCara === 'promovida' ? 'peon' : 'promovida');
+    el.examinarTexto.textContent = OBJETOS.ficha.texto;
+    sentir('tope', { db: -10, tono: 1.8, sinVibrar: true });
+    if (n3.fichaCara === 'promovida' && primeraVez('coronada')) el.examinarAyuda.textContent = 'Coronada. Toca fuera para guardarla';
+  }
+  const cara = img.ficha, s = Math.cos(fichaGiro.giro - vueltas(fichaGiro.giro) * Math.PI);
+  c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, W, W);
+  c.save(); c.translate(W / 2, W / 2); c.scale(Math.max(0.04, Math.abs(s)), 1);
+  c.shadowColor = 'rgba(0, 0, 0, 0.6)'; c.shadowBlur = W * 0.04; c.shadowOffsetY = W * 0.025;
+  const h = W * 0.78, w = h * cara.width / cara.height;
+  c.drawImage(cara, -w / 2, -h / 2, w, h);
+  c.restore();
+}
+// la ficha en su hueco de la espalda: solo encaja coronada
+async function ponerFicha(desde) {
+  const n3 = estado.n3;
+  estado.ocupado = true;
+  if (estado.vista !== 'caja') { irA('caja', 0.8); await esperar(0.6); }
+  if (caraVisible() !== 'detras') { tec.girar(); await esperar(0.9); }
+  await desdeInventario('ficha', 'ficha', HUECO_FICHA, 'caja_detras', desde);
+  if (n3.fichaCara !== 'promovida') {
+    // entra, pero el hueco la devuelve: madera contra madera, sin que la caja haga nada
+    sentir('tope', { db: -2, tono: 1.2 }); await esperar(0.25); sentir('trabado', { db: -4 });
+    bocanada(HUECO_FICHA.x, HUECO_FICHA.y - 20, 0, -1, 0.6, 'caja_detras');
+    await alInventario('ficha', 'ficha', 'caja_detras', HUECO_FICHA);
+    estado.ocupado = false;
+    const n = insistir('hueco-ficha');
+    mensaje(n === 1 ? 'Entra, pero el hueco la devuelve. Por esa cara, no.' : n === 2 ? 'En el rollo, la ficha era roja.' : 'Dale la vuelta: tócala dos veces en la bandeja y deslízala de lado.', 4);
+    return;
+  }
+  n3.ficha = 'puesta';
+  sentir('clac'); await esperar(0.35);
+  sentir('pestillo'); await esperar(0.3);
+  sentir('mecanismo'); sacudir(2, 0.25);
+  bocanada(860, 478, 0.2, -1, 1, 'caja_detras');
+  n3.largo = 'suelto';
+  irA('largo', 0.9);
+  setTimeoutReloj(0.5, () => { cajonAnim.largo.objetivo = 0.12; cajonAnim.largo.v = 2.2; });
+  estado.ocupado = false;
+  mensaje('Encaja. Dentro corre un pestillo largo: el cajón de abajo se ha soltado.', 4.5);
+}
+function tocarHuecoFicha() {
+  const n3 = estado.n3;
+  if (n3 && n3.ficha === 'puesta') { mensaje('La ficha coronada, en su hueco. Encaja justa.'); return; }
+  if (n3 && n3.ficha === 'mano') { mensaje('Un hueco con forma de ficha de shōgi. Elige la ficha en la bandeja y toca el hueco.'); return; }
+  mensaje('Un hueco con forma de ficha de shōgi. Falta la ficha.');
+}
+// ---- el cajón largo de la espalda ----
+function tocarLargo(p = {}) {
+  const n3 = estado.n3;
+  if (estado.nivel !== 3 || !n3 || n3.largo === 'cerrado') {
+    const texto = estado.nivel === 3 ? 'Cerrado. Dentro se oye un pestillo largo, que va hasta el hueco de la ficha.' : 'Tiene cerradura, pero no es la de la llave de bambú.';
+    cajonCerrado('largo', 860, 478, 0.2, -1, texto, 'caja_detras');
+    return;
+  }
+  const a = cajonAnim.largo;
+  // suelto o abierto, la cámara se acerca a él y se queda allí (como en el costado)
+  if (estado.vista !== 'largo') { irA('largo', 0.85); return; }
+  if (n3.largo === 'suelto') {
+    a.v += 1.6;
+    sentir('holgura', { tono: 1.05 });
+    mensaje(primeraVez('tirar-largo') ? 'Se ha soltado. Tira de él hacia fuera: arrastra el dedo.' : 'Tira de él.');
+    return;
+  }
+  if (n3.campanilla === 'cajon' && (p.largo === 'campanilla' || a.k > 0.7)) { cogerCampanilla(); return; }
+  mensaje(n3.campanilla === 'cajon' ? 'Dentro, algo de bronce.' : 'Vacío. Huele a bronce viejo.');
+}
+function abrirLargo() {
+  const n3 = estado.n3, a = cajonAnim.largo;
+  n3.largo = 'abierto';
+  a.objetivo = 1;
+  sonar('cajon', -4, 0.85); vibrar(15);
+  setTimeoutReloj(0.3, () => polvoDeCajon(860, 500));
+  if (n3.campanilla === 'cajon') {
+    setTimeoutReloj(0.35, () => mensaje('Dentro del cajón largo, una campanilla de bronce. No tiene badajo.', 4));
+    if (tec.inclinar) setTimeoutReloj(0.25, () => tec.inclinar(0, 0.4));
+  }
+}
+function cogerCampanilla() {
+  const n3 = estado.n3;
+  n3.campanilla = 'mano';
+  const v = tec.puntoCampanillaLargo ? tec.puntoCampanillaLargo() : null, m = v ? tec.ancla(v) : null;
+  sonar('recoger', -2, 0.95); sonar('campanilla_muda', -10);
+  alInventario('campanilla', 'campanilla', 'caja_detras', m && m.visible ? { x: m.x, y: m.y, k: 1.4, enPantalla: true } : { x: 860, y: 510 });
+  mensaje(primeraVez('campanilla') ? 'Una campanilla de bronce, pequeña y pesada. Sin badajo, no suena: es la voz dormida.' : 'La campanilla.', 4.5);
+}
+// ---- la tetera y el badajo ----
+const teteraInclinada = () => tetera3.inclinacion > 0.02;
+// mientras se vuelca: el chorro sale cuando está bastante inclinada; con el té cae el badajo
+function actualizarTetera3(dt) {
+  const n3 = estado.n3;
+  const vierte = tetera3.inclinacion > 0.62;
+  tetera3.chorro = mezclar(tetera3.chorro, vierte ? 1 : 0, 1 - Math.exp(-dt * (vierte ? 10 : 6)));
+  if (!vierte) return;
+  if (reloj > tetera3.sonandoHasta) { sonar('vertido', -6, azar(0.95, 1.05)); tetera3.sonandoHasta = reloj + 1.35; }
+  tetera3.vertido += dt;
+  if (Math.random() < dt * 8) ondas.push({ i: 0, t: 0, f: 0.5 });
+  if (n3 && n3.badajo === 'tetera' && tetera3.vertido > 1) caerBadajo();
+}
+function caerBadajo() {
+  const n3 = estado.n3;
+  n3.badajo = 'taza';
+  setTimeoutReloj(0.12, () => { sonar('tin', -2); vibrar([12, 30, 8]); agitarTe(1); });
+  mirarA(TAZAS[0], 2);
+  mensaje('Con el té cae algo pequeño en la taza: tin.', 3.5);
+}
+function tocarTazas(p) {
+  const n3 = estado.n3;
+  if (estado.nivel === 3 && n3) {
+    if (n3.badajo === 'taza' && p && Math.hypot(p.x - TAZAS[0].x, p.y - TAZAS[0].y) < 60) { cogerBadajo(); return; }
+    if (estado.vista !== 'te' && tec.inclinarTetera) { irA('te', 0.85); return; }
+  }
+  agitarTe(0.8);
+  mensaje(estado.nivel === 3 && n3 && n3.badajo !== 'tetera' ? 'Té tibio. Lo bebió la caja, o nadie.' : 'Dos tazas servidas. Nadie vino a beberlas.');
+}
+function cogerBadajo() {
+  const n3 = estado.n3;
+  n3.badajo = 'mano';
+  agitarTe(0.6);
+  sonar('recoger', -3, 1.3);
+  alInventario('badajo', 'badajo', 'te', { x: TAZAS[0].x + 4, y: TAZAS[0].y - 8 });
+  mensaje('Un badajo de bronce, mojado de té. La lengua de una campanilla.', 4);
+}
+// ---- juntar el badajo y la campanilla (en la bandeja) ----
+const COMBINACIONES = [['badajo', 'campanilla']];
+const combinan = (a, b) => COMBINACIONES.some(([x, y]) => (a === x && b === y) || (a === y && b === x));
+function combinar(a, b) {
+  if (!combinan(a, b)) { sonar('trabado', -10, 1.3); mensaje('No encajan.'); return; }
+  const n3 = estado.n3;
+  n3.badajo = 'puesto'; n3.completa = true;
+  estado.inventario = estado.inventario.filter(o => o !== 'badajo');
+  if (estado.seleccion === 'badajo') estado.seleccion = null;
+  ponerCampanillaCompleta(true);
+  sentir('clac', { tono: 1.25 });
+  setTimeoutReloj(0.35, () => sonar('campanilla', -5));
+  const h = huecoDe('campanilla');
+  if (h) { h.classList.remove('llega'); void h.offsetWidth; h.classList.add('llega'); }
+  mensaje('El badajo encaja dentro de la campanilla. Ya tiene lengua: suena clara.', 4);
+}
+// ---- la campanilla: suena; la caja solo contesta mientras suelta el aire ----
+function usarCampanilla(p, desde) {
+  const n3 = estado.n3;
+  const delante = p && p.cara !== 'detras' && !p.hija;
+  if (!n3.completa) {
+    sonar('campanilla_muda', -6); vibrar(8);
+    mensaje(primeraVez('muda') ? 'Sin badajo no suena: solo roza el bronce.' : 'Sin badajo, muda.');
+    return;
+  }
+  if (delante && n3.labios >= 1 && dentro(['elipse', BOCA.x, BOCA.y, 56, 30], p)) { ponerCampanilla(desde); return; }
+  if (!delante || !dentro(['poli', CAJA], p)) {
+    sonar('campanilla', -8);
+    if (p && p.cara === 'frente') mirarA(p, 1.5);
+    mensaje(primeraVez('campanilla-fuera') ? 'Suena clara. La caja vuelve un poco el ojo hacia el sonido.' : 'Suena clara.');
+    return;
+  }
+  if (n3.labios >= 1) { sonar('campanilla', -8); mensaje('Ya ha abierto la boca: dale la campanilla.'); return; }
+  tocarCampanillaACaja();
+}
+function tocarCampanillaACaja() {
+  const n3 = estado.n3;
+  sonar('campanilla', -4); vibrar(12);
+  if (exhalando()) {
+    const n = ++n3.toques;
+    setTimeoutReloj(0.55, () => {
+      sonar('tarareo', -6 + n, 0.94 + 0.05 * n);
+      bocanada(BOCA.x, BOCA.y + 10, 0, -1, 0.3 + 0.2 * n);
+      labiosTiemblan = reloj + 1.4;
+    });
+    if (n >= 3) setTimeoutReloj(1.7, abrirLabios);
+    else mensaje(n === 1 ? 'Mientras suelta el aire, la caja contesta: un murmullo, con la boca cerrada.' : 'Otro murmullo, más hondo. Los labios tiemblan.', 4);
+  } else {
+    contenerAliento(1.6); entornar(1.2);
+    if (n3.toques > 0) n3.toques--;
+    mensaje(primeraVez('campanilla-dentro') ? 'Estaba tomando aire: lo contiene, y no contesta.' : 'Lo contiene. No contesta.', 3.5);
+  }
+}
+async function abrirLabios() {
+  const n3 = estado.n3;
+  estado.ocupado = true;
+  if (estado.vista !== 'cara') { irA('cara', 0.9); await esperar(0.8); }
+  sonar('suspiro', -6, 0.85); sentir('mecanismo', { db: -6 });
+  await animarPromesa(1.4, k => { n3.labios = suave(k); });
+  vaho();
+  estado.ocupado = false;
+  mensaje('Al tercer murmullo, los labios se entreabren. Dentro hay un hueco oscuro, del tamaño de la campanilla.', 5);
+}
+async function ponerCampanilla(desde) {
+  const n3 = estado.n3;
+  estado.ocupado = true;
+  if (estado.seleccion === 'campanilla') { estado.seleccion = null; pintarInventario(); }
+  if (estado.vista !== 'cara') { irA('cara', 0.9); await esperar(0.7); }
+  mirarA(BOCA, 3);
+  await desdeInventario('campanilla', 'campanilla', BOCA, 'caja', desde);
+  n3.campanilla = 'puesta';
+  sonar('encajar', -2); sentir('desbloqueo', { db: -4 }); sacudir(3, 0.3);
+  destello(BOCA.x, BOCA.y, 90, '255,215,150', 0.7, 1.6);
+  contenerAliento(1.8);
+  await esperar(1.3);
+  // canta: cierra un poco los ojos, respira hondo y suena su voz
+  animar(0.5, k => { ojo.parpadoBase = 0.62 * suave(k); ojo2.parpadoBase = 0.62 * suave(k); });
+  sonar('canto', -2);
+  for (let i = 0; i < 6; i++) setTimeoutReloj(0.3 + i * 1.05, () => bocanada(BOCA.x + azar(-8, 8), BOCA.y + 8, azar(-0.3, 0.3), -1, 0.6));
+  destello(BOCA.x, BOCA.y, 150, '255,210,140', 0.5, 6.5);
+  agitarLampara(2, 0.4);
+  await esperar(6.6);
+  animar(0.6, k => { ojo.parpadoBase = 0.62 * (1 - salida(k)); ojo2.parpadoBase = 0.62 * (1 - salida(k)); });
+  await esperar(1.2);
+  estado.ocupado = false;
+  terminarNivel(3);
+}
+// lo que se dibuja encima de la escena en el nivel 3 (B): el papel entre los labios, los labios, la campanilla en la
+// boca, la ficha que cae y en el tatami, el badajo en la taza, el chorro de té, las tintas y la luz fría
+function dibujarNivel3Encima(conAncla) {
+  const n3 = estado.n3;
+  if (!n3) return;
+  const deFrente = tec.cara() === 'frente';
+  dibujarTintas(conAncla);
+  if (deFrente && n3.nota === 'boca' && notaSale > 0.01) conAncla(BOCA.x, BOCA.y, 'caja', () => {
+    // un papel doblado que asoma entre los labios, torcido, con su doblez y un sello rojo
+    ctx.save(); ctx.translate(BOCA.x - 6, BOCA.y + 1); ctx.rotate(BOCA.ang + 0.22);
+    const sale = 4 + 10 * notaSale;
+    ctx.fillStyle = 'rgba(30, 16, 8, 0.3)';
+    ctx.beginPath(); ctx.moveTo(-11, 1.5); ctx.lineTo(12, 1.5); ctx.lineTo(10, sale + 1.5); ctx.lineTo(-13, sale + 1.5); ctx.closePath(); ctx.fill();
+    const g = ctx.createLinearGradient(0, 0, 0, sale); g.addColorStop(0, '#bfae8c'); g.addColorStop(0.35, '#e6d8bb'); g.addColorStop(1, '#f1e6cd');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.moveTo(-12, 0); ctx.lineTo(11, 0); ctx.lineTo(9, sale); ctx.lineTo(-14, sale); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(40, 24, 12, 0.75)'; ctx.lineWidth = 0.7; ctx.stroke();
+    ctx.strokeStyle = 'rgba(120, 96, 64, 0.6)'; ctx.beginPath(); ctx.moveTo(-1, 0); ctx.lineTo(-3, sale); ctx.stroke();
+    if (sale > 8) { ctx.fillStyle = 'rgba(184, 68, 45, 0.85)'; ctx.beginPath(); ctx.arc(5, sale - 3.5, 1.8, 0, Math.PI * 2); ctx.fill(); }
+    ctx.restore();
+  });
+  if (deFrente && (n3.labios > 0.01 || reloj < labiosTiemblan)) conAncla(BOCA.x, BOCA.y, 'caja', () => {
+    const tiembla = reloj < labiosTiemblan ? 0.9 * Math.abs(Math.sin(reloj * 31)) * (labiosTiemblan - reloj) : 0;
+    const h = 6.5 * n3.labios + tiembla;
+    if (h < 0.15) return;
+    ctx.save(); ctx.translate(BOCA.x, BOCA.y); ctx.rotate(BOCA.ang);
+    const w = BOCA.ancho / 2 * 0.84;
+    ctx.beginPath(); ctx.moveTo(-w, 0); ctx.quadraticCurveTo(0, -h * 0.9, w, 0); ctx.quadraticCurveTo(0, h * 1.25, -w, 0); ctx.closePath();
+    const g = ctx.createRadialGradient(0, 0, 1, 0, 0, w);
+    g.addColorStop(0, 'rgba(8, 3, 2, 0.95)'); g.addColorStop(1, 'rgba(40, 16, 8, 0.85)');
+    ctx.fillStyle = g; ctx.fill();
+    // la campanilla, dentro
+    if (n3.campanilla === 'puesta') {
+      ctx.clip();
+      const c = img.campanilla_completa, ch = 30, cw = ch * c.width / c.height;
+      ctx.drawImage(c, -cw / 2, -ch * 0.62, cw, ch);
+    }
+    ctx.restore();
+  });
+  if (n3.ficha === 'cayendo' || n3.ficha === 'suelo') conAncla(fichaCae.x, fichaCae.y, 'sala', () => {
+    const d = datos.capas.ficha_suelo;
+    ctx.save(); ctx.translate(fichaCae.x, fichaCae.y);
+    ctx.fillStyle = 'rgba(20, 10, 4, 0.3)'; ctx.beginPath(); ctx.ellipse(1, d.h * 0.42, d.w * 0.55, 3, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.rotate(fichaCae.ang);
+    ctx.drawImage(img.ficha_suelo, -d.w / 2, -d.h / 2, d.w, d.h);
+    ctx.restore();
+  });
+  if (n3.badajo === 'taza') conAncla(TAZAS[0].x, TAZAS[0].y, 'te', () => {
+    ctx.save(); ctx.translate(TAZAS[0].x + 5, TAZAS[0].y - 4); ctx.rotate(0.55);
+    ctx.drawImage(img.badajo, -6, -16, 12, 18);
+    ctx.restore();
+  });
+  if (tetera3.chorro > 0.02) {
+    const a = tec.ancla(PICO_TETERA, 'tetera'), b = tec.ancla({ x: TAZAS[0].x, y: TAZAS[0].y - 2 }, 'te');
+    if (a && b && a.visible && b.visible) {
+      ctx.setTransform(ppp, 0, 0, ppp, 0, 0);
+      ctx.strokeStyle = `rgba(150, 112, 44, ${0.85 * tetera3.chorro})`; ctx.lineCap = 'round';
+      ctx.lineWidth = Math.max(1.2, 3.2 * a.k * tetera3.chorro);
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.quadraticCurveTo(a.x - 6 * a.k, (a.y + b.y) / 2, b.x, b.y); ctx.stroke();
+      ctx.strokeStyle = `rgba(255, 230, 170, ${0.35 * tetera3.chorro})`; ctx.lineWidth = Math.max(0.6, 1 * a.k);
+      ctx.stroke();
+    }
+  }
+}
+// las pistas del nivel 3, de vagas a claras
+function pistaNivel3() {
+  const n3 = estado.n3;
+  const escalon = (clave, lista) => {
+    const n = estado.pistasPaso[clave] = (estado.pistasPaso[clave] || 0) + 1;
+    return mensaje(lista[Math.min(n, lista.length) - 1], 4.5);
+  };
+  if (!n3) return mensaje('Mira.');
+  if (n3.nota === 'boca') return escalon('nota', ['Entre los labios de la caja asoma algo.', 'Un papel. Tócalo.']);
+  if (n3.ficha === 'rollo') {
+    if (!n3.tintas.rollo) return escalon('luz', ['El ojo nuevo da una luz fría. Lo que alumbra se ve distinto.',
+      'No te mira: si pones el dedo a un lado de su cara, la luz se va al otro.', 'Deja el dedo quieto en la tetera: la luz irá al rollo colgado.']);
+    return escalon('rollo', ['La tinta del rollo señala abajo, a la varilla.', 'Algo suelto suena dentro de la varilla.',
+      'Mécelo fuerte: tócalo varias veces seguidas.']);
+  }
+  if (n3.ficha === 'cayendo' || n3.ficha === 'suelo') return escalon('suelo', ['La ficha cayó al tatami, bajo el rollo.', 'Tócala para cogerla.']);
+  if (n3.ficha === 'mano') {
+    if (n3.fichaCara !== 'promovida') return escalon('coronar', ['¿Dónde encaja una ficha de shōgi?', 'En la espalda de la caja hay un hueco con su forma… pero la ficha del rollo era roja.',
+      'Dale la vuelta: tócala dos veces en la bandeja y deslízala de lado.']);
+    return escalon('hueco', ['En la espalda hay un hueco con forma de ficha.', 'Gira la caja, elige la ficha y toca el hueco.']);
+  }
+  if (n3.largo === 'suelto') return escalon('largo', ['El cajón largo de la espalda se ha soltado.', 'Tira de él hacia fuera con el dedo.']);
+  if (n3.campanilla === 'cajon') return escalon('campanilla', ['Dentro del cajón largo hay algo de bronce.', 'Tócalo para cogerlo.']);
+  if (n3.badajo === 'tetera') {
+    if (!n3.tintas.te) return escalon('te-luz', ['A la campanilla le falta la lengua: el badajo.', 'La luz fría encontrará tinta en la madera, junto a la tetera.',
+      'Deja el dedo quieto junto a la lámpara: la luz irá a la madera de la derecha.']);
+    return escalon('tetera', ['¿Qué tintinea en esta sala cuando nadie lo toca?', 'La tetera. Acércate (tócala).', 'Vuélcala sobre la taza: arrastra hacia abajo y no sueltes hasta que caiga el té.']);
+  }
+  if (n3.badajo === 'taza') return escalon('taza', ['Algo cayó en la taza.', 'Tócala para sacarlo.']);
+  if (!n3.completa) return escalon('juntar', ['El badajo va dentro de la campanilla.', 'En la bandeja, arrastra el badajo encima de la campanilla.']);
+  if (n3.labios < 1) {
+    if (!n3.tintas.suelo) return escalon('suelo-luz', ['La caja escucha la campanilla, pero no siempre contesta.', 'Queda tinta en el tatami. Llévale la luz.',
+      'Deja el dedo quieto en la ventana de la derecha: la luz irá al tatami.']);
+    return escalon('aliento', ['La tinta del tatami: sube, se queda, baja. La campanilla está en el que baja.',
+      'Mira el humo del incienso: va hacia la caja cuando toma aire y se aparta cuando lo suelta.',
+      'Toca la caja con la campanilla mientras suelta el aire (cuando se encoge). Tres veces.']);
+  }
+  return escalon('boca', ['Los labios se han abierto.', 'Pon la campanilla en la boca.']);
+}
+
+// ---------------------------------------------------------------------------------------------
 // Usar lo que llevas
 // ---------------------------------------------------------------------------------------------
 // un toque elige el objeto; otro toque sobre el elegido lo examina
 function seleccionar(objeto) {
   if (estado.seleccion === objeto) { estado.seleccion = null; pintarInventario(); examinar(objeto); return; }
+  // con otro objeto elegido, si encajan, se juntan (el badajo en la campanilla)
+  if (estado.seleccion && combinan(estado.seleccion, objeto)) {
+    const otro = estado.seleccion; estado.seleccion = null; pintarInventario(); combinar(otro, objeto); return;
+  }
   estado.seleccion = objeto;
   pintarInventario();
   mostrarEtiqueta(objeto);
   sonar('toque', -12, 1.2);
+  const n3 = estado.n3;
   const textos = { llave: 'La llave de bambú. ¿Dónde la usas?', cuerno: 'El cuerno de marfil. ¿Dónde va?', nota: 'La nota. Tócala otra vez para leerla.',
-    cajita: 'La cajita roja. Tócala otra vez para mirarla de cerca.', ojo: 'El ojo de piedra de luna. ¿Dónde va?' };
+    cajita: 'La cajita roja. Tócala otra vez para mirarla de cerca.', ojo: 'El ojo de piedra de luna. ¿Dónde va?',
+    ficha: 'La ficha de shōgi. Tócala otra vez para mirarla de cerca.',
+    campanilla: n3 && n3.completa ? 'La campanilla. Toca donde quieras hacerla sonar.' : 'La campanilla, sin badajo. Tócala otra vez para mirarla.',
+    badajo: 'El badajo. ¿Dónde va?' };
   mensaje(textos[objeto], 2.4);
 }
 function usarObjeto(objeto, p, desde = null) {
@@ -2559,11 +3259,17 @@ function usarObjeto(objeto, p, desde = null) {
   if (objeto === 'cuerno' && deFrente && dentro(['elipse', 912, 291, 40, 40], p)) { deseleccionar(); ponerCuerno(desde); return; }
   if (objeto === 'ojo' && deFrente && !p.hija && dentro(['elipse', CUENCA.x, CUENCA.y, 42, 28], p)) { deseleccionar(); ponerOjo(desde); return; }
   if (objeto === 'cajita') { deseleccionar(); sonar('trabado', -10, 1.3); mensaje('Primero habría que abrirla. Tócala dos veces en la bandeja para mirarla de cerca.'); return; }
+  // nivel 3
+  if (objeto === 'ficha' && p && p.cara === 'detras' && dentro(['rect', 805, 318, 888, 418], p)) { deseleccionar(); ponerFicha(desde); return; }
+  if (objeto === 'campanilla' && estado.n3) { deseleccionar(); usarCampanilla(p, desde); return; }
+  if (objeto === 'badajo' && p && p.cara !== 'detras' && dentro(['poli', CAJA], p)) { deseleccionar(); sonar('trabado', -8, 1.2); mensaje('El badajo solo, no. Va dentro de algo.'); return; }
   deseleccionar();
   sonar('trabado', -8, 1.2);
   const enCaja = p && (p.cara === 'detras' || dentro(['poli', CAJA], p));
   if (objeto === 'llave') mensaje(p && p.cara === 'detras' && dentro(['rect', 715, 474, 990, 558], p) ? 'No es esta llave: es demasiado pequeña.' : enCaja ? 'La llave no entra en la caja.' : 'La llave no entra ahí.');
   else if (objeto === 'ojo') mensaje(enCaja ? 'Ahí no encaja. ¿Dónde le falta un ojo a la cara?' : 'Ahí no encaja.');
+  else if (objeto === 'ficha') mensaje(enCaja ? 'Ahí no encaja. ¿Dónde hay un hueco con su forma?' : 'Ahí no encaja.');
+  else if (objeto === 'badajo') mensaje('Ahí no. ¿De qué es la lengua?');
   else mensaje(enCaja ? 'Ahí no encaja. ¿Dónde le falta un cuerno?' : 'Ahí no encaja.');
 }
 
@@ -2726,7 +3432,6 @@ function terminarNivel(n) {
   el.volver.hidden = true;
   guardarProgreso(n);
   const nivel = NIVELES[n], siguiente = NIVELES[n + 1];
-  el.tarjetaHecho.textContent = `Nivel ${n} superado`;
   el.tarjetaTitulo.textContent = nivel.titulo;
   el.tarjetaTexto.textContent = nivel.texto;
   for (const pieza of el.tarjeta.querySelectorAll('.pieza')) {
@@ -2734,13 +3439,15 @@ function terminarNivel(n) {
     pieza.classList.toggle('recuperada', i <= n);
     pieza.classList.toggle('nueva', i === n);
   }
-  el.tarjeta.querySelector('.marcador').setAttribute('aria-label', `La cara: ${n} de 3 piezas`);
-  const puede = n === 1 && hay3D();
-  el.tarjetaSiguiente.textContent = n === 1
-    ? (puede ? `Nivel 2 · ${siguiente.titulo}` : 'El nivel 2 necesita la escena 3D, y este móvil no puede abrirla.')
-    : `Nivel ${n + 1} · ${siguiente.titulo}: llega en la próxima entrega.`;
+  el.tarjeta.querySelector('.marcador').setAttribute('aria-label', `La cara: ${Math.min(n, 3)} de 3 piezas`);
+  const puede = n < ULTIMO_NIVEL && hay3D();
+  el.tarjetaHecho.textContent = `${nombreNivel(n)} superado`;
+  el.tarjetaSiguiente.textContent = n >= ULTIMO_NIVEL ? 'Fin.'
+    : puede ? `${nombreNivel(n + 1)} · ${siguiente.titulo}`
+      : `${nombreNivel(n + 1)} necesita la escena 3D, y este móvil no puede abrirla.`;
   el.seguir.hidden = !puede;
-  el.quedarse.hidden = n < 2;
+  // quedarse en la sala: al final (o si este móvil no puede seguir), para mirar la caja con calma
+  el.quedarse.hidden = puede;
   el.tarjeta.hidden = false;
   requestAnimationFrame(() => el.tarjeta.classList.remove('oculta'));
   sonar('papel', -10, 0.9);
@@ -2809,6 +3516,8 @@ function actualizar(dt) {
   actualizarCajones(dt);
   if (puntero && puntero.gesto) actualizarGesto(puntero.gesto, dt);
   actualizarHolguraHija();
+  actualizarNivel3(dt);
+  actualizarTetera3(dt);
   actualizarOjo(dt);
   actualizarOjo2(dt);
   actualizarAliento(dt);
@@ -2848,7 +3557,7 @@ function cuadro(ahora) {
 // ---------------------------------------------------------------------------------------------
 const punteros = new Map();
 let puntero = null, arrastre = null, pellizco = null;
-const VISTA_PADRE = { cajones: 'caja', cara: 'caja', incensario: 'sala', caja: 'sala', hija: 'caja' };
+const VISTA_PADRE = { cajones: 'caja', cara: 'caja', incensario: 'sala', caja: 'sala', hija: 'caja', te: 'sala', largo: 'caja' };
 function posicion(e) { const r = lienzo.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
 lienzo.addEventListener('pointerdown', e => {
   desbloquearAudio();
@@ -2870,7 +3579,7 @@ lienzo.addEventListener('pointerdown', e => {
   puntero = { ...q, x0: q.x, y0: q.y, inicio: performance.now(), id: e.pointerId, movido: 0, gesto: gestoEn(p, q),
     enCaja: (v === 'sala' || v === 'caja') && !hijaEnMesa() && !!(p && (p.cara === 'detras' || p.cajon || dentro(['poli', CAJA], p))),
     enHija: hijaEnMesa() && v === 'hija' };
-  if (estado.fase === 'jugando' && p && p.cara === 'frente') mirarA(p);
+  if (estado.fase === 'jugando' && p && p.cara === 'frente') { mirarA(p); guiarLuz(p); }
 });
 lienzo.addEventListener('pointermove', e => {
   const q = posicion(e);
@@ -2879,7 +3588,7 @@ lienzo.addEventListener('pointermove', e => {
   if ((e.pointerType === 'mouse' || puntero) && estado.fase === 'jugando') {
     const p = tec.aPintura(q.x, q.y);
     moverDedo(p);
-    if (p && p.cara === 'frente') mirarA(p);
+    if (p && p.cara === 'frente') { mirarA(p); if (puntero) guiarLuz(p); }
   }
   if (!puntero || e.pointerId !== puntero.id) return;
   const dx = q.x - puntero.x, dy = q.y - puntero.y;
@@ -2988,6 +3697,11 @@ function gestoEn(p, q) {
   }
   if (!p) return null;
   if (p.cajon && v === 'cajones') return { tipo: 'cajon', id: p.cajon };
+  // nivel 3: el cajón largo de la espalda (suelto o abierto) se tira; la tetera, de cerca, se vuelca
+  if (estado.nivel === 3 && estado.n3) {
+    if (p.cara === 'detras' && (p.largo || dentro(LARGO, p)) && estado.n3.largo !== 'cerrado' && v !== 'sala') return { tipo: 'largo' };
+    if (v === 'te' && tec.inclinarTetera && p.cara === 'frente' && dentro(['rect', 1196, 466, 1376, 632], p)) return { tipo: 'tetera' };
+  }
   if (p.hija && v === 'hija' && hijaEnMesa()) {
     if (p.hija === 'tablilla') return { tipo: 'tablilla', i: p.tablilla };
     if (p.hija === 'cajon') return { tipo: 'cajoncito' };
@@ -3017,6 +3731,21 @@ function empezarGesto(g, dx, dy) {
       g.asentado = a.k < 0.02;              // cerrado, está asentado: cede tras un poco de tirón
       a.agarrado = true; a.v = 0;
       if (!g.asentado) sentir('roce', { tono: 1.05 });
+      break;
+    }
+    case 'largo': {
+      const a = cajonAnim.largo;
+      g.eje = tec.pantallaLargo ? { a: tec.pantallaLargo(0), b: tec.pantallaLargo(1) } : null;
+      if (!g.eje || !g.eje.a || !g.eje.b) return false;
+      g.k0 = a.k; g.kAntes = a.k; g.t = performance.now();
+      a.agarrado = true; a.v = 0;
+      sentir('roce', { tono: 0.9 });
+      break;
+    }
+    case 'tetera': {
+      if (dy < -Math.abs(dx) * 0.5) return false;             // hacia arriba no se vuelca
+      g.objetivo = tetera3.inclinacion; g.t = performance.now();
+      sentir('roce', { tono: 1.7, db: -4 });
       break;
     }
     case 'tablilla': case 'cajoncito': {
@@ -3090,6 +3819,18 @@ function moverGesto(g, q) {
       g.kAntes = k;
       break;
     }
+    case 'largo': {
+      const a = cajonAnim.largo, k = limitar(g.k0 + avanceEnEje(g.eje, dx, dy), 0, 1.04);
+      a.v = mezclar(a.v, (k - a.k) / paso, 0.5); a.k = k; g.t = ahora;
+      if (k >= 1 && g.kAntes < 1) sentir('tope', { db: -4, tono: 0.95 });
+      g.kAntes = k;
+      break;
+    }
+    case 'tetera': {
+      // se vuelca hacia la taza: arrastrando hacia abajo (o hacia abajo y a la izquierda, hacia el pico)
+      g.objetivo = limitar((dy - dx * 0.6) / 110, 0, 1);
+      break;
+    }
     case 'tablilla': case 'cajoncito': {
       let avance = avanceEnEje(g.eje, dx, dy);
       if (g.asentado && avance >= 0.07) { g.asentado = false; sentir('holgura', { tono: 1.15 }); sentir('roce', { tono: 1.6, db: 2 }); }
@@ -3141,6 +3882,12 @@ function actualizarGesto(g, dt) {
   if (g.estado !== 'activo') return;
   const seguir = rapidez => 1 - Math.exp(-dt * rapidez);
   switch (g.tipo) {
+    case 'tetera': {
+      // pesa: va detrás del dedo, despacio
+      tetera3.inclinacion += (g.objetivo - tetera3.inclinacion) * seguir(5);
+      if (tec.inclinarTetera) tec.inclinarTetera(tetera3.inclinacion);
+      break;
+    }
     case 'tablilla': case 'cajoncito': {
       g.visto += (g.k - g.visto) * seguir(20);
       if (g.tipo === 'tablilla') tec.ponerTablilla(g.i, g.visto); else tec.ponerCajonHija(g.visto);
@@ -3185,6 +3932,24 @@ function soltarGesto(g, cancelado = false) {
       }
       break;
     }
+    case 'largo': {
+      const a = cajonAnim.largo, n3 = estado.n3;
+      a.agarrado = false;
+      const final = a.k + limitar(a.v, -6, 6) * 0.12;
+      if (!cancelado && final > 0.5) { if (n3.largo !== 'abierto') abrirLargo(); else a.objetivo = 1; }
+      else {
+        n3.largo = 'suelto'; a.objetivo = 0.12;
+        if (a.k > 0.2) a.v = Math.min(a.v, -1.2);
+      }
+      break;
+    }
+    case 'tetera': {
+      const i0 = tetera3.inclinacion;
+      animar(0.5, k => { tetera3.inclinacion = i0 * (1 - curva(k)); if (tec.inclinarTetera) tec.inclinarTetera(tetera3.inclinacion); },
+        () => { tetera3.inclinacion = 0; if (tec.inclinarTetera) tec.inclinarTetera(0); if (i0 > 0.1) sentir('tope', { db: -6, tono: 1.7 }); });
+      if (!cancelado && i0 < 0.4) mensaje(primeraVez('volcar') ? 'Pesa. Arrastra más hacia abajo, y aguanta, para volcarla.' : 'Más abajo.');
+      break;
+    }
     case 'tablilla': {
       const final = g.k + limitar(g.v, -6, 6) * 0.1;
       if (!cancelado && final > 0.55) correrTablilla(g.i, 0.22);
@@ -3221,7 +3986,7 @@ function girarCaja() {
   sonar('deslizar_madera', -10, 1.1);
   tec.girar();
   // desde la sala o desde el costado de los cajones, la cámara se aparta para ver la caja entera girar
-  if (estado.vista === 'sala' || estado.vista === 'cajones') irA('caja');
+  if (estado.vista === 'sala' || estado.vista === 'cajones' || estado.vista === 'largo' || estado.vista === 'cara') irA('caja');
   setTimeoutReloj(0.45, () => bocanada(EJE_CAJA, 600, 0, -1, 0.5));
 }
 
@@ -3260,6 +4025,9 @@ for (const hueco of huecosBandeja()) {
     if (a.fantasma) a.fantasma.remove();
     if (e.type === 'pointercancel' || a.examinado) return;
     if (!a.movido) { seleccionar(a.objeto); return; }
+    // soltado encima de otro objeto de la bandeja: se juntan (si encajan)
+    const bajo = document.elementFromPoint(e.clientX, e.clientY), otro = bajo && bajo.closest ? bajo.closest('.hueco') : null;
+    if (otro && otro !== hueco && otro.dataset.objeto) { if (estado.seleccion) { estado.seleccion = null; pintarInventario(); } combinar(a.objeto, otro.dataset.objeto); return; }
     const q = posicion(e); q.y -= 30;
     usarObjeto(a.objeto, tec.aPintura(q.x, q.y), q);
   };
@@ -3298,7 +4066,9 @@ function prepararTecnica(letra) {
       opciones3d = opciones3d || { lienzo3d, camaraBoceto, escena3d, img, datos, compuesto, planchas, dibujarOjo, vistas: VISTAS, ojo: () => ojo,
         cajones: cajonesDatos, CAJONES, cajonAbertura: id => cajonAnim[id].k,
         decoracion: { sombrasBambu, rollo, ROLLO, VENTANAS }, recortarTe, nivel2,
-        estado: () => estado, reloj: () => reloj, aliento: () => aliento.valor, despertar, alHornear,
+        recortarTetera: (l, dx = 0, dy = 0) => recortarTe(l, dx, dy, true),
+        // (en el nivel 3 respira más hondo: se ve cuándo suelta el aire)
+        estado: () => estado, reloj: () => reloj, aliento: () => aliento.valor * (estado.nivel === 3 ? 1.7 : 1), despertar, alHornear,
         tapa: () => tapaVuelo, conTapaEnMesa: () => estado.tapaEnMesa, llaveGirando: () => llaveGirando,
         sacudida: () => (reloj < sacudida.hasta ? sacudida.fuerza * (sacudida.hasta - reloj) : 0), quieto };
       tecnicas[letra] = await modulo3d.crearTecnica(letra, opciones3d);
@@ -3357,10 +4127,15 @@ async function entrar(nivel = 1) {
   tec.empezar ? tec.empezar(3.2) : tec.irA('sala', 3.2);
   el.volver.hidden = true;
   el.girar.hidden = false; el.inventario.hidden = false;
-  if (nivel === 2 && hay3D()) {
+  // seguir una partida (o «?nivel=N»): la caja como quedó al terminar el nivel anterior
+  if (nivel >= 2 && hay3D()) {
     estadoTrasNivel1();
+    if (nivel >= 3) estadoTrasNivel2();
+    if (nivel >= 4 && typeof estadoTrasNivel3 === 'function') estadoTrasNivel3();
     await esperar(1.2);
-    empezarNivel2();
+    if (nivel === 2) empezarNivel2();
+    else if (nivel === 3) empezarNivel3();
+    else if (typeof empezarFinal === 'function') empezarFinal();
     return;
   }
   lampara.proxima = reloj + 12;
@@ -3375,6 +4150,13 @@ async function entrar(nivel = 1) {
 }
 function reiniciar(nivel = 1) {
   estado = estadoInicial();
+  // lo del nivel 3: la luz, la tetera, el papel, los objetos y la nota del principio
+  luzFria.guiadaHasta = 0; luzFria.fuerza = 0; tetera3.inclinacion = 0; tetera3.vertido = 0; tetera3.chorro = 0;
+  if (tec && tec.inclinarTetera) tec.inclinarTetera(0);
+  notaSale = 0; labiosTiemblan = 0;
+  for (const t of Object.values(TINTAS)) { t.vis = 0; t.acum = 0; }
+  if (img.ficha_peon) { img.ficha = img.ficha_peon; OBJETOS.ficha.icono = OBJETOS.ficha.iconoPeon; ponerCampanillaCompleta(false); }
+  ponerTextoNota(1);
   for (const a of Object.values(cajonAnim)) Object.assign(a, { k: 0, v: 0, objetivo: 0, agarrado: false });
   pintarInventario();
   cerrarExaminar();
@@ -3391,14 +4173,22 @@ function reiniciar(nivel = 1) {
   entrar(nivel);
 }
 el.entrar.addEventListener('click', () => entrar(1));
-el.continuar.addEventListener('click', () => entrar(2));
+let nivelSeguir = 2;
+el.continuar.addEventListener('click', () => entrar(nivelSeguir));
 el.otra.addEventListener('click', () => reiniciar(1));
-el.seguir.addEventListener('click', () => { desbloquearAudio(); empezarNivel2(); });
+// el paso al nivel siguiente desde la tarjeta
+function siguienteNivel() {
+  const n = estado.nivel + 1;
+  if (n === 2) empezarNivel2();
+  else if (n === 3) empezarNivel3();
+  else if (n === 4 && typeof empezarFinal === 'function') empezarFinal();
+}
+el.seguir.addEventListener('click', () => { desbloquearAudio(); siguienteNivel(); });
 el.quedarse.addEventListener('click', () => {
   ocultarTarjeta();
   estado.fase = 'jugando';
   el.volver.hidden = estado.vista === 'sala';
-  mensaje('La caja te mira con sus dos ojos. Lo demás, en la próxima entrega.', 4);
+  mensaje(estado.nivel >= ULTIMO_NIVEL ? 'La caja respira tranquila. Puedes quedarte con ella todo lo que quieras.' : 'La caja te mira.', 4);
 });
 
 // Si la página se actualiza con alguien jugando, conserva por dónde iba
@@ -3406,16 +4196,26 @@ function restaurar(guardado) {
   if (!guardado || !guardado.estado || guardado.estado.fase === 'portada') return false;
   const g = guardado.estado;
   estado = { ...estadoInicial(), ...g, ocupado: false, seleccion: null, vista: 'sala' };
-  if (estado.fase === 'despertar' || estado.fase === 'fin' || estado.fase === 'tarjeta') estado.fase = estado.nivel === 2 ? 'jugando' : 'fin';
+  if (estado.fase === 'despertar' || estado.fase === 'fin' || estado.fase === 'tarjeta') estado.fase = estado.nivel >= 2 ? 'jugando' : 'fin';
   if (estado.tapa === 'abierta') estado.tapaEnMesa = true;
   if (estado.llave === 'cerradura') llaveGirando = { t: 0, sentido: -1, desvanece: 0 };
   tapaVuelo = estado.tapa === 'suelta' ? tapaSuelta() : null;
-  if (estado.nivel === 2 && estado.hija) {
+  if (estado.nivel >= 2 && estado.hija) {
     if (estado.hija.fase === 'subiendo') estado.hija.fase = 'mesa';
-    Object.assign(despertar, { ojos: 0, humo: 0, trampilla: 1, oscuridad: 0.16 });
+    Object.assign(despertar, { ojos: 0, humo: 0, trampilla: estado.nivel === 2 ? 1 : 0, oscuridad: 0.16 });
     lampara.apagada = 0.1;
     if (estado.hija.ojo === 'puesto') Object.assign(ojo2, { visible: 1, parpadoBase: 0, cerrado: 0 });
-    el.girar.hidden = true; el.inventario.hidden = false;
+    // nivel 3: los objetos y el cajón largo como estaban
+    const n3 = estado.n3;
+    if (estado.nivel === 3 && n3) {
+      if (n3.ficha === 'cayendo') n3.ficha = 'suelo';
+      fichaCae.x = FICHA_SUELO.x; fichaCae.y = FICHA_SUELO.y; fichaCae.ang = 0;
+      notaSale = 1;
+      cajonAnim.largo.k = cajonAnim.largo.objetivo = n3.largo === 'abierto' ? 1 : n3.largo === 'suelto' ? 0.12 : 0;
+      if (n3.nota === 'mano') ponerTextoNota(3);
+      if (img.ficha_peon) { ponerCaraFicha(n3.fichaCara); ponerCampanillaCompleta(n3.completa); }
+    }
+    el.girar.hidden = estado.nivel === 2; el.inventario.hidden = false;
     el.portada.hidden = true;
     ojo.parpadoBase = 0;
     pintarInventario();
@@ -3461,6 +4261,7 @@ async function arrancar(guardado) {
   }
   compuesto.width = ANCHO; compuesto.height = ALTO;
   prepararOjo(); prepararOjoLuna(); prepararMotas(); prepararPuntoLuz(); prepararCapasFijas(); prepararLaca(); prepararDecoracion();
+  prepararNivel3();
   pintarInventario();
   const restaurado = restaurar(guardado);
   hornear();
@@ -3470,17 +4271,18 @@ async function arrancar(guardado) {
   tecnicaA.activar();
   el.cargando.hidden = true;
   el.entrar.disabled = false; el.entrar.textContent = 'Entrar en la sala';
-  // seguir donde se dejó: el nivel 2, si el 1 está superado (o si se pide con «?nivel=2»)
+  // seguir donde se dejó: el nivel siguiente al último superado (o el que se pida con «?nivel=N»)
   const progreso = leerProgreso();
-  if ((progreso || nivelPedido === 2) && eleccion !== 'A') {
+  nivelSeguir = limitar(Math.max(progreso ? progreso.superado + 1 : 1, nivelPedido), 1, ULTIMO_NIVEL);
+  if (nivelSeguir >= 2 && eleccion !== 'A') {
     el.continuar.hidden = false;
-    el.continuar.textContent = `Seguir: nivel 2 · ${NIVELES[2].titulo}`;
+    el.continuar.textContent = `Seguir: ${nombreNivel(nivelSeguir).toLowerCase()} · ${NIVELES[nivelSeguir].titulo}`;
     el.entrar.textContent = 'Empezar desde el principio';
     el.entrar.classList.add('secundario');
   }
   if (restaurado) {
     if (eleccion !== 'A' && !(await usarTecnica(eleccion))) await usarTecnica('A');
-    if (estado.nivel === 2 && tec.ponerHija) tec.ponerHija(estado.hija);
+    if (estado.nivel >= 2 && tec.ponerHija) tec.ponerHija(estado.hija);
     if (estado.fase === 'jugando') bucle('noche', -13, 2);
     if (estado.fase === 'fin' && estado.nivel === 1) terminarNivel(1);
   } else if (eleccion !== 'A') prepararTecnica(eleccion).catch(() => {});      // mientras se mira la portada
@@ -3539,5 +4341,18 @@ window.__prueba = {
   // ¿el incensario se ve en (x, y) del boceto? (la máscara de su silueta en la técnica B)
   incensarioVisible: (x, y) => (tec.alfaIncensario ? tec.alfaIncensario(x, y) : 1),
   usar: (objeto, x, y, o = 'caja') => { const m = tec.ancla({ x, y }, o); usarObjeto(objeto, tec.aPintura(m.x, m.y), null); },
+  // nivel 3: la luz fría y las tintas, el rollo, la respiración, la tetera, el cajón largo y la ficha en la mano
+  n3: () => (estado.n3 ? JSON.parse(JSON.stringify(estado.n3)) : null),
+  luz: () => ({ x: luzFria.x, y: luzFria.y, fuerza: luzFria.fuerza, guiada: reloj < luzFria.guiadaHasta }),
+  espejoLuz: (x, y) => espejoLuz({ x, y }),
+  tinta: id => ({ x: TINTAS[id].x, y: TINTAS[id].y, vis: TINTAS[id].vis || 0 }),
+  rollo: () => ({ a: rollo.a, v: rollo.v }),
+  aliento: () => ({ fase: aliento.fase, valor: aliento.valor, exhalando: exhalando(), soplo: aliento.soplo }),
+  tetera: () => ({ ...tetera3 }),
+  largo: () => ({ ...cajonAnim.largo }),
+  pantallaLargo: k => (tec.pantallaLargo ? tec.pantallaLargo(k) : null),
+  fichaGiro: () => ({ giro: fichaGiro.giro, objetivo: fichaGiro.objetivo }),
+  labios: () => (estado.n3 ? estado.n3.labios : 0),
+  puntoCampanilla: () => { const v = tec.puntoCampanillaLargo && tec.puntoCampanillaLargo(), m = v ? tec.ancla(v) : null; return m ? { x: m.x, y: m.y } : null; },
 };
 window.__tec = () => tec;
