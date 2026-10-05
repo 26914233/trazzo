@@ -16,7 +16,8 @@ const CAPAS = ['sala', 'sala_vacia', 'sala_mesa_vacia', 'sala_detras', 'tapa', '
 const CAPAS_NIVEL2 = ['cajita', 'ojo2', 'iris2'];       // la cajita roja y el ojo nuevo (herramientas/nivel2_capas.py)
 const SONIDOS = ['noche', 'fuego', 'trabado', 'recoger', 'encajar', 'despertar', 'final_caja_viva', 'suspiro', 'ojo_abre',
   'grunido', 'espiritu', 'papel', 'llave', 'candado_abre', 'tope_madera', 'clic_madera', 'acercar', 'pista', 'toque',
-  'mecanismo', 'racha', 'bisagra', 'deslizar_madera', 'cajon', 'trampilla', 'cristal', 'viento', 'clic_metal'];
+  'mecanismo', 'racha', 'bisagra', 'deslizar_madera', 'cajon', 'trampilla', 'cristal', 'viento', 'clic_metal',
+  'holgura', 'clac', 'pestillo', 'desbloqueo'];                // el vocabulario (herramientas/sonidos_vocabulario.py)
 
 // Encuadres de la técnica A: [x0, y0, x1, y1] de lo que debe verse en horizontal (h) y en vertical (v)
 const VISTAS = {
@@ -39,6 +40,7 @@ const ANCLA_CAJA = { x: 928, y: 640 };        // la caja respira desde su peana
 const TAPA_ORIGEN = { x: 575, y: 519 };       // centro de la base de la tapa
 const TAPA_MESA = { x: 521, y: 642 };         // donde se deja: en la mesa, delante del incensario
 const CERRADURA = { x: 576, y: 508 };
+const TAPA_SUELTA = { x: 578, y: 515, ang: -0.035 };   // suelta, la tapa queda entreabierta: un poco alzada y torcida
 let CAJA = [[686, 200], [790, 168], [1150, 178], [1205, 215], [1210, 530], [1180, 545], [1180, 600], [1160, 640],
   [1000, 690], [660, 615], [655, 585], [686, 545]];
 const INCENSARIO = ['rect', 496, 426, 652, 612];
@@ -207,7 +209,7 @@ function bucle(nombre, db = 0, fundido = 1) {
   g.gain.setValueAtTime(0.0001, ahora);
   g.gain.exponentialRampToValueAtTime(Math.pow(10, db / 20), ahora + Math.max(0.05, fundido));
   fuente.connect(g); g.connect(audio.maestro); fuente.start();
-  audio.bucles[nombre] = { fuente, g };
+  audio.bucles[nombre] = { fuente, g, base: Math.pow(10, db / 20) };
 }
 function pararBucle(nombre, fundido = 1) {
   delete audio.pendientes[nombre];
@@ -221,6 +223,40 @@ function pararBucle(nombre, fundido = 1) {
   b.fuente.stop(ahora + fundido + 0.05);
 }
 function vibrar(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* sin vibración */ } }
+// El vocabulario de sonido y vibración (genero/05_gramatica_y_sistemas.md §7): cada cosa suena y vibra siempre igual,
+// para que se entienda sin texto
+const VOCABULARIO = {
+  toque:      { sonido: 'toque', db: -14 },                                   // has tocado algo que responde
+  holgura:    { sonido: 'holgura', db: -9, vibrar: 8 },                       // la pieza asoma: se puede mover
+  roce:       { sonido: 'deslizar_madera', db: -14, tono: 1.2 },             // algo se está moviendo
+  tope:       { sonido: 'tope_madera', db: -9, vibrar: 12 },                  // llegó al final
+  clac:       { sonido: 'clac', db: -5, vibrar: [14, 45, 22] },               // posición correcta: encajó
+  pestillo:   { sonido: 'pestillo', db: -6, vibrar: 10 },                     // un pestillo corre dentro
+  muesca:     { sonido: 'clic_metal', db: -13, tono: 1.3, vibrar: 6 },        // un paso del mecanismo (la llave al girar)
+  mecanismo:  { sonido: 'mecanismo', db: -8, vibrar: 20 },                    // algo se mueve dentro de la caja
+  desbloqueo: { sonido: 'desbloqueo', db: -2, vibrar: [40, 70, 90] },         // gran desbloqueo
+  trabado:    { sonido: 'trabado', db: -3, vibrar: 35 },                      // no se puede, ahora
+};
+function sentir(evento, { tono = 1, db = 0, sinVibrar = false } = {}) {
+  const v = VOCABULARIO[evento];
+  if (!v) return;
+  sonar(v.sonido, (v.db || 0) + db, (v.tono || 1) * tono);
+  if (v.vibrar && !sinVibrar) vibrar(v.vibrar);
+}
+// el silencio es tensión: mientras la caja contiene el aliento, el ambiente baja
+function atenuarAmbiente(segundos, db = -11) {
+  if (!audio.ctx) return;
+  const ahora = audio.ctx.currentTime;
+  for (const b of Object.values(audio.bucles)) {
+    const base = b.base || b.g.gain.value;
+    b.base = base;
+    b.g.gain.cancelScheduledValues(ahora);
+    b.g.gain.setValueAtTime(Math.max(0.0001, b.g.gain.value), ahora);
+    b.g.gain.exponentialRampToValueAtTime(Math.max(0.0001, base * Math.pow(10, db / 20)), ahora + 0.25);
+    b.g.gain.exponentialRampToValueAtTime(Math.max(0.0001, base * Math.pow(10, db / 20)), ahora + 0.25 + segundos);
+    b.g.gain.exponentialRampToValueAtTime(base, ahora + 0.25 + segundos + 1.2);
+  }
+}
 
 // ---------------------------------------------------------------------------------------------
 // El ojo: mira, parpadea, se entorna y se distrae con la luz. Se dibuja en coordenadas del boceto.
@@ -415,7 +451,10 @@ function dibujarParpado(c, p, geo) {
 // Respiración de la caja (contiene el aliento cuando la fuerzan)
 // ---------------------------------------------------------------------------------------------
 const aliento = { fase: 0, valor: 0, contenidoHasta: 0, soltando: 0 };
-function contenerAliento(segundos = 1.8) { aliento.contenidoHasta = reloj + segundos; }
+function contenerAliento(segundos = 1.8) {
+  if (reloj >= aliento.contenidoHasta) atenuarAmbiente(segundos);
+  aliento.contenidoHasta = reloj + segundos;
+}
 function actualizarAliento(dt) {
   if (reloj < aliento.contenidoHasta) {
     aliento.valor = mezclar(aliento.valor, 1, 1 - Math.exp(-dt * 6));
@@ -556,7 +595,10 @@ function humoDelIncienso() {
   humos.incienso = estado.tapa === 'abierta'
     ? [new Cinta(566, 494, { ritmo: 18, vida: 5.2, vel: 30, ancho: 5, alfa: 0.5, objeto: 'incensario' }),
        new Cinta(586, 496, { ritmo: 16, vida: 4.6, vel: 26, ancho: 4, alfa: 0.4, objeto: 'incensario' })]
-    : [new Cinta(531, 462, { ritmo: 14, vida: 5, vel: 22, ancho: 3.4, alfa: 0.42, objeto: 'incensario' })];
+    : estado.tapa === 'suelta' && tapaVuelo
+      ? [new Cinta(533, 458, { ritmo: 14, vida: 5, vel: 22, ancho: 3.4, alfa: 0.42, objeto: 'incensario' }),
+         new Cinta(606, 513, { ritmo: 11, vida: 3.6, vel: 16, ancho: 2.6, alfa: 0.3, objeto: 'incensario' })]
+      : [new Cinta(531, 462, { ritmo: 14, vida: 5, vel: 22, ancho: 3.4, alfa: 0.42, objeto: 'incensario' })];
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1004,7 +1046,7 @@ function tocarCajon(id) {
   const a = cajonAnim[id];
   if (estado.cajones[id] !== 'abierto') {
     a.v += 1.9;
-    sonar('clic_madera', -12, 1.3);
+    sentir('holgura', { tono: 1.1 });
     mensaje(primeraVez('tirar') ? 'Tira del cajón hacia fuera: arrastra el dedo.' : 'Tira de él.');
     return;
   }
@@ -1133,6 +1175,39 @@ function dibujarTapa(c, x, y, ang = 0, sx = 1, sy = 1) {
   c.drawImage(img.tapa, -55, -81);
   c.restore();
 }
+// la tapa que se mueve (suelta, levantada o en el aire); suelta, por la rendija se escapa la luz de las brasas
+function dibujarTapaVuelo(c) {
+  const t = tapaVuelo;
+  if (estado.tapa !== 'abierta' && t.rendija > 0) {
+    const parpadeo = 0.8 + 0.2 * Math.sin(reloj * 7.3) * Math.sin(reloj * 3.1 + 1), a = t.rendija * parpadeo;
+    c.save(); c.globalCompositeOperation = 'lighter';
+    c.translate(TAPA_ORIGEN.x + 1, TAPA_ORIGEN.y - 2); c.scale(1, 0.085);
+    const g = c.createRadialGradient(0, 0, 0, 0, 0, 46);
+    g.addColorStop(0, `rgba(255, 150, 60, ${0.5 * a})`); g.addColorStop(0.6, `rgba(255, 110, 40, ${0.2 * a})`);
+    g.addColorStop(1, 'rgba(255, 90, 30, 0)');
+    c.fillStyle = g; c.beginPath(); c.arc(0, 0, 46, 0, Math.PI * 2); c.fill();
+    c.restore();
+  }
+  dibujarTapa(c, t.x, t.y, t.ang, t.sx, t.sy);
+}
+// donde estaba la tapa (y unos píxeles alrededor), la pintura del incensario abierto y sin el cuerno: la boca con
+// sus brasas y la pared de detrás. El cuenco se queda como en el boceto (la pintura abierta lo tiñe de rojo)
+const bocaLienzos = {};
+function bocaSinTapa(c) {
+  const t = datos.capas.tapa, v = datos.capas.incensario_vacio, m = 4, w = t.w + 2 * m, h = t.h + 2 * m;
+  if (!bocaLienzos.boca) {
+    for (const n of ['boca', 'mascara']) { bocaLienzos[n] = document.createElement('canvas'); bocaLienzos[n].width = w; bocaLienzos[n].height = h; }
+    const k = bocaLienzos.mascara.getContext('2d');
+    for (const [dx, dy] of [[0, 0], [-m, 0], [m, 0], [0, -m], [0, m], [-3, -3], [3, -3], [-3, 3], [3, 3]]) k.drawImage(img.tapa, m + dx, m + dy);
+    const b = bocaLienzos.boca.getContext('2d');
+    b.drawImage(img.incensario_vacio, v.x - (t.x - m), v.y - (t.y - m));
+    b.globalCompositeOperation = 'destination-in';
+    b.drawImage(bocaLienzos.mascara, 0, 0);
+    b.globalCompositeOperation = 'source-over';
+  }
+  c.drawImage(bocaLienzos.boca, t.x - m, t.y - m);
+}
+const tapaSuelta = () => ({ x: TAPA_SUELTA.x, y: TAPA_SUELTA.y, ang: TAPA_SUELTA.ang, sx: 1, sy: 1, rendija: 1 });
 function tapaEnLaMesa(c) {
   const { x, y } = TAPA_MESA, s = 1.04;
   c.save();
@@ -1199,6 +1274,8 @@ function hornear() {
   c.clearRect(0, 0, ANCHO, ALTO);
   c.drawImage(img.sala, 0, 0);
   if (estado.tapa === 'abierta') pintarCapa(c, estado.cuerno === 'brasas' ? 'incensario_abierto' : 'incensario_vacio');
+  // suelta, la tapa se dibuja aparte (entreabierta); debajo, la boca sin el cuerno, que aún no se ve
+  else if (tapaVuelo) bocaSinTapa(c);
   if (estado.cuerno === 'puesto') pintarCapa(c, 'cuerno_puesto');
   if (despertar.humo > 0) pintarCapa(c, 'despierta_humo', despertar.humo);
   if (despertar.ojos > 0) pintarCapa(c, 'despierta_ojos', despertar.ojos);
@@ -1470,7 +1547,7 @@ const tecnicaA = {
     c.save(); c.translate(di.x, di.y);
     c.drawImage(capas2d.incensario, capas2d.incensario.sitio.x, capas2d.incensario.sitio.y);
     if (estado.tapaEnMesa) tapaEnLaMesa(c);
-    if (tapaVuelo) dibujarTapa(c, tapaVuelo.x, tapaVuelo.y, tapaVuelo.ang, tapaVuelo.sx, tapaVuelo.sy);
+    if (tapaVuelo) dibujarTapaVuelo(c);
     if (llaveGirando) dibujarLlaveGirando(c);
     dibujarHumo(c, 'incensario');
     c.restore();
@@ -1548,7 +1625,7 @@ let tapaVuelo = null, llaveGirando = null, vueloEnCaja = null;
 function dibujarLlaveGirando(c) {
   const d = datos.capas.llave, k = llaveGirando.t;
   c.save(); c.globalAlpha = 1 - (llaveGirando.desvanece || 0);
-  c.translate(CERRADURA.x, CERRADURA.y); c.rotate((llaveGirando.sentido || -1) * 1.2 * k); c.scale(0.8, 0.8 - 0.35 * k);
+  c.translate(CERRADURA.x, CERRADURA.y); c.rotate((llaveGirando.sentido || -1) * 1.2 * k + (llaveGirando.holgura || 0)); c.scale(0.8, 0.8 - 0.35 * k);
   c.drawImage(img.llave, -d.w / 2, -d.h / 2);
   c.restore();
 }
@@ -1588,7 +1665,7 @@ function dibujarEncima3D() {
   };
   if (tec.tapa2D) {
     if (estado.tapaEnMesa) conAncla(TAPA_MESA.x, TAPA_MESA.y, 'mesa', () => tapaEnLaMesa(ctx));
-    if (tapaVuelo) conAncla(TAPA_ORIGEN.x, TAPA_ORIGEN.y, 'incensario', () => dibujarTapa(ctx, tapaVuelo.x, tapaVuelo.y, tapaVuelo.ang, tapaVuelo.sx, tapaVuelo.sy));
+    if (tapaVuelo) conAncla(TAPA_ORIGEN.x, TAPA_ORIGEN.y, 'incensario', () => dibujarTapaVuelo(ctx));
   }
   if (llaveGirando) conAncla(CERRADURA.x, CERRADURA.y, 'incensario', () => dibujarLlaveGirando(ctx));
   c.setTransform(ppp, 0, 0, ppp, 0, 0);
@@ -1840,10 +1917,10 @@ el.bolsillo.addEventListener('keydown', e => {
 });
 async function encajarTapa() {
   bolsillo.encajada = true;
-  sonar('clic_metal', -4, 1.1); vibrar(30);
+  sentir('clac', { tono: 1.2 });                     // posición correcta
   bolsillo.brillo = 1;
   await esperar(0.45);
-  sonar('encajar', -10, 1.5);
+  sentir('pestillo', { tono: 1.3 });                 // dentro, el pestillo de la tapa se retira
   el.examinarTexto.textContent = 'La tapa se suelta…';
   await animarPromesa(0.9, k => { bolsillo.abierta = salida(k); });
   sonar('cristal', -8, 1.3);
@@ -2178,7 +2255,7 @@ function tocarTrampilla() {
     if (estado.hija.fase !== 'dentro') { mensaje('La trampilla está vacía. La luz se va apagando.'); return; }
     // algo empuja desde dentro: se saca tirando hacia arriba
     destello(TRAMPILLA.x, TRAMPILLA.y - 6, 90, '255,215,140', 0.4, 0.7);
-    sonar('clic_madera', -12, 0.9); vibrar(10);
+    sentir('holgura', { tono: 0.9 });
     mensaje(primeraVez('trampilla2') ? 'Dentro hay algo que empuja. Tira de ello hacia arriba con el dedo.' : 'Tira hacia arriba.');
     return;
   }
@@ -2193,14 +2270,20 @@ function tocarIncensario() {
   if (estado.tapa === 'abierta') { mensaje(estado.cuerno === 'brasas' ? 'Algo blanco asoma entre las brasas.' : 'Solo quedan brasas.'); return; }
   if (estado.llave === 'cerradura') {
     // la llave se mueve un poco en la cerradura: hay que girarla con el dedo
-    animar(0.3, k => { if (llaveGirando) llaveGirando.t = 0.07 * Math.sin(k * Math.PI); });
-    sonar('clic_metal', -16, 1.2);
-    mensaje('La llave está en la cerradura. Gírala: arrastra el dedo en círculo a su alrededor.');
+    animar(0.3, k => { if (llaveGirando) llaveGirando.holgura = 0.08 * Math.sin(k * Math.PI * 2); });
+    sentir('holgura', { tono: 1.3 });
+    mensaje(primeraVez('tocar-llave') ? 'La llave está en la cerradura. Gírala: arrastra el dedo en círculo a su alrededor.' : 'Gírala en círculo.');
     return;
   }
   if (estado.tapa === 'suelta') {
-    sonar('clic_madera', -12, 1.1); bocanada(575, 505, 0, -1, 1, 'incensario');
-    mensaje('La tapa está suelta. Levántala: pon el dedo en ella y arrastra hacia arriba.');
+    // la tapa entreabierta asoma un poco y vuelve a caer: se mueve, pero hay que levantarla con el dedo
+    if (tapaVuelo) {
+      const y0 = TAPA_SUELTA.y;
+      animar(0.32, k => { if (tapaVuelo && estado.tapa === 'suelta') tapaVuelo.y = y0 - 5 * Math.sin(k * Math.PI); });
+      setTimeoutReloj(0.3, () => sentir('tope', { db: -6, tono: 1.3 }));
+    }
+    sentir('holgura', { tono: 0.9 }); bocanada(575, 512, 0, -1, 1, 'incensario');
+    mensaje(primeraVez('tocar-tapa') ? 'La tapa está suelta. Levántala: pon el dedo en ella y arrastra hacia arriba.' : 'Arrastra hacia arriba.');
     return;
   }
   const veces = insistir('incensario');
@@ -2281,7 +2364,7 @@ function tocarTablilla(i) {
   if (i !== siguiente) { tablillaTrabada(siguiente); return; }
   if (laVeElOjo(i)) { resistirMirada(); return; }
   tec.correrTablilla(i, 0.34, 0, 0.09);
-  sonar('clic_madera', -12, 1.6); vibrar(8);
+  sentir('holgura', { tono: 1.2 });
   mensaje(primeraVez('correr') ? 'Cede un poco. Deslízala con el dedo hacia donde asoma.' : 'Deslízala con el dedo.');
 }
 // no le toca: madera contra madera, sin que la caja grande intervenga
@@ -2307,8 +2390,8 @@ function correrTablilla(i, duracion = 0.5) {
   const h2 = estado.hija;
   h2.tablillas[i] = true;
   tec.correrTablilla(i, duracion);
-  sonar('deslizar_madera', -5, 1.5); vibrar(15);
-  setTimeoutReloj(0.42, () => sonar('clic_madera', -6, 1.6));
+  sentir('roce', { tono: 1.5 / 1.2, db: 9 }); vibrar(8);
+  setTimeoutReloj(Math.max(0.16, duracion * 0.8), () => sentir('clac', { tono: 1.3, db: -2 }));     // encajó en su sitio
   const textos = [
     'Corre. Debajo hay una flecha de marquetería.',
     'Corre hacia abajo. Otra flecha.',
@@ -2324,7 +2407,7 @@ function tirarCajoncito() {
   if (h2.cajon === 'abierto') { mensaje(h2.cajita === 'cajon' ? 'Dentro, una cajita roja.' : 'Vacío.'); return; }
   if (laVeElOjo(4)) { resistirMirada(); return; }
   tec.abrirCajonHija(0.34, 0, 0.12);
-  sonar('clic_madera', -12, 1.5); vibrar(8);
+  sentir('holgura', { tono: 1.15 });
   mensaje(primeraVez('cajoncito') ? 'Un cajoncito. Tira de él: arrastra hacia fuera.' : 'Tira de él.');
 }
 function abrirCajoncito(duracion = 0.6) {
@@ -2352,7 +2435,7 @@ async function ponerOjo(desde) {
   await desdeInventario('ojo', 'ojo_luna', CUENCA, 'caja', desde);
   estado.hija.ojo = 'puesto';
   ojo2.visible = 1; ojo2.parpadoBase = 1; ojo2.cerrado = 1;
-  sonar('encajar', -1); vibrar(60); sacudir(4, 0.3);
+  sonar('encajar', -1); sentir('desbloqueo', { db: -4 }); sacudir(4, 0.3);
   destello(CUENCA.x, CUENCA.y, 80, '190,215,255', 0.75, 1.4);
   contenerAliento(2.2);
   await esperar(0.8);
@@ -2418,19 +2501,43 @@ async function meterLlave(desde) {
   estado.ocupado = false;
   mensaje(primeraVez('girar-llave') ? 'La llave entra. Gírala: arrastra el dedo en círculo alrededor de la cerradura.' : 'Gírala.', 4.5);
 }
-// el giro completo: clic, el león suelta la tapa y la llave se queda en la cerradura (se desvanece)
+// el giro completo, en cadena y a la vista: la llave encaja (clac), dentro corre un pestillo, la tapa salta y queda
+// entreabierta, con la luz de las brasas por la rendija; la llave se queda en la cerradura (se desvanece)
 async function abrirCerradura() {
   estado.ocupado = true;
   const t0 = llaveGirando.t;
-  await animarPromesa(0.16, k => { llaveGirando.t = mezclar(t0, 1, k); });
-  sonar('candado_abre', -2); vibrar(30);
-  bocanada(560, 500, -0.6, -1, 1, 'incensario'); bocanada(592, 500, 0.6, -1, 1, 'incensario');
+  llaveGirando.holgura = (llaveGirando.sentido || -1) * 0.07;
+  await animarPromesa(0.14, k => { llaveGirando.t = mezclar(t0, 1, k); });
+  sentir('clac');
+  await esperar(0.14);
+  sentir('pestillo');
+  await esperar(0.26);
   estado.llave = 'usada';
   estado.tapa = 'suelta';
-  await animarPromesa(0.5, k => { llaveGirando.desvanece = suave(k); }, 0.3);
+  saltarTapa();
+  await animarPromesa(0.5, k => { llaveGirando.desvanece = suave(k); }, 0.35);
   llaveGirando = null;
   estado.ocupado = false;
-  mensaje('Clic. El león suelta la tapa: levántala arrastrando hacia arriba.', 4);
+  if (primeraVez('tapa-suelta')) mensaje('El león suelta la tapa. Levántala: arrastra hacia arriba.', 4);
+}
+// la tapa salta al soltarla el león: sube, cae torcida y rebota; por la rendija sale humo y luz
+function saltarTapa() {
+  const s = TAPA_SUELTA, o = TAPA_ORIGEN;
+  tapaVuelo = { x: o.x, y: o.y, ang: 0, sx: 1, sy: 1, rendija: 0 };
+  hornear();
+  sentir('mecanismo', { db: -2 });
+  bocanada(546, 517, -0.9, -0.4, 1, 'incensario'); bocanada(604, 517, 0.9, -0.4, 1, 'incensario');
+  agitarTe(0.2);
+  animar(0.6, k => {
+    const salto = k < 0.42 ? Math.sin(k / 0.42 * Math.PI) : 0.2 * Math.sin((k - 0.42) / 0.58 * Math.PI);
+    const e = suave(Math.min(1, k / 0.42));
+    tapaVuelo.x = mezclar(o.x, s.x, e);
+    tapaVuelo.y = mezclar(o.y, s.y, e) - 9 * salto;
+    tapaVuelo.ang = s.ang * e + 0.05 * salto;
+    tapaVuelo.rendija = Math.min(1, k * 2.4);
+  }, () => { if (tapaVuelo) Object.assign(tapaVuelo, tapaSuelta()); });
+  setTimeoutReloj(0.27, () => sentir('tope', { db: -5, tono: 1.2 }));
+  humoDelIncienso();
 }
 // la tapa, levantada con el dedo (gesto «tapa»), va a la mesa; si se suelta antes, cae en su sitio
 function llevarTapaAMesa() {
@@ -2459,12 +2566,16 @@ function llevarTapaAMesa() {
     });
   });
 }
+// soltada antes de tiempo, la tapa cae y se queda otra vez entreabierta (la boca vuelve a tapar el cuerno)
 function devolverTapa() {
-  const x0 = tapaVuelo.x, y0 = tapaVuelo.y, ang0 = tapaVuelo.ang;
-  animar(0.2, k => { const e = k * k; tapaVuelo.x = mezclar(x0, TAPA_ORIGEN.x, e); tapaVuelo.y = mezclar(y0, TAPA_ORIGEN.y, e); tapaVuelo.ang = mezclar(ang0, 0, e); }, () => {
-    sonar('tope_madera', -6, 1.25); vibrar(12);
-    bocanada(575, 505, 0, -1, 1, 'incensario');
-    estado.tapa = 'suelta'; tapaVuelo = null; hornear(); humoDelIncienso();
+  const x0 = tapaVuelo.x, y0 = tapaVuelo.y, ang0 = tapaVuelo.ang, s = TAPA_SUELTA;
+  estado.tapa = 'suelta'; estado.ocupado = true; tapaVuelo.rendija = 0; hornear();
+  animar(0.2, k => { const e = k * k; tapaVuelo.x = mezclar(x0, s.x, e); tapaVuelo.y = mezclar(y0, s.y, e); tapaVuelo.ang = mezclar(ang0, s.ang, e); }, () => {
+    sentir('tope', { db: 1, tono: 1.25 });
+    bocanada(575, 512, 0, -1, 1, 'incensario');
+    Object.assign(tapaVuelo, tapaSuelta());
+    estado.ocupado = false;
+    humoDelIncienso();
   });
 }
 async function ponerCuerno(desde) {
@@ -2483,7 +2594,7 @@ async function ponerCuerno(desde) {
 async function despertarCaja() {
   estado.fase = 'despertar';
   el.volver.hidden = true;
-  sonar('encajar', -1); vibrar(60); sacudir(5, 0.35);
+  sonar('encajar', -1); sentir('desbloqueo', { db: -3 }); sacudir(5, 0.35);
   ojo.punto = null; ojo.distraidoHasta = 0;
   await esperar(0.5);
   pararBucle('noche', 2.5);
@@ -2619,6 +2730,7 @@ function actualizar(dt) {
   for (let i = vuelos.length - 1; i >= 0; i--) { const v = vuelos[i]; v.t += dt; if (v.t >= v.duracion) { vuelos.splice(i, 1); v.ok(); } }
   for (let i = destellos.length - 1; i >= 0; i--) { destellos[i].t += dt; if (destellos[i].t >= destellos[i].duracion) destellos.splice(i, 1); }
   actualizarCajones(dt);
+  if (puntero && puntero.gesto) actualizarGesto(puntero.gesto, dt);
   actualizarOjo(dt);
   actualizarOjo2(dt);
   actualizarAliento(dt);
@@ -2694,6 +2806,9 @@ lienzo.addEventListener('pointermove', e => {
   if (!puntero || e.pointerId !== puntero.id) return;
   const dx = q.x - puntero.x, dy = q.y - puntero.y;
   puntero.movido = Math.max(puntero.movido, Math.hypot(q.x - puntero.x0, q.y - puntero.y0));
+  // la velocidad del dedo (px/s): al soltar con impulso, la caja sigue girando un poco
+  const ahoraMov = performance.now(), pasoMov = Math.max(0.008, (ahoraMov - (puntero.tMov || puntero.inicio)) / 1000);
+  puntero.vx = mezclar(puntero.vx || 0, dx / pasoMov, 0.5); puntero.tMov = ahoraMov;
   if (puntero.gesto && moverGesto(puntero.gesto, q)) { puntero.x = q.x; puntero.y = q.y; return; }
   if (puntero.movido > 10 && estado.fase !== 'portada' && !estado.ocupado) {
     if (puntero.enHija) tec.girarHija(dx, dy);
@@ -2720,8 +2835,9 @@ function finToque(e) {
   if (g && g.estado) soltarGesto(g, e.type === 'pointercancel');
   else if (puntero.movido < 16 && performance.now() - puntero.inicio < 900 && e.type === 'pointerup') tocarEscena(q.x, q.y);
   else {
-    if (puntero.enHija && tec.soltarHija) { tec.soltarHija(); if (puntero.movido >= 16) sonar('tope_madera', -18, 1.6); }
-    tec.soltar();
+    if (puntero.enHija && tec.soltarHija) { tec.soltarHija(); if (puntero.movido >= 16) sentir('tope', { db: -9, tono: 1.6, sinVibrar: true }); }
+    const conImpulso = puntero.enCaja && performance.now() - (puntero.tMov || 0) < 80;
+    tec.soltar(conImpulso ? puntero.vx : 0, puntero.enCaja);
   }
   puntero = null;
 }
@@ -2819,8 +2935,9 @@ function empezarGesto(g, dx, dy) {
       }
       const a = cajonAnim[g.id];
       g.eje = ejeCajon(g.id); g.k0 = a.k; g.kAntes = a.k; g.t = performance.now();
+      g.asentado = a.k < 0.02;              // cerrado, está asentado: cede tras un poco de tirón
       a.agarrado = true; a.v = 0;
-      sonar('deslizar_madera', -14, 1.25);
+      if (!g.asentado) sentir('roce', { tono: 1.05 });
       break;
     }
     case 'tablilla': case 'cajoncito': {
@@ -2835,25 +2952,25 @@ function empezarGesto(g, dx, dy) {
         if (h2.cajon === 'abierto') return false;
         if (laVeElOjo(4)) { resistirMirada(); g.estado = 'bloqueado'; return true; }
       }
-      g.k = 0; g.v = 0; g.t = performance.now();
-      sonar('deslizar_madera', -12, 1.6);
+      g.k = 0; g.v = 0; g.t = performance.now(); g.visto = 0; g.asentado = true;
       break;
     }
     case 'llave': {
       const c = cerraduraEnPantalla();
       g.centro = { x: c.x, y: c.y };
       g.angulo = Math.atan2(puntero.y0 - c.y, puntero.x0 - c.x);
-      g.giro = 0; g.sentido = 0; g.clics = 0;
+      g.giro = 0; g.sentido = 0; g.clics = 0; g.objetivo = llaveGirando.t; g.cedio = false;
       break;
     }
     case 'tapa': {
       if (dy > -Math.abs(dx) * 0.4) return false;          // solo hacia arriba
       estado.tapa = 'abierta';
-      tapaVuelo = { x: TAPA_ORIGEN.x, y: TAPA_ORIGEN.y, ang: 0, sx: 1, sy: 1 };
+      tapaVuelo = tapaVuelo || tapaSuelta();
+      g.base = { x: tapaVuelo.x, y: tapaVuelo.y, ang: tapaVuelo.ang }; g.objetivo = { ...g.base }; g.vx = 0;
       hornear();
       humoDelIncienso();
-      sonar('clic_madera', -6, 0.85); vibrar(10);
-      bocanada(560, 500, -0.6, -1, 1, 'incensario'); bocanada(592, 500, 0.6, -1, 1, 'incensario');
+      sentir('roce', { tono: 0.8, db: 3 }); vibrar(10);
+      bocanada(560, 508, -0.6, -1, 1, 'incensario'); bocanada(592, 508, 0.6, -1, 1, 'incensario');
       break;
     }
     case 'trampilla': {
@@ -2877,20 +2994,27 @@ function moverGesto(g, q) {
   const ahora = performance.now(), paso = Math.max(0.004, (ahora - g.t) / 1000);
   switch (g.tipo) {
     case 'cajon': {
-      const a = cajonAnim[g.id], k = limitar(g.k0 + avanceEnEje(g.eje, dx, dy), 0, 1.04);
+      let avance = avanceEnEje(g.eje, dx, dy);
+      if (g.asentado) {
+        if (avance < 0.08) avance = avance * 0.15;
+        else { g.asentado = false; g.cede = 0.08 * 0.85; sentir('holgura'); sentir('roce', { tono: 1.05, db: 2 }); }
+      }
+      if (g.cede) avance -= g.cede;
+      const a = cajonAnim[g.id], k = limitar(g.k0 + avance, 0, 1.04);
       a.v = mezclar(a.v, (k - a.k) / paso, 0.5); a.k = k; g.t = ahora;
       if (k <= 0 && g.kAntes > 0.015 && reloj > a.golpe) {                  // cerrado de un empujón
         a.golpe = reloj + 0.25; sonar('tope_madera', -9, 1.15); vibrar(10); agitarTe(0.3);
       }
-      if (k >= 1 && g.kAntes < 1) sonar('clic_madera', -14, 0.9);              // el tope de fuera
+      if (k >= 1 && g.kAntes < 1) sentir('tope', { db: -4, tono: 1.1 });       // el tope de fuera
       g.kAntes = k;
       break;
     }
     case 'tablilla': case 'cajoncito': {
-      const k = limitar(avanceEnEje(g.eje, dx, dy), 0, 1);
+      let avance = avanceEnEje(g.eje, dx, dy);
+      if (g.asentado && avance >= 0.07) { g.asentado = false; sentir('holgura', { tono: 1.15 }); sentir('roce', { tono: 1.6, db: 2 }); }
+      if (g.asentado) avance *= 0.2;
+      const k = limitar(avance, 0, 1);
       g.v = mezclar(g.v, (k - g.k) / paso, 0.5); g.k = k; g.t = ahora;
-      if (g.tipo === 'tablilla') tec.ponerTablilla(g.i, k); else tec.ponerCajonHija(k);
-      if (k >= 1 && !g.tope) { g.tope = true; sonar('clic_madera', -8, 1.6); }
       break;
     }
     case 'llave': {
@@ -2900,20 +3024,25 @@ function moverGesto(g, q) {
       g.angulo = ang;
       if (r < 14) break;                          // en el centro mismo, el ángulo salta: no cuenta
       g.giro += d;
-      if (!g.sentido && Math.abs(g.giro) > 0.12) { g.sentido = Math.sign(g.giro); llaveGirando.sentido = g.sentido; }
-      if (!g.sentido) break;
-      const t = limitar(g.giro * g.sentido / 1.2, 0, 1);
-      llaveGirando.t = t;
-      const clics = Math.floor(t * 5);
-      if (clics > g.clics) { g.clics = clics; sonar('clic_metal', -15, 1.25 + 0.07 * clics); vibrar(6); }
-      if (t >= 0.75) { g.estado = 'hecho'; abrirCerradura(); }
+      if (!g.sentido) {
+        llaveGirando.holgura = limitar(g.giro, -0.12, 0.12) * 0.6;          // la holgura: se mueve en su hueco
+        if (Math.abs(g.giro) > 0.12) { g.sentido = Math.sign(g.giro); llaveGirando.sentido = g.sentido; }
+        break;
+      }
+      const avance = g.giro * g.sentido - 0.12;
+      llaveGirando.holgura = g.sentido * 0.07;
+      if (avance > 0.02 && !g.cedio) { g.cedio = true; sentir('holgura', { tono: 0.85 }); }
+      // las muescas: la llave se frena en cada una y salta a la siguiente
+      const x = limitar(avance / 1.08, 0, 1);
+      g.objetivo = limitar(x - 0.03 * Math.sin(2 * Math.PI * x / 0.2), 0, 1);
+      if (x >= 0.75) { g.estado = 'hecho'; abrirCerradura(); }
       break;
     }
     case 'tapa': {
       const m = tec.ancla(TAPA_ORIGEN, 'incensario'), k = Math.max(0.2, m ? m.k : 1);
       const alzada = limitar(-dy / k, 0, 40), lado = limitar(dx / k, -40, 40) * 0.4;
-      tapaVuelo.x = TAPA_ORIGEN.x + lado; tapaVuelo.y = TAPA_ORIGEN.y - alzada;
-      tapaVuelo.ang = lado * 0.003 - 0.06 * Math.min(1, alzada / 30);
+      g.vx = mezclar(g.vx, (lado - (g.objetivo.x - g.base.x)) / paso, 0.4);
+      g.objetivo = { x: g.base.x + lado, y: g.base.y - alzada, ang: g.base.ang * (1 - Math.min(1, alzada / 12)) + lado * 0.003 - 0.06 * Math.min(1, alzada / 30) };
       g.alzada = alzada;
       if (alzada >= 34) { g.estado = 'hecho'; llevarTapaAMesa(); }
       break;
@@ -2924,6 +3053,37 @@ function moverGesto(g, q) {
     }
   }
   return true;
+}
+// en cada cuadro, mientras el dedo mueve algo: la pieza lo sigue con un poco de retraso (pesa), se frena en sus
+// muescas y suena al llegar a su tope
+function actualizarGesto(g, dt) {
+  if (g.estado !== 'activo') return;
+  const seguir = rapidez => 1 - Math.exp(-dt * rapidez);
+  switch (g.tipo) {
+    case 'tablilla': case 'cajoncito': {
+      g.visto += (g.k - g.visto) * seguir(20);
+      if (g.tipo === 'tablilla') tec.ponerTablilla(g.i, g.visto); else tec.ponerCajonHija(g.visto);
+      if (g.visto >= 0.985 && !g.tope) { g.tope = true; sentir('tope', { db: -6, tono: 1.6 }); }
+      else if (g.visto < 0.9) g.tope = false;
+      break;
+    }
+    case 'llave': {
+      if (!llaveGirando) break;
+      llaveGirando.t += (g.objetivo - llaveGirando.t) * seguir(16);
+      const muescas = Math.min(3, Math.floor(llaveGirando.t * 5 + 0.02));
+      if (muescas > g.clics) sentir('muesca', { tono: 1 + 0.06 * muescas });
+      g.clics = muescas;
+      break;
+    }
+    case 'tapa': {
+      if (!tapaVuelo) break;
+      const o = g.objetivo, e = seguir(14);
+      g.vx *= Math.exp(-dt * 6);
+      tapaVuelo.x += (o.x - tapaVuelo.x) * e; tapaVuelo.y += (o.y - tapaVuelo.y) * e;
+      tapaVuelo.ang += (o.ang - limitar(g.vx * 0.0015, -0.08, 0.08) - tapaVuelo.ang) * seguir(10);     // se mece al moverla de lado
+      break;
+    }
+  }
 }
 // el dedo se levanta (o llega otro dedo: «cancelado»)
 function soltarGesto(g, cancelado = false) {
@@ -2947,19 +3107,20 @@ function soltarGesto(g, cancelado = false) {
     case 'tablilla': {
       const final = g.k + limitar(g.v, -6, 6) * 0.1;
       if (!cancelado && final > 0.55) correrTablilla(g.i, 0.22);
-      else { tec.correrTablilla(g.i, 0.22, 0); sonar('tope_madera', -18, 1.7); }
+      else { tec.correrTablilla(g.i, 0.22, 0); if (g.visto > 0.03) sentir('tope', { db: -9, tono: 1.7, sinVibrar: true }); }
       break;
     }
     case 'cajoncito': {
       const final = g.k + limitar(g.v, -6, 6) * 0.1;
       if (!cancelado && final > 0.5) abrirCajoncito(0.25);
-      else { tec.abrirCajonHija(0.22, 0); sonar('tope_madera', -18, 1.7); }
+      else { tec.abrirCajonHija(0.22, 0); if (g.visto > 0.03) sentir('tope', { db: -9, tono: 1.7, sinVibrar: true }); }
       break;
     }
     case 'llave': {
-      const t0 = llaveGirando.t;
-      if (t0 > 0.02) { animar(0.25, k => { if (llaveGirando) llaveGirando.t = t0 * (1 - suave(k)); }); sonar('clic_metal', -18, 1.05); }
-      if (!cancelado && g.giro === 0) mensaje('Gírala: arrastra el dedo en círculo alrededor de la cerradura.');
+      const t0 = llaveGirando.t, h0 = llaveGirando.holgura || 0;
+      animar(0.25, k => { if (llaveGirando) { llaveGirando.t = t0 * (1 - suave(k)); llaveGirando.holgura = h0 * (1 - suave(k)); } });
+      if (t0 > 0.02) sentir('muesca', { db: -4, tono: 0.85, sinVibrar: true });
+      if (!cancelado && g.giro === 0) mensaje(primeraVez('girar-en-circulo') ? 'Gírala: arrastra el dedo en círculo alrededor de la cerradura.' : 'Gírala en círculo.');
       break;
     }
     case 'tapa': {
@@ -3167,6 +3328,7 @@ function restaurar(guardado) {
   if (estado.fase === 'despertar' || estado.fase === 'fin' || estado.fase === 'tarjeta') estado.fase = estado.nivel === 2 ? 'jugando' : 'fin';
   if (estado.tapa === 'abierta') estado.tapaEnMesa = true;
   if (estado.llave === 'cerradura') llaveGirando = { t: 0, sentido: -1, desvanece: 0 };
+  tapaVuelo = estado.tapa === 'suelta' ? tapaSuelta() : null;
   if (estado.nivel === 2 && estado.hija) {
     if (estado.hija.fase === 'subiendo') estado.hija.fase = 'mesa';
     Object.assign(despertar, { ojos: 0, humo: 0, trampilla: 1, oscuridad: 0.16 });

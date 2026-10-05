@@ -225,8 +225,9 @@ button { font: inherit; color: inherit; }
 
 #boton-girar:focus-visible { outline: 2px solid var(--laton); outline-offset: 3px; }
 
+/* arriba, junto a la pista y el sonido: abajo a la izquierda tapaba el pie del incensario y se llevaba sus toques */
 #boton-girar {
-  position: absolute; z-index: 3; left: 16px; bottom: 16px; height: 46px; padding-inline: 14px 18px; border-radius: 23px;
+  position: absolute; z-index: 3; right: 128px; top: 12px; height: 46px; padding-inline: 14px 18px; border-radius: 23px;
   display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 15px; letter-spacing: 0.04em;
   background: var(--sumi-velo); border: 1px solid rgba(201, 164, 93, 0.55); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
 }
@@ -259,7 +260,7 @@ button { font: inherit; color: inherit; }
   .hueco.elegido { transform: translateY(-7px) scale(1.07); }
   #etiqueta-objeto, #etiqueta-objeto.visible { transform: translate(-50%, calc(-100% - 40px)); }
   #mensaje { bottom: 96px; }
-  #boton-girar { left: auto; right: 16px; padding-inline: 13px; }
+  #boton-girar { top: auto; bottom: 16px; right: 16px; padding-inline: 13px; }
   #boton-girar span { display: none; }
 }
 @media (max-height: 520px) {

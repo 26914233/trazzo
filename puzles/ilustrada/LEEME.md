@@ -76,14 +76,57 @@ acción, es que jale el cajón, no solo tocar, ese tipo de movimientos».
   | Qué | Gesto |
   |---|---|
   | Cajón del costado | Tirar de él hacia fuera (por la línea por la que sale) y empujarlo para cerrarlo. Sigue al dedo y, al soltarlo, acaba de salir con un rebote o se cierra con un golpe seco. Los de cerradura no se mueven: la caja contiene el aliento |
-  | Llave en el león | Se mete con la llave del inventario y se gira con el dedo en círculo alrededor de la cerradura (en cualquier sentido); a tres cuartos de vuelta, clic. Si se suelta antes, vuelve |
-  | Tapa del incensario | Ya sin llave, se levanta arrastrando hacia arriba; arriba del todo, va a la mesa. Si se suelta pronto, cae en su sitio |
+  | Llave en el león | Se mete con la llave del inventario y se gira con el dedo en círculo alrededor de la cerradura (en cualquier sentido). Desde la 0.3 tiene holgura al principio, cede y se frena en tres muescas; a tres cuartos de vuelta encaja, dentro corre un pestillo y la tapa salta. Si se suelta antes, vuelve |
+  | Tapa del incensario | Suelta, queda entreabierta, con luz por la rendija (0.3). Se levanta arrastrando hacia arriba; arriba del todo, va a la mesa. Si se suelta pronto, cae y se queda entreabierta |
   | Trampilla (nivel 2) | Tirar hacia arriba: sube la caja pequeña |
   | Tablillas (nivel 2) | Deslizar con el dedo la que toca, por su línea; arrastrar en otra dirección (o cualquier otra tablilla) gira la caja pequeña. Si el ojo la ve, no se mueve |
   | Cajoncito (nivel 2) | Tirar de él hacia fuera |
 
 - **Los cajones tienen física:** un muelle por cajón (cuánto ha salido, su velocidad y adónde va). Mientras el
   dedo lo agarra va donde lo lleve; al soltarlo, la velocidad del dedo cuenta (un tirón rápido lo abre).
+
+## Tacto, sonido y causa → efecto (0.3, 05-10-2026)
+
+**Por qué:** la auditoría (`../genero/07_auditoria_caja_viva.md` §5) puso primero el tacto con peso, el vocabulario de
+sonido, las señales sin texto y la causa → efecto visible. Son lo que define el género y no necesitan arte nuevo.
+
+**Qué cambió:**
+- **El vocabulario de sonido y vibración** (`VOCABULARIO` y `sentir()` en `juego.js`; la tabla está en
+  `../genero/05_gramatica_y_sistemas.md` §7). Cada cosa suena y vibra siempre igual:
+
+  | Evento | Qué significa |
+  |---|---|
+  | holgura | la pieza asoma: se puede mover |
+  | roce | algo se está moviendo |
+  | tope | llegó al final |
+  | clac | encajó en su sitio |
+  | pestillo | algo corre dentro |
+  | muesca | un paso del mecanismo (la llave) |
+  | mecanismo | algo se mueve dentro de la caja |
+  | desbloqueo | gran desbloqueo (grave y largo) |
+  | trabado | no se puede, ahora |
+
+  Hay cuatro sonidos nuevos: `holgura`, `clac`, `pestillo` y `desbloqueo` (`herramientas/sonidos_vocabulario.py`).
+- **El silencio es tensión:** cuando la caja contiene el aliento, el ambiente baja unos 11 dB y luego vuelve.
+- **Peso en las piezas** (`actualizarGesto`, en cada cuadro mientras el dedo mueve algo):
+  - la llave tiene holgura: el primer trozo de giro solo la mueve en su hueco. Luego cede con un sonido, se frena en
+    tres muescas con su clic y sigue al dedo con un poco de retraso;
+  - un cajón del costado cerrado está asentado: hay que tirar un poco antes de que ceda (holgura), y su tope de fuera
+    suena;
+  - las tablillas y el cajoncito de la caja pequeña ceden igual. Siguen al dedo con retraso, suenan al llegar al tope
+    y, al correr del todo, hacen clac;
+  - la tapa del incensario sigue al dedo con retraso y se mece si se mueve de lado;
+  - la caja grande, soltada con impulso, sigue girando un poco. La pequeña se asienta con un leve rebote: un muelle
+    de giro (`girarConMuelle` en `tecnica_3d.js`) en vez de acercarse sin más.
+- **Causa → efecto en la cerradura del león.** Antes solo sonaba un clic y había que leer el mensaje. Ahora, en
+  cadena: la llave llega al final (clac), dentro corre un pestillo, y la tapa salta, cae torcida y se queda
+  entreabierta, con la luz de las brasas por la rendija y humo saliendo por ella. La tapa suelta se dibuja aparte:
+  debajo se pinta la boca abierta (sin el cuerno) solo donde estaba la tapa (`bocaSinTapa`).
+- **Señales sin texto:** un toque en algo que se mueve lo hace asomar con el sonido de holgura. Los textos largos de
+  cada gesto salen solo la primera vez; después, uno corto («Gírala en círculo», «Arrastra hacia arriba»). Los
+  grandes desbloqueos (el cuerno y el ojo de piedra de luna) suenan con el desbloqueo grave.
+- **«Girar» va arriba**, junto a la pista y el sonido. Abajo a la izquierda tapaba el pie del incensario y se llevaba
+  sus toques (fallo 1 de la auditoría).
 
 ## Qué hay
 
@@ -160,10 +203,11 @@ acción, es que jale el cajón, no solo tocar, ese tipo de movimientos».
 - **Los cajones:** su forma en metros sale de `capas/cajones.json`. Se abren tirando de ellos y se cierran
   empujándolos (un muelle con rebote y golpe seco); los de cerradura resisten sin moverse; al despertar, todos
   traquetean. Tocar uno de lejos lleva la cámara a la vista del costado.
-- **Los gestos** (`gestoEn`, `empezarGesto`, `moverGesto` y `soltarGesto`): al apoyar el dedo se mira qué hay
-  debajo; el gesto empieza cuando el dedo se mueve y, si no era para eso, el arrastre gira la caja o, en la sala,
-  mueve la cámara. Por dónde se tira de un cajón o se desliza una tablilla sale de su línea en la pantalla (dónde
-  está cerrada y dónde abierta).
+- **Los gestos** (`gestoEn`, `empezarGesto`, `moverGesto`, `actualizarGesto` y `soltarGesto`): al apoyar el dedo se
+  mira qué hay debajo; el gesto empieza cuando el dedo se mueve y, si no era para eso, el arrastre gira la caja o, en
+  la sala, mueve la cámara. Por dónde se tira de un cajón o se desliza una tablilla sale de su línea en la pantalla
+  (dónde está cerrada y dónde abierta). El dedo marca adónde va la pieza y `actualizarGesto` la lleva en cada cuadro,
+  con su retraso, sus muescas y sus topes.
 - **El inventario:** una bandeja lacada con cuatro huecos. Tocar un objeto dice su nombre y lo elige; tocarlo
   otra vez (o mantenerlo pulsado) lo examina en grande; arrastrarlo lo usa donde se suelte. La nota se
   guarda y se relee.
@@ -207,6 +251,8 @@ acción, es que jale el cajón, no solo tocar, ese tipo de movimientos».
 ```
 # rehacer las capas, las siluetas y los sonidos de la página
 python3 puzles/ilustrada/preparar_capas.py
+# los cuatro sonidos del vocabulario (holgura, clac, pestillo y desbloqueo), a 22 kHz
+python3 puzles/ilustrada/herramientas/sonidos_vocabulario.py
 
 # la cámara del boceto, la escena y los cajones (solo si cambia el boceto)
 python3 puzles/ilustrada/herramientas/camara_boceto.py
@@ -230,6 +276,8 @@ node puzles/ilustrada/prueba/jugar.mjs B vertical <carpeta de capturas>
 node puzles/ilustrada/prueba/jugar_nivel2.mjs horizontal <carpeta de capturas>
 ```
 
+- **Resultado (05-10-2026, 0.3, con el tacto y el vocabulario de sonido):** el nivel 1, 34 de 34 en la B y en la A
+  (en horizontal); el nivel 2, 28 de 28. La web del APK 0.3, sin red: 36 de 36 y 30 de 30.
 - **Resultado (03-10-2026, noche, con los gestos):** el nivel 1, 34 de 34 en la B y en la A (en horizontal); el
   aviso de girar el móvil en vertical, 3 de 3; el nivel 2, 28 de 28. La web del APK 0.2, sin red: 36 de 36 y 30 de
   30. Antes de los gestos: 24 de 24 y 25 de 25.

@@ -584,6 +584,18 @@ que pueda interactuar, que quede fijo en esa parte […] que jale el cajón, no 
   deslizan y el cajoncito se tira. Un toque solo avisa y hace asomar la pieza.
 - Detalle en `ilustrada/LEEME.md` («Gestos y horizontal»). Es la `caja-viva-0.2-prueba.apk`.
 
+**Tacto, sonido y causa → efecto (05-10-2026) [Hecho, APK 0.3]:** lo primero que pedía la auditoría
+(`genero/07_auditoria_caja_viva.md` §5), dentro del método del usuario (§9):
+- Un vocabulario de sonido y vibración fijo: holgura, roce, tope, clac, pestillo, muesca, mecanismo, desbloqueo y
+  trabado; y cuando la caja contiene el aliento, el ambiente baja.
+- Peso en las piezas: la llave tiene holgura, cede y se frena en tres muescas; los cajones, las tablillas y el
+  cajoncito están asentados y ceden tras un poco de esfuerzo; todo sigue al dedo con un poco de retraso y suena al
+  llegar al tope; la caja grande sigue girando si se suelta con impulso y la pequeña se asienta con un rebote.
+- La cerradura del león se entiende sin leer: la llave encaja, corre un pestillo, la tapa salta y se queda
+  entreabierta con luz por la rendija.
+- Menos texto repetido y «Girar» arriba (abajo tapaba el incensario).
+- Detalle en `ilustrada/LEEME.md` («Tacto, sonido y causa → efecto»). Es la `caja-viva-0.3-prueba.apk`.
+
 **Siguiente:**
 - Nivel 3 · La caja del revés y el nivel final, en las próximas entregas (diseño en `NIVELES.md` §6 y §7).
 - Medir los niveles con jugadores, como dice el §3: el tiempo, las pistas y las ganas de seguir.

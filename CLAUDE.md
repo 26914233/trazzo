@@ -546,6 +546,26 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
 
 # Cuatro cajas (puzles): estado y decisiones
 
+- **Método de diseño de La caja viva (encargo del usuario, 04-10-2026):** el texto entero está en
+  `puzles/METODO_CAJA_VIVA.md`; lo que salió de él (investigación del género, bases de datos, banco de ideas,
+  auditoría y roadmap), en `puzles/genero/`.
+  - **El bucle:** investigar → analizar → extraer el principio → comparar → combinar → variar → filtrar → diseñar →
+    implementar → animar → añadir audio → probar → observar la frustración → corregir → pulir.
+  - **Prioridad:** jugabilidad, calidad de los puzles, progresión, interacción, animación, cámara, feedback, audio,
+    visuales y detalles, en ese orden.
+  - **Una buena mecánica no se consulta:** si mejora el juego, es coherente, clara, combinable, escala, tiene buen
+    feedback, es viable y memorable, se implementa. La historia y los cambios grandes de alcance se siguen
+    proponiendo con el formato DECISIÓN.
+  - **Comandos del usuario:** `INVESTIGAR [tema]` (varias fuentes; hallazgos, principios, ejemplos, aplicaciones,
+    riesgos y propuesta) · `DESMONTAR [juego]` (core loop, interacción, mecánicas, puzles, progresión, cámara,
+    feedback, animación, audio, narrativa, dificultad y recompensas, y qué principios se adaptan) · `COMBINAR`
+    (combinaciones, variaciones, puzles, sistemas y niveles) · `PUZZLES` (generar y revisar, con variedad) ·
+    `ANIMACIONES` (cada mecanismo: objeto → disparador → animación → sonido → feedback → cambio de estado) ·
+    `SIGUIENTE` (hacer, sin preguntar, la tarea de mayor impacto).
+  - Cada idea de puzle se escribe antes de construirla: idea, mecánica base, referencia, qué funciona, qué no,
+    transformación, variable nueva, implementación, dificultad y reutilización.
+  - Se distingue siempre hecho, opinión e interpretación. Principios sí; assets, textos, escenarios y soluciones
+    exactas de otros juegos, no.
 - **Índice:** `puzles/LEEME.md` · **plan, datos de mercado y cómo se valida:** `puzles/PLAN.md`.
 - **Análisis de The Room:** `puzles/ANALISIS_THE_ROOM.md`, con anexos en `puzles/referencia/`.
   Se hizo con los cuatro vídeos de partidas que mandó el usuario el 02-10-2026 y su consejo de 30

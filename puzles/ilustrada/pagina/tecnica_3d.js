@@ -18,6 +18,23 @@ const curva = k => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
 const EJE_Y = new THREE.Vector3(0, 1, 0);
 const TAPA_ORIGEN = { x: 575, y: 519 }, TAPA_MESA = { x: 521, y: 642 };
 
+// Un giro con muelle: «q» va hacia «objetivo» con velocidad angular «w» (rad/s, en ejes del mundo), con un poco de
+// rebote al llegar. Así la caja pequeña pesa: sigue al dedo con retraso y, al soltarla, se pasa un poco y se asienta.
+const _dif = new THREE.Quaternion(), _paso = new THREE.Quaternion(), _error = new THREE.Vector3(), _eje = new THREE.Vector3();
+function girarConMuelle(q, objetivo, w, dt, rigidez = 170, amortiguacion = 0.62) {
+  _dif.copy(objetivo).multiply(_paso.copy(q).invert());
+  if (_dif.w < 0) { _dif.x = -_dif.x; _dif.y = -_dif.y; _dif.z = -_dif.z; _dif.w = -_dif.w; }
+  const s = Math.sqrt(Math.max(0, 1 - _dif.w * _dif.w)), angulo = 2 * Math.acos(limitar(_dif.w, -1, 1));
+  if (s > 1e-6) _error.set(_dif.x / s, _dif.y / s, _dif.z / s).multiplyScalar(angulo); else _error.set(0, 0, 0);
+  // en pasos cortos, para que un cuadro lento no lo dispare
+  for (let resto = dt; resto > 1e-5; resto -= 1 / 120) {
+    const h = Math.min(resto, 1 / 120);
+    w.addScaledVector(_error, rigidez * h).multiplyScalar(Math.max(0, 1 - 2 * Math.sqrt(rigidez) * amortiguacion * h));
+    const v = w.length();
+    if (v > 1e-6) { q.premultiply(_paso.setFromAxisAngle(_eje.copy(w).divideScalar(v), v * h)).normalize(); _error.addScaledVector(w, -h); }
+  }
+}
+
 // ---------------------------------------------------------------------------------------------
 // El mundo común: el lienzo WebGL, la sala pintada, la mesa y las texturas del boceto
 // ---------------------------------------------------------------------------------------------
@@ -558,7 +575,7 @@ export async function crearTecnica(letra, op) {
   const POS_HIJA = new THREE.Vector3(0, ZT + LADO_HIJA / 2, 0.245);          // en la mesa, delante de la caja
   const TRAMPILLA_3D = new THREE.Vector3(0.0005, 0.255, -0.005);
   const OJO_3D = new THREE.Vector3(-0.0431, 0.1588, 0.11);                     // el ojo grande, en el frente
-  const animHija = { subida: null, qObjetivo: new THREE.Quaternion(), tablillas: [], cajon: null };
+  const animHija = { subida: null, qObjetivo: new THREE.Quaternion(), vAngular: new THREE.Vector3(), tablillas: [], cajon: null };
 
   if (esB) {
     // la caja pintada (frente y espalda, y los costados y la tapa también pintados de frente) y lo que hay en la
@@ -756,7 +773,8 @@ export async function crearTecnica(letra, op) {
       if (enCaja) giroObj += dx * 0.011;
       else rig.arrastrar(dx, dy);
     },
-    soltar() {},
+    // soltada con impulso, la caja grande sigue girando un poco (pesa) y el muelle la frena
+    soltar(vx = 0, enCaja = false) { if (enCaja && vx) giroObj += limitar(vx, -2500, 2500) * 0.011 * 0.08; },
     pellizcar(r, m0, m1) { return rig.pellizcar(r, m0, m1); },
     lupa() { return rig.lupa.zObj; },
     abrirTrampilla(k) { trampilla = k; },
@@ -834,7 +852,7 @@ export async function crearTecnica(letra, op) {
       giro = giroObj = vGiro = 0; trampilla = 0;
       if (hija) {
         hija.estado.tablillas.fill(0); hija.estado.cajon = 0; animHija.subida = null; animHija.tablillas = []; animHija.cajon = null;
-        animHija.qObjetivo.identity(); hija.cuerpo.quaternion.identity(); hija.grupo.position.copy(TRAMPILLA_3D); hija.poner();
+        animHija.qObjetivo.identity(); hija.cuerpo.quaternion.identity(); animHija.vAngular.set(0, 0, 0); hija.grupo.position.copy(TRAMPILLA_3D); hija.poner();
       }
     },
     actualizar(dt) {
@@ -849,7 +867,8 @@ export async function crearTecnica(letra, op) {
         actualizarHija(dt);
         if (incensarioB) {           // la silueta del incensario, con su tapa o sin ella (y con el cuerno en las brasas)
           const e = op.estado(), t = mundo.tex;
-          incensarioB.material.uniforms.uMascara.value = e.tapa !== 'abierta' ? t.siluetaIncensario
+          // suelta, la tapa se dibuja aparte (op.tapa()) y la boca va sin el cuerno, que aún no se ve
+          incensarioB.material.uniforms.uMascara.value = e.tapa !== 'abierta' ? (op.tapa() ? t.siluetaIncensarioAbierto : t.siluetaIncensario)
             : e.cuerno === 'brasas' ? t.siluetaIncensarioCuerno : t.siluetaIncensarioAbierto;
         }
         if (rolloB) { const r = op.decoracion.rollo; rolloB.rotation.set(r.a, 0, r.lift); }
@@ -966,12 +985,12 @@ export async function crearTecnica(letra, op) {
       }
       hija.grupo.position.copy(p);
       hija.cuerpo.rotation.y = (1 - curvaSuave(k)) * 1.6;
-      if (k >= 1) { animHija.subida = null; hija.cuerpo.rotation.set(0, 0, 0); animHija.qObjetivo.identity(); hija.cuerpo.quaternion.identity(); if (a.fin) a.fin(); }
+      if (k >= 1) { animHija.subida = null; hija.cuerpo.rotation.set(0, 0, 0); animHija.qObjetivo.identity(); hija.cuerpo.quaternion.identity(); animHija.vAngular.set(0, 0, 0); if (a.fin) a.fin(); }
     } else if (fuera) {
       hija.grupo.position.copy(POS_HIJA);
       // un leve vaivén, como si respirara también
       hija.grupo.position.y += 0.0012 * Math.sin(op.reloj() * 1.3);
-      hija.cuerpo.quaternion.slerp(animHija.qObjetivo, 1 - Math.exp(-dt * 11));
+      girarConMuelle(hija.cuerpo.quaternion, animHija.qObjetivo, animHija.vAngular, dt);
     }
     // tablillas y cajoncito
     for (const t of animHija.tablillas) {
