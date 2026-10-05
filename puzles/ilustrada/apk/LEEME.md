@@ -16,7 +16,8 @@ sola pantalla (un WebView).
 | Paquete | `com.thunderdarkness.cajaviva` (otro distinto del de «Cuatro cajas»: no lo pisa) |
 | Nombre | «La caja viva», con la cara de la caja como icono |
 | Android | 7.0 o más (SDK mínimo 24; objetivo 34; compilado con la plataforma 35) |
-| Versión 0.2 | código 2, 5,3 MB, `caja-viva-0.2-prueba.apk`: gestos (tirar de los cajones, girar la llave, levantar la tapa, deslizar las tablillas), pellizcar para acercar o alejar, la cámara fija de cerca y en horizontal |
+| Versión 0.3 | código 3, 5,4 MB, `caja-viva-0.3-prueba.apk` (05-10-2026): tacto con peso (holgura, muescas, retraso y topes), vocabulario de sonido y vibración, la cerradura del león a la vista, menos texto repetido y «Girar» arriba |
+| Versión 0.2 | código 2, 5,3 MB, `caja-viva-0.2-prueba.apk`: gestos (tirar de los cajones, girar la llave, levantar la tapa, deslizar las tablillas), pellizcar para acercar o alejar, la cámara fija de cerca y en horizontal (en «Versiones anteriores (puzles)») |
 | Versión 0.1 | código 1, 5,3 MB, `caja-viva-0.1-prueba.apk` (en «Versiones anteriores (puzles)») |
 | Firma | clave de prueba propia («La caja viva prueba»); ver abajo |
 
@@ -28,7 +29,7 @@ sola pantalla (un WebView).
 # y la clave de prueba en /root/.local/share/caja_viva/firma (de Drive; ver «La firma»)
 
 python3 puzles/ilustrada/apk/herramientas/icono_apk.py        # el icono (solo si cambia)
-python3 puzles/ilustrada/apk/construir_apk.py --version 0.2 --codigo 2
+python3 puzles/ilustrada/apk/construir_apk.py --version 0.3 --codigo 3
 ```
 
 El guion (`construir_apk.py`):
