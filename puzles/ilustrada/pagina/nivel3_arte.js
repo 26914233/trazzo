@@ -172,3 +172,117 @@ export function icono(fuente, lado = 96) {
   k.drawImage(fuente, (lado - fuente.width * s) / 2, (lado - fuente.height * s) / 2, fuente.width * s, fuente.height * s);
   return c.toDataURL('image/png');
 }
+
+// ---------------------------------------------------------------------------------------------
+// El corazón (nivel final): la base y los tres anillos, vistos desde arriba. Son lienzos cuadrados para las coronas de
+// Three.js (RingGeometry): el anillo ocupa la corona entre r0 (fracción del radio) y el borde. El ángulo 0 es el frente
+// (abajo en el lienzo, hacia la cara) y crece en sentido contrario a las agujas del reloj, visto desde arriba.
+// ---------------------------------------------------------------------------------------------
+const ORO = '#d8ad5f', ORO_OSCURO = '#8a6227';
+const enAngulo = (W, r, a) => [W / 2 + Math.sin(a) * r, W / 2 + Math.cos(a) * r];
+function corona(k, W, r0, r1, relleno) {
+  k.beginPath(); k.arc(W / 2, W / 2, r1, 0, Math.PI * 2); k.arc(W / 2, W / 2, r0, 0, Math.PI * 2, true);
+  k.fillStyle = relleno; k.fill('evenodd');
+}
+function filete(k, W, r, grosor, color = ORO) { k.strokeStyle = color; k.lineWidth = grosor; k.beginPath(); k.arc(W / 2, W / 2, r, 0, Math.PI * 2); k.stroke(); }
+// un carácter puesto en el anillo, mirando hacia fuera (de pie visto desde el borde)
+function caracterEn(k, W, r, a, texto, tam, color) {
+  const [x, y] = enAngulo(W, r, a);
+  k.save(); k.translate(x, y); k.rotate(-a);
+  k.fillStyle = color; k.font = `800 ${tam}px ${FUENTE_KANJI}`; k.textAlign = 'center'; k.textBaseline = 'middle';
+  k.fillText(texto, 0, 0);
+  k.restore();
+}
+// la base: laca negra con olas de oro (seigaiha) muy tenues, el marco con ocho muescas y la del frente, más grande
+export function dibujarBaseCorazon(W = 512) {
+  const c = lienzo(W, W), k = c.getContext('2d'), R = W / 2;
+  const g = k.createRadialGradient(R, R * 0.9, R * 0.1, R, R, R);
+  g.addColorStop(0, '#2b1710'); g.addColorStop(1, '#0d0605');
+  k.fillStyle = g; k.beginPath(); k.arc(R, R, R, 0, Math.PI * 2); k.fill();
+  k.save(); k.beginPath(); k.arc(R, R, R * 0.98, 0, Math.PI * 2); k.clip();
+  k.strokeStyle = 'rgba(216, 173, 95, 0.14)'; k.lineWidth = 2;
+  for (let y = -20; y < W + 40; y += 26) for (let x = (y / 26) % 2 ? 0 : 26; x < W + 52; x += 52) {
+    for (const r of [22, 15, 8]) { k.beginPath(); k.arc(x, y, r, Math.PI, 0); k.stroke(); }
+  }
+  k.restore();
+  filete(k, W, R * 0.985, 5, ORO_OSCURO); filete(k, W, R * 0.97, 2);
+  // las muescas del marco: ocho, y la del frente (un triángulo de oro que apunta hacia dentro)
+  for (let i = 0; i < 8; i++) {
+    const a = i * Math.PI / 4, [x0, y0] = enAngulo(W, R * 0.995, a), [x1, y1] = enAngulo(W, R * 0.955, a);
+    k.strokeStyle = ORO; k.lineWidth = i === 0 ? 0 : 4; k.beginPath(); k.moveTo(x0, y0); k.lineTo(x1, y1); if (i) k.stroke();
+  }
+  const [ax, ay] = enAngulo(W, R * 0.995, -0.07), [bx, by] = enAngulo(W, R * 0.995, 0.07), [px, py] = enAngulo(W, R * 0.93, 0);
+  k.fillStyle = ORO; k.beginPath(); k.moveTo(ax, ay); k.lineTo(bx, by); k.lineTo(px, py); k.closePath(); k.fill();
+  k.strokeStyle = 'rgba(30, 16, 6, 0.9)'; k.lineWidth = 2; k.stroke();
+  return c;
+}
+// los anillos: 0 · el del cuerno (laca bermellón, con el cuerno y 角 en oro), 1 · el del ojo (laca negra con puntos de
+// hueso; su marca solo se ve a la luz fría), 2 · el de la voz (madera oscura con ocho muescas, sin marca: se oye)
+export function dibujarAnillo(i, r0n, W = 512) {
+  const c = lienzo(W, W), k = c.getContext('2d'), R = W / 2, r0 = R * r0n, rm = (R + r0) / 2;
+  if (i === 0) {
+    const g = k.createRadialGradient(R, R, r0, R, R, R);
+    g.addColorStop(0, '#6e170c'); g.addColorStop(0.5, '#a93a22'); g.addColorStop(1, '#5a1208');
+    corona(k, W, r0, R, g);
+    for (let j = 0; j < 8; j++) { const [x, y] = enAngulo(W, rm, j * Math.PI / 4); if (j) { k.fillStyle = ORO; k.beginPath(); k.arc(x, y, 5, 0, Math.PI * 2); k.fill(); } }
+    // el cuerno y su carácter, en el frente del anillo
+    const [hx, hy] = enAngulo(W, rm, 0);
+    k.save(); k.translate(hx, hy);
+    k.fillStyle = '#f0e2c4'; k.strokeStyle = 'rgba(40, 20, 8, 0.9)'; k.lineWidth = 2.5;
+    k.beginPath(); k.moveTo(-26, 12); k.quadraticCurveTo(-30, -14, -6, -24); k.quadraticCurveTo(-16, -6, -12, 12); k.closePath(); k.fill(); k.stroke();
+    k.restore();
+    caracterEn(k, W, rm, 0.2, '角', (R - r0) * 0.62, ORO);
+  } else if (i === 1) {
+    const g = k.createRadialGradient(R, R, r0, R, R, R);
+    g.addColorStop(0, '#16100c'); g.addColorStop(0.5, '#2a1f18'); g.addColorStop(1, '#100a07');
+    corona(k, W, r0, R, g);
+    for (let j = 0; j < 40; j++) {
+      const a = j / 40 * Math.PI * 2 + 0.04 * Math.sin(j * 7), r = rm + (R - r0) * 0.22 * Math.sin(j * 2.3);
+      const [x, y] = enAngulo(W, r, a);
+      k.fillStyle = 'rgba(232, 222, 196, 0.55)'; k.beginPath(); k.arc(x, y, 2.4 + (j % 3), 0, Math.PI * 2); k.fill();
+    }
+  } else {
+    const g = k.createRadialGradient(R, R, r0, R, R, R);
+    g.addColorStop(0, '#3b2414'); g.addColorStop(0.5, '#5c3a20'); g.addColorStop(1, '#3a2213');
+    corona(k, W, r0, R, g);
+    k.save(); k.beginPath(); k.arc(R, R, R, 0, Math.PI * 2); k.arc(R, R, r0, 0, Math.PI * 2, true); k.clip('evenodd');
+    k.strokeStyle = 'rgba(30, 16, 8, 0.25)'; k.lineWidth = 1.5;
+    for (let r = r0 + 4; r < R; r += 5) { k.beginPath(); k.arc(R, R + Math.sin(r) * 2, r, 0, Math.PI * 2); k.stroke(); }
+    k.restore();
+    for (let j = 0; j < 8; j++) {
+      const a = j * Math.PI / 4, [x0, y0] = enAngulo(W, r0 + 3, a), [x1, y1] = enAngulo(W, r0 + (R - r0) * 0.45, a);
+      k.strokeStyle = 'rgba(18, 9, 4, 0.9)'; k.lineWidth = 5; k.beginPath(); k.moveTo(x0, y0); k.lineTo(x1, y1); k.stroke();
+    }
+  }
+  filete(k, W, R - 2.5, 4); filete(k, W, r0 + 2.5, 4);
+  k.strokeStyle = 'rgba(20, 10, 4, 0.9)'; k.lineWidth = 1.5;
+  k.beginPath(); k.arc(R, R, R - 0.75, 0, Math.PI * 2); k.stroke(); k.beginPath(); k.arc(R, R, r0 + 0.75, 0, Math.PI * 2); k.stroke();
+  return c;
+}
+// la marca del anillo del ojo, en tinta fría (solo se ve donde llega la luz del ojo de piedra de luna), en el ángulo «a»
+export function dibujarTintaAnillo(r0n, a, W = 512) {
+  const c = lienzo(W, W), k = c.getContext('2d'), R = W / 2, rm = (R + R * r0n) / 2;
+  k.save(); k.shadowColor = 'rgba(170, 205, 255, 0.95)'; k.shadowBlur = 16;
+  caracterEn(k, W, rm, a, '目', (R - R * r0n) * 0.66, 'rgba(225, 238, 255, 0.95)');
+  k.restore();
+  const [x0, y0] = enAngulo(W, R - 6, a - 0.12), [x1, y1] = enAngulo(W, R - 6, a + 0.12);
+  k.strokeStyle = 'rgba(200, 225, 255, 0.85)'; k.lineWidth = 4; k.beginPath(); k.moveTo(x0, y0); k.lineTo(x1, y1); k.stroke();
+  return c;
+}
+// el hueco del centro: cuadrado, oscuro, con su borde de oro (del tamaño de la caja pequeña)
+export function dibujarHuecoCorazon(W = 256) {
+  const c = lienzo(W, W), k = c.getContext('2d');
+  const g = k.createRadialGradient(W / 2, W / 2, 4, W / 2, W / 2, W * 0.7);
+  g.addColorStop(0, '#050202'); g.addColorStop(1, '#1d0f08');
+  k.fillStyle = g; k.fillRect(0, 0, W, W);
+  k.strokeStyle = ORO; k.lineWidth = 8; k.strokeRect(4, 4, W - 8, W - 8);
+  k.strokeStyle = 'rgba(20, 10, 4, 0.9)'; k.lineWidth = 2; k.strokeRect(9, 9, W - 18, W - 18);
+  return c;
+}
+// un brillo redondo (para los destellos del corazón, en mezcla aditiva)
+export function dibujarBrillo(color = '255, 200, 120', W = 128) {
+  const c = lienzo(W, W), k = c.getContext('2d'), g = k.createRadialGradient(W / 2, W / 2, 0, W / 2, W / 2, W / 2);
+  g.addColorStop(0, `rgba(${color}, 1)`); g.addColorStop(0.35, `rgba(${color}, 0.45)`); g.addColorStop(1, `rgba(${color}, 0)`);
+  k.fillStyle = g; k.fillRect(0, 0, W, W);
+  return c;
+}

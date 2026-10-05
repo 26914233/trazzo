@@ -149,11 +149,11 @@ Cada sistema sube por estos siete escalones, repartidos entre niveles. Ejemplo c
 |---|---|---|---|
 | 1 · El cuerno [Hecho] | Aprendizaje | S1 la mirada (distraer) | S2 cajones |
 | 2 · La caja de dentro [Hecho] | Aplicación | S7 anidar + S1 esconder | S2 orden |
-| 3 · La caja del revés | Combinación | S4 luz + S1 alumbrar (invertida) + S8 transformarse | S3 la llave otra vez, S5 la ficha |
-| 4 | Variación | S6 respiración | S1, S4 |
+| 3 · La voz [Hecho, 0.5] | Combinación | S4 luz + S1 alumbrar (invertida: va al revés del dedo) + S6 respiración (el ritmo) | S2 el cajón largo, S5 la ficha y las tintas, S9 la sala (rollo, tetera, tatami) |
+| 4 | Variación | S8 transformarse (la caja que se despliega, propuesta antigua del 3) | S1, S4 |
 | 5 | Dominio | S9 la sala viva + S5 marcas cruzadas | Todos |
 | 6 | Combinación avanzada | S10 sonido + S11 peso | Todos |
-| Final · El corazón | Síntesis | Los tres anillos: cuerno, ojo y voz | Todos |
+| Final · El corazón [Hecho, 0.5] | Síntesis | Los tres anillos: cuerno (el ojo viejo señala), ojo (el nuevo alumbra) y voz (la campanilla avisa); la caja hija es la llave | Todos |
 
 ## 7. Políticas de diseño
 

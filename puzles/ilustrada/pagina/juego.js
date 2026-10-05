@@ -14,7 +14,7 @@ const CAPAS = ['sala', 'sala_vacia', 'sala_mesa_vacia', 'sala_detras', 'tapa', '
   'cuerno_brasas', 'llave', 'nota', 'cuerno', 'cuerno_puesto', 'despierta_ojos', 'despierta_trampilla',
   'despierta_humo', 'ojo_vacio', 'iris', 'silueta_mesa', 'silueta_caja', 'silueta_caja_detras', 'silueta_incensario',
   'silueta_te', 'laca_pared'];
-const CAPAS_NIVEL2 = ['cajita', 'ojo2', 'iris2'];       // la cajita roja y el ojo nuevo (herramientas/nivel2_capas.py)
+const CAPAS_NIVEL2 = ['cajita', 'ojo2', 'iris2', 'hija_frente'];   // la cajita roja, el ojo nuevo y la cara de la caja pequeña
 const SONIDOS = ['noche', 'fuego', 'trabado', 'recoger', 'encajar', 'despertar', 'final_caja_viva', 'suspiro', 'ojo_abre',
   'grunido', 'espiritu', 'papel', 'llave', 'candado_abre', 'tope_madera', 'clic_madera', 'acercar', 'pista', 'toque',
   'mecanismo', 'racha', 'bisagra', 'deslizar_madera', 'cajon', 'trampilla', 'cristal', 'viento', 'clic_metal',
@@ -35,6 +35,8 @@ const VISTAS = {
   te:         { h: [1110, 430, 1376, 705], v: [1130, 400, 1376, 720] },
   // nivel 3: el cajón largo de la espalda, de cerca (con sitio delante para cuando sale)
   largo:      { h: [690, 380, 1020, 640], v: [700, 360, 1010, 660] },
+  // nivel final: el corazón en la tapa, mirado desde arriba, con la cara debajo (sus ojos ayudan)
+  corazon:    { h: [660, 40, 1200, 520], v: [690, 40, 1170, 560] },
 };
 const OJO = { x: 784.5, y: 369 };            // iris en reposo
 const CUENCA = { x: 905, y: 378 };
@@ -67,7 +69,7 @@ const NIVELES = {
   1: { titulo: 'El cuerno', pieza: 'cuerno', texto: 'La caja tiene otra vez su cuerno… y ya te ha visto.' },
   2: { titulo: 'La caja de dentro', pieza: 'ojo', texto: 'Ya tiene sus dos ojos. El nuevo mira donde el viejo no mira.' },
   3: { titulo: 'La voz', pieza: 'voz', texto: 'Canta, muy bajo. Ya tiene su cara entera: el cuerno, los ojos y la voz.' },
-  4: { titulo: 'El corazón', texto: 'Te ha abierto su corazón.' },
+  4: { titulo: 'El corazón', texto: 'Late tranquila, con la cara entera. Te ha abierto su corazón.' },
 };
 const ULTIMO_NIVEL = 4;
 const nombreNivel = n => (n >= ULTIMO_NIVEL ? 'Nivel final' : `Nivel ${n}`);
@@ -195,6 +197,10 @@ function estadoInicial() {
     //                  fichaCara: peon | promovida, largo: cerrado | suelto | abierto, campanilla: cajon | mano | puesta,
     //                  badajo: tetera | taza | mano | puesto, completa, toques (respuestas de la caja), labios (0…1) }
     n3: null,
+    // en el nivel final: { fase: subiendo | anillos | centro | abierto, subida, angulos [3], bloqueados [3], ranura, marca,
+    //                      voz (los sitios de los anillos, en octavos de vuelta), hija: mesa | mano | puesta, giroHija,
+    //                      centro, latido, luz (donde alumbra el ojo nuevo, en el corazón) }
+    fin: null,
     pistasPaso: {},
     intentosMirada: 0,
   };
@@ -366,7 +372,8 @@ function firmaAvance() {
   const h = estado.hija, n3 = estado.n3;
   return [estado.nivel, estado.llave, estado.nota, estado.tapa, estado.cuerno, estado.inventario.length,
     Object.values(estado.cajones).join(''), h ? [h.fase, h.tablillas.join(''), h.cajon, h.cajita, h.ojo].join('') : '',
-    n3 ? [n3.nota, Object.keys(n3.tintas).join(''), n3.ficha, n3.fichaCara, n3.largo, n3.campanilla, n3.badajo, n3.toques].join('') : ''].join('|');
+    n3 ? [n3.nota, Object.keys(n3.tintas).join(''), n3.ficha, n3.fichaCara, n3.largo, n3.campanilla, n3.badajo, n3.toques].join('') : '',
+    estado.fin ? [estado.fin.fase, estado.fin.bloqueados.join(''), estado.fin.hija].join('') : ''].join('|');
 }
 // lo que la caja teme: el frente abierto ahora mismo (o nada, si ya lo vigila)
 function frenteAbierto() {
@@ -406,7 +413,11 @@ function actualizarOjo(dt) {
   // en el nivel 2 vigila la caja pequeña desde que asoma por la trampilla
   const vigilada = estado.nivel === 2 && estado.hija && estado.hija.fase !== 'dentro' && estado.hija.ojo !== 'puesto' && tec.hijaEnBoceto
     ? tec.hijaEnBoceto() : null;
-  if (reloj < ojo.distraidoHasta) objetivo = haciaPunto(ojo.distraidoPor || LAMPARA);
+  // en el nivel final ya no vigila: señala la ranura donde va el cuerno
+  const f = estado.fin, ranura = estado.nivel === 4 && f && f.fase === 'anillos' && !f.bloqueados[0] && tec.corazonEnBoceto
+    ? tec.corazonEnBoceto(0.1045, f.ranura * Math.PI / 4) : null;
+  if (ranura) objetivo = haciaPunto(ranura);
+  else if (reloj < ojo.distraidoHasta) objetivo = haciaPunto(ojo.distraidoPor || LAMPARA);
   else if (ojo.punto && reloj - ojo.ultimoToque < 2.5) objetivo = haciaPunto(ojo.punto);
   else if (ojo.vistazo && reloj < ojo.vistazo.hasta) objetivo = haciaPunto(ojo.vistazo.punto);
   else if (vigilada) objetivo = haciaPunto(vigilada);
@@ -535,10 +546,11 @@ function dibujarParpado(c, p, geo) {
 // ---------------------------------------------------------------------------------------------
 const luzFria = { x: 1100, y: 40, vx: 0, vy: 0, fuerza: 0, guiadaHasta: 0, punto: null };
 const espejoLuz = p => ({ x: limitar(CUENCA.x + (CUENCA.x - p.x) * 1.6, 10, ANCHO - 10), y: limitar(CUENCA.y + (CUENCA.y - p.y) * 1.6, 10, ALTO - 10) });
-const luzActiva = () => estado.nivel === 3 && estado.fase === 'jugando' && ojo2.visible > 0.5 && caraVisible() === 'frente';
+const luzActiva = () => estado.nivel >= 3 && estado.fase === 'jugando' && ojo2.visible > 0.5 && caraVisible() === 'frente';
 function guiarLuz(p) {
   if (!luzActiva() || !p || p.cara === 'detras' || p.hija) return;
-  luzFria.punto = espejoLuz(p);
+  // (en el nivel final la caja ya no se defiende: el ojo nuevo alumbra lo que tocas)
+  luzFria.punto = estado.nivel >= 4 ? { x: p.x, y: p.y } : espejoLuz(p);
   luzFria.guiadaHasta = reloj + 4;
   ojo2.proximoVagar = Math.max(ojo2.proximoVagar, reloj + 4);
   if (primeraVez('luz-guiada')) setTimeoutReloj(1.2, () => { if (!mensajeHasta) mensaje('La luz fría se va al otro lado de tu dedo.', 3.2); });
@@ -562,6 +574,7 @@ function actualizarLuzFria(dt) {
     luzFria.x += luzFria.vx * h; luzFria.y += luzFria.vy * h;
   }
   const n3 = estado.n3, f = luzFria.fuerza * (1 - ojo2.cerrado);
+  if (estado.nivel !== 3) return;
   for (const [id, t] of Object.entries(TINTAS)) {
     const d = Math.hypot(luzFria.x - t.x, luzFria.y - t.y);
     const alumbrada = limitar(1 - (d - 45) / 85, 0, 1) * f;
@@ -594,7 +607,14 @@ function dibujarLuzFria(conAncla) {
   const f = luzFria.fuerza * (1 - ojo2.cerrado);
   if (f < 0.01) return;
   const objeto = objetoBajo(luzFria);
-  const a = tec.ancla(CUENCA, 'caja'), b = tec.ancla({ x: luzFria.x, y: luzFria.y }, objeto);
+  const a = tec.ancla(CUENCA, 'caja');
+  let b = tec.ancla({ x: luzFria.x, y: luzFria.y }, objeto);
+  // en el final la luz cae en el corazón, encima de la tapa: donde se toca o, si no, en su centro
+  const fin = estado.fin, enCorazon = estado.nivel === 4 && fin && fin.subida > 0.5 && tec.corazonEnPantalla;
+  if (enCorazon && a) {
+    const L = fin.luz && reloj < fin.luz.hasta ? fin.luz : { r: 0, alfa: 0 }, q = tec.corazonEnPantalla(L.r, L.alfa);
+    b = q ? { x: q.x, y: q.y, k: a.k * 0.8, visible: true } : null;
+  }
   if (!a || !b || !a.visible || !b.visible) return;
   const dx = b.x - a.x, dy = b.y - a.y, L = Math.hypot(dx, dy) || 1, nx = -dy / L, ny = dx / L, w0 = 3 * a.k, w1 = 46 * b.k;
   ctx.setTransform(ppp, 0, 0, ppp, 0, 0);
@@ -603,6 +623,7 @@ function dibujarLuzFria(conAncla) {
   ctx.fillStyle = g;
   ctx.beginPath(); ctx.moveTo(a.x + nx * w0, a.y + ny * w0); ctx.lineTo(b.x + nx * w1, b.y + ny * w1);
   ctx.lineTo(b.x - nx * w1, b.y - ny * w1); ctx.lineTo(a.x - nx * w0, a.y - ny * w0); ctx.closePath(); ctx.fill();
+  if (enCorazon) { ctx.setTransform(ppp, 0, 0, ppp, 0, 0); brillo(ctx, b.x, b.y, 60 * b.k, '150,190,255', 0.42 * f); return; }
   conAncla(luzFria.x, luzFria.y, objeto, () => { brillo(ctx, luzFria.x, luzFria.y, 84, '150,190,255', 0.5 * f); brillo(ctx, luzFria.x, luzFria.y, 30, '225,238,255', 0.4 * f); });
 }
 
@@ -795,7 +816,7 @@ function actualizarLampara() {
   if (estado.fase === 'jugando' && reloj >= lampara.proxima) {
     lampara.proxima = reloj + azar(14, 24);
     agitarLampara(0.9, 0.6);
-    if (reloj > ojo.distraidoHasta && !vigilaLaPequena()) { ojo.distraidoPor = LAMPARA; ojo.distraidoHasta = reloj + 1.3; }
+    if (reloj > ojo.distraidoHasta && !vigilaLaPequena() && estado.nivel !== 4) { ojo.distraidoPor = LAMPARA; ojo.distraidoHasta = reloj + 1.3; }
   }
 }
 const motas = [];
@@ -950,7 +971,7 @@ function actualizarDecoracion(dt) {
   if (tetera.t < tetera.duracion) tetera.t += dt;
   if (estado.fase === 'jugando' && reloj > tetera.proxima) {
     tetera.proxima = reloj + azar(26, 46); vaporTetera(azar(0.5, 0.8));
-    if (reloj > ojo.distraidoHasta && !vigilaLaPequena() && ojo.parpadoBase < 0.5) { ojo.distraidoPor = TAPA_TETERA; ojo.distraidoHasta = reloj + 1.1; }
+    if (reloj > ojo.distraidoHasta && !vigilaLaPequena() && ojo.parpadoBase < 0.5 && estado.nivel !== 4) { ojo.distraidoPor = TAPA_TETERA; ojo.distraidoHasta = reloj + 1.1; }
   }
   for (let i = ondas.length - 1; i >= 0; i--) { ondas[i].t += dt; if (ondas[i].t > 1.5) ondas.splice(i, 1); }
   actualizarPolillas(dt);
@@ -1868,13 +1889,13 @@ function dibujarEncima3D() {
   c.setTransform(ppp, 0, 0, ppp, 0, 0);
   for (const n of nubes) conAncla(n.ax, n.ay, n.objeto, () => dibujarNube(ctx, n));
   for (const lista of [humos.incienso, humos.te, humos.sueltos]) for (const h of lista) conAncla(h.x, h.y, h.objeto, () => h.dibujar(ctx));
-  if (estado.nivel === 3) { dibujarNivel3Encima(conAncla); c.setTransform(ppp, 0, 0, ppp, 0, 0); }
+  if (estado.nivel >= 3) { dibujarNivel3Encima(conAncla); c.setTransform(ppp, 0, 0, ppp, 0, 0); }
   if (despertar.oscuridad > 0) {
     c.setTransform(ppp, 0, 0, ppp, 0, 0);
     c.fillStyle = `rgba(6, 4, 8, ${despertar.oscuridad})`; c.fillRect(0, 0, ancho, alto);
   }
   c.globalCompositeOperation = 'lighter';
-  if (estado.nivel === 3) { dibujarLuzFria(conAncla); c.setTransform(ppp, 0, 0, ppp, 0, 0); }
+  if (estado.nivel >= 3) { dibujarLuzFria(conAncla); c.setTransform(ppp, 0, 0, ppp, 0, 0); }
   for (const objeto of ['sala', 'incensario', 'caja']) {
     if (objeto === 'caja' && tec.cara() !== 'frente') continue;
     for (const [x, y, r, col, a] of luces(objeto)) conAncla(x, y, objeto, () => brillo(ctx, x, y, r, col, a));
@@ -1915,6 +1936,8 @@ const OBJETOS = {
   ficha: { nombre: 'Ficha de shōgi', texto: 'Un peón de madera, 歩. Por detrás tiene otra cara.', icono: '', capa: 'ficha' },
   campanilla: { nombre: 'Campanilla de bronce', texto: 'Pequeña y pesada. No tiene badajo: no suena.', icono: '', capa: 'campanilla' },
   badajo: { nombre: 'Badajo de bronce', texto: 'Mojado de té. La lengua de una campanilla.', icono: '', capa: 'badajo' },
+  // nivel final
+  hija: { nombre: 'La caja pequeña', texto: 'Cerrada otra vez. Cabe justa en la mano… y en algún hueco.', icono: 'capas/hija_frente.webp', capa: 'hija' },
 };
 const huecosBandeja = () => [...el.bandeja.querySelectorAll('.hueco')];
 const huecoDe = objeto => huecosBandeja().find(h => h.dataset.objeto === objeto) || null;
@@ -2286,6 +2309,7 @@ function pista() {
   const n = estado.pistas++;
   if (estado.nivel === 2) return pistaNivel2();
   if (estado.nivel === 3) return pistaNivel3();
+  if (estado.nivel === 4) return pistaFinal();
   if (estado.llave === 'cajon') {
     if (caraVisible() !== 'frente') return mensaje('Los cajones están junto a la cara. Gira la caja.');
     if (estado.cajones.c8 !== 'abierto') return mensaje(n % 2 ? 'Los cajones del costado se abren tirando de ellos. Prueba los de abajo.' : 'Algunos cajones tienen cerradura y otros no. Tira de ellos y mira dentro.');
@@ -2364,9 +2388,10 @@ function tocarEscena(sx, sy) {
   if (estado.fase !== 'jugando' || estado.ocupado) return;
   const p = tec.aPintura(sx, sy);
   if (!p) return;                        // de cerca, la cámara se queda: se vuelve con «Sala», atrás o pellizcando
-  if (estado.seleccion) { usarObjeto(estado.seleccion, p, null); return; }
-  const v = estado.vista, deCerca = v === 'caja' || v === 'cara' || v === 'cajones' || v === 'hija' || v === 'largo';
+  if (estado.seleccion) { usarObjeto(estado.seleccion, p, null, { x: sx, y: sy }); return; }
+  const v = estado.vista, deCerca = v === 'caja' || v === 'cara' || v === 'cajones' || v === 'hija' || v === 'largo' || v === 'corazon';
   if (p.hija) { tocarHija(p); return; }
+  if (p.corazon) { sonar('toque', -14); tocarCorazon(p, { x: sx, y: sy }); return; }
   if (p.cara === 'detras') {
     if (!deCerca) { irA('caja'); return; }
     if (p.largo) { sonar('toque', -14); tocarLargo(p); return; }          // el cajón largo abierto (o lo que guarda)
@@ -2615,6 +2640,12 @@ async function subirCajaHija() {
 function tocarHija(p) {
   const h2 = estado.hija;
   if (!h2 || h2.fase !== 'mesa') return;
+  if (estado.nivel === 4 && estado.fin) {
+    const f = estado.fin;
+    if (f.hija === 'mesa') { cogerHija(); return; }
+    if (f.hija === 'puesta') { sentir('holgura', { tono: 0.9 }); mensaje(f.fase === 'abierto' ? 'Late.' : 'Gírala con el dedo, en círculo, como una llave.'); }
+    return;
+  }
   if (estado.nivel >= 3) { sonar('toque', -14); mensaje('La caja pequeña, abierta. Ya no guarda nada… por ahora.'); return; }
   if (estado.vista !== 'hija') { irA('hija'); return; }
   sonar('toque', -14);
@@ -2775,6 +2806,9 @@ function prepararNivel3() {
   OBJETOS.campanilla.icono = icono(img.campanilla); OBJETOS.campanilla.iconoCompleta = icono(img.campanilla_completa);
   OBJETOS.badajo.icono = icono(img.badajo);
   OBJETOS.ficha.iconoPeon = OBJETOS.ficha.icono; OBJETOS.campanilla.iconoMuda = OBJETOS.campanilla.icono;
+  // la caja pequeña (nivel final): su cara, para la bandeja y los vuelos
+  img.hija = img.hija_frente;
+  datos.capas.hija = { x: 900, y: 660, w: 60, h: 60 };
 }
 // la ficha, el icono y el texto según la cara que mira hacia arriba; la campanilla, con badajo o sin él
 function ponerCaraFicha(cara) {
@@ -3126,7 +3160,7 @@ function dibujarNivel3Encima(conAncla) {
   const n3 = estado.n3;
   if (!n3) return;
   const deFrente = tec.cara() === 'frente';
-  dibujarTintas(conAncla);
+  if (estado.nivel === 3) dibujarTintas(conAncla);
   if (deFrente && n3.nota === 'boca' && notaSale > 0.01) conAncla(BOCA.x, BOCA.y, 'caja', () => {
     // un papel doblado que asoma entre los labios, torcido, con su doblez y un sello rojo
     ctx.save(); ctx.translate(BOCA.x - 6, BOCA.y + 1); ctx.rotate(BOCA.ang + 0.22);
@@ -3225,6 +3259,198 @@ function pistaNivel3() {
 }
 
 // ---------------------------------------------------------------------------------------------
+// Nivel final · El corazón (solo en la B). Con la cara entera, la caja ya no se defiende: respira hondo y su corazón sube
+// por la trampilla y se queda en la tapa, con tres anillos. Ayuda con lo que le has devuelto:
+//   el anillo del cuerno: el ojo viejo mira la ranura donde va el cuerno (y la ranura late en rojo);
+//   el anillo del ojo: su marca es tinta fría, y ahora el ojo nuevo alumbra lo que tocas;
+//   el anillo de la voz: no tiene marca; la campanilla de la boca suena cuando pasa por su sitio.
+// Con los tres en su sitio se abre el hueco del centro: la caja pequeña del nivel 2 es la última llave (se pone y se gira).
+// ---------------------------------------------------------------------------------------------
+const PASO_ANILLO = Math.PI / 4;
+const RADIOS_ANILLOS = [[0.0855, 0.106], [0.0705, 0.0855], [0.054, 0.0705]];
+const angular = a => Math.atan2(Math.sin(a), Math.cos(a));
+const anilloEn = r => RADIOS_ANILLOS.findIndex(([a, b]) => r >= a && r < b);
+// dónde tiene que quedar cada anillo: el cuerno (en el frente del suyo) en la ranura; la marca del ojo en la muesca
+// de oro del frente; el de la voz, donde suena la campanilla
+function sitioAnillo(f, i) { return i === 0 ? f.ranura * PASO_ANILLO : i === 1 ? -f.marca * PASO_ANILLO : f.voz * PASO_ANILLO; }
+const enSitio = (f, i, a = f.angulos[i]) => Math.abs(angular(a - sitioAnillo(f, i))) < PASO_ANILLO * 0.3;
+// el estado al final del nivel 3, para empezar el final sin jugarlo (seguir una partida guardada, o «?nivel=4»)
+function estadoTrasNivel3() {
+  estado.n3 = { nota: 'mano', tintas: { rollo: true, te: true, suelo: true }, ficha: 'puesta', fichaCara: 'promovida', largo: 'suelto',
+    campanilla: 'puesta', badajo: 'puesto', completa: true, toques: 3, labios: 1 };
+  cajonAnim.largo.k = cajonAnim.largo.objetivo = 0.12;
+  ponerTextoNota(3); ponerCaraFicha('promovida'); ponerCampanillaCompleta(true);
+  Object.assign(despertar, { trampilla: 0 });
+  if (tec.abrirTrampilla) tec.abrirTrampilla(0);
+  hornear();
+}
+async function empezarFinal() {
+  ocultarTarjeta();
+  estado.nivel = 4;
+  const paso = () => Math.floor(Math.random() * 8);
+  const f = estado.fin = { fase: 'subiendo', subida: 0, angulos: [0, 0, 0], bloqueados: [false, false, false],
+    ranura: 1 + Math.floor(Math.random() * 7), marca: paso(), voz: paso(), hija: 'mesa', giroHija: 0, centro: 0, latido: 0, luz: null };
+  for (let i = 0; i < 3; i++) do { f.angulos[i] = paso() * PASO_ANILLO; } while (enSitio(f, i));      // ninguno empieza en su sitio
+  estado.pistasPaso = {}; estado.insistencia = {};
+  estado.fase = 'jugando'; estado.ocupado = true;
+  el.girar.hidden = true; el.inventario.hidden = false; el.volver.hidden = true;
+  for (const id of Object.keys(CAJONES)) if (estado.cajones[id] === 'abierto') cerrarCajon(id);
+  if (estado.n3 && estado.n3.largo === 'abierto') { estado.n3.largo = 'suelto'; cajonAnim.largo.objetivo = 0.12; }
+  if (tec.cara() !== 'frente') tec.girar();
+  ojo.punto = null; ojo.distraidoHasta = 0; ojo.parpadoBase = 0; Object.assign(ojo2, { visible: 1, parpadoBase: 0 });
+  // la caja pequeña se cierra sola, en la mesa: será la última llave
+  if (estado.hija && tec.correrTablilla) {
+    estado.hija.tablillas.forEach((_, i) => setTimeoutReloj(0.4 + 0.18 * (4 - i), () => { tec.correrTablilla(i, 0.4, 0); sonar('deslizar_madera', -18, 1.6); }));
+    setTimeoutReloj(0.2, () => tec.abrirCajonHija(0.4, 0));
+    estado.hija.tablillas = estado.hija.tablillas.map(() => false); estado.hija.cajon = 'cerrado';
+  }
+  bucle('noche', -14, 2);
+  irA('caja', 1.4);
+  await esperar(1.8);
+  // respira hondo, suena su voz, y la trampilla deja salir el corazón
+  contenerAliento(2.2); sonar('suspiro', -6, 0.8);
+  await esperar(1.2);
+  sonar('campanilla', -6); sonar('mecanismo', -4, 0.8); vibrar(30);
+  destello(TRAMPILLA.x, TRAMPILLA.y - 10, 180, '255,215,140', 0.7, 1.5);
+  irA('corazon', 2.4);
+  if (tec.inclinar) tec.inclinar(0, 0.52);
+  sonar('deslizar_madera', -6, 0.6);
+  await animarPromesa(2.4, k => { f.subida = curva(k); });
+  sentir('clac', { tono: 0.8 }); sonar('latido', -6);
+  f.fase = 'anillos';
+  estado.ocupado = false; el.volver.hidden = false;
+  mensaje('Su corazón, con tres anillos. Ya no se defiende: el ojo viejo señala, el nuevo alumbra lo que tocas y su voz te avisa.', 6);
+}
+function actualizarFinal(dt) {
+  const f = estado.fin;
+  if (estado.nivel !== 4 || !f) return;
+  actualizarLuzFria(dt);
+  // abierto, el corazón late y sus anillos giran solos
+  if (f.fase === 'abierto') { f.angulos[0] += 0.5 * dt; f.angulos[1] -= 0.8 * dt; f.angulos[2] += 1.2 * dt; }
+}
+// tocar el corazón le dice al ojo nuevo dónde alumbrar (la tinta del anillo del ojo solo se ve allí)
+function alumbrarCorazon(q) {
+  const f = estado.fin;
+  if (!f || estado.vista !== 'corazon' || !tec.puntoEnCorazon || !q) return;
+  const c = tec.puntoEnCorazon(q.x, q.y);
+  if (c && c.r < 0.11) f.luz = { alfa: c.alfa, r: c.r, hasta: reloj + 3 };
+}
+function tocarCorazon(p, q) {
+  const f = estado.fin;
+  if (!f) return;
+  if (estado.vista !== 'corazon') { irA('corazon', 0.9); if (tec.inclinar) tec.inclinar(0, 0.52); return; }
+  const c = q && tec.puntoEnCorazon ? tec.puntoEnCorazon(q.x, q.y) : null, i = c ? anilloEn(c.r) : -1;
+  if (f.fase === 'anillos' && i >= 0) {
+    if (f.bloqueados[i]) { mensaje('Ese ya está en su sitio.'); return; }
+    sentir('holgura', { tono: 0.8 + 0.1 * i });
+    mensaje(primeraVez('anillo') ? 'Gira: arrastra el dedo en círculo sobre el anillo.' : ['El anillo del cuerno.', 'El anillo del ojo: su marca no se ve.', 'El anillo de la voz: no tiene marca.'][i], 3);
+    return;
+  }
+  if (f.fase === 'centro' && f.hija !== 'puesta') { mensaje('Un hueco cuadrado, del tamaño de la caja pequeña.'); return; }
+  mensaje(f.fase === 'anillos' ? 'En el centro, la madera está cerrada. Primero, sus tres anillos.' : 'Late.');
+}
+function bloquearAnillo(i) {
+  const f = estado.fin;
+  if (f.bloqueados[i]) return;
+  f.bloqueados[i] = true;
+  sentir('clac', { tono: 0.85 + 0.12 * i }); setTimeoutReloj(0.25, () => sentir('pestillo', { tono: 0.9 }));
+  sonar('espiritu', -16, 1.15 + 0.1 * i);
+  const textos = ['El cuerno, en la ranura que miraba el ojo viejo. El anillo queda firme.', 'La marca del ojo, frente a la muesca de oro. Encaja.',
+    'Donde sonó la voz, el anillo encaja.'];
+  mensaje(textos[i], 4);
+  if (f.bloqueados.every(Boolean)) setTimeoutReloj(1.4, abrirCentro);
+}
+function avisarVoz() {
+  if (estado.fin) estado.fin.vozHasta = reloj + 0.9;       // (el corazón también brilla un momento: se ve sin sonido)
+  sonar('campanilla', -11, 1.02);
+  destello(BOCA.x, BOCA.y, 60, '255,215,150', 0.6, 0.9);
+  labiosTiemblan = reloj + 0.6;
+}
+async function abrirCentro() {
+  const f = estado.fin;
+  f.fase = 'centro';
+  sentir('mecanismo'); sonar('latido', -8);
+  await animarPromesa(1.2, k => { f.centro = suave(k); });
+  mensaje(f.hija === 'mano' ? 'En el centro se abre un hueco cuadrado: el de la caja pequeña que llevas.'
+    : 'En el centro se abre un hueco cuadrado… del tamaño de la caja pequeña que espera en la mesa.', 5);
+}
+function cogerHija() {
+  const f = estado.fin;
+  f.hija = 'mano';
+  const v = tec.puntoHija ? tec.puntoHija() : null, m = v ? tec.ancla(v) : null;
+  estado.hija.fase = 'mano';
+  sonar('recoger', -2, 0.9);
+  alInventario('hija', 'hija', 'caja', m && m.visible ? { x: m.x, y: m.y, k: 1, enPantalla: true } : { x: 930, y: 690 });
+  mensaje(f.fase === 'centro' ? 'La caja pequeña, cerrada. Cabe justa en el hueco del corazón.' : 'La caja pequeña, cerrada otra vez. Cabe en la mano… y en algún hueco.', 4);
+}
+async function ponerHijaEnCorazon(desde) {
+  const f = estado.fin;
+  estado.ocupado = true;
+  if (estado.vista !== 'corazon') { irA('corazon', 0.8); if (tec.inclinar) tec.inclinar(0, 0.52); await esperar(0.9); }
+  await desdeInventario('hija', 'hija', tec.centroCorazon(), 'caja', desde);
+  f.hija = 'puesta'; estado.hija.fase = 'corazon';
+  sentir('clac', { tono: 0.8 }); sonar('tope_madera', -4, 0.9); sacudir(2, 0.25);
+  estado.ocupado = false;
+  mensaje('Encaja en el centro del corazón. Gírala con el dedo, en círculo.', 4.5);
+}
+// la caja pequeña, girada un cuarto de vuelta en el corazón: se asienta y abre
+async function girarLlaveHija(signo) {
+  const f = estado.fin;
+  estado.ocupado = true;
+  const desde = f.giroHija;
+  await animarPromesa(0.22, k => { f.giroHija = mezclar(desde, signo * Math.PI / 2, suave(k)); });
+  abrirCorazon();
+}
+// el final: la caja pequeña gira como una llave, los anillos se sueltan y el corazón late; la sala se aclara y la caja
+// canta con los dos ojos abiertos
+async function abrirCorazon() {
+  const f = estado.fin;
+  f.fase = 'abierto';
+  estado.ocupado = true; el.volver.hidden = true;
+  sentir('clac'); await esperar(0.35);
+  sentir('desbloqueo'); sacudir(4, 0.4);
+  ojo.parpadoBase = 0; ojo2.parpadoBase = 0; ojo.punto = null;
+  for (let i = 0; i < 7; i++) setTimeoutReloj(0.4 + i * 1.15, () => {
+    sonar('latido', -3 + Math.min(i, 3)); vibrar([30, 90, 20]);
+    animar(0.9, k => { f.latido = Math.sin(Math.min(1, k * 3) * Math.PI / 2) * (1 - k) * 0.9 + 0.25; });
+  });
+  setTimeoutReloj(1.2, () => sonar('canto', 0));
+  const oscuro0 = despertar.oscuridad, apagada0 = lampara.apagada;
+  animar(4, k => { const e = suave(k); despertar.oscuridad = oscuro0 * (1 - e); lampara.apagada = apagada0 * (1 - e); });
+  for (const [x, y] of [[OJO.x, OJO.y], [CUENCA.x, CUENCA.y]]) destello(x, y, 80, '255,220,160', 0.7, 2.5);
+  for (const [x, y, dx] of [[880, 190, -0.4], [980, 190, 0.4], [930, 180, 0]]) {
+    humos.sueltos.push(new Cinta(x, y, { ritmo: 14, vida: 5, vel: 18, ancho: 4, alfa: 0.3, dir: { x: dx, y: -1 }, duracion: 7, rizo: 1.2,
+      color: [255, 236, 200], tinta: 0.1, objeto: 'caja' }));
+  }
+  await esperar(3);
+  irA('caja', 3);
+  await esperar(4);
+  irA('sala', 4.5);
+  await esperar(4.5);
+  estado.ocupado = false;
+  terminarNivel(4);
+}
+function pistaFinal() {
+  const f = estado.fin;
+  const escalon = (clave, lista) => {
+    const n = estado.pistasPaso[clave] = (estado.pistasPaso[clave] || 0) + 1;
+    return mensaje(lista[Math.min(n, lista.length) - 1], 4.5);
+  };
+  if (!f || f.fase === 'subiendo' || f.fase === 'abierto') return mensaje('Mira.');
+  if (f.fase === 'anillos') {
+    if (!f.bloqueados[0]) return escalon('cuerno', ['El anillo de fuera lleva un cuerno. ¿Adónde mira el ojo viejo?',
+      'Una ranura del marco late en rojo: ahí va el cuerno.', 'Gira el anillo de fuera (arrastra en círculo) hasta dejar el cuerno en la ranura roja, y suéltalo.']);
+    if (!f.bloqueados[1]) return escalon('ojo', ['El anillo de en medio tiene una marca que no se ve.', 'El ojo nuevo alumbra lo que tocas: toca el anillo por varios sitios.',
+      'Cuando veas 目, gira el anillo hasta la muesca de oro del frente.']);
+    return escalon('voz', ['El anillo de dentro no tiene marca. Escucha.', 'Gíralo despacio: la campanilla de la boca suena cuando pasa por su sitio.',
+      'Suéltalo justo donde suena la campanilla.']);
+  }
+  if (f.hija === 'mesa') return escalon('hija', ['El hueco del centro es cuadrado. ¿Qué tiene ese tamaño?', 'La caja pequeña, en la mesa. Cógela.']);
+  if (f.hija === 'mano') return escalon('poner', ['Lleva la caja pequeña al centro del corazón.', 'Elígela en la bandeja y toca el hueco.']);
+  return escalon('llave', ['Una llave se gira.', 'Gira la caja pequeña con el dedo, en círculo: un cuarto de vuelta.']);
+}
+
+// ---------------------------------------------------------------------------------------------
 // Usar lo que llevas
 // ---------------------------------------------------------------------------------------------
 // un toque elige el objeto; otro toque sobre el elegido lo examina
@@ -3243,10 +3469,11 @@ function seleccionar(objeto) {
     cajita: 'La cajita roja. Tócala otra vez para mirarla de cerca.', ojo: 'El ojo de piedra de luna. ¿Dónde va?',
     ficha: 'La ficha de shōgi. Tócala otra vez para mirarla de cerca.',
     campanilla: n3 && n3.completa ? 'La campanilla. Toca donde quieras hacerla sonar.' : 'La campanilla, sin badajo. Tócala otra vez para mirarla.',
-    badajo: 'El badajo. ¿Dónde va?' };
+    badajo: 'El badajo. ¿Dónde va?', hija: 'La caja pequeña. ¿Dónde cabe?' };
   mensaje(textos[objeto], 2.4);
 }
-function usarObjeto(objeto, p, desde = null) {
+// (desde: de dónde sale volando, si se arrastró desde la bandeja; toque: el punto de la pantalla donde se usa)
+function usarObjeto(objeto, p, desde = null, toque = desde) {
   const deseleccionar = () => { estado.seleccion = null; pintarInventario(); };
   const deFrente = p && p.cara !== 'detras';
   if (objeto === 'nota') { deseleccionar(); leerNota(); return; }
@@ -3261,7 +3488,15 @@ function usarObjeto(objeto, p, desde = null) {
   if (objeto === 'cajita') { deseleccionar(); sonar('trabado', -10, 1.3); mensaje('Primero habría que abrirla. Tócala dos veces en la bandeja para mirarla de cerca.'); return; }
   // nivel 3
   if (objeto === 'ficha' && p && p.cara === 'detras' && dentro(['rect', 805, 318, 888, 418], p)) { deseleccionar(); ponerFicha(desde); return; }
-  if (objeto === 'campanilla' && estado.n3) { deseleccionar(); usarCampanilla(p, desde); return; }
+  if (objeto === 'campanilla' && estado.n3 && estado.nivel === 3) { deseleccionar(); usarCampanilla(p, desde); return; }
+  if (objeto === 'hija' && estado.fin) {
+    deseleccionar();
+    const f = estado.fin, c = toque && tec.puntoEnCorazon ? tec.puntoEnCorazon(toque.x, toque.y) : null;
+    if (f.fase === 'centro' && (p && p.corazon || (c && c.r < 0.11))) { ponerHijaEnCorazon(desde); return; }
+    sonar('trabado', -8, 1.2);
+    mensaje(f.fase === 'anillos' ? 'El corazón aún no tiene hueco: primero, sus tres anillos.' : 'Ahí no. ¿Dónde hay un hueco de su tamaño?');
+    return;
+  }
   if (objeto === 'badajo' && p && p.cara !== 'detras' && dentro(['poli', CAJA], p)) { deseleccionar(); sonar('trabado', -8, 1.2); mensaje('El badajo solo, no. Va dentro de algo.'); return; }
   deseleccionar();
   sonar('trabado', -8, 1.2);
@@ -3442,7 +3677,7 @@ function terminarNivel(n) {
   el.tarjeta.querySelector('.marcador').setAttribute('aria-label', `La cara: ${Math.min(n, 3)} de 3 piezas`);
   const puede = n < ULTIMO_NIVEL && hay3D();
   el.tarjetaHecho.textContent = `${nombreNivel(n)} superado`;
-  el.tarjetaSiguiente.textContent = n >= ULTIMO_NIVEL ? 'Fin.'
+  el.tarjetaSiguiente.textContent = n >= ULTIMO_NIVEL ? 'Fin de la primera caja. Gracias por jugar.'
     : puede ? `${nombreNivel(n + 1)} · ${siguiente.titulo}`
       : `${nombreNivel(n + 1)} necesita la escena 3D, y este móvil no puede abrirla.`;
   el.seguir.hidden = !puede;
@@ -3518,6 +3753,7 @@ function actualizar(dt) {
   actualizarHolguraHija();
   actualizarNivel3(dt);
   actualizarTetera3(dt);
+  actualizarFinal(dt);
   actualizarOjo(dt);
   actualizarOjo2(dt);
   actualizarAliento(dt);
@@ -3557,7 +3793,7 @@ function cuadro(ahora) {
 // ---------------------------------------------------------------------------------------------
 const punteros = new Map();
 let puntero = null, arrastre = null, pellizco = null;
-const VISTA_PADRE = { cajones: 'caja', cara: 'caja', incensario: 'sala', caja: 'sala', hija: 'caja', te: 'sala', largo: 'caja' };
+const VISTA_PADRE = { cajones: 'caja', cara: 'caja', incensario: 'sala', caja: 'sala', hija: 'caja', te: 'sala', largo: 'caja', corazon: 'caja' };
 function posicion(e) { const r = lienzo.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
 lienzo.addEventListener('pointerdown', e => {
   desbloquearAudio();
@@ -3577,9 +3813,10 @@ lienzo.addEventListener('pointerdown', e => {
   // tirar de sus cajones); en el nivel 2, con la caja pequeña en la mesa, no se gira: arrastrar gira la pequeña en la mano
   const v = estado.vista;
   puntero = { ...q, x0: q.x, y0: q.y, inicio: performance.now(), id: e.pointerId, movido: 0, gesto: gestoEn(p, q),
-    enCaja: (v === 'sala' || v === 'caja') && !hijaEnMesa() && !!(p && (p.cara === 'detras' || p.cajon || dentro(['poli', CAJA], p))),
+    // (en el final no se gira: su corazón está en la tapa y los ojos tienen que verlo)
+    enCaja: (v === 'sala' || v === 'caja') && !hijaEnMesa() && estado.nivel !== 4 && !!(p && (p.cara === 'detras' || p.cajon || dentro(['poli', CAJA], p))),
     enHija: hijaEnMesa() && v === 'hija' };
-  if (estado.fase === 'jugando' && p && p.cara === 'frente') { mirarA(p); guiarLuz(p); }
+  if (estado.fase === 'jugando' && p && p.cara === 'frente') { if (estado.nivel !== 4) mirarA(p); guiarLuz(p); alumbrarCorazon(q); }
 });
 lienzo.addEventListener('pointermove', e => {
   const q = posicion(e);
@@ -3588,7 +3825,7 @@ lienzo.addEventListener('pointermove', e => {
   if ((e.pointerType === 'mouse' || puntero) && estado.fase === 'jugando') {
     const p = tec.aPintura(q.x, q.y);
     moverDedo(p);
-    if (p && p.cara === 'frente') { mirarA(p); if (puntero) guiarLuz(p); }
+    if (p && p.cara === 'frente') { if (estado.nivel !== 4) mirarA(p); if (puntero) { guiarLuz(p); alumbrarCorazon(q); } }
   }
   if (!puntero || e.pointerId !== puntero.id) return;
   const dx = q.x - puntero.x, dy = q.y - puntero.y;
@@ -3695,6 +3932,12 @@ function gestoEn(p, q) {
     const c = cerraduraEnPantalla();
     if (c && ((p && dentro(INCENSARIO, p)) || Math.hypot(q.x - c.x, q.y - c.y) < 120)) return { tipo: 'llave' };
   }
+  // nivel final: los anillos del corazón se giran en círculo, y la caja pequeña puesta en él, también
+  if (estado.nivel === 4 && estado.fin && v === 'corazon' && tec.puntoEnCorazon) {
+    const f = estado.fin, c = tec.puntoEnCorazon(q.x, q.y);
+    if (c && f.fase === 'anillos' && anilloEn(c.r) >= 0) return { tipo: 'anillo', i: anilloEn(c.r) };
+    if (c && f.fase === 'centro' && f.hija === 'puesta' && c.r < 0.075) return { tipo: 'llaveHija' };
+  }
   if (!p) return null;
   if (p.cajon && v === 'cajones') return { tipo: 'cajon', id: p.cajon };
   // nivel 3: el cajón largo de la espalda (suelto o abierto) se tira; la tetera, de cerca, se vuelca
@@ -3731,6 +3974,16 @@ function empezarGesto(g, dx, dy) {
       g.asentado = a.k < 0.02;              // cerrado, está asentado: cede tras un poco de tirón
       a.agarrado = true; a.v = 0;
       if (!g.asentado) sentir('roce', { tono: 1.05 });
+      break;
+    }
+    case 'anillo': case 'llaveHija': {
+      const f = estado.fin;
+      if (g.tipo === 'anillo' && f.bloqueados[g.i]) { sentir('tope', { db: -6, tono: 0.8 }); mensaje('Ese ya está en su sitio.'); g.estado = 'bloqueado'; return true; }
+      const c = tec.puntoEnCorazon(puntero.x0, puntero.y0);
+      g.alfa = c ? c.alfa : 0;
+      g.objetivo = g.tipo === 'anillo' ? f.angulos[g.i] : f.giroHija;
+      g.paso = Math.round(g.objetivo / PASO_ANILLO);
+      sentir('roce', { tono: 0.7, db: -2 });
       break;
     }
     case 'largo': {
@@ -3819,6 +4072,13 @@ function moverGesto(g, q) {
       g.kAntes = k;
       break;
     }
+    case 'anillo': case 'llaveHija': {
+      const c = tec.puntoEnCorazon(q.x, q.y);
+      if (!c || c.r < 0.012) break;                       // en el centro mismo, el ángulo salta
+      g.objetivo += angular(c.alfa - g.alfa); g.alfa = c.alfa;
+      if (g.tipo === 'llaveHija' && Math.abs(g.objetivo) > 1.35) { g.estado = 'hecho'; girarLlaveHija(Math.sign(g.objetivo)); }
+      break;
+    }
     case 'largo': {
       const a = cajonAnim.largo, k = limitar(g.k0 + avanceEnEje(g.eje, dx, dy), 0, 1.04);
       a.v = mezclar(a.v, (k - a.k) / paso, 0.5); a.k = k; g.t = ahora;
@@ -3882,6 +4142,25 @@ function actualizarGesto(g, dt) {
   if (g.estado !== 'activo') return;
   const seguir = rapidez => 1 - Math.exp(-dt * rapidez);
   switch (g.tipo) {
+    case 'anillo': {
+      const f = estado.fin;
+      f.angulos[g.i] += (g.objetivo - f.angulos[g.i]) * seguir(14);
+      const paso = Math.round(f.angulos[g.i] / PASO_ANILLO);
+      if (paso !== g.paso) {
+        g.paso = paso;
+        sentir('muesca', { tono: 0.75 + 0.12 * g.i }); sonar('anillo', -12, 0.9 + 0.1 * g.i);
+        // la voz: al pasar por su sitio, la campanilla de la boca suena
+        if (g.i === 2 && enSitio(f, 2, paso * PASO_ANILLO)) avisarVoz();
+      }
+      break;
+    }
+    case 'llaveHija': {
+      const f = estado.fin;
+      f.giroHija += (g.objetivo - f.giroHija) * seguir(12);
+      const paso = Math.round(f.giroHija / (PASO_ANILLO / 2));
+      if (paso !== g.paso) { g.paso = paso; sentir('muesca', { tono: 0.7 }); }
+      break;
+    }
     case 'tetera': {
       // pesa: va detrás del dedo, despacio
       tetera3.inclinacion += (g.objetivo - tetera3.inclinacion) * seguir(5);
@@ -3930,6 +4209,21 @@ function soltarGesto(g, cancelado = false) {
         a.objetivo = 0;
         if (a.k > 0.02) a.v = Math.min(a.v, -1.2);           // vuelve solo, con su golpe al cerrar
       }
+      break;
+    }
+    case 'anillo': {
+      const f = estado.fin, i = g.i, desde = f.angulos[i], final = Math.round(desde / PASO_ANILLO) * PASO_ANILLO;
+      animar(0.18, k => { f.angulos[i] = mezclar(desde, final, suave(k)); }, () => {
+        f.angulos[i] = final;
+        if (!cancelado && enSitio(f, i)) bloquearAnillo(i);
+        else sentir('tope', { db: -10, tono: 0.9, sinVibrar: true });
+      });
+      break;
+    }
+    case 'llaveHija': {
+      const f = estado.fin, desde = f.giroHija;
+      animar(0.3, k => { f.giroHija = desde * (1 - suave(k)); });
+      if (!cancelado) mensaje(primeraVez('girar-hija') ? 'Gírala más: un cuarto de vuelta, como una llave.' : 'Más.');
       break;
     }
     case 'largo': {
@@ -3982,7 +4276,7 @@ function soltarGesto(g, cancelado = false) {
 }
 
 function girarCaja() {
-  if (estado.fase !== 'jugando' || estado.ocupado || estado.nivel === 2) return;
+  if (estado.fase !== 'jugando' || estado.ocupado || estado.nivel === 2 || estado.nivel === 4) return;
   sonar('deslizar_madera', -10, 1.1);
   tec.girar();
   // desde la sala o desde el costado de los cajones, la cámara se aparta para ver la caja entera girar
@@ -4067,6 +4361,8 @@ function prepararTecnica(letra) {
         cajones: cajonesDatos, CAJONES, cajonAbertura: id => cajonAnim[id].k,
         decoracion: { sombrasBambu, rollo, ROLLO, VENTANAS }, recortarTe, nivel2,
         recortarTetera: (l, dx = 0, dy = 0) => recortarTe(l, dx, dy, true),
+        // nivel final: dónde alumbra el ojo nuevo en el corazón (lo que tocas) y con cuánta fuerza
+        luzCorazon: () => { const f = estado.fin; return f && f.luz && reloj < f.luz.hasta ? { alfa: f.luz.alfa, fuerza: luzFria.fuerza * (1 - ojo2.cerrado) } : null; },
         // (en el nivel 3 respira más hondo: se ve cuándo suelta el aire)
         estado: () => estado, reloj: () => reloj, aliento: () => aliento.valor * (estado.nivel === 3 ? 1.7 : 1), despertar, alHornear,
         tapa: () => tapaVuelo, conTapaEnMesa: () => estado.tapaEnMesa, llaveGirando: () => llaveGirando,
@@ -4207,7 +4503,7 @@ function restaurar(guardado) {
     if (estado.hija.ojo === 'puesto') Object.assign(ojo2, { visible: 1, parpadoBase: 0, cerrado: 0 });
     // nivel 3: los objetos y el cajón largo como estaban
     const n3 = estado.n3;
-    if (estado.nivel === 3 && n3) {
+    if (estado.nivel >= 3 && n3) {
       if (n3.ficha === 'cayendo') n3.ficha = 'suelo';
       fichaCae.x = FICHA_SUELO.x; fichaCae.y = FICHA_SUELO.y; fichaCae.ang = 0;
       notaSale = 1;
@@ -4215,7 +4511,8 @@ function restaurar(guardado) {
       if (n3.nota === 'mano') ponerTextoNota(3);
       if (img.ficha_peon) { ponerCaraFicha(n3.fichaCara); ponerCampanillaCompleta(n3.completa); }
     }
-    el.girar.hidden = estado.nivel === 2; el.inventario.hidden = false;
+    if (estado.fin && estado.fin.fase === 'subiendo') { estado.fin.subida = 1; estado.fin.fase = 'anillos'; }
+    el.girar.hidden = estado.nivel === 2 || estado.nivel === 4; el.inventario.hidden = false;
     el.portada.hidden = true;
     ojo.parpadoBase = 0;
     pintarInventario();
@@ -4354,5 +4651,10 @@ window.__prueba = {
   fichaGiro: () => ({ giro: fichaGiro.giro, objetivo: fichaGiro.objetivo }),
   labios: () => (estado.n3 ? estado.n3.labios : 0),
   puntoCampanilla: () => { const v = tec.puntoCampanillaLargo && tec.puntoCampanillaLargo(), m = v ? tec.ancla(v) : null; return m ? { x: m.x, y: m.y } : null; },
+  // nivel final: el corazón (sus anillos y dónde va cada uno) y dónde está en la pantalla un punto suyo
+  fin: () => (estado.fin ? JSON.parse(JSON.stringify(estado.fin)) : null),
+  enSitio: i => !!(estado.fin && enSitio(estado.fin, i)),
+  sitioAnillo: i => (estado.fin ? sitioAnillo(estado.fin, i) : 0),
+  puntoCorazon: (r, alfa) => (tec.corazonEnPantalla ? tec.corazonEnPantalla(r, alfa) : null),
 };
 window.__tec = () => tec;

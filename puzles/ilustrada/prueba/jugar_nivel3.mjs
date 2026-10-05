@@ -215,14 +215,15 @@ await mantener(p3.x, p3.y, 2.6);
 comprobar('la luz descubre la tinta del tatami', (await n3()).tintas.suelo === true, await mensaje());
 await foto('09_tinta_suelo');
 await tocarBoceto(960, 600, 'caja', 1);
-// mientras toma aire, no contesta
-await hasta(() => !window.__prueba.aliento().exhalando && window.__prueba.aliento().fase % (2 * Math.PI) > 0.4);
+// mientras toma aire, no contesta (la campanilla se elige antes y se toca al empezar a tomar aire)
+const PI2 = 2 * Math.PI;
 await elegir('campanilla');
+await hasta(() => { const a = window.__prueba.aliento(), f = a.fase % (2 * Math.PI); return !a.exhalando && f > 0.25 && f < 1.1; });
 await tocarBoceto(990, 560, 'caja', 0.4);
 comprobar('mientras toma aire, la caja no contesta a la campanilla', (await n3()).toques === 0, await mensaje());
 for (let i = 1; i <= 3; i++) {
-  await hasta(() => window.__prueba.aliento().exhalando && Math.sin(window.__prueba.aliento().fase) < -0.3);
   await elegir('campanilla');
+  await hasta(PI2 => { const a = window.__prueba.aliento(), f = a.fase % PI2; return a.exhalando && f > Math.PI + 0.15 && f < Math.PI + 1; }, PI2);
   await tocarBoceto(990, 560, 'caja', 0.3);
   await hasta(i => window.__prueba.n3().toques >= i, i);
   await espera(1);

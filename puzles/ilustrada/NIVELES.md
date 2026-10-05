@@ -12,8 +12,8 @@
 - DECISIÓN 24: **una línea primero**; las otras cajas, en entregas futuras.
 - DECISIÓN 29: la técnica **B**.
 
-Este documento es el plan de niveles. El nivel 1 y el nivel 2 ya se juegan en la página privada (`PLAN.md`
-§8). Sigue la biblia: plantilla de nueve fases (§8), familias de
+Este documento es el plan de niveles. **Desde el 05-10-2026 se juegan los cuatro** (el 1, el 2, el 3 y el final) en
+la página privada y en el APK 0.5 (`PLAN.md` §8). Sigue la biblia: plantilla de nueve fases (§8), familias de
 puzle (§5), progresión presentar → ampliar → invertir → combinar (§7) y control de originalidad (anexo B).
 Todo es **[Propuesta]** salvo lo marcado **[Hecho]**.
 
@@ -40,7 +40,7 @@ NIVEL 1 · El cuerno ──► el cuerno
 NIVEL 2 · La caja de dentro ──► el ojo
         │
         ▼
-NIVEL 3 · La caja del revés ──► la voz
+NIVEL 3 · La voz ──► la voz
         │
         ▼
    la cara completa ──► NIVEL FINAL · El corazón
@@ -55,22 +55,22 @@ NIVEL 3 · La caja del revés ──► la voz
 
 ## 3. Qué trae cada nivel
 
-| | Nivel 1 · El cuerno | Nivel 2 · La caja de dentro | Nivel 3 · La caja del revés | Final · El corazón |
+| | Nivel 1 · El cuerno | Nivel 2 · La caja de dentro | Nivel 3 · La voz | Final · El corazón |
 |---|---|---|---|---|
-| **Escala y vista** | La sala y la caja por fuera: frente, costado de cajones y espalda | **De grande a pequeña:** una caja hija sale de la trampilla y se gira en la mano; dentro, otra más pequeña | **Cambio total:** la caja se despliega como un biombo y enseña un interior en tres secciones | Dentro del todo: la máscara se abre como una puerta |
-| **Idea estructural nueva** | La sala participa (lámpara, incensario) | Trabajar un objeto que se gira en la mano | La caja cambia de forma; secciones | Todo junto; lo guardado vuelve |
-| **La mirada** | **Presentar:** no deja tocar mientras te ve; la lámpara la distrae | **Ampliar:** el ojo grande vigila la caja pequeña; lo que mira no se mueve; hay que esconderle lo que haces | **Invertir:** ahora conviene que mire; el ojo nuevo descubre marcas que no se ven | **Combinar:** los dos ojos, la voz y el cuerno colaboran |
-| **Familias (§5)** | Atención, Manipular, Observar, Montar | Atención, Manipular, Memoria espacial, Bolsillo | Transformación, Observar, Deducir, Guiar | Meta, Atención, Tiempo (ritmo lento) |
-| **Pasos** | 12 | 12 | 13 | 10 |
+| **Escala y vista** | La sala y la caja por fuera: frente, costado de cajones y espalda | **De grande a pequeña:** una caja hija sale de la trampilla y se gira en la mano; dentro, otra más pequeña | **La sala entera es el puzle:** el rollo, la tetera y el tatami, la espalda de la caja y su boca | **Desde arriba:** el corazón sube por la trampilla y se queda en la tapa |
+| **Idea estructural nueva** | La sala participa (lámpara, incensario) | Trabajar un objeto que se gira en la mano | La mirada como linterna; el ritmo de la respiración | Todo junto; lo guardado vuelve (la caja hija es la llave) |
+| **La mirada** | **Presentar:** no deja tocar mientras te ve; la lámpara la distrae | **Ampliar:** el ojo grande vigila la caja pequeña; lo que mira no se mueve; hay que esconderle lo que haces | **Invertir:** ahora conviene que mire; el ojo nuevo descubre tinta que no se ve, y va al revés del dedo | **Combinar:** el ojo viejo señala, el nuevo alumbra y la voz avisa |
+| **Familias (§5)** | Atención, Manipular, Observar, Montar | Atención, Manipular, Memoria espacial, Bolsillo | Observar, Guiar, Deducir, Manipular, Tiempo (ritmo lento) | Meta, Atención, Oído |
+| **Pasos** | 12 | 12 | 14 | 8 |
 | **Pieza** | El cuerno | El ojo (de piedra de luna) | La voz (una campanilla de bronce) | — |
-| **Sorpresa** | La caja despierta y su trampilla da luz | El ojo nuevo no es como el otro: ve lo que el viejo no ve | La caja da la vuelta sola y se abre como un biombo | La caja habla con su campanilla |
-| **Duración [Hipótesis]** | 8-12 min | 10-15 min | 12-18 min | 8-12 min |
+| **Sorpresa** | La caja despierta y su trampilla da luz | El ojo nuevo no es como el otro: ve lo que el viejo no ve | La caja escribe con la boca cerrada… y al final canta | Su corazón sube por la trampilla; la sala se aclara |
+| **Duración [Hipótesis]** | 8-12 min | 10-15 min | 12-18 min | 5-8 min |
 
 **Lo que el usuario pidió, dónde está:**
 - puntos de vista diferentes: la sala, la caja, el costado, la mano, el interior y el corazón;
 - de una caja grande a pequeña: el nivel 2 (y la cajita de dentro de la caja hija);
-- cambio total de la caja: el nivel 3;
-- diferentes secciones: el interior del nivel 3 y las capas del final;
+- cambio de la caja: su espalda se abre (nivel 3) y su corazón sale por la trampilla (final);
+- diferentes secciones: la sala entera en el nivel 3 (rollo, tetera, tatami, espalda y boca) y los anillos del final;
 - pasar niveles para entrar al nivel final: la cara.
 
 ---
@@ -128,8 +128,7 @@ Hay que girarla en la mano para esconderle lo que haces: el punto ciego ya no lo
    en cada uno, y solo se abre cuando su marca dorada coincide con la del borde. Dentro está el ojo, de piedra
    de luna, que aparta la vista de tu dedo.
 9. **Transición:** el ojo va a la cuenca vacía de la caja grande. La caja cierra el ojo viejo y abre los dos:
-   el nuevo es claro y mira hacia otro lado. Tarjeta «Nivel 2 superado» (sellos 角 y 目) y «Nivel 3 · La caja
-   del revés: llega en la próxima entrega».
+   el nuevo es claro y mira hacia otro lado. Tarjeta «Nivel 2 superado» (sellos 角 y 目) y «Nivel 3 · La voz».
 
 **Cómo está hecho [Hecho]:**
 - La caja hija es 3D de verdad (`pagina/caja_hija.js`), con las caras pintadas por Gemini
@@ -167,39 +166,78 @@ enseñar el objeto en la mano.
 
 ---
 
-## 6. Nivel 3 · La caja del revés [Propuesta]
+## 6. Nivel 3 · La voz [Hecho, en la B, 05-10-2026]
 
-**En una frase:** con dos ojos, la caja ve demasiado; para que se abra, tienes que hacer que mire.
+**En una frase:** con dos ojos, la caja ve demasiado y no puede hablar; para devolverle la voz, tienes que hacer que
+mire.
 
-- **Sorpresa de entrada:** la caja se da la vuelta sola. El ojo nuevo mira su propia espalda.
-- **La espalda:** el hueco con forma de ficha de shōgi y el cajón largo con cerradura [arte Hecho].
-  - El cajón largo se abre con la llave de bambú: **la llave sirve dos veces** (biblia §7.3).
-  - Dentro, la ficha de shōgi, con un carácter grabado que solo se lee a la luz del ojo nuevo.
-- **El cambio total:** la ficha en su hueco hace que la caja se despliegue como un biombo de cuatro hojas.
-  Por dentro es un pequeño santuario en **tres secciones**, que se recorren con la cámara.
-- **La regla, invertida:** el ojo de piedra de luna alumbra lo que mira y descubre marcas escritas en tinta
-  invisible. Ahora quieres que mire: se le dirige con la lámpara y con un espejo de mano (*kagami*) que
-  hay en la sección de la izquierda.
-- **Las tres secciones:**
-  - izquierda: el espejo y una rueda de los doce animales;
-  - centro: tres puertecitas que solo abren en el orden que enseña la luz;
-  - derecha: la campanilla, colgada detrás de una celosía.
-- **Recompensa:** la campanilla (la voz). Va a la boca: los labios se abren un poco.
-- **Pasos:** unos 13, en dos ramas largas que se juntan (espejo y rueda; puertecitas).
+**Qué cambió respecto de la propuesta** (la caja que se despliega como un biombo, con espejo y rueda de animales):
+- se queda la idea central, **la regla invertida: el ojo nuevo descubre tinta que no se ve**;
+- el biombo pedía de 6 a 10 imágenes nuevas y una caja que cambia de forma; en su lugar, **la sala entera es el
+  puzle** y todo lo nuevo se dibuja por código (`pagina/nivel3_arte.js`): sin gasto y en el estilo de tinta;
+- el espejo de mano (*kagami*) se cambió por algo más propio de este ojo: **no te mira, así que su luz va al revés
+  de tu dedo** (ya se veía en el nivel 2: en la cajita, aparta la vista del dedo).
 
-## 7. Nivel final · El corazón [Propuesta]
+**La nota de la boca:** «Me falta la voz. Duerme a mi espalda, sin lengua.» (la voz es una campanilla de bronce; la
+lengua, su badajo).
 
-**En una frase:** con la cara completa, la caja ya no se defiende: te enseña su corazón y te pide que la
-ayudes a abrirlo.
+**Los pasos (14):**
+1. **Introducción:** la caja suelta el aire y, entre sus labios, asoma un papel: la nota.
+2. **La luz fría:** el ojo de piedra de luna alumbra lo que mira, con un haz frío. Con el dedo quieto a un lado de la
+   cara, la luz se va al otro (simétrica respecto de la cuenca).
+3. **La tinta del rollo:** alumbrado un momento, el rollo colgado enseña una ficha de shōgi en rojo y una flecha que
+   baja a su varilla.
+4. **El rollo:** tocado, se mece y dentro de la varilla algo suelto golpea la madera; mecido fuerte (toques seguidos,
+   o con el viento del shoji), la ficha cae al tatami.
+5. **La ficha:** se coge del tatami: un peón, 歩.
+6. **Darle la vuelta:** en la mano se desliza de lado y se voltea: と en rojo, el peón coronado (en el shōgi, una
+   pieza que corona se vuelve del revés).
+7. **El hueco de la espalda:** por la cara del peón, el hueco la devuelve; coronada, encaja, corre un pestillo largo
+   y **el cajón largo se suelta** (la cerradura que no era de la llave de bambú).
+8. **El cajón largo:** se tira de él con el dedo (vista nueva, de cerca) y dentro está **la campanilla, sin badajo**:
+   no suena.
+9. **La tinta de la tetera:** en la madera de junto a la tetera: alguien vierte el té y algo pequeño cae en la taza.
+10. **La tetera:** de cerca (vista nueva), se vuelca arrastrando hacia abajo; con el té cae el badajo en la taza
+    («tin»). Desde el nivel 1, la tapa de la tetera tintineaba: ahora se sabe por qué.
+11. **Juntar:** en la bandeja, el badajo se arrastra encima de la campanilla: ya suena.
+12. **La tinta del tatami:** tres trazos como una respiración (sube, se queda, baja) y la campanilla en el que baja.
+13. **El ritmo:** la caja respira más hondo y el humo del incienso va hacia ella al tomar aire. Solo contesta a la
+    campanilla **mientras suelta el aire**: con un murmullo, la boca cerrada. Si se toca mientras toma aire, lo
+    contiene y no contesta. Al tercer murmullo, **los labios se entreabren**.
+14. **Clímax y recompensa:** la campanilla en la boca: la caja canta, muy bajo. Tarjeta «Nivel 3 superado · La
+    voz», con los tres sellos (角 目 声) y «Nivel final · El corazón».
 
-- La caja se cierra sola, da la vuelta y su máscara se abre como una puerta.
-- **El corazón:** un mecanismo de tres anillos con el cuerno, el ojo y la voz como piezas.
-- **Combinar:** la caja colabora:
-  - el ojo viejo vigila y el nuevo alumbra;
-  - la campanilla suena al ritmo que hay que seguir, siempre con su señal visual y sin prisa;
-  - la caja hija del nivel 2 vuelve: es la llave del último anillo («lo que guardaste importa»).
-- **Clímax:** la caja respira hondo, abre los dos ojos a la vez y suena su melodía entera.
-- **Final:** una última nota de la caja. Lo que cuenta depende de la DECISIÓN 25 (el marco de la historia).
+**Cómo está hecho:** `pagina/juego.js` (sección «Nivel 3 · La voz») y `pagina/tecnica_3d.js` (el cajón largo de la
+espalda, con la pintura de espaldas proyectada en su frente; la ficha en su hueco; la tetera que se vuelca con su
+pintura). Sonidos: `herramientas/sonidos_nivel3.py`. Prueba: `prueba/jugar_nivel3.mjs` (31 de 31).
+
+## 7. Nivel final · El corazón [Hecho, en la B, 05-10-2026]
+
+**En una frase:** con la cara completa, la caja ya no se defiende: te enseña su corazón y te ayuda a abrirlo.
+
+**Qué cambió respecto de la propuesta** (la máscara que se abre como una puerta): el corazón **sube por la
+trampilla y se queda en la tapa**. Así la cara sigue en su sitio, con sus ojos y su boca trabajando (la puerta los
+habría girado hacia un lado), y repite el gesto del nivel 2 (lo que sale de la trampilla).
+
+**Los pasos (8):**
+1. **Introducción:** la caja pequeña, en la mesa, se cierra sola; la caja grande respira hondo, suena su voz y la
+   trampilla deja salir el corazón: tres anillos sobre una base de laca, mirados desde arriba.
+2. **El anillo del cuerno** (fuera, bermellón, con un cuerno y 角): **el ojo viejo señala** la ranura del marco donde
+   va el cuerno, y la ranura late en rojo. Se gira arrastrando el dedo en círculo; encaja al soltarlo en su sitio.
+3. **El anillo del ojo** (en medio, laca negra): su marca, 目, es **tinta fría**, y ahora **el ojo nuevo alumbra lo
+   que tocas**: se busca tocando el anillo por varios sitios y se lleva a la muesca de oro del frente.
+4. **El anillo de la voz** (dentro, madera, sin marca): al girarlo, **la campanilla de la boca suena** cuando pasa
+   por su sitio (y el corazón brilla un instante: también se ve sin sonido).
+5. **El hueco del centro:** con los tres anillos firmes, se abre un hueco cuadrado del tamaño de la caja pequeña.
+6. **La última llave:** la caja pequeña del nivel 2 se coge de la mesa y se pone en el hueco («lo que guardaste
+   importa»).
+7. **Clímax:** se gira como una llave, un cuarto de vuelta: los anillos se sueltan y giran solos, el corazón late,
+   la sala se aclara y la caja canta con los dos ojos abiertos.
+8. **Final:** tarjeta «Nivel final superado · El corazón», «Fin de la primera caja», con «Quedarse en la sala» y
+   «Volver a empezar». La última nota de la caja sigue pendiente de la DECISIÓN 25 (el marco de la historia).
+
+**Cómo está hecho:** `pagina/juego.js` (sección «Nivel final · El corazón»), `pagina/tecnica_3d.js` (el corazón:
+base, anillos y brillos, dibujados por código en `nivel3_arte.js`). Prueba: `prueba/jugar_final.mjs` (17 de 17).
 
 ---
 
@@ -209,8 +247,8 @@ ayudes a abrirlo.
 |---|---|---|---|---|---|
 | 1 [Hecho] | Atención, Manipular, Observar, Montar | Ninguno | La llave no se deja coger mientras el ojo mira | La sala participa | La caja despierta |
 | 2 | Atención, Manipular, Memoria espacial, Bolsillo | Ninguno: flechas de marquetería | No hay llave: el orden de las tablillas | El objeto en la mano; esconder del ojo | El ojo nuevo ve otra cosa |
-| 3 | Transformación, Observar, Deducir, Guiar | El orden de las puertecitas, a la luz del ojo | La llave de bambú, otra vez | La mirada como linterna | La caja se da la vuelta y se despliega |
-| Final | Meta, Atención, Tiempo | Ninguno | La caja hija es la última llave | Memoria entre niveles | La caja habla |
+| 3 [Hecho] | Observar, Guiar, Deducir, Manipular, Tiempo | Tres tintas que solo se ven a la luz del ojo | La ficha coronada (darle la vuelta) | La mirada como linterna; la respiración como ritmo | La caja escribe y, al final, canta |
+| Final [Hecho] | Meta, Atención, Oído | Lo señala la propia caja: el ojo, la luz y la voz | La caja hija es la última llave | Memoria entre niveles | Su corazón sube por la trampilla |
 
 ## 9. Control de originalidad (filas nuevas para el anexo B de la biblia)
 
@@ -218,8 +256,10 @@ ayudes a abrirlo.
 |---|---|---|---|
 | Caja hija que sale de la grande | Capas: dentro hay más (The Room anida cajas) | **Medio:** en la referencia la caja nueva sustituye a la anterior | La grande **sigue viva y vigilando** mientras trabajas la pequeña, y lo de dentro es **una parte de su cuerpo** (el ojo), que vuelve a ella. Sin miniaturas ni «entrar en lo pequeño» |
 | La cajita de laca con tapa que gira | Puzle de bolsillo | Bajo: es del género | Mantener |
-| La caja que se despliega como un biombo | Transformación del objeto | Bajo-medio: en la serie las cajas se abren por capas | Que sea un biombo japonés de cuatro hojas, con secciones que se recorren |
-| El ojo nuevo que descubre tinta invisible | Capa oculta | **Medio:** la lente de la referencia revela lo oculto | Lo revela **la mirada de la caja**, que hay que dirigir: nunca un objeto que se pone el jugador. Sin viñeta ni filtro de pantalla |
+| El ojo nuevo que descubre tinta invisible | Capa oculta | **Medio:** la lente de la referencia revela lo oculto | Lo revela **la mirada de la caja**, que hay que dirigir (va al revés del dedo): nunca un objeto que se pone el jugador. Sin viñeta ni filtro de pantalla [Hecho así] |
+| La ficha de shōgi que se corona dándole la vuelta | Una pieza con dos caras; la regla del juego real | Bajo: es una regla del shōgi, no de la serie | Mantener |
+| Tocar la campanilla al ritmo de la respiración | Ritmo lento, con señal visual (el humo del incienso) | Bajo | Sin prisa ni castigo: si falla, la caja solo contiene el aire |
+| El corazón con tres anillos que se alinean | Cerradura final que recoge lo aprendido | **Medio:** los anillos concéntricos son comunes en el género | Cada anillo se resuelve con un sentido de la caja (mirada, luz, voz) y la llave es la caja hija |
 | La cara como cerradura final | Objetivos intermedios bajo uno final | Bajo: los sellos y pirámides de la serie | Lo nuestro son partes del cuerpo del objeto, que se ven volver |
 
 ## 10. Producción en la B
@@ -228,7 +268,6 @@ ayudes a abrirlo.
   - la caja hija y la cajita son 3D, con texturas pintadas (Gemini) y el mismo aire de tinta y acuarela;
   - un retoque de la cara con el ojo nuevo en la cuenca, para animarlo como el viejo;
   - unas 5 imágenes, unos 0,25 USD **[Estimación]**.
-- **Nivel 3:** la caja se parte en hojas que giran sobre bisagras (la pintura va con cada hoja). El interior
-  pide de 6 a 10 imágenes (unos 0,45 USD **[Estimación]**).
-- **Final:** de 4 a 6 imágenes.
+- **Nivel 3 y final [Hecho]:** sin imágenes nuevas: lo nuevo se dibuja por código (`pagina/nivel3_arte.js`) y los
+  sonidos se sintetizan (`herramientas/sonidos_nivel3.py`). Coste: 0 USD.
 - **La A** (el respaldo sin WebGL) solo llega al nivel 1: los niveles nuevos necesitan la escena 3D.

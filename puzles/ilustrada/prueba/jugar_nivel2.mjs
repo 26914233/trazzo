@@ -240,9 +240,12 @@ comprobar('el ojo nuevo está en la cuenca y abierto', await pagina.evaluate(() 
 comprobar('la tarjeta cierra el nivel 2 con dos piezas', await pagina.evaluate(() =>
   document.getElementById('tarjeta-hecho').textContent.includes('2') && document.querySelectorAll('.pieza.recuperada').length === 2));
 comprobar('la partida queda guardada', await pagina.evaluate(() => JSON.parse(localStorage.getItem('caja_viva_partida')).superado === 2));
-await pagina.tap('#boton-quedarse');
+comprobar('la tarjeta ofrece seguir en el nivel 3', await pagina.isVisible('#boton-seguir') && /Nivel 3/.test(await pagina.textContent('#tarjeta-siguiente')),
+  await pagina.textContent('#tarjeta-siguiente'));
+await pagina.tap('#boton-seguir');
+await hasta(() => window.__prueba.estado().nivel === 3 && window.__prueba.estado().fase === 'jugando');
 await espera(1.2);
-comprobar('se puede quedar en la sala', await pagina.evaluate(() => window.__prueba.estado().fase === 'jugando'));
+comprobar('«Seguir» empieza el nivel 3', await pagina.evaluate(() => window.__prueba.n3() && window.__prueba.n3().nota === 'boca'));
 
 if (SIN_RED) {
   comprobar('sin internet: nada sale de la página', fuera.length === 0, fuera.slice(0, 3).join(' | '));

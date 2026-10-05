@@ -542,7 +542,8 @@ entrar al nivel final».
 **El plan** está en `ilustrada/NIVELES.md`:
 - La idea en una frase: **la caja no te deja tocar mientras te mira; devuélvele la cara (el cuerno, el ojo y la
   voz) y te abrirá su corazón.**
-- Cuatro niveles: 1 · El cuerno, 2 · La caja de dentro, 3 · La caja del revés y el final, El corazón.
+- Cuatro niveles: 1 · El cuerno, 2 · La caja de dentro, 3 · La voz y el final, El corazón. **Los cuatro se juegan
+  desde el 05-10-2026** (APK 0.5).
 - La cara es el puzle grande: cada nivel le devuelve una pieza y el final solo se abre con las tres.
 
 **Hecho [en la página privada]:**
@@ -596,7 +597,23 @@ que pueda interactuar, que quede fijo en esa parte […] que jale el cajón, no 
 - Menos texto repetido y «Girar» arriba (abajo tapaba el incensario).
 - Detalle en `ilustrada/LEEME.md` («Tacto, sonido y causa → efecto»). Es la `caja-viva-0.3-prueba.apk`.
 
+**Señales sin texto (05-10-2026) [Hecho, APK 0.4]:** el ojo mira de reojo el frente abierto tras 35 s sin avanzar,
+la tablilla que toca se afloja cuando el ojo no la ve y la tetera también distrae al ojo (`ilustrada/LEEME.md`).
+
+**El juego completo (05-10-2026) [Hecho, APK 0.5]:** el usuario probó la 0.4 y pidió el juego final con todo lo
+investigado («cuando se lance y yo quiera cobrar por un juego de 3 minutos no será divertido»), girar la vista de
+cerca y que el incensario no desapareciera.
+- **Nivel 3 · La voz** (`NIVELES.md` §6): la regla invertida, la luz fría del ojo nuevo (va al revés del dedo) y tres
+  tintas; la ficha de shōgi del rollo que se corona y abre el cajón largo de la espalda; la campanilla sin badajo;
+  la tetera que se vuelca; y la campanilla al ritmo de la respiración, hasta que la caja abre los labios y canta.
+- **Final · El corazón** (`NIVELES.md` §7): sube por la trampilla con tres anillos que se resuelven con lo que la caja
+  ha recuperado (el ojo viejo señala, el nuevo alumbra, la voz avisa); la caja pequeña del nivel 2 es la última llave.
+- **La cámara de cerca gira** sin salir de la vista y se asoma a los cajones al abrirlos; el incensario ya no
+  desaparece al destaparlo.
+- Sin imágenes nuevas (dibujo por código y sonidos sintetizados): coste 0.
+- Duración estimada del juego entero: 35-55 minutos **[Hipótesis]** (`NIVELES.md` §3), por medir.
+
 **Siguiente:**
-- Nivel 3 · La caja del revés y el nivel final, en las próximas entregas (diseño en `NIVELES.md` §6 y §7).
 - Medir los niveles con jugadores, como dice el §3: el tiempo, las pistas y las ganas de seguir.
+- Las DECISIONES 25 (el marco de la historia: la última nota de la caja) y 26 (las pistas), abiertas.
 

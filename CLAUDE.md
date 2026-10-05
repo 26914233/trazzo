@@ -566,6 +566,17 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
     transformación, variable nueva, implementación, dificultad y reutilización.
   - Se distingue siempre hecho, opinión e interpretación. Principios sí; assets, textos, escenarios y soluciones
     exactas de otros juegos, no.
+  - **La investigación (04/05-10-2026), en `puzles/genero/`:** The Room 1-4 (Old Sins es la cuarta: 265 puzles, 70
+    mecánicas, 33 tipos y la interacción y la cámara de cada entrega), unos 50 juegos más en tres bloques (A: caja y
+    misterio; B: lógica, perspectiva y física; C: grandes juegos con puzles), jugadores y principios (25.613 reseñas de
+    Steam y 8.682 de la App Store), el catálogo de 330 mecánicas (`herramientas/unir_mecanicas.py`), la gramática, la
+    auditoría y el roadmap con la DECISIÓN 30 (la escala propia). El cupo de búsquedas web de esa sesión se agotó; los
+    vídeos de Game Maker's Toolkit no se leyeron porque cada transcripción cuesta 5 créditos de vidIQ (quedan 48, que no
+    se renuevan): pedir permiso antes de gastarlos.
+  - **Parecidos que vigilar** (`genero/08_ROADMAP.md` §6): Old Sins pone una talla en la frente de una cara y ojos de
+    piedra en una cuenca (como nuestro cuerno y nuestro ojo de piedra de luna) y usa un abanico en su galería japonesa
+    (no usar abanicos); Boxes: Lost Fragments tiene un puzle de «luz roja, luz verde», el precedente más cercano a la
+    regla del ojo.
 - **Índice:** `puzles/LEEME.md` · **plan, datos de mercado y cómo se valida:** `puzles/PLAN.md`.
 - **Análisis de The Room:** `puzles/ANALISIS_THE_ROOM.md`, con anexos en `puzles/referencia/`.
   Se hizo con los cuatro vídeos de partidas que mandó el usuario el 02-10-2026 y su consejo de 30
@@ -666,7 +677,17 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   - Al terminar cada nivel, una tarjeta con la cara como marcador (sellos 角 目 声) y la partida guardada en el
     navegador; la portada ofrece seguir. `?nivel=2` empieza en el 2.
   - Prueba del nivel 2: `prueba/jugar_nivel2.mjs horizontal`.
-  - Siguen en propuesta: el nivel 3 (La caja del revés) y el final.
+  - **Hechos también (05-10-2026, el juego completo, APK 0.5), solo en la B:**
+    - **nivel 3, «La voz»** (`NIVELES.md` §6): la regla invertida; la luz fría del ojo nuevo va al revés del dedo y
+      descubre tres tintas (rollo, madera junto a la tetera, tatami); la ficha de shōgi cae del rollo mecido, se corona
+      dándole la vuelta y abre el cajón largo de la espalda (la campanilla sin badajo); el badajo sale de la tetera
+      volcada; la caja solo contesta a la campanilla mientras suelta el aire y, a la tercera, abre los labios y canta.
+      Prueba: `prueba/jugar_nivel3.mjs horizontal`;
+    - **final, «El corazón»** (`NIVELES.md` §7): sube por la trampilla con tres anillos (el ojo viejo señala dónde va el
+      cuerno, el nuevo alumbra la marca escondida y la campanilla suena donde va el de la voz) y la caja pequeña del nivel 2
+      es la última llave. Prueba: `prueba/jugar_final.mjs horizontal`;
+    - sin imágenes nuevas: dibujo por código (`pagina/nivel3_arte.js`) y sonidos sintetizados (`herramientas/sonidos_nivel3.py`).
+      `?nivel=3` y `?nivel=4` empiezan en cada uno. La última nota de la caja espera a la DECISIÓN 25.
 - **Gestos y horizontal (pedidos por el usuario al probar el APK 0.1, 03-10-2026, noche; hechos, APK 0.2):**
   - **El juego es horizontal:** la app siempre (`sensorLandscape`); la página, en un móvil en vertical, pide girarlo.
   - **De cerca, la cámara se queda fija:** arrastrar no la mueve y tocar fuera no devuelve a la sala (se vuelve con
@@ -684,7 +705,8 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
     `/root/android-sdk/platforms/android-35`: 64 MB, descarga autorizada el 03-10-2026, SHA-1
     `0bb560a90a7a2cbd0dd8348224d518b638fe7949`.
   - Paquete `com.thunderdarkness.cajaviva`, «La caja viva», SDK mínimo 24 y objetivo 34. La 0.1 pesa 5,3 MB; la
-    0.2 (código 2) trae los gestos y el horizontal.
+    0.2 (código 2) trae los gestos y el horizontal; la 0.3 (código 3), el tacto y el sonido; la 0.4 (código 4), las
+    señales sin texto.
   - **Firma:** la clave de RONIN no se usa (su contraseña quedó bloqueada por seguridad: no insistir). La caja viva
     tiene su propia clave de prueba, `caja-viva-prueba.keystore` con su contraseña en `clave.txt`, en
     `/root/.local/share/caja_viva/firma/`. Su copia, con permiso del usuario, está en Drive ›
@@ -719,8 +741,14 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
     APK).
   - Las esperas de la prueba van en tiempo real y comprobando el estado: sin tarjeta gráfica, un
     cuadro puede tardar segundos mientras compila sombreadores.
-- **APK de prueba:** el de hoy es `caja-viva-0.2-prueba.apk` (La caja viva ilustrada, arriba), en la raíz de Drive ›
-  `Respaldos Claude/puzles/`; la 0.1 pasó a «Versiones anteriores (puzles)». El de los prototipos de Godot, `puzles-0.2.1-prueba.apk`, pasó el 03-10-2026 a
+- **APK de prueba:** el de hoy es `caja-viva-0.5-prueba.apk` (La caja viva ilustrada, arriba), en la raíz de Drive ›
+  `Respaldos Claude/puzles/`; de la 0.1 a la 0.4 están en «Versiones anteriores (puzles)».
+  - 0.5 (05-10-2026): **el juego completo** (niveles 3 y final), la cámara que gira de cerca sin salir de la vista y se
+    asoma a los cajones al abrirlos, y el incensario que ya no desaparece al destaparlo.
+  - 0.3 (05-10-2026): tacto con peso (holgura, muescas, retraso y topes), vocabulario de sonido y vibración (`sentir()`),
+    la cerradura del león a la vista (la tapa salta y queda entreabierta) y «Girar» arriba.
+  - 0.4 (05-10-2026): señales sin texto de la investigación: el ojo mira de reojo el frente abierto tras 35 s sin
+    avanzar, la tablilla que toca se afloja cuando el ojo no la ve y la tetera también distrae al ojo (la caja oye). El de los prototipos de Godot, `puzles-0.2.1-prueba.apk`, pasó el 03-10-2026 a
   «Versiones anteriores (puzles)». Lo que sigue es del APK de Godot:
   - Paquete `com.thunderdarkness.puzles`, nombre «Cuatro cajas», 49,9 MB, código de versión 3.
   - Firmado con la misma clave de prueba de RONIN.

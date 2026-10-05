@@ -1,6 +1,7 @@
 # Roadmap de La caja viva (05-10-2026)
 
-**Qué es:** el camino desde el prototipo de hoy (APK 0.3, dos niveles) hasta un juego que se pueda lanzar, con el orden
+**Qué es:** el camino desde el prototipo (APK 0.3, dos niveles; desde la 0.5, el juego entero: tres niveles y el final)
+hasta un juego que se pueda lanzar, con el orden
 de trabajo, lo que entra en cada fase y las decisiones que tiene que tomar el usuario. Sale de la auditoría
 (`07_auditoria_caja_viva.md`), la gramática (`05_gramatica_y_sistemas.md`), la investigación del género
 (`01`-`04` y `06`) y el método del usuario (`../METODO_CAJA_VIVA.md`).
@@ -12,22 +13,28 @@ todo de lo que se tarde en dar con buenos puzles y de las pruebas con jugadores.
 
 ## 1. Dónde estamos [Hecho]
 
-- **Fase:** prototipo jugable. Dos niveles (El cuerno y La caja de dentro), unos 10-15 minutos.
+- **Fase:** prototipo jugable de principio a fin (APK 0.5, 05-10-2026): tres niveles (El cuerno, La caja de dentro y
+  La voz) y el final (El corazón). Entre 35 y 55 minutos [Hipótesis, sin medir con jugadores].
 - **Lo que ya es bueno:** la regla del ojo («no deja tocar mientras te ve»), esconderle cosas al ojo, la resistencia
   creativa, el estilo pintado del boceto, la cara como puzle grande y, desde la 0.3, el tacto con peso y un
   vocabulario de sonido fijo. Desde la 0.4, tres señales sin texto: el ojo mira de reojo el frente abierto, la tablilla
   que toca se afloja cuando el ojo no la ve y la caja también oye (la tetera lo distrae).
 - **Dónde está frente a The Room** [Interpretación, `the_room_interaccion_y_camara.md` b.4]: entre The Room y Two. Un
   objeto central en una sala que participa, con vistas fijas.
-- **Lo que más falta:** contenido (horas, no minutos), variedad de familias de puzle, información cruzada larga,
-  menos texto y una historia contada (el marco, DECISIÓN 25, sigue abierto).
+- **Desde la 0.5:** la regla invertida (la luz fría del ojo nuevo, que va al revés del dedo, y tres tintas), el ritmo
+  de la respiración, la ficha de shōgi que se corona, la tetera que se vuelca y un final que recoge lo aprendido (el
+  ojo viejo señala, el nuevo alumbra, la voz avisa, y la caja pequeña es la llave). Información cruzada larga: la tapa
+  de la tetera tintinea desde el nivel 1 y es donde está el badajo; el hueco de la ficha y el cajón largo de la espalda,
+  vistos en el nivel 1, se abren en el 3.
+- **Lo que más falta:** horas de contenido (2-3 niveles más), menos texto, pistas en escalones (DECISIÓN 26) y una
+  historia contada (el marco, DECISIÓN 25, sigue abierto).
 
 ## 2. Las fases
 
 | Fase | Qué es | Qué tiene que estar | Cómo se sabe que está | Cuándo [Estimación] |
 |---|---|---|---|---|
-| **Prototipo** (hoy) | Validar la regla del ojo y el tacto | Niveles 1 y 2, gestos, sonido, APK | El usuario lo juega en su móvil [Hecho] | Hecho (0.1-0.3) |
-| **Corte vertical** | Una porción con la calidad final | Nivel 3 completo, el marco de la historia, pistas en 4 escalones, música, ajustes de sonido y vibración, arte a 2K en lo que se ve de cerca | 3-5 personas lo terminan sin la última pista en casi todos los pasos y quieren seguir (§5) | 2-4 semanas |
+| **Prototipo** | Validar la regla del ojo y el tacto | Niveles 1 y 2, gestos, sonido, APK | El usuario lo juega en su móvil [Hecho] | Hecho (0.1-0.4) |
+| **Corte vertical** (hoy) | Una porción con la calidad final | Nivel 3 completo y un final corto [Hecho, 0.5]; falta el marco de la historia, pistas en 4 escalones, música, ajustes de sonido y vibración y arte a 2K en lo que se ve de cerca | 3-5 personas lo terminan sin la última pista en casi todos los pasos y quieren seguir (§5) | 2-4 semanas |
 | **Alfa** | Todo el juego jugable | Todos los niveles y el final con arte provisional donde falte | Se puede jugar de principio a fin; la prueba automática lo recorre | +1-2 meses |
 | **Beta** | Juego completo y pulido | Arte final, sonido final, español e inglés, rendimiento medido en móviles modestos | La prueba cerrada de Google Play (12 personas, 14 días) sin bloqueos | +1 mes |
 | **Lanzamiento** | Google Play | Ficha de la tienda, tráiler, capturas, precio | Publicado | — |
@@ -66,16 +73,18 @@ Por impacto, como pide el método (prioridades del punto 34):
 
 1. **[Hecho, 0.3]** Tacto con peso, vocabulario de sonido, causa → efecto en la cerradura del león y menos texto.
    **[Hecho, 0.4]** Señales sin texto: el vistazo del ojo, la holgura de la tablilla y la caja que oye.
-2. **Nivel 3, «La caja del revés»** (`../ilustrada/NIVELES.md` §6): la mayor falta es contenido y variedad. Trae luz
-   (el ojo nuevo alumbra), transformación (la caja se da la vuelta y se despliega) y cosecha las dos semillas de la
-   espalda (el hueco de la ficha y el cajón largo). **Necesita arte** (6-10 imágenes con Gemini, unos 0,05 USD cada
-   una [Estimación]): se pide permiso antes de generarlo.
+2. **[Hecho, 0.5] Nivel 3, «La voz», y el final, «El corazón»** (`../ilustrada/NIVELES.md` §6 y §7). El nivel 3
+   trae la luz (el ojo nuevo alumbra), el ritmo y la sala entera como puzle, y cosecha las dos semillas de la espalda
+   (el hueco de la ficha y el cajón largo). Se hizo **sin arte nuevo** (dibujo por código y sonidos sintetizados, coste
+   0): la caja que se despliega como un biombo quedó fuera; si se quiere, es un buen nivel nuevo.
 3. **Pistas en 4 escalones y un aviso suave** (DECISIÓN 26, recomendada la B).
 4. **El marco de la historia** (DECISIÓN 25, recomendada la C).
 5. **Prueba con 3-5 jugadores** (§5) antes de seguir con más niveles.
 6. **Música y ajustes** (sonido, vibración, letra).
 7. **Arte a 2K** de lo que se ve de cerca.
-8. **Niveles 4-6 y el final**, con la DECISIÓN 30 resuelta.
+8. **Dos o tres niveles más entre el 3 y el final** (para llegar a las 2-3 horas del Must Have), con la DECISIÓN 30
+   resuelta. Candidatos: la caja que se despliega como un biombo (la propuesta antigua del nivel 3) y las ideas de la
+   biblia.
 
 ## 5. Cómo se valida cada paso
 

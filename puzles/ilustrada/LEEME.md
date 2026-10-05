@@ -149,6 +149,32 @@ que el ojo mire de reojo lo que protege.
   ojo la mira un instante (así se aprende, igual que con la llama). Mientras vigila la caja pequeña (nivel 2), ni la
   llama ni la tetera lo distraen: antes, la llama que temblaba sola aún lo distraía un momento pese al mensaje.
 
+## El juego completo: niveles 3 y final, y la cámara de cerca (0.5, 05-10-2026)
+
+**Qué pidió el usuario** (al probar el APK 0.4): que no tenía vista hacia arriba, que el nivel acababa en la caja más
+pequeña («cuando se lance y yo quiera cobrar por un juego de 3 minutos no será divertido»), que se montara el juego
+final con todo incluido, que el incensario se volvía invisible al destaparlo y que, de cerca, la vista se quedaba
+pegada: anclada a su sitio sí, pero que se pudiera girar en la misma vista para ver la llave del cajón abierto.
+
+**Qué cambió:**
+- **La cámara de cerca gira:** en las vistas de cerca, arrastrar en vacío gira la vista alrededor de lo que mira, sin
+  salir de ella, también hacia arriba (límites por vista en `tecnica_3d.js`). Al abrir el cajón que guarda la llave o
+  la nota, la cámara se asoma sola para que se vea dentro.
+- **El incensario ya no desaparece** al quitarle la tapa (la máscara se recortaba con «destination-in» aún puesto).
+- **El nivel 3, «La voz»** (`NIVELES.md` §6): la luz fría del ojo nuevo, que va al revés del dedo, descubre tinta en
+  el rollo, junto a la tetera y en el tatami; la ficha de shōgi cae del rollo mecido, se corona dándole la vuelta y
+  abre el cajón largo de la espalda, con la campanilla sin badajo; el badajo sale de la tetera volcada; y la caja solo
+  contesta a la campanilla mientras suelta el aire, hasta abrir los labios. Vistas nuevas de cerca: la tetera y el
+  cajón largo.
+- **El nivel final, «El corazón»** (`NIVELES.md` §7): el corazón sube por la trampilla con tres anillos que se giran
+  en círculo; el ojo viejo señala dónde va el cuerno, el nuevo alumbra la marca escondida y la campanilla suena donde
+  va el de la voz. La caja pequeña del nivel 2 es la última llave. Vista nueva: el corazón, desde arriba.
+- **Sin imágenes nuevas:** lo nuevo se dibuja por código (`pagina/nivel3_arte.js`: la ficha, la campanilla, el
+  badajo, las tintas y el corazón) y los ocho sonidos nuevos se sintetizan (`herramientas/sonidos_nivel3.py`).
+- **Los niveles en la página:** cada tarjeta lleva al siguiente («Seguir»); la partida guardada y «?nivel=N»
+  (de 2 a 4) empiezan en el que toca; al final, «Quedarse en la sala» o «Volver a empezar».
+- **Respiración sin saltos:** al soltar el aire contenido, la caja volvía de golpe a «llena»; ahora sigue desde vacía.
+
 ## Qué hay
 
 | Ruta | Qué es |
@@ -165,12 +191,14 @@ que el ojo mire de reojo lo que protege.
 | `pagina/juego.js` | Todo lo común: estado y recorrido, cajones, inventario, ojo, respiración, humo, luz, decoración viva, sonido, toques y la técnica A |
 | `pagina/tecnica_3d.js` | La técnica B (y la C retirada); se carga mientras se ve la portada |
 | `pagina/caja_hija.js` | La caja hija del nivel 2: el cubo con sus tablillas, sus flechas, el cajoncito y la cajita |
+| `pagina/nivel3_arte.js` | Lo que se dibuja por código en el nivel 3 y el final: la ficha, la campanilla, el badajo, las tintas y el corazón |
+| `herramientas/sonidos_nivel3.py` | Los sonidos del nivel 3 y el final: campanilla, tintineo, vertido, murmullo, canto, latido y anillo |
 | `herramientas/nivel2_capas.py` | Las capas del nivel 2: las caras de la caja hija, la cajita y el ojo nuevo (`capas/nivel2.json`) |
 | `NIVELES.md` | El plan de niveles: la cara como puzle grande y los cuatro niveles |
 | `apk/` | El APK de Android: la página dentro de un WebView, sin conexión (`apk/LEEME.md`) |
 | `pagina/escena3d.js` | La sala del boceto en 3D, el material que proyecta la pintura, la caja pintada y sus cajones |
 | `pagina/capas/`, `pagina/sonidos/` | Lo que generan los guiones |
-| `prueba/` | `servir.py` (servidor local), `jugar.mjs` (prueba del nivel 1) y `jugar_nivel2.mjs` (del nivel 2) |
+| `prueba/` | `servir.py` (servidor local), `jugar.mjs` (prueba del nivel 1), `jugar_nivel2.mjs`, `jugar_nivel3.mjs` y `jugar_final.mjs` |
 
 ### Las fuentes
 
@@ -295,7 +323,14 @@ node puzles/ilustrada/prueba/jugar.mjs B horizontal <carpeta de capturas>
 node puzles/ilustrada/prueba/jugar.mjs A horizontal <carpeta de capturas>
 node puzles/ilustrada/prueba/jugar.mjs B vertical <carpeta de capturas>
 node puzles/ilustrada/prueba/jugar_nivel2.mjs horizontal <carpeta de capturas>
+node puzles/ilustrada/prueba/jugar_nivel3.mjs horizontal <carpeta de capturas>
+node puzles/ilustrada/prueba/jugar_final.mjs horizontal <carpeta de capturas>
+
+# los sonidos del nivel 3 y el final (22 kHz)
+python3 puzles/ilustrada/herramientas/sonidos_nivel3.py
 ```
+
+- **Resultado (05-10-2026, 0.5, el juego completo):** RESULTADOS_05
 
 - **Resultado (05-10-2026, 0.4, con las señales sin texto):** el nivel 1, 36 de 36 en la B y en la A (en horizontal); el
   nivel 2, 30 de 30. Las pruebas comprueban el vistazo hacia el cajón de la llave, la tetera que distrae al ojo y la
@@ -340,12 +375,14 @@ node puzles/ilustrada/prueba/jugar_nivel2.mjs horizontal <carpeta de capturas>
   el inventario; y, del nivel 2, la caja hija, dónde tocar cada parte, por dónde se desliza, si el ojo ve una
   tablilla y la cajita) y `window.__tec`.
 - **Para publicarla de nuevo** en la misma página privada: la herramienta Artifact, con `pagina/index.html`
-  y, en `files`, los tres `.js` y todo `capas/` y `sonidos/`. La raíz es `pagina/`.
+  y, en `files`, los cinco `.js` (con `caja_hija.js` y `nivel3_arte.js`) y todo `capas/` y `sonidos/`. La raíz es `pagina/`.
 
 ## Lo que falta para un juego [Opinión]
 
 - **Más resolución:** la herramienta de hoy da 1376 × 768. Al acercarse en un móvil se ve algo blando, y
   la versión final pide 2K o 4K.
-- **Los niveles 3 y final** (`NIVELES.md` §6 y §7).
+- **Probarlo con jugadores** (`../PLAN.md` §3): cuánto dura cada nivel de verdad, dónde se atascan y si la luz fría
+  y el ritmo de la respiración se entienden sin texto.
+- **La última nota de la caja:** depende de la DECISIÓN 25 (el marco de la historia), abierta.
 - **El APK:** hecho, la página empaquetada tal cual (`apk/`). Para Google Play faltaría subir el SDK objetivo a
   35 y el AAB firmado con una clave de publicación.

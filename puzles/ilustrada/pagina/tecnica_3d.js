@@ -9,7 +9,7 @@ import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { aThree, crearProyector, rectanguloUV, cargarTextura, crearSala, crearMesa, crearObjetos, crearCajaPintada,
   crearCajonesPintados, materialPintura } from './escena3d.js';
 import { crearCajaHija, TABLILLAS, LADO as LADO_HIJA, SALE_CAJONCITO } from './caja_hija.js';
-import { dibujarFicha, dibujarCampanilla } from './nivel3_arte.js';
+import { dibujarFicha, dibujarCampanilla, dibujarBaseCorazon, dibujarAnillo, dibujarTintaAnillo, dibujarHuecoCorazon, dibujarBrillo } from './nivel3_arte.js';
 
 const ANCHO = 1376, ALTO = 768;
 const limitar = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -216,6 +216,9 @@ function crearRig(op, limites) {
     // nivel 3: la tetera, de cerca, para volcarla en la taza
     te: { T: puntoTe, s: 0.56, pivote: puntoTe },
     largo: { T: puntoLargo.clone().add(new THREE.Vector3(0, 0.012, 0.02)), s: 0.42, pivote: puntoLargo },
+    // nivel final: el corazón, en la tapa de la caja (se mira desde arriba: juego.js inclina la vista al llegar)
+    corazon: { T: new THREE.Vector3(0, mundo.centroCaja.y + mundo.altoCaja / 2 + 0.002, 0.03), s: 0.45,
+      pivote: new THREE.Vector3(0, mundo.centroCaja.y + mundo.altoCaja / 2, 0) },
   };
   function encuadre(nombre) {
     const v = VISTAS[nombre];
@@ -583,7 +586,7 @@ export async function crearTecnica(letra, op) {
         incensario: { th: 0.42, ph: [-0.1, 0.45], lupa: [0.45, 1.25] }, cara: { th: 0.36, ph: [-0.1, 0.35], lupa: [0.45, 1.25] },
         cajones: { th: 0.5, ph: [-0.1, 0.6], lupa: [0.5, 1.25] }, subida: { th: 0.2, ph: [-0.05, 0.15], lupa: [1, 1] },
         hija: { th: 0.3, ph: [-0.05, 0.35], lupa: [0.55, 1.2] }, te: { th: 0.35, ph: [-0.08, 0.4], lupa: [0.5, 1.2] },
-        largo: { th: 0.45, ph: [-0.1, 0.6], lupa: [0.5, 1.25] } }
+        largo: { th: 0.45, ph: [-0.1, 0.6], lupa: [0.5, 1.25] }, corazon: { th: 0.5, ph: [0.12, 0.78], lupa: [0.5, 1.25] } }
     : { sala: { th: 0.24, ph: [-0.06, 0.14], lupa: [0.45, 1] }, caja: { th: 0.95, ph: [-0.15, 0.45], lupa: [0.45, 1.25] },
         incensario: { th: 0.7, ph: [-0.12, 0.4], lupa: [0.45, 1.25] }, cara: { th: 0.55, ph: [-0.12, 0.3], lupa: [0.45, 1.25] },
         cajones: { th: 0.7, ph: [-0.12, 0.4], lupa: [0.5, 1.25] } };
@@ -593,7 +596,7 @@ export async function crearTecnica(letra, op) {
   let pintada = null, cajonesB = null, carasB = [], rolloB = null, hija = null, sombraHija = null, incensarioB = null;
   // nivel 3: el cajón largo de la espalda, la ficha en su hueco y la tetera que se vuelca (en el boceto de espaldas, el
   // frente del cajón largo y el hueco de la ficha)
-  let largoB = null, fichaB = null, teteraB = null;
+  let largoB = null, fichaB = null, teteraB = null, corazonB = null;
   const RECT_LARGO = [719, 476, 989, 558], RECT_HUECO = [816, 334, 876, 404];
   // nivel 2: dónde sale la caja hija (la trampilla), dónde se posa y dónde está el ojo grande que la vigila
   const ZT = op.escena3d.z_tablero;
@@ -650,6 +653,7 @@ export async function crearTecnica(letra, op) {
     }
     crearNivel3B();
     prepararTetera(objetos);
+    crearCorazonB();
   } else {
     tintas = crearTintas();
     const cargador = new GLTFLoader();
@@ -825,6 +829,27 @@ export async function crearTecnica(letra, op) {
     },
     puntoCampanillaLargo() { return largoB ? largoB.campanilla.getWorldPosition(new THREE.Vector3()) : null; },
     inclinarTetera,
+    // nivel final: dónde cae un punto de la pantalla en el plano del corazón (radio y ángulo, desde el frente, en sentido
+    // contrario a las agujas visto desde arriba), un punto del corazón en el boceto y en la pantalla
+    puntoEnCorazon(sx, sy) {
+      if (!corazonB) return null;
+      rig.colocar(op.reloj(), 0);
+      caja.updateMatrixWorld();
+      mundo.raycaster.setFromCamera(new THREE.Vector2(sx / mundo.ancho * 2 - 1, 1 - sy / mundo.alto * 2), mundo.camara);
+      const centro = corazonB.grupo.getWorldPosition(new THREE.Vector3());
+      const q = mundo.raycaster.ray.intersectPlane(new THREE.Plane(EJE_Y, -centro.y), new THREE.Vector3());
+      if (!q) return null;
+      const local = corazonB.grupo.worldToLocal(q.clone());
+      return { r: Math.hypot(local.x, local.z), alfa: Math.atan2(local.x, local.z) };
+    },
+    corazonEnBoceto(r, alfa) { return corazonB ? alBoceto(corazonB.grupo.localToWorld(new THREE.Vector3(Math.sin(alfa) * r, 0.004, Math.cos(alfa) * r))) : null; },
+    corazonEnPantalla(r, alfa) {
+      if (!corazonB) return null;
+      rig.colocar(op.reloj(), 0); caja.updateMatrixWorld();
+      const q = aPantalla(corazonB.grupo.localToWorld(new THREE.Vector3(Math.sin(alfa) * r, 0.004, Math.cos(alfa) * r)));
+      return { x: q.x, y: q.y };
+    },
+    centroCorazon() { return corazonB ? corazonB.grupo.localToWorld(new THREE.Vector3(0, 0.02, 0)) : mundo.centroCaja.clone(); },
     // el frente de un cajón del costado en la pantalla, abierto k (0 cerrado … 1 abierto): el dedo tira de él por
     // esa línea
     pantallaCajon(id, k) {
@@ -922,6 +947,7 @@ export async function crearTecnica(letra, op) {
         }
         if (rolloB) { const r = op.decoracion.rollo; rolloB.rotation.set(r.a, 0, r.lift); }
         actualizarNivel3B();
+        actualizarCorazonB(dt);
       } else actualizarC(dt);
     },
     dibujar() {
@@ -1018,6 +1044,16 @@ export async function crearTecnica(letra, op) {
     if (!hija) return;
     const est = op.estado(), h2 = est.hija;
     if (!h2) { hija.grupo.visible = false; sombraHija.visible = false; return; }     // nivel 1 (o vuelta a empezar)
+    // nivel final: en la mano no se ve; puesta en el corazón, hundida en su hueco y girada lo que diga el dedo
+    if (h2.fase === 'mano') { hija.grupo.visible = false; sombraHija.visible = false; return; }
+    if (h2.fase === 'corazon' && corazonB) {
+      hija.grupo.visible = true; sombraHija.visible = false;
+      caja.updateMatrixWorld();
+      hija.grupo.position.copy(corazonB.grupo.localToWorld(new THREE.Vector3(0, LADO_HIJA / 2 - 0.022, 0)));
+      hija.cuerpo.quaternion.setFromAxisAngle(EJE_Y, (est.fin && est.fin.giroHija) || 0);
+      hija.poner();
+      return;
+    }
     const fuera = h2.fase !== 'dentro';
     hija.grupo.visible = fuera || !!animHija.subida;
     sombraHija.visible = fuera && !animHija.subida;
@@ -1187,6 +1223,101 @@ export async function crearTecnica(letra, op) {
     T.malla.updateMatrixWorld(true);
   }
 
+  // ---- Nivel final: el corazón. Sube por la trampilla y se queda en la tapa: una base de laca con su marco, tres
+  // anillos que giran (el del cuerno, el del ojo y el de la voz) y, en el centro, un hueco cuadrado para la caja pequeña.
+  // juego.js lleva el estado (estado.fin); aquí se pone cada cosa en su sitio
+  function crearCorazonB() {
+    const textura = lienzo => { const t = new THREE.CanvasTexture(lienzo); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; };
+    const plano = (geo, mapa, extra = {}) => {
+      const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: textura(mapa), transparent: true, ...extra }));
+      m.rotation.x = -Math.PI / 2;
+      return m;
+    };
+    const grupo = new THREE.Group();
+    grupo.position.set(0, 0.034 + pintada.alto + 0.0012, 0);
+    grupo.visible = false;
+    // (todo es transparente por los bordes: el orden de dibujo va fijado, de abajo arriba, para que la tinta y los
+    // brillos, que no escriben profundidad, no queden tapados por su propio anillo)
+    const base = plano(new THREE.CircleGeometry(0.106, 96), dibujarBaseCorazon());
+    base.userData.tipo = 'corazon'; base.renderOrder = 1;
+    grupo.add(base);
+    const RADIOS = [[0.086, 0.103], [0.071, 0.085], [0.057, 0.07]];
+    const anillos = RADIOS.map(([r0, r1], i) => {
+      const giro = new THREE.Group(); giro.position.y = 0.0012 * (i + 1);
+      const malla = plano(new THREE.RingGeometry(r0, r1, 128, 1), dibujarAnillo(i, r0 / r1));
+      malla.userData = { tipo: 'corazon', anillo: i }; malla.renderOrder = 2;
+      giro.add(malla);
+      grupo.add(giro);
+      return { giro, malla, r0, r1 };
+    });
+    // la marca del anillo del ojo, en tinta fría (juego.js dice en qué ángulo está y cuánto la alumbra la luz)
+    const tintaOjo = { malla: null, a: null };
+    tintaOjo.poner = a => {
+      if (tintaOjo.a === a) return;
+      tintaOjo.a = a;
+      if (tintaOjo.malla) anillos[1].giro.remove(tintaOjo.malla);
+      tintaOjo.malla = plano(new THREE.RingGeometry(RADIOS[1][0], RADIOS[1][1], 128, 1), dibujarTintaAnillo(RADIOS[1][0] / RADIOS[1][1], a),
+        { opacity: 0, depthWrite: false });
+      tintaOjo.malla.position.y = 0.0004;
+      tintaOjo.malla.raycast = () => {}; tintaOjo.malla.renderOrder = 3;
+      anillos[1].giro.add(tintaOjo.malla);
+    };
+    // el hueco del centro
+    const hueco = plano(new THREE.PlaneGeometry(0.079, 0.079), dibujarHuecoCorazon());
+    hueco.position.y = 0.0005; hueco.userData.tipo = 'corazon'; hueco.renderOrder = 2;
+    grupo.add(hueco);
+    // los brillos: el de la ranura que mira el ojo viejo (rojo), el de cada anillo en su sitio y el del corazón abierto
+    const brillo = (color, tam) => {
+      const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: textura(dibujarBrillo(color)), transparent: true, depthWrite: false,
+        blending: THREE.AdditiveBlending, opacity: 0 }));
+      s.scale.set(tam, tam, 1); s.raycast = () => {}; s.renderOrder = 4;
+      return s;
+    };
+    const ranura = brillo('255, 70, 40', 0.05);
+    grupo.add(ranura);
+    const marcas = anillos.map((a, i) => { const s = brillo(i === 1 ? '190, 215, 255' : '255, 190, 110', 0.045); a.giro.add(s); return s; });
+    const luz = brillo('255, 196, 120', 0.34); luz.position.y = 0.04;
+    grupo.add(luz);
+    caja.add(grupo);
+    corazonB = { grupo, anillos, tintaOjo, hueco, ranura, marcas, luz, RADIOS };
+  }
+  // cada cuadro: la subida, el giro de cada anillo, los brillos y la tinta del anillo del ojo
+  function actualizarCorazonB(dt) {
+    if (!corazonB) return;
+    const f = op.estado().fin, C = corazonB, t = op.reloj();
+    C.grupo.visible = !!f && f.subida > 0.001;
+    if (!C.grupo.visible) return;
+    const k = f.subida;
+    C.grupo.scale.setScalar(Math.max(0.001, k));
+    C.grupo.position.y = 0.034 + pintada.alto + 0.0012 - 0.03 * (1 - k);
+    C.grupo.rotation.y = (1 - k) * 2.4;
+    const RM = C.RADIOS.map(([a, b]) => (a + b) / 2);
+    C.anillos.forEach((a, i) => { a.giro.rotation.y = f.angulos[i]; });
+    // la marca de cada anillo (en su sitio, brilla); el anillo del ojo: su tinta, donde llega la luz
+    const marcaLocal = [0.2, f.marca * Math.PI / 4, 0];
+    C.marcas.forEach((s, i) => {
+      s.position.set(Math.sin(marcaLocal[i]) * RM[i], 0.003, Math.cos(marcaLocal[i]) * RM[i]);
+      const voz = i === 2 && f.vozHasta && t < f.vozHasta ? (f.vozHasta - t) / 0.9 : 0;
+      s.material.opacity = f.bloqueados[i] ? 0.55 + 0.25 * Math.sin(t * 3 + i) : voz;
+    });
+    C.tintaOjo.poner(f.marca * Math.PI / 4);
+    const luz = op.luzCorazon ? op.luzCorazon() : null;
+    let vis = f.bloqueados[1] ? 1 : 0;
+    if (luz && !f.bloqueados[1]) {
+      const dif = Math.atan2(Math.sin(luz.alfa - (marcaLocal[1] + f.angulos[1])), Math.cos(luz.alfa - (marcaLocal[1] + f.angulos[1])));
+      vis = luz.fuerza * Math.max(0, 1 - Math.abs(dif) / 0.6);
+    }
+    C.tintaOjo.malla.material.opacity += (vis - C.tintaOjo.malla.material.opacity) * (1 - Math.exp(-dt * 10));
+    // la ranura que mira el ojo viejo: late en rojo mientras el anillo del cuerno no está en su sitio
+    const a = f.ranura * Math.PI / 4;
+    C.ranura.position.set(Math.sin(a) * 0.1045, 0.004, Math.cos(a) * 0.1045);
+    C.ranura.material.opacity = f.fase === 'anillos' && !f.bloqueados[0] ? 0.5 + 0.35 * Math.sin(t * 2.6) : 0;
+    // el hueco del centro brilla al abrirse; abierto el corazón, late
+    const voz = f.vozHasta && t < f.vozHasta ? 0.3 * (f.vozHasta - t) / 0.9 : 0;
+    C.luz.material.opacity = Math.max(0.35 * f.centro * (0.7 + 0.3 * Math.sin(t * 2)), f.latido || 0, voz);
+    C.luz.scale.setScalar(0.2 + 0.25 * (f.latido || 0));
+  }
+
   // los cajones de la B: cuánto ha salido cada uno (lo lleva juego.js), su hueco, su sombra y lo que guarda
   function actualizarCajonesB() {
     const est = op.estado();
@@ -1284,6 +1415,7 @@ export async function crearTecnica(letra, op) {
       }
       if (esB && tipo === 'cajon') return { malla: o, punto: { ...centroCajon(o.userData.cajon), cara: 'frente', cajon: o.userData.cajon } };
       if (esB && tipo === 'largo') return { malla: o, punto: { x: 852, y: 516, cara: 'detras', largo: o.userData.parte || 'cajon' } };
+      if (esB && tipo === 'corazon') return { malla: o, punto: { ...alBoceto(h.point), cara: 'frente', corazon: true } };
       if (esB && tipo === 'caja') {
         const local = caja.worldToLocal(h.point.clone());
         const detras = h.face && (h.face.materialIndex === 1 || h.face.materialIndex === 5);
