@@ -1067,6 +1067,9 @@ function abrirCajon(id, callado = false, sinSonido = false) {
   mirarA(c, 1.6);
   setTimeoutReloj(0.25, () => polvoDeCajon(c.x + 10, c.y + 2));
   setTimeoutReloj(0.35, () => mensaje(textoCajon(id)));
+  // si guarda algo, la cámara se asoma para que se vea dentro (la consecuencia siempre se ve)
+  const guarda = CAJONES[id].contiene;
+  if (guarda && estado[guarda] === 'cajon' && estado.vista === 'cajones' && tec.inclinar) setTimeoutReloj(0.2, () => tec.inclinar(0.12, 0.42));
 }
 function cerrarCajon(id, sinSonido = false) {
   const a = cajonAnim[id];
@@ -2888,7 +2891,8 @@ lienzo.addEventListener('pointermove', e => {
   if (puntero.movido > 10 && estado.fase !== 'portada' && !estado.ocupado) {
     if (puntero.enHija) tec.girarHija(dx, dy);
     else if (puntero.enCaja) tec.arrastrar(dx, dy, true);
-    else if (estado.vista === 'sala') tec.arrastrar(dx, dy, false);      // de cerca, la cámara no se mueve
+    // en la sala se mira alrededor; de cerca, la vista sigue anclada a su sitio, pero gira a su alrededor
+    else if (estado.vista !== 'subida') tec.arrastrar(dx, dy, false);
     if (tec.nombre !== 'A' && (puntero.enCaja || puntero.enHija) && !puntero.sonoGiro && puntero.movido > 24) {
       puntero.sonoGiro = true; sonar('deslizar_madera', puntero.enHija ? -17 : -14, puntero.enHija ? 1.5 : 1.1);
     }
@@ -3531,6 +3535,9 @@ window.__prueba = {
   adelantarVistazo: () => { progreso.proximoVistazo = reloj; },
   vistazo: () => (ojo.vistazo && reloj < ojo.vistazo.hasta ? { ...ojo.vistazo.punto } : null),
   tablillaPos: i => (tec.tablilla ? tec.tablilla(i) : null),
+  mirada: () => (tec.mirada ? tec.mirada() : null),
+  // ¿el incensario se ve en (x, y) del boceto? (la máscara de su silueta en la técnica B)
+  incensarioVisible: (x, y) => (tec.alfaIncensario ? tec.alfaIncensario(x, y) : 1),
   usar: (objeto, x, y, o = 'caja') => { const m = tec.ancla({ x, y }, o); usarObjeto(objeto, tec.aPintura(m.x, m.y), null); },
 };
 window.__tec = () => tec;

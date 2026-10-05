@@ -183,6 +183,11 @@ await espera(0.9);
 await foto('04_cajon_abierto');
 c = await cajon('c8');
 comprobar('tirando con el dedo, el cajón de abajo sale y se queda abierto', c.estado === 'abierto' && c.k > 0.95, JSON.stringify(c));
+await espera(0.8);
+if (tecnica === 'B') {
+  const m = await pagina.evaluate(() => window.__prueba.mirada());
+  comprobar('al abrir el cajón de la llave, la cámara se asoma para ver dentro', m && m.ph > 0.2, JSON.stringify(m));
+}
 const ejeAntes = await pagina.evaluate(() => window.__prueba.ejeCajon('c8'));
 // (la tetera: su tintineo también distrae al ojo, pero calmarLampara lo deshace; el shoji no vale, su viento agita la
 // llama y distrae al ojo)
@@ -192,6 +197,15 @@ await espera(0.9);
 const ejeDespues = await pagina.evaluate(() => window.__prueba.ejeCajon('c8'));
 comprobar('de cerca, la cámara se queda fija: tocar otra cosa no vuelve a la sala',
   (await estado()).vista === 'cajones' && Math.hypot(ejeAntes.a.x - ejeDespues.a.x, ejeAntes.a.y - ejeDespues.a.y) < 6);
+if (tecnica === 'B') {
+  // de cerca, la vista sigue anclada, pero arrastrar en vacío la gira alrededor de los cajones (también hacia arriba)
+  const antes = await pagina.evaluate(() => window.__prueba.mirada());
+  await arrastrar(ancho * 0.45, alto * 0.2, ancho * 0.3, alto * 0.45, 10);
+  await espera(0.6);
+  const despues = await pagina.evaluate(() => window.__prueba.mirada());
+  comprobar('de cerca, arrastrar en vacío gira la vista sin salir de ella', (await estado()).vista === 'cajones'
+    && Math.abs(despues.thObj - antes.thObj) > 0.05, `${JSON.stringify(antes)} → ${JSON.stringify(despues)}`);
+}
 
 await pagina.evaluate(() => window.__prueba.calmarLampara());
 await tocarCajon('c8');
@@ -315,6 +329,8 @@ await espera(0.6);
 await foto('15_abierto');
 e = await estado();
 comprobar('arrastrando hacia arriba, la tapa se levanta y queda en la mesa', e.tapa === 'abierta' && e.tapaEnMesa);
+comprobar('sin la tapa, el incensario se sigue viendo (el cuenco y el cuerno en las brasas)',
+  await pagina.evaluate(() => window.__prueba.incensarioVisible(575, 565) > 0.5 && window.__prueba.incensarioVisible(601, 478) > 0.5));
 
 await tocar(593, 480, 'incensario');
 await espera(1.3);

@@ -73,6 +73,9 @@ function siluetaEstrecha(op, nombre, radio, recortarMas = null) {
   k.globalCompositeOperation = 'destination-in';
   const d = Math.round(radio * 0.7);
   for (const [dx, dy] of [[-radio, 0], [radio, 0], [0, -radio], [0, radio], [-d, -d], [d, d], [-d, d], [d, -d]]) k.drawImage(base, dx, dy);
+  // (con «destination-in» aún puesto, lo que dibujara recortarMas borraría todo lo demás: el incensario abierto se
+  // quedaba solo con el cuerno)
+  k.globalCompositeOperation = 'source-over';
   if (recortarMas) recortarMas(c);
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.NoColorSpace;
@@ -194,9 +197,9 @@ function crearRig(op, limites) {
     // (un poco por encima del centro, para que se vea la trampilla de arriba)
     caja: { T: mundo.centroCaja.clone().add(new THREE.Vector3(0, 0.008, 0)), s: 0.62, pivote: mundo.centroCaja },
     incensario: { T: mundo.centroIncensario, s: 0.56, pivote: mundo.centroIncensario },
-    cara: { T: puntoCara, s: 0.5, pivote: mundo.centroCaja },
-    // el costado de los cajones, de cerca
-    cajones: { T: puntoCajones, s: 0.46, pivote: mundo.centroCaja },
+    cara: { T: puntoCara, s: 0.5, pivote: puntoCara },
+    // el costado de los cajones, de cerca (al girar la vista, gira alrededor de ellos)
+    cajones: { T: puntoCajones, s: 0.46, pivote: puntoCajones },
     // nivel 2: la caja hija sube de la trampilla (se ve la caja entera con aire encima) y baja a la mesa, donde se
     // mira de cerca con el ojo grande encima, vigilándola
     subida: { T: new THREE.Vector3(0, 0.2, 0.06), s: 0.78, pivote: mundo.centroCaja },
@@ -244,6 +247,12 @@ function crearRig(op, limites) {
       const l = limites[this.vista] || limites.sala;
       this.thObj = limitar(this.thObj - dx * 0.0042, -l.th, l.th);
       this.phObj = limitar(this.phObj + dy * 0.0032, l.ph[0], l.ph[1]);
+    },
+    // gira la vista hasta un ángulo (dentro de sus límites): para asomarse a un cajón que se acaba de abrir
+    inclinar(th, ph) {
+      const l = limites[this.vista] || limites.sala;
+      this.thObj = limitar(th, -l.th, l.th);
+      this.phObj = limitar(ph, l.ph[0], l.ph[1]);
     },
     // pellizcar: r es cuánto se han separado los dedos; el punto que había bajo ellos (m0) queda bajo ellos (m1).
     // Devuelve 'fuera' o 'dentro' si se ha querido pasar del margen de la vista (juego.js sale de la vista al alejarse)
@@ -556,12 +565,13 @@ export async function crearTecnica(letra, op) {
   const caja = new THREE.Group();          // gira (y respira) alrededor de la peana
   caja.name = 'caja';
   grupo.add(caja);
-  // th y ph: cuánto se mira alrededor al arrastrar (solo en la sala: de cerca, la cámara se queda fija); lupa: cuánto
-  // acerca y aleja el pellizco en cada vista (en la sala no aleja: fuera del boceto no hay pintura)
+  // th y ph: cuánto se gira la vista al arrastrar en vacío (en la sala se mira alrededor; de cerca, la vista sigue anclada
+  // a su sitio pero gira a su alrededor, también hacia arriba, para ver dentro de los cajones o la tapa de la caja);
+  // lupa: cuánto acerca y aleja el pellizco en cada vista (en la sala no aleja: fuera del boceto no hay pintura)
   const limites = esB
-    ? { sala: { th: 0.14, ph: [-0.05, 0.1], lupa: [0.45, 1] }, caja: { th: 0.38, ph: [-0.12, 0.22], lupa: [0.45, 1.25] },
-        incensario: { th: 0.32, ph: [-0.1, 0.22], lupa: [0.45, 1.25] }, cara: { th: 0.32, ph: [-0.1, 0.2], lupa: [0.45, 1.25] },
-        cajones: { th: 0.42, ph: [-0.1, 0.3], lupa: [0.5, 1.25] }, subida: { th: 0.2, ph: [-0.05, 0.15], lupa: [1, 1] },
+    ? { sala: { th: 0.14, ph: [-0.05, 0.1], lupa: [0.45, 1] }, caja: { th: 0.5, ph: [-0.12, 0.55], lupa: [0.45, 1.25] },
+        incensario: { th: 0.42, ph: [-0.1, 0.45], lupa: [0.45, 1.25] }, cara: { th: 0.36, ph: [-0.1, 0.35], lupa: [0.45, 1.25] },
+        cajones: { th: 0.5, ph: [-0.1, 0.6], lupa: [0.5, 1.25] }, subida: { th: 0.2, ph: [-0.05, 0.15], lupa: [1, 1] },
         hija: { th: 0.3, ph: [-0.05, 0.35], lupa: [0.55, 1.2] } }
     : { sala: { th: 0.24, ph: [-0.06, 0.14], lupa: [0.45, 1] }, caja: { th: 0.95, ph: [-0.15, 0.45], lupa: [0.45, 1.25] },
         incensario: { th: 0.7, ph: [-0.12, 0.4], lupa: [0.45, 1.25] }, cara: { th: 0.55, ph: [-0.12, 0.3], lupa: [0.45, 1.25] },
@@ -777,6 +787,14 @@ export async function crearTecnica(letra, op) {
     soltar(vx = 0, enCaja = false) { if (enCaja && vx) giroObj += limitar(vx, -2500, 2500) * 0.011 * 0.08; },
     pellizcar(r, m0, m1) { return rig.pellizcar(r, m0, m1); },
     lupa() { return rig.lupa.zObj; },
+    inclinar(th, ph) { rig.inclinar(th, ph); },
+    mirada() { return { th: rig.th, ph: rig.ph, thObj: rig.thObj, phObj: rig.phObj }; },
+    // cuánto se ve el incensario en (x, y) del boceto con la máscara de ahora (para las pruebas)
+    alfaIncensario(x, y) {
+      const imagen = incensarioB && incensarioB.material.uniforms.uMascara.value.image;
+      if (!imagen || !imagen.getContext) return 1;
+      return imagen.getContext('2d').getImageData(Math.round(x), Math.round(y), 1, 1).data[3] / 255;
+    },
     abrirTrampilla(k) { trampilla = k; },
     // el frente de un cajón del costado en la pantalla, abierto k (0 cerrado … 1 abierto): el dedo tira de él por
     // esa línea
