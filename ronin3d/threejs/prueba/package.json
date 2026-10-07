@@ -1,0 +1,13 @@
+{
+  "name": "ronin3d-threejs-prueba",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Prueba automática de RONIN 3D (Three.js · HD-2D) con Playwright y Chromium sin ventana",
+  "type": "module",
+  "scripts": {
+    "prueba": "node prueba.mjs"
+  },
+  "dependencies": {
+    "playwright": "1.56.1"
+  }
+}

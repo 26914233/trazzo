@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- La caja viva: una sola pantalla con la página del juego (WebView), todo dentro del APK -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.thunderdarkness.cajaviva">
+
+    <!-- INTERNET solo para que el WebView cargue la dirección local que sirve la app; el juego no sale a la red -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
+
+    <application
+        android:label="@string/nombre_app"
+        android:icon="@mipmap/icono"
+        android:theme="@style/TemaCaja"
+        android:allowBackup="true"
+        android:hardwareAccelerated="true"
+        android:largeHeap="true">
+
+        <activity
+            android:name=".ActividadCaja"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="sensorLandscape"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation|uiMode|density">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

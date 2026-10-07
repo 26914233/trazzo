@@ -1,0 +1,1831 @@
+// La caja viva en 3D: las técnicas B y C (DECISIÓN 29).
+//   B · la pintura del boceto proyectada sobre una caja, una mesa y una sala sencillas (escena3d.js).
+//   C · el modelo de Blender de la caja y de lo que hay en la mesa, con tinta y acuarela; la sala sigue pintada.
+// Las dos comparten el lienzo WebGL, la sala, la mesa y la cámara. juego.js les pide lo mismo que a la técnica A:
+// dibujar, pasar de la pantalla al boceto, anclar los efectos, moverse entre vistas y girar la caja.
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
+import { aThree, crearProyector, rectanguloUV, cargarTextura, crearSala, crearMesa, crearObjetos, crearCajaPintada,
+  crearCajonesPintados, materialPintura } from './escena3d.js';
+import { crearCajaHija, TABLILLAS, LADO as LADO_HIJA, SALE_CAJONCITO } from './caja_hija.js';
+import { dibujarFicha, dibujarCampanilla, dibujarBaseCorazon, dibujarAnillo, dibujarTintaAnillo, dibujarHuecoCorazon, dibujarBrillo } from './nivel3_arte.js';
+import { dibujarBorla, dibujarTarjetaLazo, dibujarTsukegi, dibujarCordonPasador, dibujarOvillo, dibujarFrasquito, dibujarDedal } from './nivel5_arte.js';
+
+const ANCHO = 1376, ALTO = 768;
+const limitar = (v, a, b) => Math.min(b, Math.max(a, v));
+const mezclar = (a, b, k) => a + (b - a) * k;
+const suave = (a, b, x) => { const t = limitar((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const curva = k => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
+const EJE_Y = new THREE.Vector3(0, 1, 0);
+const TAPA_ORIGEN = { x: 575, y: 519 }, TAPA_MESA = { x: 521, y: 642 };
+
+// Un giro con muelle: «q» va hacia «objetivo» con velocidad angular «w» (rad/s, en ejes del mundo), con un poco de
+// rebote al llegar. Así la caja pequeña pesa: sigue al dedo con retraso y, al soltarla, se pasa un poco y se asienta.
+const _dif = new THREE.Quaternion(), _paso = new THREE.Quaternion(), _error = new THREE.Vector3(), _eje = new THREE.Vector3();
+function girarConMuelle(q, objetivo, w, dt, rigidez = 170, amortiguacion = 0.62) {
+  _dif.copy(objetivo).multiply(_paso.copy(q).invert());
+  if (_dif.w < 0) { _dif.x = -_dif.x; _dif.y = -_dif.y; _dif.z = -_dif.z; _dif.w = -_dif.w; }
+  const s = Math.sqrt(Math.max(0, 1 - _dif.w * _dif.w)), angulo = 2 * Math.acos(limitar(_dif.w, -1, 1));
+  if (s > 1e-6) _error.set(_dif.x / s, _dif.y / s, _dif.z / s).multiplyScalar(angulo); else _error.set(0, 0, 0);
+  // en pasos cortos, para que un cuadro lento no lo dispare
+  for (let resto = dt; resto > 1e-5; resto -= 1 / 120) {
+    const h = Math.min(resto, 1 / 120);
+    w.addScaledVector(_error, rigidez * h).multiplyScalar(Math.max(0, 1 - 2 * Math.sqrt(rigidez) * amortiguacion * h));
+    const v = w.length();
+    if (v > 1e-6) { q.premultiply(_paso.setFromAxisAngle(_eje.copy(w).divideScalar(v), v * h)).normalize(); _error.addScaledVector(w, -h); }
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// El mundo común: el lienzo WebGL, la sala pintada, la mesa y las texturas del boceto
+// ---------------------------------------------------------------------------------------------
+let mundo = null;
+
+function texturaDeImagen(imagen) {
+  const t = new THREE.Texture(imagen);
+  t.colorSpace = THREE.NoColorSpace;          // la pintura pasa tal cual
+  t.minFilter = THREE.LinearMipmapLinearFilter;
+  t.anisotropy = 4;
+  t.needsUpdate = true;
+  return t;
+}
+
+// El alfa de las siluetas, en la CPU: dice si un toque cae en el objeto pintado o en el hueco de al lado
+function leerSilueta(op, nombre) {
+  const s = op.datos.capas[nombre], c = document.createElement('canvas');
+  c.width = s.w; c.height = s.h;
+  const k = c.getContext('2d', { willReadFrequently: true });
+  k.drawImage(op.img[nombre], 0, 0);
+  const d = k.getImageData(0, 0, s.w, s.h).data;
+  return (x, y) => {
+    const i = Math.round(x - s.x), j = Math.round(y - s.y);
+    return i < 0 || j < 0 || i >= s.w || j >= s.h ? 0 : d[(j * s.w + i) * 4 + 3] / 255;
+  };
+}
+
+// Una silueta algo más estrecha (la de la pintura incluye un borde de mesa que, al girar, parece un halo)
+function siluetaEstrecha(op, nombre, radio, recortarMas = null) {
+  const s = op.datos.capas[nombre];
+  const base = document.createElement('canvas'); base.width = ANCHO; base.height = ALTO;
+  base.getContext('2d').drawImage(op.img[nombre], s.x, s.y);
+  const c = document.createElement('canvas'); c.width = ANCHO; c.height = ALTO;
+  const k = c.getContext('2d');
+  k.drawImage(base, 0, 0);
+  k.globalCompositeOperation = 'destination-in';
+  const d = Math.round(radio * 0.7);
+  for (const [dx, dy] of [[-radio, 0], [radio, 0], [0, -radio], [0, radio], [-d, -d], [d, d], [-d, d], [d, -d]]) k.drawImage(base, dx, dy);
+  // (con «destination-in» aún puesto, lo que dibujara recortarMas borraría todo lo demás: el incensario abierto se
+  // quedaba solo con el cuerno)
+  k.globalCompositeOperation = 'source-over';
+  if (recortarMas) recortarMas(c);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.NoColorSpace;
+  return t;
+}
+
+// Sin la tapa (cuando el león la deja en la mesa), lo que había encima de la boca del incensario ya no es incensario:
+// la capa abierta pinta allí la pared, y en el cilindro se vería como un fantasma al mover la cámara. El cuerno de las
+// brasas, mientras está, sí cuenta
+function quitarTapa(op, c, conCuerno) {
+  const k = c.getContext('2d'), t = op.datos.capas.tapa, boca = 490;
+  k.save();
+  k.globalCompositeOperation = 'destination-out';
+  k.beginPath(); k.rect(t.x - 6, t.y - 40, t.w + 12, boca - (t.y - 40)); k.clip();
+  for (const [dx, dy] of [[0, 0], [-3, 0], [3, 0], [0, -3]]) k.drawImage(op.img.tapa, t.x + dx, t.y + dy);
+  k.restore();
+  if (conCuerno) { const h = op.datos.capas.cuerno_brasas; k.drawImage(op.img.cuerno_brasas, h.x, h.y); }
+}
+
+function prepararMundo(op) {
+  if (mundo) return mundo;
+  const render = new THREE.WebGLRenderer({ canvas: op.lienzo3d, antialias: true, powerPreference: 'high-performance' });
+  render.setClearColor(0x0c0907, 1);
+  const escena = new THREE.Scene();
+  const proyector = crearProyector(op.camaraBoceto);
+  const capas = op.datos.capas;
+  // el boceto de frente con lo que ya ha pasado (juego.js lo rehace al cambiar de estado)
+  const frente = new THREE.CanvasTexture(op.compuesto);
+  frente.colorSpace = THREE.NoColorSpace; frente.minFilter = THREE.LinearMipmapLinearFilter; frente.anisotropy = 4;
+  op.alHornear.push(() => { frente.needsUpdate = true; });
+  // el ojo de la pintura: un lienzo pequeño, del tamaño de la almendra, que se repinta en cada cuadro
+  const A = [...op.datos.almendra, ...((op.nivel2 && op.nivel2.almendra2) || [])], xs = A.map(p => p[0]), ys = A.map(p => p[1]);
+  const sitio = { x: Math.floor(Math.min(...xs) - 10), y: Math.floor(Math.min(...ys) - 13) };
+  sitio.w = Math.ceil(Math.max(...xs) + 10) - sitio.x; sitio.h = Math.ceil(Math.max(...ys) + 10) - sitio.y;
+  const escalaOjo = 4, lienzoOjo = document.createElement('canvas');
+  lienzoOjo.width = sitio.w * escalaOjo; lienzoOjo.height = sitio.h * escalaOjo;
+  const texOjo = new THREE.CanvasTexture(lienzoOjo);
+  texOjo.colorSpace = THREE.NoColorSpace; texOjo.generateMipmaps = false; texOjo.minFilter = THREE.LinearFilter;
+  const ojo = { lienzo: lienzoOjo, textura: texOjo, sitio, escala: escalaOjo,
+    rect: rectanguloUV([sitio.x, sitio.y, sitio.x + sitio.w, sitio.y + sitio.h]) };
+  // las planchas (juego.js): la pintura original y, solo donde había objetos, lo que Gemini pintó detrás
+  const tex = {
+    salaVacia: texturaDeImagen(op.planchas.sala), mesaVacia: texturaDeImagen(op.planchas.mesa),
+    detras: texturaDeImagen(op.img.sala_detras), frente, ojo,
+    siluetaIncensario: siluetaEstrecha(op, 'silueta_incensario', 3),
+    siluetaIncensarioAbierto: siluetaEstrecha(op, 'silueta_incensario', 3, c => quitarTapa(op, c, false)),
+    siluetaIncensarioCuerno: siluetaEstrecha(op, 'silueta_incensario', 3, c => quitarTapa(op, c, true)),
+    siluetaTe: siluetaEstrecha(op, 'silueta_te', 2, op.recortarTe),
+  };
+  const sala = crearSala(op.escena3d, proyector, tex), mesa = crearMesa(op.escena3d, proyector, tex);
+  escena.add(sala, mesa);
+  const camara = new THREE.PerspectiveCamera(op.camaraBoceto.fov_vertical_grados, ANCHO / ALTO, 0.02, 40);
+  // la geometría en reposo del boceto, para anclar los efectos (humo, luces) y para las vistas
+  const e = op.escena3d, altoCaja = 0.21 * e.alto_caja, p = e.peana;
+  const centroCaja = new THREE.Vector3(0, 0.034 + altoCaja / 2, 0);
+  const cajasReposo = [
+    new THREE.Box3(new THREE.Vector3(-0.11, 0.034, -0.11), new THREE.Vector3(0.11, 0.034 + altoCaja, 0.11)),
+    new THREE.Box3().setFromCenterAndSize(aThree(p.centro[0], p.centro[1], (p.z_abajo + p.z_arriba) / 2),
+      new THREE.Vector3(p.medio_x * 2, p.z_arriba - p.z_abajo, p.medio_y * 2)),
+  ];
+  const centro = nombre => { const o = e.objetos[nombre]; return aThree(o.base[0], o.base[1], o.base[2] + o.alto * 0.45); };
+  mundo = {
+    op, render, escena, proyector, tex, sala, mesa, camara, ojo, ancho: 1, alto: 1, ppp: 1,
+    siluetas: { incensario: leerSilueta(op, 'silueta_incensario'), te: leerSilueta(op, 'silueta_te') },
+    centroCaja, cajasReposo, altoCaja, centroIncensario: centro('incensario'), centroTe: centro('tetera'),
+    zTablero: e.z_tablero, raycaster: new THREE.Raycaster(),
+  };
+  escena.add(sombraBajo(centroCaja.x, 0.017, 0.2, e.z_tablero + 0.0015));
+  return mundo;
+}
+
+// Una sombra suave en la mesa (la plancha de la mesa vacía no la tiene)
+function sombraBajo(x, z, radio, y) {
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const k = c.getContext('2d'), g = k.createRadialGradient(32, 32, 4, 32, 32, 32);
+  g.addColorStop(0, 'rgba(10,6,3,0.6)'); g.addColorStop(0.55, 'rgba(10,6,3,0.32)'); g.addColorStop(1, 'rgba(10,6,3,0)');
+  k.fillStyle = g; k.fillRect(0, 0, 64, 64);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.NoColorSpace;
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(radio * 2.3, radio * 2.3),
+    new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false, toneMapped: false }));
+  m.rotation.x = -Math.PI / 2; m.position.set(x, y, z);
+  m.raycast = () => {};
+  return m;
+}
+
+// Del espacio a los píxeles del boceto, y del boceto a un rayo
+function alBoceto(v) {
+  const q = v.clone().project(mundo.proyector);
+  return { x: (q.x + 1) / 2 * ANCHO, y: (1 - q.y) / 2 * ALTO };
+}
+function rayoDelBoceto(x, y) {
+  const P = mundo.proyector.position;
+  const q = new THREE.Vector3(x / ANCHO * 2 - 1, 1 - y / ALTO * 2, 0.5).unproject(mundo.proyector);
+  return new THREE.Ray(P.clone(), q.sub(P).normalize());
+}
+// plano vertical que pasa por un punto y mira a la cámara del boceto
+function planoFrontal(punto) {
+  const n = mundo.proyector.position.clone().sub(punto); n.y = 0; n.normalize();
+  return new THREE.Plane().setFromNormalAndCoplanarPoint(n, punto);
+}
+function esVisible(o) { for (; o; o = o.parent) if (!o.visible) return false; return true; }
+
+// ---------------------------------------------------------------------------------------------
+// Las vistas: la cámara del boceto, acercada (se mueve hacia el objeto) y recortada como la técnica A
+// ---------------------------------------------------------------------------------------------
+function crearRig(op, limites) {
+  const P0 = mundo.proyector.position.clone(), Q0 = mundo.proyector.quaternion.clone();
+  const adelante0 = new THREE.Vector3(0, 0, -1).applyQuaternion(Q0);
+  const distCaja = mundo.centroCaja.distanceTo(P0);
+  const puntoCara = rayoDelBoceto(862, 398).intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -0.11), new THREE.Vector3())
+    || mundo.centroCaja.clone();
+  // el centro de la columna de cajones (en el costado, x = 0,11), con sitio debajo para los de abajo abiertos
+  const puntoCajones = rayoDelBoceto(1112, 412).intersectPlane(new THREE.Plane(new THREE.Vector3(1, 0, 0), -0.11), new THREE.Vector3())
+    || new THREE.Vector3(0.11, mundo.centroCaja.y, 0);
+  const VISTAS = op.vistas;
+  // la tetera y la taza de la izquierda (nivel 3), en el plano que mira a la cámara por el centro de la tetera
+  // (un poco a la izquierda de la tetera: a la derecha se acaba la pintura)
+  const puntoTe = rayoDelBoceto(1222, 585).intersectPlane(planoFrontal(mundo.centroTe), new THREE.Vector3()) || mundo.centroTe.clone();
+  // el cajón largo de la espalda, con la caja de espaldas: el boceto de espaldas pinta la espalda donde está el frente
+  const puntoLargo = rayoDelBoceto(854, 517).intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -0.11), new THREE.Vector3())
+    || new THREE.Vector3(0, mundo.centroCaja.y - 0.05, 0.11);
+  // nivel 4: la peana de frente (sus tres olas de oro y el cajón del centro), en el plano de su frente
+  const zPeana = -op.escena3d.peana.centro[1] + op.escena3d.peana.medio_y;
+  const puntoZocalo = rayoDelBoceto(829, 612).intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -zPeana), new THREE.Vector3())
+    || new THREE.Vector3(0, 0.012, zPeana);
+  // nivel 5: los cajones de la espalda (con la caja de espaldas, la espalda queda donde el frente) y el costado de la
+  // borla (con la caja girada un cuarto de vuelta, el costado izquierdo mira a la cámara; la borla va hacia el medio)
+  const puntoEspalda = rayoDelBoceto(852, 392).intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -0.11), new THREE.Vector3())
+    || mundo.centroCaja.clone();
+  const puntoBorla = new THREE.Vector3(-0.11 + 0.22 * 610 / 1024, 0.034 + mundo.altoCaja * (1 - 640 / 1024), 0.11);
+  // qué mira cada vista: objetivo T, cuánto se acerca s (1 = donde se pintó) y alrededor de qué gira
+  const definiciones = {
+    sala: { T: P0.clone().add(adelante0.clone().multiplyScalar(distCaja)), s: 1, pivote: mundo.centroCaja },
+    // (un poco por encima del centro, para que se vea la trampilla de arriba)
+    caja: { T: mundo.centroCaja.clone().add(new THREE.Vector3(0, 0.008, 0)), s: 0.62, pivote: mundo.centroCaja },
+    incensario: { T: mundo.centroIncensario, s: 0.56, pivote: mundo.centroIncensario },
+    cara: { T: puntoCara, s: 0.5, pivote: puntoCara },
+    // el costado de los cajones, de cerca (al girar la vista, gira alrededor de ellos)
+    cajones: { T: puntoCajones, s: 0.46, pivote: puntoCajones },
+    // nivel 2: la caja hija sube de la trampilla (se ve la caja entera con aire encima) y baja a la mesa, donde se
+    // mira de cerca con el ojo grande encima, vigilándola
+    subida: { T: new THREE.Vector3(0, 0.2, 0.06), s: 0.78, pivote: mundo.centroCaja },
+    // (cerca y con más ángulo, para que la pequeña se vea grande sin perder el ojo; en vertical cabe más)
+    hija: { T: new THREE.Vector3(-0.01, 0.04, 0.17), s: 0.35, Tv: new THREE.Vector3(-0.03, 0.055, 0.19), sv: 0.35,
+      pivote: new THREE.Vector3(0, op.escena3d.z_tablero + 0.0375, 0.245) },
+    // nivel 3: la tetera, de cerca, para volcarla en la taza
+    te: { T: puntoTe, s: 0.56, pivote: puntoTe },
+    largo: { T: puntoLargo.clone().add(new THREE.Vector3(0, 0.012, 0.02)), s: 0.42, pivote: puntoLargo },
+    // nivel final: el corazón, en la tapa de la caja (se mira desde arriba: juego.js inclina la vista al llegar)
+    corazon: { T: new THREE.Vector3(0, mundo.centroCaja.y + mundo.altoCaja / 2 + 0.002, 0.03), s: 0.45,
+      pivote: new THREE.Vector3(0, mundo.centroCaja.y + mundo.altoCaja / 2, 0) },
+    // nivel 4: la peana, de cerca (con sitio delante para el cajón que sale)
+    zocalo: { T: puntoZocalo.clone().add(new THREE.Vector3(0, 0.012, 0.03)), s: 0.4, pivote: puntoZocalo },
+    // nivel 5: la espalda de cerca (sus cajones, con sitio delante para los que salen) y la borla del costado
+    espalda: { T: puntoEspalda.clone().add(new THREE.Vector3(0, 0, 0.025)), s: 0.5, pivote: puntoEspalda },
+    borla: { T: puntoBorla.clone().add(new THREE.Vector3(0, 0, 0.01)), s: 0.46, pivote: puntoBorla },
+  };
+  function encuadre(nombre) {
+    const v = VISTAS[nombre];
+    const vertical = mundo.alto > mundo.ancho * 1.05;
+    const def = definiciones[nombre], d = vertical && def.Tv ? { ...def, T: def.Tv, s: def.sv } : def;
+    const [x0, y0, x1, y1] = vertical ? v.v : v.h;
+    const rw = (x1 - x0) / d.s, rh = (y1 - y0) / d.s;
+    const sc = Math.min(mundo.ancho / rw, mundo.alto / rh);
+    const cw = mundo.ancho / sc, ch = mundo.alto / sc;
+    let cx = ANCHO / 2, cy = ALTO / 2;
+    if (d.s === 1) {
+      // la vista de la sala es el boceto mismo: el recorte no se sale de la ilustración si cabe
+      cx = (x0 + x1) / 2; cy = (y0 + y1) / 2;
+      cx = cw >= ANCHO ? ANCHO / 2 : limitar(cx, cw / 2, ANCHO - cw / 2);
+      cy = ch >= ALTO ? ALTO / 2 : limitar(cy, ch / 2, ALTO - ch / 2);
+    }
+    return { T: d.T.clone(), s: d.s, pivote: d.pivote.clone(), cx, cy, cw, ch };
+  }
+  const rig = {
+    vista: 'sala', transicion: null, intro: null,
+    th: 0, ph: 0, zoom: 1, vth: 0, vph: 0, vzoom: 0, thObj: 0, phObj: 0, zoomObj: 1,
+    // la lupa de dos dedos: recorta el encuadre alrededor de los dedos (z < 1 acerca, z > 1 aleja) sin mover la
+    // cámara, así la pintura no se deforma; f es cuánto se ha corrido el recorte (en píxeles de la imagen)
+    lupa: { z: 1, zObj: 1, fx: 0, fy: 0, fxObj: 0, fyObj: 0 },
+    actual: null,
+    irA(nombre, duracion = 0.75) {
+      // la transición sale de lo que se ve ahora, con la lupa incluida, y la lupa vuelve a 1 sin saltos
+      const L = this.lupa, a = this.actual;
+      const desde = a ? { ...a, cx: a.cx + L.fx, cy: a.cy + L.fy, cw: a.cw * L.z, ch: a.ch * L.z } : encuadre(nombre);
+      this.transicion = { desde, t: 0, duracion };
+      this.vista = nombre;
+      this.thObj = 0; this.phObj = 0; this.zoomObj = 1;
+      this.quitarLupa();
+    },
+    saltarA(nombre) { this.vista = nombre; this.transicion = null; this.actual = encuadre(nombre); this.th = this.ph = 0; this.zoom = 1; this.quitarLupa(); },
+    quitarLupa() { Object.assign(this.lupa, { z: 1, zObj: 1, fx: 0, fy: 0, fxObj: 0, fyObj: 0 }); },
+    empezar(duracion) { this.saltarA('sala'); this.intro = { t: 0, duracion }; },
+    arrastrar(dx, dy) {
+      const l = limites[this.vista] || limites.sala;
+      this.thObj = limitar(this.thObj - dx * 0.0042, -l.th, l.th);
+      this.phObj = limitar(this.phObj + dy * 0.0032, l.ph[0], l.ph[1]);
+    },
+    // gira la vista hasta un ángulo (dentro de sus límites): para asomarse a un cajón que se acaba de abrir
+    inclinar(th, ph) {
+      const l = limites[this.vista] || limites.sala;
+      this.thObj = limitar(th, -l.th, l.th);
+      this.phObj = limitar(ph, l.ph[0], l.ph[1]);
+    },
+    // pellizcar: r es cuánto se han separado los dedos; el punto que había bajo ellos (m0) queda bajo ellos (m1).
+    // Devuelve 'fuera' o 'dentro' si se ha querido pasar del margen de la vista (juego.js sale de la vista al alejarse)
+    pellizcar(r, m0, m1) {
+      const l = (limites[this.vista] || limites.sala).lupa || [0.6, 1], L = this.lupa, a = this.actual;
+      if (!a || this.transicion) return null;
+      m0 = m0 || { x: mundo.ancho / 2, y: mundo.alto / 2 }; m1 = m1 || m0;
+      const pedido = L.zObj / r, z1 = limitar(pedido, l[0], l[1]);
+      const cw0 = a.cw * L.zObj, ch0 = a.ch * L.zObj;
+      const ux = a.cx + L.fxObj - cw0 / 2 + m0.x / mundo.ancho * cw0, uy = a.cy + L.fyObj - ch0 / 2 + m0.y / mundo.alto * ch0;
+      const cw1 = a.cw * z1, ch1 = a.ch * z1;
+      L.zObj = z1;
+      L.fxObj = ux - m1.x / mundo.ancho * cw1 + cw1 / 2 - a.cx;
+      L.fyObj = uy - m1.y / mundo.alto * ch1 + ch1 / 2 - a.cy;
+      this.limitarLupa(true);
+      return pedido > l[1] + 1e-4 ? 'fuera' : pedido < l[0] - 1e-4 ? 'dentro' : null;
+    },
+    // el recorte no se sale del encuadre de la vista (al alejarse, se queda centrado)
+    limitarLupa(objetivo) {
+      const L = this.lupa, a = this.actual;
+      if (!a) return;
+      const z = objetivo ? L.zObj : L.z, mx = Math.max(0, (1 - z) * a.cw / 2), my = Math.max(0, (1 - z) * a.ch / 2);
+      if (objetivo) { L.fxObj = limitar(L.fxObj, -mx, mx); L.fyObj = limitar(L.fyObj, -my, my); }
+      else { L.fx = limitar(L.fx, -mx, mx); L.fy = limitar(L.fy, -my, my); }
+    },
+    actualizar(dt) {
+      const destino = encuadre(this.vista);
+      if (this.transicion) {
+        const tr = this.transicion; tr.t += dt;
+        const k = curva(limitar(tr.t / tr.duracion, 0, 1)), a = tr.desde;
+        this.actual = {
+          T: a.T.clone().lerp(destino.T, k), s: Math.exp(mezclar(Math.log(a.s), Math.log(destino.s), k)),
+          pivote: a.pivote.clone().lerp(destino.pivote, k), cx: mezclar(a.cx, destino.cx, k), cy: mezclar(a.cy, destino.cy, k),
+          cw: Math.exp(mezclar(Math.log(a.cw), Math.log(destino.cw), k)), ch: Math.exp(mezclar(Math.log(a.ch), Math.log(destino.ch), k)),
+        };
+        if (k >= 1) this.transicion = null;
+      } else this.actual = destino;
+      // la mirada (arrastrar) y el acercamiento (pellizcar), con muelle suave
+      const muelle = (x, v, obj, kk = 38) => { const am = 2 * Math.sqrt(kk) * 0.92; v += ((obj - x) * kk - v * am) * dt; return [x + v * dt, v]; };
+      [this.th, this.vth] = muelle(this.th, this.vth, this.thObj);
+      [this.ph, this.vph] = muelle(this.ph, this.vph, this.phObj);
+      [this.zoom, this.vzoom] = muelle(this.zoom, this.vzoom, this.zoomObj);
+      const L = this.lupa, e = 1 - Math.exp(-dt * 24);      // la lupa sigue a los dedos casi al instante
+      L.z += (L.zObj - L.z) * e; L.fx += (L.fxObj - L.fx) * e; L.fy += (L.fyObj - L.fy) * e;
+      this.limitarLupa(false);
+      if (this.intro) { this.intro.t += dt; if (this.intro.t >= this.intro.duracion) this.intro = null; }
+    },
+    // coloca la cámara: el encuadre, la mirada, el vaivén de cámara en mano y la sacudida
+    colocar(reloj, sacudida) {
+      const a = this.actual, cam = mundo.camara;
+      const pos = a.T.clone().add(P0.clone().sub(a.T).multiplyScalar(a.s));
+      const q = new THREE.Quaternion().setFromUnitVectors(adelante0, a.T.clone().sub(P0).normalize()).multiply(Q0);
+      let th = this.th, ph = this.ph, zoom = this.zoom;
+      if (this.intro) {
+        const k = 1 - curva(limitar(this.intro.t / this.intro.duracion, 0, 1));
+        th += -0.13 * k; ph += 0.07 * k; zoom *= 1 + 0.2 * k;
+      }
+      if (!op.quieto) {
+        th += Math.sin(reloj * 0.13) * 0.0045 + Math.sin(reloj * 0.31) * 0.0018;
+        ph += Math.sin(reloj * 0.11 + 1) * 0.0028;
+        if (sacudida > 0) { th += Math.sin(reloj * 71) * sacudida * 0.00045; ph += Math.sin(reloj * 53 + 2) * sacudida * 0.00045; }
+      }
+      const rel = pos.sub(a.pivote);
+      const qY = new THREE.Quaternion().setFromAxisAngle(EJE_Y, th);
+      rel.applyQuaternion(qY);
+      const derecha = new THREE.Vector3().crossVectors(EJE_Y, rel).normalize();
+      const qX = new THREE.Quaternion().setFromAxisAngle(derecha, -ph);
+      rel.applyQuaternion(qX).multiplyScalar(zoom);
+      cam.position.copy(a.pivote).add(rel);
+      cam.quaternion.copy(q).premultiply(qY).premultiply(qX);
+      cam.aspect = ANCHO / ALTO;
+      const L = this.lupa, cw = a.cw * L.z, ch = a.ch * L.z;
+      cam.setViewOffset(ANCHO, ALTO, a.cx + L.fx - cw / 2, a.cy + L.fy - ch / 2, cw, ch);
+      cam.updateMatrixWorld(true);
+    },
+  };
+  rig.definiciones = definiciones;        // (para ajustar los encuadres a mano desde la consola)
+  rig.saltarA('sala');
+  return rig;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Técnica C: el modelo de Blender con tinta y acuarela
+// ---------------------------------------------------------------------------------------------
+// Papel: grano fino y manchas de pigmento, en el espacio de la pantalla (como el papel de una acuarela)
+function texturaPapel() {
+  const lado = 256, c = document.createElement('canvas'); c.width = c.height = lado;
+  const k = c.getContext('2d'), datos = k.createImageData(lado, lado);
+  const ruido = (x, y, s) => { const v = Math.sin(x * 12.9898 * s + y * 78.233 * s) * 43758.5453; return v - Math.floor(v); };
+  const suave = (x, y, celda, s) => {
+    const fx = x / celda, fy = y / celda, ix = Math.floor(fx), iy = Math.floor(fy), tx = fx - ix, ty = fy - iy;
+    const n = lado / celda, r = (i, j) => ruido(((i % n) + n) % n, ((j % n) + n) % n, s);
+    const u = tx * tx * (3 - 2 * tx), w = ty * ty * (3 - 2 * ty);
+    return mezclar(mezclar(r(ix, iy), r(ix + 1, iy), u), mezclar(r(ix, iy + 1), r(ix + 1, iy + 1), u), w);
+  };
+  for (let y = 0; y < lado; y++) for (let x = 0; x < lado; x++) {
+    const grano = ruido(x, y, 1) * 0.5 + suave(x, y, 4, 2) * 0.5;
+    const mancha = suave(x, y, 64, 3) * 0.55 + suave(x, y, 32, 4) * 0.3 + suave(x, y, 16, 5) * 0.15;
+    const i = (y * lado + x) * 4;
+    datos.data[i] = grano * 255; datos.data[i + 1] = mancha * 255; datos.data[i + 2] = 0; datos.data[i + 3] = 255;
+  }
+  k.putImageData(datos, 0, 0);
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.NoColorSpace;
+  return t;
+}
+
+const GLSL_ACUARELA = /* glsl */`
+  vec3 col = outgoingLight;
+  // pigmento que se acumula en los bordes de cada forma, como en la acuarela
+  vec3 haciaOjo = normalize(vViewPosition);
+  float rasante = 1.0 - abs(dot(normal, haciaOjo));
+  col *= 1.0 - 0.3 * smoothstep(0.5, 0.97, rasante);
+  col += uMetal * 0.32 * pow(max(dot(normal, haciaOjo), 0.0), 8.0) * vec3(0.95, 0.78, 0.42);
+  // el papel: grano fino y manchas grandes de pigmento
+  vec4 papel = texture2D(uPapel, gl_FragCoord.xy / 256.0);
+  vec4 papelGrande = texture2D(uPapel, gl_FragCoord.xy / 900.0 + 0.37);
+  col *= 0.9 + 0.17 * papel.r;
+  col *= 0.86 + 0.26 * papelGrande.g;
+  // la paleta del boceto: cálida, algo apagada
+  float gris = dot(col, vec3(0.3, 0.55, 0.15));
+  col = mix(vec3(gris), col, 0.85) * vec3(1.03, 0.97, 0.88);
+  gl_FragColor = vec4(col, diffuseColor.a);`;
+
+// El ojo de la cara de Blender, pintado en su textura (píxeles de una cara de 1024): el iris se mueve y el
+// párpado baja; al despertar, el ojo y la cuenca vacía brillan en rojo
+const GLSL_OJO = /* glsl */`
+  {
+    vec2 px = vMapUv * 1024.0;
+    float t = (px.x - 205.0) / 215.0;
+    if (t > 0.0 && t < 1.0) {
+      float yc = 480.0 + 12.0 * t;
+      float ys = yc - 31.0 * pow(sin(3.14159 * t), 0.85);
+      float yi = yc + 23.0 * pow(sin(3.14159 * t), 0.9);
+      if (px.y > ys - 1.0 && px.y < yi + 1.0) {
+        vec3 blanco = pow(vec3(0.84, 0.77, 0.63), vec3(2.2)) * (0.72 + 0.28 * smoothstep(ys, ys + 16.0, px.y));
+        vec2 c = vec2(335.0, 478.0) + uIris;
+        float d = length(px - c);
+        vec3 ojo = blanco;
+        ojo = mix(ojo, pow(vec3(0.6, 0.16, 0.08), vec3(2.2)), smoothstep(25.0, 23.0, d));
+        ojo = mix(ojo, pow(vec3(0.33, 0.06, 0.04), vec3(2.2)), smoothstep(25.0, 23.0, d) * smoothstep(13.0, 24.0, d) * 0.7);
+        ojo = mix(ojo, vec3(0.002), smoothstep(10.0, 8.0, d));
+        ojo = mix(ojo, vec3(1.0, 0.9, 0.75), smoothstep(4.0, 2.4, length(px - c - vec2(-7.0, -8.0))) * 0.85);
+        float yl = ys + (yi - ys) * uCierre;
+        vec3 madera = texture2D(map, vMapUv - vec2(0.0, 52.0 / 1024.0)).rgb;
+        vec3 res = mix(madera, ojo, smoothstep(yl - 0.6, yl + 0.6, px.y));
+        res = mix(res, vec3(0.01, 0.006, 0.004), (1.0 - smoothstep(1.4, 3.4, abs(px.y - yl))) * step(0.03, uCierre));
+        float dentro = smoothstep(ys - 1.0, ys + 0.5, px.y) * (1.0 - smoothstep(yi - 0.5, yi + 1.0, px.y));
+        diffuseColor.rgb = mix(diffuseColor.rgb, res, dentro);
+        totalEmissiveRadiance += vec3(1.0, 0.1, 0.04) * uRojo * smoothstep(26.0, 14.0, d) * 2.2 * dentro;
+      }
+    }
+    vec2 q = (px - vec2(690.0, 481.0)) / vec2(84.0, 30.0);
+    totalEmissiveRadiance += vec3(1.0, 0.08, 0.03) * uRojo * smoothstep(1.0, 0.2, length(q)) * 1.8;
+  }`;
+
+function crearTintas() {
+  const papel = texturaPapel();
+  const grad = new THREE.DataTexture(new Uint8Array([70, 140, 205, 255]), 4, 1, THREE.RedFormat);
+  grad.minFilter = grad.magFilter = THREE.NearestFilter; grad.needsUpdate = true;
+  const ojo = { uIris: { value: new THREE.Vector2() }, uCierre: { value: 0 }, uRojo: { value: 0 } };
+  const contorno = new THREE.ShaderMaterial({
+    uniforms: { uGrosor: { value: 1.5 }, uResolucion: { value: new THREE.Vector2(1, 1) },
+      uTinta: { value: new THREE.Color(0.12, 0.075, 0.05) } },
+    vertexShader: /* glsl */`
+      uniform float uGrosor; uniform vec2 uResolucion;
+      void main() {
+        vec4 clip = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        vec3 n = normalize(normalMatrix * normal);
+        vec2 dir = (projectionMatrix * vec4(n.xy, 0.0, 0.0)).xy;
+        float l = length(dir);
+        if (l > 1e-5) dir /= l;
+        clip.xy += dir * uGrosor * 2.0 / uResolucion * clip.w;
+        gl_Position = clip;
+      }`,
+    fragmentShader: /* glsl */`uniform vec3 uTinta; void main() { gl_FragColor = vec4(uTinta, 1.0); }`,
+    side: THREE.BackSide,
+  });
+  const cache = new Map();
+  function material(original, { cara = false } = {}) {
+    const clave = original.uuid + (cara ? 'c' : '');
+    if (cache.has(clave)) return cache.get(clave);
+    const parametros = { color: original.color ? original.color.clone() : new THREE.Color(1, 1, 1), map: original.map || null,
+      gradientMap: grad, side: original.side ?? THREE.FrontSide };
+    if (original.normalMap) { parametros.normalMap = original.normalMap; parametros.normalScale = original.normalScale.clone(); }
+    const nombre = original.name || '';
+    // el bronce, de latón oscuro; el barro, algo más claro
+    if (nombre === 'Bronce') parametros.color.setRGB(0.13, 0.11, 0.05);          // latón oscuro, como el del boceto
+    if (nombre === 'Barro') parametros.color.multiplyScalar(1.15);
+    // los metales llevan un brillo suave donde miran a la cámara
+    const metal = { Bronce: 1, OroViejo: 0.7, Hierro: 0.15 }[nombre] || 0;
+    const m = new THREE.MeshToonMaterial(parametros);
+    m.onBeforeCompile = sh => {
+      sh.uniforms.uPapel = { value: papel };
+      sh.uniforms.uMetal = { value: metal };
+      let cabecera = 'uniform sampler2D uPapel;\nuniform float uMetal;\n';
+      if (cara) { Object.assign(sh.uniforms, ojo); cabecera += 'uniform vec2 uIris;\nuniform float uCierre;\nuniform float uRojo;\n'; }
+      sh.fragmentShader = sh.fragmentShader
+        .replace('#include <common>', '#include <common>\n' + cabecera)
+        .replace('#include <opaque_fragment>', GLSL_ACUARELA);
+      if (cara) sh.fragmentShader = sh.fragmentShader.replace('#include <map_fragment>', '#include <map_fragment>\n' + GLSL_OJO);
+    };
+    if (cara) m.customProgramCacheKey = () => 'cara-viva';
+    cache.set(clave, m);
+    return m;
+  }
+  // un contorno a tinta: la misma malla, un poco hinchada y vuelta del revés (normales suavizadas)
+  function contornear(malla) {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', malla.geometry.attributes.position);
+    if (malla.geometry.index) g.setIndex(malla.geometry.index);
+    const unida = mergeVertices(g, 1e-4);
+    unida.computeVertexNormals();
+    const borde = new THREE.Mesh(unida, contorno);
+    borde.raycast = () => {};
+    borde.userData.contorno = true;
+    malla.add(borde);
+  }
+  return { papel, grad, ojo, contorno, material, contornear };
+}
+
+function geometriaCuerno(largo = 0.036, radio = 0.0072, curvatura = 0.011) {
+  const seg = 16, lados = 12, pos = [], idx = [];
+  for (let i = 0; i <= seg; i++) {
+    const t = i / seg, x = curvatura * t * t, y = largo * t, r = radio * Math.pow(1 - t, 0.9) + 0.0003;
+    for (let j = 0; j <= lados; j++) { const a = j / lados * Math.PI * 2; pos.push(x + Math.cos(a) * r, y, Math.sin(a) * r); }
+  }
+  for (let i = 0; i < seg; i++) for (let j = 0; j < lados; j++) {
+    const a = i * (lados + 1) + j, b = a + lados + 1;
+    idx.push(a, b, a + 1, b, b + 1, a + 1);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setIndex(idx); g.computeVertexNormals();
+  return g;
+}
+
+function materialBrasas() {
+  return new THREE.ShaderMaterial({
+    uniforms: { uT: { value: 0 } },
+    vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: /* glsl */`
+      uniform float uT; varying vec2 vUv;
+      float h(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+      float n(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y); }
+      void main() {
+        vec2 p = vUv * 9.0;
+        float v = n(p + vec2(uT * 0.3, -uT * 0.2)) * 0.6 + n(p * 2.3 - uT * 0.5) * 0.4;
+        vec3 c = mix(vec3(0.16, 0.04, 0.02), vec3(1.0, 0.42, 0.1), smoothstep(0.35, 0.8, v));
+        c = mix(c, vec3(1.0, 0.85, 0.5), smoothstep(0.78, 0.95, v));
+        c *= 1.0 - 0.55 * smoothstep(0.6, 1.0, length(vUv - 0.5) * 2.0);
+        gl_FragColor = vec4(c, 1.0);
+      }`,
+  });
+}
+function materialResplandor(color) {
+  return new THREE.ShaderMaterial({
+    uniforms: { uFuerza: { value: 0 }, uColor: { value: new THREE.Color(color) } },
+    vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: /* glsl */`
+      uniform float uFuerza; uniform vec3 uColor; varying vec2 vUv;
+      void main() { float r = length(vUv - 0.5) * 2.0; gl_FragColor = vec4(uColor * uFuerza * (1.0 - smoothstep(0.2, 1.0, r)), 1.0); }`,
+    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+  });
+}
+
+// Qué representa cada pieza del modelo en el recorrido: un punto del boceto (las zonas de juego.js)
+const ZONA_CAJON = { 0: [1047, 272], 2: [1132, 323], 3: [1044, 446], 4: [1088, 423], 6: [1047, 272], 7: [1132, 323], 8: [1044, 446] };
+function zonaDePieza(nombres, estado) {
+  const tiene = prefijo => nombres.some(n => n.startsWith(prefijo));
+  if (tiene('LlaveBambu') || tiene('CajonDerecho_5')) return { x: 1072, y: 488, cara: 'frente' };
+  // la nota está en el cajón abierto de en medio: tocar el cajón o el papel la abre
+  if (tiene('Papel') || tiene('CajonDerecho_1')) return { x: 1138, y: 450, cara: 'frente' };
+  const cajon = nombres.find(n => /^CajonDerecho_\d$/.test(n));
+  if (cajon) { const i = Number(cajon.slice(-1)); return { x: ZONA_CAJON[i][0], y: ZONA_CAJON[i][1], cara: 'frente' }; }
+  if (tiene('CajonDetras_4')) return { x: 737, y: 334, cara: 'detras' };
+  if (tiene('CajonDetras')) return { x: 900, y: 330, cara: 'detras' };
+  if (tiene('CajonLargo') || tiene('Cerradura')) return { x: 850, y: 516, cara: 'detras' };
+  if (tiene('HuecoFicha') || tiene('PanelFicha')) return { x: 846, y: 368, cara: 'detras' };
+  if (tiene('Borla') || tiene('Nudo') || tiene('Cordon')) return { x: 1086, y: 400, cara: 'detras' };
+  if (tiene('Trampilla')) return { x: 930, y: 196, cara: 'frente' };
+  if (tiene('CuernoPuesto') || tiene('CuernoIzquierdo')) return tiene('CuernoIzquierdo') ? { x: 835, y: 285, cara: 'frente' } : { x: 912, y: 291, cara: 'frente' };
+  if (tiene('CuernoBrasas') || tiene('Brasas')) return estado.cuerno === 'brasas' ? { x: 593, y: 480, cara: 'frente' } : { x: 575, y: 540, cara: 'frente' };
+  if (tiene('TapaIncensario')) return estado.tapaEnMesa ? { x: 521, y: 625, cara: 'frente' } : { x: 575, y: 540, cara: 'frente' };
+  if (tiene('Incensario') || tiene('Leon')) return { x: 575, y: 540, cara: 'frente' };
+  if (tiene('Tetera')) return { x: 1290, y: 550, cara: 'frente' };
+  if (tiene('Taza')) return { x: 1230, y: 640, cara: 'frente' };
+  return null;
+}
+// Las partes de la cara (en píxeles de su textura) y su sitio en el boceto
+function zonaDeCara(px, py) {
+  const cerca = (x, y, r) => Math.hypot(px - x, py - y) < r;
+  if (cerca(636, 184, 72)) return { x: 912, y: 291 };                 // el hueco del cuerno
+  if (px > 195 && px < 430 && py > 430 && py < 525) return { x: 785, y: 370 };   // el ojo abierto
+  if (Math.hypot((px - 690) / 100, (py - 481) / 42) < 1) return { x: 905, y: 378 };   // la cuenca vacía
+  if (Math.hypot((px - 512) / 140, (py - 800) / 60) < 1) return { x: 842, y: 484 };   // los labios
+  return { x: 960, y: 560 };
+}
+
+// ---------------------------------------------------------------------------------------------
+// Crear una técnica (B o C)
+// ---------------------------------------------------------------------------------------------
+export async function crearTecnica(letra, op) {
+  prepararMundo(op);
+  const esB = letra === 'B';
+  const grupo = new THREE.Group();
+  grupo.visible = false;
+  mundo.escena.add(grupo);
+  const caja = new THREE.Group();          // gira (y respira) alrededor de la peana
+  caja.name = 'caja';
+  grupo.add(caja);
+  // th y ph: cuánto se gira la vista al arrastrar en vacío (en la sala se mira alrededor; de cerca, la vista sigue anclada
+  // a su sitio pero gira a su alrededor, también hacia arriba, para ver dentro de los cajones o la tapa de la caja);
+  // lupa: cuánto acerca y aleja el pellizco en cada vista (en la sala no aleja: fuera del boceto no hay pintura)
+  const limites = esB
+    ? { sala: { th: 0.14, ph: [-0.05, 0.1], lupa: [0.45, 1] }, caja: { th: 0.5, ph: [-0.12, 0.55], lupa: [0.45, 1.25] },
+        incensario: { th: 0.42, ph: [-0.1, 0.45], lupa: [0.45, 1.25] }, cara: { th: 0.36, ph: [-0.1, 0.35], lupa: [0.45, 1.25] },
+        cajones: { th: 0.5, ph: [-0.1, 0.6], lupa: [0.5, 1.25] }, subida: { th: 0.2, ph: [-0.05, 0.15], lupa: [1, 1] },
+        hija: { th: 0.3, ph: [-0.05, 0.35], lupa: [0.55, 1.2] }, te: { th: 0.35, ph: [-0.08, 0.4], lupa: [0.5, 1.2] },
+        largo: { th: 0.45, ph: [-0.1, 0.6], lupa: [0.5, 1.25] }, corazon: { th: 0.5, ph: [0.12, 0.78], lupa: [0.5, 1.25] },
+        zocalo: { th: 0.4, ph: [-0.08, 0.55], lupa: [0.5, 1.25] },
+        espalda: { th: 0.45, ph: [-0.1, 0.55], lupa: [0.5, 1.25] }, borla: { th: 0.35, ph: [-0.12, 0.4], lupa: [0.5, 1.25] } }
+    : { sala: { th: 0.24, ph: [-0.06, 0.14], lupa: [0.45, 1] }, caja: { th: 0.95, ph: [-0.15, 0.45], lupa: [0.45, 1.25] },
+        incensario: { th: 0.7, ph: [-0.12, 0.4], lupa: [0.45, 1.25] }, cara: { th: 0.55, ph: [-0.12, 0.3], lupa: [0.45, 1.25] },
+        cajones: { th: 0.7, ph: [-0.12, 0.4], lupa: [0.5, 1.25] } };
+  const rig = crearRig(op, limites);
+  const pistas = {};          // piezas que se animan (técnica C)
+  let tintas = null, objetivosToque = [];
+  let pintada = null, cajonesB = null, carasB = [], rolloB = null, hija = null, sombraHija = null, incensarioB = null;
+  // nivel 3: el cajón largo de la espalda, la ficha en su hueco y la tetera que se vuelca (en el boceto de espaldas, el
+  // frente del cajón largo y el hueco de la ficha)
+  let largoB = null, fichaB = null, teteraB = null, corazonB = null, zocaloB = null, n5B = null;
+  const RECT_LARGO = [719, 476, 989, 558], RECT_HUECO = [816, 334, 876, 404];
+  // nivel 2: dónde sale la caja hija (la trampilla), dónde se posa y dónde está el ojo grande que la vigila
+  const ZT = op.escena3d.z_tablero;
+  const POS_HIJA = new THREE.Vector3(0, ZT + LADO_HIJA / 2, 0.245);          // en la mesa, delante de la caja
+  // desde el nivel 4, a un lado de la mesa (delante tapaba la peana y sus olas de oro)
+  const POS_HIJA_LADO = new THREE.Vector3(0.205, ZT + LADO_HIJA / 2, 0.19);
+  const posHija = new THREE.Vector3().copy(POS_HIJA);
+  const TRAMPILLA_3D = new THREE.Vector3(0.0005, 0.255, -0.005);
+  const OJO_3D = new THREE.Vector3(-0.0431, 0.1588, 0.11);                     // el ojo grande, en el frente
+  const animHija = { subida: null, qObjetivo: new THREE.Quaternion(), vAngular: new THREE.Vector3(), tablillas: [], cajon: null };
+
+  if (esB) {
+    // la caja pintada (frente y espalda, y los costados y la tapa también pintados de frente) y lo que hay en la
+    // mesa, pintado sobre cilindros
+    const [caraDerecha, caraIzquierda, caraArriba] = await Promise.all(['derecha', 'izquierda', 'arriba'].map(n => cargarTextura(`capas/cara_${n}.webp`)));
+    const tex = { ...mundo.tex, caraDerecha, caraIzquierda, caraArriba, lacaPared: op.img.laca_pared };
+    pintada = crearCajaPintada(op.escena3d, mundo.proyector, tex);
+    caja.add(pintada.caja);
+    // cuánto se mezcla cada cara pintada de frente: según lo lejos que esté la cámara de la del boceto, vista desde
+    // la caja (la caja quieta es el espacio del mundo; la izquierda se pintó con la caja girada media vuelta)
+    const P0 = mundo.proyector.position, yMedio = 0.034 + pintada.alto / 2;
+    const cara = (centro, fuente, mezcla) => ({ centro, desde: fuente.clone().sub(centro).normalize(), mezcla });
+    carasB = [
+      cara(new THREE.Vector3(0.11, yMedio, 0), P0, pintada.mezclas.derecha),
+      cara(new THREE.Vector3(-0.11, yMedio, 0), new THREE.Vector3(-P0.x, P0.y, -P0.z), pintada.mezclas.izquierda),
+      cara(new THREE.Vector3(0, 0.034 + pintada.alto, 0), P0, pintada.mezclas.arriba),
+    ];
+    // los cajones del costado, con lo que guardan (la llave y la nota, tal como están pintadas)
+    cajonesB = crearCajonesPintados(op.cajones, pintada.alto, mundo.proyector, tex, pintada.mezclas.derecha);
+    for (const [id, c] of Object.entries(cajonesB)) {
+      pintada.caja.add(c.grupo, c.agujero, c.sombra);
+      const guarda = op.CAJONES[id].contiene;
+      if (!guarda) continue;
+      const imagen = op.img[guarda], t = new THREE.Texture(imagen);
+      t.colorSpace = THREE.SRGBColorSpace; t.needsUpdate = true;
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthWrite: false }));
+      const pxm = c.dentro.distanceTo(P0) / op.camaraBoceto.focal_px;     // metros por píxel del boceto a esa distancia
+      sprite.scale.set(imagen.width * pxm, imagen.height * pxm, 1);
+      sprite.position.copy(c.dentro).add(new THREE.Vector3(0, imagen.height * pxm * 0.42, 0));
+      sprite.userData.tipo = 'cajon'; sprite.userData.cajon = id;
+      c.grupo.add(sprite); c[guarda] = sprite;
+    }
+    const objetos = crearObjetos(op.escena3d, mundo.proyector, mundo.tex);
+    for (const o of Object.values(objetos)) grupo.add(o);
+    incensarioB = objetos.incensario;
+    // la sombra de la tetera y las tazas en la mesa (sus siluetas ya no traen la de la pintura)
+    for (const [nombre, o] of Object.entries(op.escena3d.objetos)) {
+      if (nombre === 'incensario') continue;
+      const b = aThree(o.base[0], o.base[1], o.base[2]);
+      grupo.add(sombraBajo(b.x, b.z, o.radio * 1.15, mundo.zTablero + 0.0012));
+    }
+    objetivosToque = [caja, ...Object.values(objetos)];
+    if (op.decoracion) crearDecoracionB(grupo);
+    if (op.nivel2) {
+      await crearHijaB(grupo);
+      objetivosToque.push(hija.grupo);
+    }
+    crearNivel3B();
+    crearNivel4B();
+    await crearNivel5B(tex);
+    prepararTetera(objetos);
+    crearCorazonB();
+  } else {
+    tintas = crearTintas();
+    const cargador = new GLTFLoader();
+    const [modeloCaja, modeloMesa] = await Promise.all([cargador.loadAsync('modelos/caja_viva.json'), cargador.loadAsync('modelos/mesa.json')]);
+    // la caja: se apoya en la mesa y se ajusta a la altura de la caja pintada (el boceto la hace algo más alta)
+    const raiz = modeloCaja.scene;
+    raiz.position.set(0, mundo.zTablero, 0);
+    raiz.scale.set(1.02, 1.07, 1.02);
+    caja.add(raiz);
+    // lo que hay en la mesa: cada pieza donde está en el boceto, con su alto
+    const mesaC = modeloMesa.scene;
+    grupo.add(mesaC);
+    mesaC.updateMatrixWorld(true);
+    const piezasDe = nombres => { const r = []; mesaC.traverse(o => { if (o.isMesh && nombres.some(n => o.name.startsWith(n))) r.push(o); }); return r; };
+    const colocar = (nombre, mallas, alto) => {
+      const o = op.escena3d.objetos[nombre];
+      const bb = new THREE.Box3(); for (const m of mallas) bb.expandByObject(m);
+      const base = new THREE.Vector3((bb.min.x + bb.max.x) / 2, bb.min.y, (bb.min.z + bb.max.z) / 2);
+      const g = new THREE.Group(); g.position.copy(base); grupo.add(g); g.updateMatrixWorld(true);
+      for (const m of mallas) g.attach(m);
+      const escala = (alto || o.alto) / (bb.max.y - bb.min.y);
+      g.position.copy(aThree(o.base[0], o.base[1], o.base[2])); g.scale.setScalar(escala);
+      g.name = nombre;
+      return g;
+    };
+    const incensario = colocar('incensario', piezasDe(['Incensario', 'Leon']));
+    colocar('tetera', piezasDe(['Tetera', 'Pico']));
+    colocar('taza_1', piezasDe(['Taza', 'TazaTe']).filter(m => !/001$/.test(m.name)));
+    colocar('taza_2', piezasDe(['Taza001', 'TazaTe001']));
+    grupo.remove(mesaC);
+    grupo.updateMatrixWorld(true);
+    // la tapa con el león: un grupo propio, con el origen en su base, para que vuele a la mesa
+    const piezasTapa = []; incensario.traverse(o => { if (o.isMesh && /^(IncensarioTapa|Leon)/.test(o.name)) piezasTapa.push(o); });
+    const bbTapa = new THREE.Box3(); for (const m of piezasTapa) bbTapa.expandByObject(m);
+    const tapa = new THREE.Group(); tapa.name = 'TapaIncensario';
+    tapa.position.set((bbTapa.min.x + bbTapa.max.x) / 2, bbTapa.min.y, (bbTapa.min.z + bbTapa.max.z) / 2);
+    grupo.add(tapa); tapa.updateMatrixWorld(true);
+    for (const m of piezasTapa) tapa.attach(m);
+    pistas.tapa = tapa; pistas.tapaReposo = tapa.position.clone();
+    // dónde se deja la tapa: el punto de la mesa del boceto
+    pistas.tapaMesa = rayoDelBoceto(TAPA_MESA.x, TAPA_MESA.y).intersectPlane(new THREE.Plane(EJE_Y, -mundo.zTablero), new THREE.Vector3())
+      || pistas.tapaReposo.clone();
+    pistas.pxMundo = mundo.centroIncensario.distanceTo(mundo.proyector.position) / op.camaraBoceto.focal_px;
+    // las brasas y el cuerno, dentro del cuenco
+    const cuenco = new THREE.Box3(); incensario.traverse(o => { if (o.isMesh && o.name === 'Incensario') cuenco.expandByObject(o); });
+    const radioCuenco = (cuenco.max.x - cuenco.min.x) / 2;
+    const brasas = new THREE.Mesh(new THREE.CircleGeometry(radioCuenco * 0.82, 32), materialBrasas());
+    brasas.rotation.x = -Math.PI / 2; brasas.name = 'Brasas';
+    brasas.position.set((cuenco.min.x + cuenco.max.x) / 2, bbTapa.min.y - 0.004, (cuenco.min.z + cuenco.max.z) / 2);
+    grupo.add(brasas); pistas.brasas = brasas;
+    // el marfil, en tonos de sRGB: el material los pasa al espacio lineal
+    const marfil = { color: new THREE.Color().setRGB(0.93, 0.87, 0.74, THREE.SRGBColorSpace), side: THREE.FrontSide, uuid: 'marfil' };
+    const cuernoBrasas = new THREE.Mesh(geometriaCuerno(0.03, 0.0062), tintas.material(marfil));
+    cuernoBrasas.name = 'CuernoBrasas';
+    cuernoBrasas.position.copy(brasas.position).add(new THREE.Vector3(0.008, -0.006, 0.004));
+    cuernoBrasas.rotation.set(0.35, 0.6, -0.5);
+    grupo.add(cuernoBrasas); pistas.cuernoBrasas = cuernoBrasas;
+    pistas.luzBrasas = new THREE.PointLight(0xff7a30, 0, 0.22, 2);
+    pistas.luzBrasas.position.copy(brasas.position).add(new THREE.Vector3(0, 0.05, 0.02));
+    grupo.add(pistas.luzBrasas);
+    // las piezas de la caja que cambian: la llave, la cara (el ojo), la trampilla
+    raiz.updateMatrixWorld(true);
+    const porNombre = n => { let r = null; raiz.traverse(o => { if (!r && o.name === n) r = o; }); return r; };
+    pistas.llave = porNombre('LlaveBambu');
+    const cara = porNombre('Cara');
+    // la cara: de píxeles de su textura (1024) a un punto de la caja (sin girar)
+    cara.geometry.computeBoundingBox();
+    const bbCara = cara.geometry.boundingBox;
+    pistas.puntoCara = (px, py, salir = 0) => {
+      const local = new THREE.Vector3(mezclar(bbCara.min.x, bbCara.max.x, px / 1024), mezclar(bbCara.max.y, bbCara.min.y, py / 1024), bbCara.max.z + salir);
+      return caja.worldToLocal(cara.localToWorld(local));
+    };
+    // los cuernos: el de la izquierda siempre; el de la derecha cuando se pone
+    const cuernoIzq = new THREE.Mesh(geometriaCuerno(0.036, 0.0072, -0.011), tintas.material(marfil));
+    cuernoIzq.name = 'CuernoIzquierdo';
+    cuernoIzq.position.copy(pistas.puntoCara(388, 184, -0.004)); cuernoIzq.rotation.set(0.45, 0, 0.32);
+    const cuernoPuesto = new THREE.Mesh(geometriaCuerno(), tintas.material(marfil));
+    cuernoPuesto.name = 'CuernoPuesto';
+    cuernoPuesto.position.copy(pistas.puntoCara(636, 184, -0.004)); cuernoPuesto.rotation.set(0.45, 0, -0.32);
+    caja.add(cuernoIzq, cuernoPuesto); pistas.cuernoPuesto = cuernoPuesto;
+    // la trampilla: gira sobre su borde de atrás; debajo, luz
+    const piezasTrampilla = []; raiz.traverse(o => { if (o.isMesh && o.name.startsWith('Trampilla')) piezasTrampilla.push(o); });
+    const bbT = new THREE.Box3(); for (const m of piezasTrampilla) bbT.expandByObject(m);
+    const bisagra = new THREE.Group();
+    bisagra.position.copy(caja.worldToLocal(new THREE.Vector3((bbT.min.x + bbT.max.x) / 2, bbT.min.y, bbT.min.z)));
+    caja.add(bisagra); bisagra.updateMatrixWorld(true);
+    for (const m of piezasTrampilla) bisagra.attach(m);
+    pistas.bisagra = bisagra;
+    const anchoT = Math.max(bbT.max.x - bbT.min.x, bbT.max.z - bbT.min.z);
+    const resplandor = new THREE.Mesh(new THREE.CircleGeometry(anchoT * 0.62, 32), materialResplandor(0xffc070));
+    resplandor.rotation.x = -Math.PI / 2;
+    resplandor.position.copy(caja.worldToLocal(new THREE.Vector3((bbT.min.x + bbT.max.x) / 2, bbT.min.y + 0.0015, (bbT.min.z + bbT.max.z) / 2)));
+    resplandor.raycast = () => {};
+    caja.add(resplandor); pistas.resplandor = resplandor;
+    pistas.luzTrampilla = new THREE.PointLight(0xffc27a, 0, 0.9, 2);
+    pistas.luzTrampilla.position.copy(resplandor.position).add(new THREE.Vector3(0, 0.08, 0));
+    caja.add(pistas.luzTrampilla);
+    // tinta y acuarela en todo el modelo; contornos menos en las piezas diminutas
+    const aTinta = raizTinta => raizTinta.traverse(o => {
+      if (!o.isMesh || o.userData.contorno || o.userData.conTinta || o === brasas || o === resplandor) return;
+      o.userData.conTinta = true;
+      if (!o.material.isMeshToonMaterial) o.material = tintas.material(o.material, { cara: o === cara });
+      o.geometry.computeBoundingSphere();
+      if (o.geometry.boundingSphere.radius > 0.007) tintas.contornear(o);
+    });
+    aTinta(caja); aTinta(grupo);
+    // luces del boceto: la lámpara a la izquierda (cálida) y la luna por las ventanas (fría)
+    const lampara = new THREE.DirectionalLight(0xffdcb4, 1.65); lampara.position.set(-0.75, 0.75, 0.55);
+    const luna = new THREE.DirectionalLight(0x8fa6d6, 0.7); luna.position.set(0.9, 0.5, -0.7);
+    const ambiente = new THREE.HemisphereLight(0xffe8cc, 0x3a2a1e, 0.9);
+    grupo.add(lampara, luna, ambiente);
+    objetivosToque = [caja, incensario, tapa, brasas, cuernoBrasas, ...grupo.children.filter(o => /^(tetera|taza)/.test(o.name))];
+    grupo.add(sombraBajo(mundo.centroIncensario.x, mundo.centroIncensario.z, 0.075, mundo.zTablero + 0.0012));
+  }
+
+  // --- la caja en el tiempo: gira con el dedo y respira ----------------------------------------
+  let giro = 0, giroObj = 0, vGiro = 0, trampilla = 0;
+  const tec = {
+    nombre: letra, listo: true, rig, tapa2D: esB,
+    activar() {
+      mundo.tecnica = tec;
+      grupo.visible = true;
+      op.lienzo3d.hidden = false;
+      rig.saltarA(op.estado().vista);
+      this.medir(mundo.ancho, mundo.alto, mundo.ppp);
+    },
+    desactivar() { grupo.visible = false; },
+    medir(ancho, alto, ppp) {
+      mundo.ancho = ancho; mundo.alto = alto; mundo.ppp = ppp;
+      mundo.render.setPixelRatio(Math.min(ppp, 1.6));
+      mundo.render.setSize(ancho, alto, false);
+      if (tintas) {
+        const b = mundo.render.getDrawingBufferSize(new THREE.Vector2());
+        tintas.contorno.uniforms.uResolucion.value.copy(b);
+        tintas.contorno.uniforms.uGrosor.value = Math.max(1.1, 1.25 * Math.min(ppp, 1.6) * Math.sqrt(alto / 420));
+      }
+    },
+    irA(nombre, duracion) { rig.irA(nombre, duracion); },
+    empezar(duracion) { rig.empezar(duracion); },
+    cara() { return Math.cos(giro) >= 0 ? 'frente' : 'detras'; },
+    girar(inmediato = false) {
+      // media vuelta hasta la otra cara: la espalda más cercana o el frente más cercano
+      const vuelta = 2 * Math.PI;
+      giroObj = this.cara() === 'frente' ? Math.round((giro - Math.PI) / vuelta) * vuelta + Math.PI : Math.round(giro / vuelta) * vuelta;
+      if (inmediato) { giro = giroObj; vGiro = 0; }
+    },
+    // sobre la caja grande, de lado la gira y hacia abajo (o arriba) inclina la vista para verla por encima, como una
+    // caja que se coge con las manos; fuera de ella, la vista gira alrededor de lo que mira
+    arrastrar(dx, dy, enCaja) {
+      if (enCaja) { giroObj += dx * 0.011; if (dy) rig.arrastrar(0, dy); }
+      else rig.arrastrar(dx, dy);
+    },
+    // soltada con impulso, la caja grande sigue girando un poco (pesa) y el muelle la frena
+    soltar(vx = 0, enCaja = false) { if (enCaja && vx) giroObj += limitar(vx, -2500, 2500) * 0.011 * 0.08; },
+    pellizcar(r, m0, m1) { return rig.pellizcar(r, m0, m1); },
+    lupa() { return rig.lupa.zObj; },
+    inclinar(th, ph) { rig.inclinar(th, ph); },
+    mirada() { return { th: rig.th, ph: rig.ph, thObj: rig.thObj, phObj: rig.phObj }; },
+    giroCaja() { return giroObj; },
+    // (para las pruebas) la caja vuelve de frente
+    enderezar() { giroObj = Math.round(giroObj / (2 * Math.PI)) * 2 * Math.PI; },
+    // cuánto se ve el incensario en (x, y) del boceto con la máscara de ahora (para las pruebas)
+    alfaIncensario(x, y) {
+      const imagen = incensarioB && incensarioB.material.uniforms.uMascara.value.image;
+      if (!imagen || !imagen.getContext) return 1;
+      return imagen.getContext('2d').getImageData(Math.round(x), Math.round(y), 1, 1).data[3] / 255;
+    },
+    abrirTrampilla(k) { trampilla = k; },
+    // nivel 3: el cajón largo de la espalda (dónde está su frente en la pantalla, abierto k), la campanilla de dentro y
+    // la tetera que se vuelca (0 de pie … 1 del todo)
+    pantallaLargo(k) {
+      if (!largoB) return null;
+      caja.updateMatrixWorld();
+      rig.colocar(op.reloj(), 0);
+      const v = largoB.centro.clone().add(new THREE.Vector3(0, 0, -0.004 - k * largoB.sale));
+      const q = aPantalla(pintada.caja.localToWorld(v));
+      return { x: q.x, y: q.y };
+    },
+    puntoCampanillaLargo() { return largoB ? largoB.campanilla.getWorldPosition(new THREE.Vector3()) : null; },
+    // nivel 4: el cajón de la peana (dónde está su frente en la pantalla, abierto k) y lo que guarda
+    pantallaZocalo(k) {
+      if (!zocaloB) return null;
+      caja.updateMatrixWorld();
+      rig.colocar(op.reloj(), 0);
+      const v = zocaloB.centro.clone().add(new THREE.Vector3(0, 0, 0.004 + k * zocaloB.sale));
+      const q = aPantalla(pintada.caja.localToWorld(v));
+      return { x: q.x, y: q.y };
+    },
+    puntoZocalo(parte) { const s = zocaloB && zocaloB.dentro[parte]; return s ? s.getWorldPosition(new THREE.Vector3()) : null; },
+    // nivel 5: un cajón de la espalda (dónde está su frente en la pantalla, abierto k), lo que guarda, un punto de la
+    // borla (en píxeles del costado) en la pantalla, y girar la caja hasta un ángulo (el más cercano equivalente)
+    hayNivel5: () => !!n5B,
+    pantallaDetras(id, k) {
+      const c = n5B && n5B.cajones[id];
+      if (!c) return null;
+      caja.updateMatrixWorld();
+      rig.colocar(op.reloj(), 0);
+      const q = aPantalla(pintada.caja.localToWorld(c.centro.clone().add(new THREE.Vector3(0, 0, -0.004 - k * c.sale))));
+      return { x: q.x, y: q.y };
+    },
+    puntoDetras(parte) { const s = n5B && n5B.dentro[parte]; return s ? s.getWorldPosition(new THREE.Vector3()) : null; },
+    pantallaBorla(bx, by) {
+      if (!n5B) return null;
+      caja.updateMatrixWorld();
+      rig.colocar(op.reloj(), 0);
+      const alto = pintada.alto, v = new THREE.Vector3(-0.1112, 0.034 + alto * (1 - by / 1024), -0.11 + 0.22 * bx / 1024);
+      const q = aPantalla(pintada.caja.localToWorld(v));
+      return { x: q.x, y: q.y, visible: q.z > -1 && q.z < 1 };
+    },
+    girarA(angulo) { giroObj = angulo + Math.round((giroObj - angulo) / (2 * Math.PI)) * 2 * Math.PI; },
+    // ¿mira el costado izquierdo a la cámara? (de 1 de frente a 0 de canto; negativo, de espaldas)
+    costadoIzquierdo() {
+      caja.updateMatrixWorld();
+      const n = new THREE.Vector3(-1, 0, 0).applyQuaternion(caja.quaternion), c = caja.localToWorld(new THREE.Vector3(-0.11, mundo.centroCaja.y, 0));
+      return n.dot(mundo.camara.position.clone().sub(c).normalize());
+    },
+    inclinarTetera,
+    // nivel final: dónde cae un punto de la pantalla en el plano del corazón (radio y ángulo, desde el frente, en sentido
+    // contrario a las agujas visto desde arriba), un punto del corazón en el boceto y en la pantalla
+    puntoEnCorazon(sx, sy) {
+      if (!corazonB) return null;
+      rig.colocar(op.reloj(), 0);
+      caja.updateMatrixWorld();
+      mundo.raycaster.setFromCamera(new THREE.Vector2(sx / mundo.ancho * 2 - 1, 1 - sy / mundo.alto * 2), mundo.camara);
+      const centro = corazonB.grupo.getWorldPosition(new THREE.Vector3());
+      const q = mundo.raycaster.ray.intersectPlane(new THREE.Plane(EJE_Y, -centro.y), new THREE.Vector3());
+      if (!q) return null;
+      const local = corazonB.grupo.worldToLocal(q.clone());
+      return { r: Math.hypot(local.x, local.z), alfa: Math.atan2(local.x, local.z) };
+    },
+    corazonEnBoceto(r, alfa) { return corazonB ? alBoceto(corazonB.grupo.localToWorld(new THREE.Vector3(Math.sin(alfa) * r, 0.004, Math.cos(alfa) * r))) : null; },
+    corazonEnPantalla(r, alfa) {
+      if (!corazonB) return null;
+      rig.colocar(op.reloj(), 0); caja.updateMatrixWorld();
+      const q = aPantalla(corazonB.grupo.localToWorld(new THREE.Vector3(Math.sin(alfa) * r, 0.004, Math.cos(alfa) * r)));
+      return { x: q.x, y: q.y };
+    },
+    centroCorazon() { return corazonB ? corazonB.grupo.localToWorld(new THREE.Vector3(0, 0.02, 0)) : mundo.centroCaja.clone(); },
+    // el frente de un cajón del costado en la pantalla, abierto k (0 cerrado … 1 abierto): el dedo tira de él por
+    // esa línea
+    pantallaCajon(id, k) {
+      if (!cajonesB) return null;
+      const d = op.cajones.cajones.find(c => c.id === id);
+      caja.updateMatrixWorld();
+      rig.colocar(op.reloj(), 0);
+      const v = new THREE.Vector3(op.cajones.x + k * op.cajones.sale, (d.z[0] + d.z[1]) / 2, -(d.y[0] + d.y[1]) / 2);
+      const q = aPantalla(pintada.caja.localToWorld(v));
+      return { x: q.x, y: q.y };
+    },
+    // nivel 2
+    hayHija: () => !!hija,
+    subirHija(duracion, fin) { if (hija) animHija.subida = { t: 0, duracion, fin }; else if (fin) fin(); },
+    girarHija, soltarHija, tablillaVista,
+    // una tablilla corre (o vuelve) desde donde esté hasta «hasta»; «asomo» la deja salir un poco y volver (un toque)
+    correrTablilla(i, duracion = 0.45, hasta = 1, asomo = 0) {
+      if (!hija) return;
+      animHija.tablillas = animHija.tablillas.filter(t => t.i !== i);
+      animHija.tablillas.push({ i, t: 0, duracion, desde: hija.estado.tablillas[i], hasta, asomo });
+    },
+    ponerTablilla(i, k) { if (!hija) return; animHija.tablillas = animHija.tablillas.filter(t => t.i !== i); hija.estado.tablillas[i] = k; },
+    // dónde está la tablilla i (0 cerrada … 1 corrida) y si se está moviendo sola
+    tablilla(i) { return hija ? { k: hija.estado.tablillas[i], moviendo: animHija.tablillas.some(t => t.i === i) } : null; },
+    abrirCajonHija(duracion = 0.6, hasta = 1, asomo = 0) { if (hija) animHija.cajon = { t: 0, duracion, desde: hija.estado.cajon, hasta, asomo }; },
+    ponerCajonHija(k) { if (!hija) return; animHija.cajon = null; hija.estado.cajon = k; },
+    // por dónde corre en la pantalla una parte de la caja hija: su centro cerrada (a) y abierta del todo (b)
+    ejeHija(parte, i) {
+      if (!hija) return null;
+      rig.colocar(op.reloj(), 0);
+      hija.grupo.updateMatrixWorld(true);
+      const h = LADO_HIJA / 2;
+      const punto = k => {
+        if (parte === 'cajon') return new THREE.Vector3(0, 0, -h - 0.0015 - k * LADO_HIJA * SALE_CAJONCITO);
+        const t = TABLILLAS[i];
+        return hija.tablillas[i].userData.reposo.clone().add(new THREE.Vector3(...t.normal).multiplyScalar(0.002))
+          .add(new THREE.Vector3(...t.corre).multiplyScalar(t.cuanto * LADO_HIJA * k));
+      };
+      const a = aPantalla(hija.cuerpo.localToWorld(punto(0))), b = aPantalla(hija.cuerpo.localToWorld(punto(1)));
+      return { a: { x: a.x, y: a.y }, b: { x: b.x, y: b.y } };
+    },
+    // la caja hija en el boceto (para que el ojo grande la mire) y un punto suyo en 3D (para los vuelos)
+    hijaEnBoceto() { return alBoceto(puntoHija()); },
+    puntoHija(parte) {
+      if (!hija) return null;
+      if (parte === 'cajita') return hija.cajita.getWorldPosition(new THREE.Vector3());
+      return puntoHija();
+    },
+    // cuánto mira la tablilla i a la cámara (1 de frente, 0 de canto, negativo si no se ve) y dónde tocar cada parte
+    tablillaHaciaCamara(i) {
+      if (!hija) return -1;
+      const n = normalObjetivo(i), c = POS_HIJA.clone().add(n.clone().multiplyScalar(LADO_HIJA / 2));
+      return n.dot(mundo.camara.position.clone().sub(c).normalize());
+    },
+    pantallaHija(parte, i) {
+      if (!hija) return null;
+      let v;
+      if (parte === 'tablilla') v = hija.centroMundo(i).add(hija.normalMundo(i).multiplyScalar(0.002));
+      else if (parte === 'cajita') v = hija.cajita.getWorldPosition(new THREE.Vector3());
+      else if (parte === 'cajon') v = hija.cajon.localToWorld(new THREE.Vector3(0, 0, -LADO_HIJA / 2 - 0.0015));
+      else v = puntoHija();
+      rig.colocar(op.reloj(), 0);
+      const q = aPantalla(v);
+      return { x: q.x, y: q.y };
+    },
+    ponerHija(h2) {
+      if (!hija || !h2) return;
+      TABLILLAS.forEach((_, i) => { hija.estado.tablillas[i] = h2.tablillas[i] ? 1 : 0; });
+      hija.estado.cajon = h2.cajon === 'abierto' ? 1 : 0;
+      animHija.subida = null; animHija.tablillas = []; animHija.cajon = null;
+      hija.poner();
+    },
+    reiniciar() {
+      giro = giroObj = vGiro = 0; trampilla = 0;
+      if (hija) {
+        hija.estado.tablillas.fill(0); hija.estado.cajon = 0; animHija.subida = null; animHija.tablillas = []; animHija.cajon = null;
+        animHija.qObjetivo.identity(); hija.cuerpo.quaternion.identity(); animHija.vAngular.set(0, 0, 0); hija.grupo.position.copy(TRAMPILLA_3D); hija.poner();
+      }
+    },
+    actualizar(dt) {
+      rig.actualizar(dt);
+      const kk = 30, am = 2 * Math.sqrt(kk) * 0.95;
+      vGiro += ((giroObj - giro) * kk - vGiro * am) * dt; giro += vGiro * dt;
+      const b = op.aliento();
+      caja.rotation.y = giro;
+      caja.scale.set(1 + 0.0028 * b, 1 + 0.0065 * b, 1 + 0.0028 * b);
+      if (esB) {
+        actualizarCajonesB();
+        actualizarHija(dt);
+        if (incensarioB) {           // la silueta del incensario, con su tapa o sin ella (y con el cuerno en las brasas)
+          const e = op.estado(), t = mundo.tex;
+          // suelta, la tapa se dibuja aparte (op.tapa()) y la boca va sin el cuerno, que aún no se ve
+          incensarioB.material.uniforms.uMascara.value = e.tapa !== 'abierta' ? (op.tapa() ? t.siluetaIncensarioAbierto : t.siluetaIncensario)
+            : e.cuerno === 'brasas' ? t.siluetaIncensarioCuerno : t.siluetaIncensarioAbierto;
+        }
+        if (rolloB) { const r = op.decoracion.rollo; rolloB.rotation.set(r.a, 0, r.lift); }
+        actualizarNivel3B();
+        actualizarNivel4B();
+        actualizarNivel5B(dt);
+        actualizarCorazonB(dt);
+      } else actualizarC(dt);
+    },
+    dibujar() {
+      rig.colocar(op.reloj(), op.sacudida());
+      if (esB) { pintarOjoB(); mezclarCaras(); }
+      mundo.render.render(mundo.escena, mundo.camara);
+    },
+    // de la pantalla al boceto: qué se toca y en qué punto de la ilustración (frente o espalda)
+    aPintura(sx, sy) {
+      const hit = tocar(sx, sy);
+      return hit ? hit.punto : null;
+    },
+    ancla,
+    pantallaDe,
+  };
+
+  // La decoración viva de la B (juego.js la anima): las sombras del bambú, en un plano pegado a la pared del shoji que
+  // toma su dibujo con la cámara del boceto (detrás de la caja, que lo tapa), y el rollo colgado, un plano con su
+  // pintura en la pared del tokonoma que gira desde su gancho
+  function crearDecoracionB(destino) {
+    const d = op.decoracion, e = op.escena3d, [ex, ey] = e.esquina;
+    const pv = new THREE.Matrix4().multiplyMatrices(mundo.proyector.projectionMatrix, mundo.proyector.matrixWorldInverse);
+    // las sombras: el lienzo de juego.js, colocado en el rectángulo del shoji del boceto
+    const lienzo = d.sombrasBambu, [x0, y0, x1, y1] = d.VENTANAS;
+    const tex = new THREE.CanvasTexture(lienzo);
+    tex.colorSpace = THREE.NoColorSpace; tex.generateMipmaps = false; tex.minFilter = THREE.LinearFilter;
+    op.alPintarBambu = () => { tex.needsUpdate = true; };
+    const mat = new THREE.ShaderMaterial({
+      uniforms: { uSombra: { value: tex }, uProyector: { value: pv }, uRect: { value: new THREE.Vector4(x0 / ANCHO, y0 / ALTO, x1 / ANCHO, y1 / ALTO) } },
+      vertexShader: `uniform mat4 uProyector; varying vec4 vProy;
+        void main() { vProy = uProyector * modelMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+      fragmentShader: `uniform sampler2D uSombra; uniform vec4 uRect; varying vec4 vProy;
+        void main() {
+          vec2 uv = vProy.xy / vProy.w * 0.5 + 0.5;
+          vec2 q = (vec2(uv.x, 1.0 - uv.y) - uRect.xy) / (uRect.zw - uRect.xy);
+          if (q.x < 0.0 || q.x > 1.0 || q.y < 0.0 || q.y > 1.0) discard;
+          gl_FragColor = texture2D(uSombra, vec2(q.x, 1.0 - q.y));
+        }`,
+      transparent: true, depthWrite: false,
+    });
+    const esquinas = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]].map(([x, y]) => rayoDelBoceto(x, y).intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), ey), new THREE.Vector3()));
+    const xs = esquinas.map(v => v.x), ys = esquinas.map(v => v.y);
+    const ancho = Math.max(...xs) - Math.min(...xs) + 0.2, alto = Math.max(...ys) - Math.min(...ys) + 0.2;
+    const sombras = new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), mat);
+    sombras.position.set((Math.max(...xs) + Math.min(...xs)) / 2, (Math.max(...ys) + Math.min(...ys)) / 2, -ey + 0.004);
+    sombras.raycast = () => {};
+    destino.add(sombras);
+    // el rollo: la tela y el palo de abajo, cada uno con el trozo de pintura que le toca, colgando del gancho
+    const pared = new THREE.Plane(new THREE.Vector3(1, 0, 0), -(ex + 0.006));
+    const enPared = (x, y) => rayoDelBoceto(x, y).intersectPlane(pared, new THREE.Vector3());
+    const gancho = enPared(d.ROLLO.gancho.x, d.ROLLO.gancho.y);
+    rolloB = new THREE.Group(); rolloB.position.copy(gancho);
+    const [rx0, ry0, rx1, ry1] = d.ROLLO.rect;
+    for (const [a, b, c2, dd] of [[245, ry0, 407, 301], [rx0, 299, rx1, ry1]]) {
+      const v = [[a, b], [c2, b], [c2, dd], [a, dd]].map(([x, y]) => enPared(x, y).sub(gancho));
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(v.flatMap(q => [q.x, q.y, q.z]), 3));
+      geo.setAttribute('uv', new THREE.Float32BufferAttribute([0, 1, 1, 1, 1, 0, 0, 0], 2));
+      geo.setIndex([0, 3, 1, 1, 3, 2]);
+      const malla = new THREE.Mesh(geo, materialPintura(mundo.tex.frente, mundo.proyector,
+        { reposo: new THREE.Matrix4().makeTranslation(gancho.x, gancho.y, gancho.z), lado: THREE.DoubleSide, recorte: rectanguloUV([a, b, c2, dd]) }));
+      malla.userData.tipo = 'sala';
+      rolloB.add(malla);
+    }
+    destino.add(rolloB);
+  }
+  // ---- Nivel 2: la caja hija ----------------------------------------------------------------
+  // Sale de la trampilla, baja a la mesa delante de la grande y se gira en la mano. Las tablillas que mira el ojo
+  // grande no se mueven (lo decide juego.js con tablillaVista()).
+  async function crearHijaB(destino) {
+    const cargar = n => new Promise((ok, mal) => new THREE.TextureLoader().load(`capas/${n}.webp`, t => {
+      t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; ok(t);
+    }, undefined, mal));
+    const [asanoha, kikko, frente, cajita] = await Promise.all(['hija_asanoha', 'hija_kikko', 'hija_frente', 'cajita'].map(cargar));
+    hija = crearCajaHija({ asanoha, kikko, frente, cajita });
+    hija.grupo.visible = false;
+    hija.grupo.position.copy(TRAMPILLA_3D);
+    destino.add(hija.grupo);
+    // luz para la caja hija (lo pintado no la necesita: solo le afecta a ella). Con las luces físicas de Three, una
+    // cara iluminada de lleno devuelve (ambiente + directa) / π de su color: así queda como la pintura de alrededor
+    const ambiente = new THREE.AmbientLight(0xfff0dc, 1.9);
+    const lampara = new THREE.DirectionalLight(0xffd2a0, 1.5); lampara.position.set(-1, 0.6, 0.35);      // el andon
+    const luna = new THREE.DirectionalLight(0x9fb4de, 0.7); luna.position.set(0.8, 0.5, -0.8);           // el shoji
+    destino.add(ambiente, lampara, luna);
+    // su sombra en la mesa
+    sombraHija = sombraBajo(POS_HIJA.x, POS_HIJA.z, 0.05, ZT + 0.0012);
+    sombraHija.visible = false;
+    destino.add(sombraHija);
+  }
+  const curvaSuave = k => k * k * (3 - 2 * k);
+  // dónde está la caja hija ahora (mundo) y en el boceto
+  function puntoHija() { return hija ? hija.grupo.getWorldPosition(new THREE.Vector3()) : POS_HIJA.clone(); }
+  function actualizarHija(dt) {
+    if (!hija) return;
+    const est = op.estado(), h2 = est.hija;
+    if (!h2) { hija.grupo.visible = false; sombraHija.visible = false; return; }     // nivel 1 (o vuelta a empezar)
+    // nivel final: en la mano no se ve; puesta en el corazón, hundida en su hueco y girada lo que diga el dedo
+    if (h2.fase === 'mano') { hija.grupo.visible = false; sombraHija.visible = false; return; }
+    if (h2.fase === 'corazon' && corazonB) {
+      hija.grupo.visible = true; sombraHija.visible = false;
+      caja.updateMatrixWorld();
+      hija.grupo.position.copy(corazonB.grupo.localToWorld(new THREE.Vector3(0, LADO_HIJA / 2 - 0.022, 0)));
+      hija.cuerpo.quaternion.setFromAxisAngle(EJE_Y, (est.fin && est.fin.giroHija) || 0);
+      hija.poner();
+      return;
+    }
+    const fuera = h2.fase !== 'dentro';
+    hija.grupo.visible = fuera || !!animHija.subida;
+    sombraHija.visible = fuera && !animHija.subida;
+    // la subida: de la trampilla hacia arriba, flota y baja a la mesa
+    if (animHija.subida) {
+      const a = animHija.subida; a.t += dt;
+      const k = limitar(a.t / a.duracion, 0, 1);
+      const alto = TRAMPILLA_3D.clone().add(new THREE.Vector3(0, 0.1, 0.03));
+      let p;
+      if (k < 0.45) p = TRAMPILLA_3D.clone().lerp(alto, curvaSuave(k / 0.45));
+      else {
+        const q = curvaSuave((k - 0.45) / 0.55);
+        p = alto.clone().lerp(POS_HIJA, q);
+        p.y += Math.sin(q * Math.PI) * 0.05;
+      }
+      hija.grupo.position.copy(p);
+      hija.cuerpo.rotation.y = (1 - curvaSuave(k)) * 1.6;
+      if (k >= 1) { animHija.subida = null; hija.cuerpo.rotation.set(0, 0, 0); animHija.qObjetivo.identity(); hija.cuerpo.quaternion.identity(); animHija.vAngular.set(0, 0, 0); if (a.fin) a.fin(); }
+    } else if (fuera) {
+      // (al empezar el nivel 4, se desliza hasta su sitio nuevo)
+      posHija.lerp(est.nivel >= 4 ? POS_HIJA_LADO : POS_HIJA, est.nivel >= 4 && posHija.distanceTo(POS_HIJA_LADO) > 0.0005 ? 1 - Math.exp(-dt * 2.5) : 1);
+      hija.grupo.position.copy(posHija);
+      sombraHija.position.x = posHija.x; sombraHija.position.z = posHija.z;
+      // un leve vaivén, como si respirara también
+      hija.grupo.position.y += 0.0012 * Math.sin(op.reloj() * 1.3);
+      girarConMuelle(hija.cuerpo.quaternion, animHija.qObjetivo, animHija.vAngular, dt);
+    }
+    // tablillas y cajoncito
+    for (const t of animHija.tablillas) {
+      t.t += dt; const k = limitar(t.t / t.duracion, 0, 1);
+      hija.estado.tablillas[t.i] = t.desde + (t.hasta - t.desde) * (1 - Math.pow(1 - k, 3)) + (t.asomo || 0) * Math.sin(k * Math.PI);
+      if (k >= 1) hija.estado.tablillas[t.i] = t.hasta;
+    }
+    animHija.tablillas = animHija.tablillas.filter(t => t.t < t.duracion);
+    if (animHija.cajon) {
+      const c = animHija.cajon; c.t += dt; const k = limitar(c.t / c.duracion, 0, 1);
+      const rebote = c.hasta > c.desde ? 0.08 * Math.sin(k * Math.PI) * (1 - k) : 0;
+      hija.estado.cajon = c.desde + (c.hasta - c.desde) * (1 - Math.pow(1 - k, 3)) + rebote + (c.asomo || 0) * Math.sin(k * Math.PI);
+      if (k >= 1) { hija.estado.cajon = c.hasta; animHija.cajon = null; }
+    }
+    hija.poner();
+    hija.cajita.visible = h2.cajita === 'cajon';
+  }
+  // el giro en la mano: arrastrar gira la caja hija alrededor del eje vertical y del eje de la derecha de la cámara
+  function girarHija(dx, dy) {
+    if (!hija) return;
+    const derecha = new THREE.Vector3(1, 0, 0).applyQuaternion(mundo.camara.quaternion); derecha.y = 0; derecha.normalize();
+    const qy = new THREE.Quaternion().setFromAxisAngle(EJE_Y, dx * 0.0115);
+    const qx = new THREE.Quaternion().setFromAxisAngle(derecha, dy * 0.0115);
+    animHija.qObjetivo.premultiply(qy).premultiply(qx).normalize();
+  }
+  // al soltar, se asienta en la orientación de cubo más cercana (una cara mirando a cada eje)
+  const ORIENTACIONES = (() => {
+    const r = [], ejes = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]].map(a => new THREE.Vector3(...a));
+    for (const x of ejes) for (const y of ejes) {
+      if (Math.abs(x.dot(y)) > 0.5) continue;
+      const z = new THREE.Vector3().crossVectors(x, y);
+      r.push(new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(x, y, z)));
+    }
+    return r;
+  })();
+  function soltarHija() {
+    if (!hija) return;
+    let mejor = null, d = -1;
+    for (const q of ORIENTACIONES) { const p = Math.abs(q.dot(animHija.qObjetivo)); if (p > d) { d = p; mejor = q; } }
+    animHija.qObjetivo.copy(mejor);
+  }
+  // la normal de la tablilla i con la caja hija ya asentada (al soltarla gira unos instantes hasta su sitio)
+  function normalObjetivo(i) { return new THREE.Vector3(...TABLILLAS[i].normal).applyQuaternion(animHija.qObjetivo); }
+  // ¿ve el ojo grande la cara de esta tablilla? (su cara mira hacia el ojo, y la caja grande no está de espaldas)
+  function tablillaVista(i) {
+    if (!hija) return false;
+    caja.updateMatrixWorld();
+    const ojo = caja.localToWorld(OJO_3D.clone());
+    const n = normalObjetivo(i), centro = POS_HIJA.clone().add(n.clone().multiplyScalar(LADO_HIJA / 2));
+    const frenteCaja = new THREE.Vector3(0, 0, 1).applyQuaternion(caja.quaternion);
+    if (frenteCaja.dot(centro.clone().sub(ojo)) <= 0) return false;
+    return n.dot(ojo.sub(centro).normalize()) > 0.3;
+  }
+
+  // ---- Nivel 3: el cajón largo de la espalda (con la campanilla), la ficha en su hueco y la tetera que se vuelca ----
+  // Todo en el espacio de la caja pintada, como los cajones del costado. Lo de la espalda se pinta con el boceto de
+  // espaldas, que es la caja girada media vuelta en su sitio: un píxel de ese boceto cae en la cara de delante de la caja
+  // quieta (z = 0,11) y, girado, en la de detrás (x y z cambiados de signo)
+  function enEspalda(x, y) {
+    const q = rayoDelBoceto(x, y).intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -0.11), new THREE.Vector3());
+    return q ? new THREE.Vector3(-q.x, q.y, -0.11) : new THREE.Vector3(0, mundo.centroCaja.y, -0.11);
+  }
+  function crearNivel3B() {
+    const [x0, y0, x1, y1] = RECT_LARGO, a = enEspalda(x0, y0), c = enEspalda(x1, y1);
+    const ancho = Math.abs(a.x - c.x), alto = Math.abs(a.y - c.y), grueso = 0.006, fondo = 0.1;
+    const centro = new THREE.Vector3((a.x + c.x) / 2, (a.y + c.y) / 2, -0.11);
+    const cajon = new THREE.Group(); cajon.position.copy(centro);
+    // el frente: una tabla con la pintura de espaldas, que se mueve con ella
+    const frente = new THREE.Mesh(new THREE.BoxGeometry(ancho, alto, grueso));
+    frente.position.set(0, 0, grueso / 2 - 0.0006);
+    cajon.updateMatrix(); frente.updateMatrix();
+    const reposo = new THREE.Matrix4().makeRotationY(Math.PI).multiply(cajon.matrix.clone().multiply(frente.matrix));
+    const color = (r, g, b) => new THREE.MeshBasicMaterial({ color: new THREE.Color().setRGB(r, g, b, THREE.SRGBColorSpace) });
+    const canto = color(0.3, 0.19, 0.11), dentro = color(0.22, 0.09, 0.05), borde = color(0.48, 0.24, 0.14), suelo = color(0.14, 0.055, 0.03);
+    // caras de BoxGeometry: +x, −x, +y, −y, +z (hacia dentro de la caja), −z (fuera)
+    frente.material = [canto, canto, canto, canto, canto, materialPintura(mundo.tex.detras, mundo.proyector, { reposo })];
+    // paredes bajas, el suelo y la trasera, de laca oscura por dentro
+    const t = 0.0025, hw = alto * 0.62, largo = fondo - grueso, zm = grueso + largo / 2, yb = -alto / 2;
+    const tabla = (sx, sy, sz, x, y, z, m) => { const malla = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), m); malla.position.set(x, y, z); return malla; };
+    const piezas = [frente,
+      tabla(t, hw, largo, -ancho / 2 + t / 2, yb + hw / 2, zm, [dentro, dentro, borde, dentro, dentro, dentro]),
+      tabla(t, hw, largo, ancho / 2 - t / 2, yb + hw / 2, zm, [dentro, dentro, borde, dentro, dentro, dentro]),
+      tabla(ancho - 2 * t, t, largo, 0, yb + t / 2, zm, suelo),
+      tabla(ancho - 2 * t, hw, t, 0, yb + hw / 2, fondo - t / 2, [dentro, dentro, borde, dentro, dentro, dentro])];
+    for (const p of piezas) { p.userData.tipo = 'largo'; cajon.add(p); }
+    // la campanilla, tumbada dentro (como la llave y la nota de los cajones del costado: un dibujo que mira a la cámara)
+    const tex = new THREE.CanvasTexture(dibujarCampanilla(false, 96, 120));
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const campanilla = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+    const altoC = 0.032;
+    campanilla.scale.set(altoC * 0.8, altoC, 1);
+    // (hacia el frente del cajón: lo que sale de la caja al abrirlo)
+    campanilla.position.set(-ancho * 0.1, yb + t + altoC * 0.45, grueso + 0.022);
+    campanilla.userData = { tipo: 'largo', parte: 'campanilla' };
+    cajon.add(campanilla);
+    // el hueco que deja en la espalda (no se mueve con el cajón)
+    const agujero = new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), color(0.05, 0.03, 0.02));
+    agujero.rotation.y = Math.PI; agujero.position.set(centro.x, centro.y, -0.1101);
+    agujero.userData.tipo = 'largo';
+    pintada.caja.add(cajon, agujero);
+    cajon.visible = agujero.visible = false;
+    largoB = { grupo: cajon, agujero, campanilla, centro, sale: 0.075 };
+    // la ficha coronada, en su hueco (sale al ponerla)
+    const [hx0, hy0, hx1, hy1] = RECT_HUECO, h0 = enEspalda(hx0, hy0), h1 = enEspalda(hx1, hy1);
+    const texF = new THREE.CanvasTexture(dibujarFicha('promovida', 120, 140));
+    texF.colorSpace = THREE.SRGBColorSpace;
+    fichaB = new THREE.Mesh(new THREE.PlaneGeometry(Math.abs(h0.x - h1.x) * 0.92, Math.abs(h0.y - h1.y) * 0.95),
+      new THREE.MeshBasicMaterial({ map: texF, transparent: true }));
+    fichaB.position.set((h0.x + h1.x) / 2, (h0.y + h1.y) / 2, -0.1104);
+    fichaB.rotation.y = Math.PI;                         // mira hacia fuera, a la espalda
+    fichaB.visible = false;
+    pintada.caja.add(fichaB);
+  }
+  function actualizarNivel3B() {
+    if (!largoB) return;
+    const n3 = op.estado().n3, k = op.cajonAbertura('largo');
+    const abierto = k > 0.002;
+    largoB.grupo.visible = largoB.agujero.visible = abierto;
+    largoB.grupo.position.z = largoB.centro.z - Math.max(0, k) * largoB.sale;
+    largoB.campanilla.visible = !!n3 && n3.campanilla === 'cajon';
+    fichaB.visible = !!n3 && n3.ficha === 'puesta';
+  }
+  // ---- Nivel 4: el cajón de la peana. Su frente es un trozo de la peana pintada (con sus olas de oro), que sale hacia
+  // ti con la pintura pegada; dentro, de laca negra, una esquirla, el tarro de laca y el sobre de oro (dibujos que miran
+  // a la cámara, como lo de los cajones del costado)
+  function crearNivel4B() {
+    const n4d = op.nivel4;
+    if (!n4d) return;
+    const p = op.escena3d.peana, zF = -p.centro[1] + p.medio_y;
+    const plano = new THREE.Plane(new THREE.Vector3(0, 0, 1), -zF);
+    const [x0, y0, x1, y1] = n4d.cajon_zocalo;
+    const a = rayoDelBoceto(x0, y0).intersectPlane(plano, new THREE.Vector3()), c = rayoDelBoceto(x1, y1).intersectPlane(plano, new THREE.Vector3());
+    if (!a || !c) return;
+    const ancho = Math.abs(a.x - c.x), alto = Math.abs(a.y - c.y), grueso = 0.005, fondo = 0.07;
+    const centro = new THREE.Vector3((a.x + c.x) / 2, (a.y + c.y) / 2, zF);
+    const cajon = new THREE.Group(); cajon.position.copy(centro);
+    const frente = new THREE.Mesh(new THREE.BoxGeometry(ancho, alto, grueso));
+    frente.position.set(0, 0, -grueso / 2 + 0.0006);
+    cajon.updateMatrix(); frente.updateMatrix();
+    const reposo = cajon.matrix.clone().multiply(frente.matrix);
+    const color = (r, g, b) => new THREE.MeshBasicMaterial({ color: new THREE.Color().setRGB(r, g, b, THREE.SRGBColorSpace) });
+    const canto = color(0.1, 0.07, 0.05), dentro = color(0.08, 0.04, 0.03), borde = color(0.22, 0.14, 0.08), suelo = color(0.05, 0.025, 0.018);
+    // caras de BoxGeometry: +x, −x, +y, −y, +z (fuera, hacia ti), −z (dentro de la peana)
+    frente.material = [canto, canto, canto, canto, materialPintura(mundo.tex.frente, mundo.proyector, { reposo }), canto];
+    const t = 0.0022, hw = alto * 0.85, yb = -alto / 2, zm = -grueso - fondo / 2;
+    const tabla = (sx, sy, sz, x, y, z, m) => { const malla = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), m); malla.position.set(x, y, z); return malla; };
+    const piezas = [frente,
+      tabla(t, hw, fondo, -ancho / 2 + t / 2, yb + hw / 2, zm, [dentro, dentro, borde, dentro, dentro, dentro]),
+      tabla(t, hw, fondo, ancho / 2 - t / 2, yb + hw / 2, zm, [dentro, dentro, borde, dentro, dentro, dentro]),
+      tabla(ancho - 2 * t, t, fondo, 0, yb + t / 2, zm, suelo),
+      tabla(ancho - 2 * t, hw, t, 0, yb + hw / 2, -grueso - fondo + t / 2, [dentro, dentro, borde, dentro, dentro, dentro])];
+    for (const q of piezas) { q.userData.tipo = 'zocalo'; cajon.add(q); }
+    // lo que guarda: cerca del frente, para que se vea al abrirlo
+    const dibujo = (lienzo, h, x, parte) => {
+      if (!lienzo) return null;
+      const tex = new THREE.CanvasTexture(lienzo); tex.colorSpace = THREE.SRGBColorSpace;
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+      sp.scale.set(h * lienzo.width / lienzo.height, h, 1);
+      sp.position.set(x, yb + t + h * 0.48, -grueso - 0.016);
+      sp.userData = { tipo: 'zocalo', parte };
+      cajon.add(sp);
+      return sp;
+    };
+    const im = op.img;
+    const dentroB = { esquirla: dibujo(im.esquirla, 0.011, -ancho * 0.3, 'esquirla'), laca: dibujo(im.laca, 0.02, 0, 'laca'),
+      oro: dibujo(im.oro, 0.016, ancho * 0.3, 'oro') };
+    // el hueco que deja en la peana (no se mueve con el cajón)
+    const agujero = new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), color(0.03, 0.02, 0.015));
+    agujero.position.set(centro.x, centro.y, zF + 0.0003);
+    agujero.userData.tipo = 'zocalo';
+    pintada.caja.add(cajon, agujero);
+    cajon.visible = agujero.visible = false;
+    zocaloB = { grupo: cajon, agujero, centro, sale: 0.06, dentro: dentroB };
+  }
+  function actualizarNivel4B() {
+    if (!zocaloB) return;
+    const n4 = op.estado().n4, k = op.cajonAbertura('zocalo');
+    const abierto = k > 0.002;
+    zocaloB.grupo.visible = zocaloB.agujero.visible = abierto;
+    zocaloB.grupo.position.z = zocaloB.centro.z + Math.max(0, k) * zocaloB.sale;
+    const d = zocaloB.dentro;
+    if (d.esquirla) d.esquirla.visible = !!n4 && n4.esquirlas[2] === 'zocalo';
+    if (d.laca) d.laca.visible = !!n4 && n4.laca === 'zocalo';
+    if (d.oro) d.oro.visible = !!n4 && n4.oro === 'zocalo';
+  }
+  // ---- Nivel 5: la cómoda. Los nueve cajones de la espalda y el escondido (el panel del hueco de la ficha), como el
+  // cajón largo: su frente es la pintura de espaldas (desde este nivel, la de capas/sala_detras_l5.webp, con m1 cerrado
+  // y sin la borla de abajo) y salen hacia fuera. La borla del costado izquierdo se dibuja por código (juego.js dice cómo
+  // está) en un plano pegado al costado, sobre su repintado sin ella (capas/cara_izquierda_l5.webp). Y lo que guardan.
+  const BORLA_LIENZO = { x: 280, y: 400, w: 560, h: 700, escala: 0.8 };      // la zona del costado (px de 1024) que dibuja
+  async function crearNivel5B(tex) {
+    const d5 = op.nivel5;
+    if (!d5) return;
+    const [texDetras, texIzq] = await Promise.all([cargarTextura('capas/sala_detras_l5.webp'), cargarTextura('capas/cara_izquierda_l5.webp')]);
+    const color = (r, g, b) => new THREE.MeshBasicMaterial({ color: new THREE.Color().setRGB(r, g, b, THREE.SRGBColorSpace) });
+    const canto = color(0.3, 0.19, 0.11), dentro = color(0.2, 0.08, 0.045), borde = color(0.46, 0.22, 0.13), suelo = color(0.13, 0.05, 0.03);
+    const hueco = color(0.05, 0.03, 0.02);
+    const cajones = {};
+    const crear = (id, [x0, y0, x1, y1], sale, fondo) => {
+      const a = enEspalda(x0, y0), c = enEspalda(x1, y1);
+      const ancho = Math.abs(a.x - c.x), alto = Math.abs(a.y - c.y), grueso = 0.006;
+      const centro = new THREE.Vector3((a.x + c.x) / 2, (a.y + c.y) / 2, -0.11);
+      const cajon = new THREE.Group(); cajon.position.copy(centro);
+      const frente = new THREE.Mesh(new THREE.BoxGeometry(ancho, alto, grueso));
+      frente.position.set(0, 0, grueso / 2 - 0.0006);
+      cajon.updateMatrix(); frente.updateMatrix();
+      const reposo = new THREE.Matrix4().makeRotationY(Math.PI).multiply(cajon.matrix.clone().multiply(frente.matrix));
+      frente.material = [canto, canto, canto, canto, canto, materialPintura(texDetras, mundo.proyector, { reposo })];
+      const t = 0.0022, hw = alto * 0.7, largo = fondo - grueso, zm = grueso + largo / 2, yb = -alto / 2;
+      const tabla = (sx, sy, sz, x, y, z, m) => { const malla = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), m); malla.position.set(x, y, z); return malla; };
+      const piezas = [frente,
+        tabla(t, hw, largo, -ancho / 2 + t / 2, yb + hw / 2, zm, [dentro, dentro, borde, dentro, dentro, dentro]),
+        tabla(t, hw, largo, ancho / 2 - t / 2, yb + hw / 2, zm, [dentro, dentro, borde, dentro, dentro, dentro]),
+        tabla(ancho - 2 * t, t, largo, 0, yb + t / 2, zm, suelo),
+        tabla(ancho - 2 * t, hw, t, 0, yb + hw / 2, fondo - t / 2, [dentro, dentro, borde, dentro, dentro, dentro])];
+      for (const p of piezas) { p.userData = { tipo: 'detras5', cajon: id }; cajon.add(p); }
+      const agujero = new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), hueco);
+      agujero.rotation.y = Math.PI; agujero.position.set(centro.x, centro.y, -0.1101);
+      agujero.userData = { tipo: 'detras5', cajon: id };
+      pintada.caja.add(cajon, agujero);
+      cajon.visible = agujero.visible = false;
+      return { grupo: cajon, agujero, centro, sale, ancho, alto, yb, grueso, rect: [x0, y0, x1, y1] };
+    };
+    for (const [id, r] of Object.entries(d5.cajones)) cajones[id] = crear(id, r, 0.048, 0.075);
+    cajones.p = crear('p', d5.panel, 0.055, 0.085);
+    // lo que guardan: dibujos que miran a la cámara, cerca del frente (lo de dentro del cajón escondido, al fondo)
+    const sprite = (cj, lienzo, h, x, parte, z = null) => {
+      const t = new THREE.CanvasTexture(lienzo); t.colorSpace = THREE.SRGBColorSpace;
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthWrite: false }));
+      sp.scale.set(h * lienzo.width / lienzo.height, h, 1);
+      sp.position.set(x, cj.yb + 0.0025 + h * 0.48, z === null ? cj.grueso + 0.016 : z);
+      sp.userData = { tipo: 'detras5', cajon: cj === cajones.p ? 'p' : Object.keys(cajones).find(k => cajones[k] === cj), parte };
+      cj.grupo.add(sp);
+      return sp;
+    };
+    const im = op.img;
+    const dentroB = {
+      tarjeta: sprite(cajones.t2, dibujarTarjetaLazo(240, 170), 0.026, 0, 'tarjeta'),
+      llave: im.llave ? sprite(cajones.c, im.llave, 0.016, 0, 'llave') : null,
+      ovillo: sprite(cajones.t3, dibujarOvillo(90, 80), 0.016, 0, 'ovillo'),
+      frasquito: sprite(cajones.r1, dibujarFrasquito(60, 90), 0.02, 0, 'frasquito'),
+      dedal: sprite(cajones.r3, dibujarDedal(60, 60), 0.012, 0, 'dedal'),
+      cordon: sprite(cajones.p, dibujarCordonPasador(260, 120), 0.024, 0, 'cordon', 0.05),
+    };
+    // en los cajones del costado: las tsukegi (c2) y su secreto (c6), como la llave y la nota
+    const enCostado = (id, lienzo, h, parte) => {
+      const c = cajonesB && cajonesB[id];
+      if (!c) return null;
+      const t = new THREE.CanvasTexture(lienzo); t.colorSpace = THREE.SRGBColorSpace;
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthWrite: false }));
+      sp.scale.set(h * lienzo.width / lienzo.height, h, 1);
+      sp.position.copy(c.dentro).add(new THREE.Vector3(0, h * 0.42, 0));
+      sp.userData = { tipo: 'cajon', cajon: id, parte };
+      c.grupo.add(sp);
+      return sp;
+    };
+    const papel = (() => {           // su secreto, doblado: un papel con una esquina de tinta
+      const c = document.createElement('canvas'); c.width = 120; c.height = 90;
+      const k = c.getContext('2d');
+      k.fillStyle = '#efe6d2'; k.strokeStyle = 'rgba(80, 60, 40, 0.9)'; k.lineWidth = 2;
+      k.beginPath(); k.moveTo(8, 14); k.lineTo(104, 6); k.lineTo(112, 74); k.lineTo(14, 84); k.closePath(); k.fill(); k.stroke();
+      k.beginPath(); k.moveTo(58, 10); k.lineTo(62, 80); k.strokeStyle = 'rgba(120, 100, 80, 0.6)'; k.stroke();
+      k.fillStyle = 'rgba(30, 30, 44, 0.75)'; k.fillRect(20, 30, 30, 4); k.fillRect(20, 40, 24, 3); k.fillRect(70, 50, 28, 14);
+      return c;
+    })();
+    dentroB.tsukegi = enCostado('c2', dibujarTsukegi(200, 150), 0.026, 'tsukegi');
+    dentroB.secreto = enCostado('c6', papel, 0.022, 'secreto');
+    // la borla: un plano pegado al costado izquierdo (por fuera), con su lienzo
+    const L = BORLA_LIENZO, alto = pintada.alto;
+    const lienzo = document.createElement('canvas');
+    lienzo.width = Math.round(L.w * L.escala); lienzo.height = Math.round(L.h * L.escala);
+    const texB = new THREE.CanvasTexture(lienzo); texB.colorSpace = THREE.SRGBColorSpace; texB.anisotropy = 4;
+    const z0 = -0.11 + 0.22 * L.x / 1024, z1 = -0.11 + 0.22 * (L.x + L.w) / 1024;
+    const yArriba = 0.034 + alto * (1 - L.y / 1024), yAbajo = 0.034 + alto * (1 - (L.y + L.h) / 1024);
+    const plano = new THREE.Mesh(new THREE.PlaneGeometry(z1 - z0, yArriba - yAbajo),
+      new THREE.MeshBasicMaterial({ map: texB, transparent: true, depthWrite: false, side: THREE.FrontSide }));
+    plano.rotation.y = -Math.PI / 2;
+    plano.position.set(-0.1112, (yArriba + yAbajo) / 2, (z0 + z1) / 2);
+    plano.userData.tipo = 'borla';
+    plano.renderOrder = 2;
+    plano.visible = false;
+    pintada.caja.add(plano);
+    const mats = pintada.cuerpo.material;
+    n5B = { texDetras, texIzq, cajones, dentro: dentroB, borla: { plano, lienzo, textura: texB, firma: '' },
+      originales: { izq: mats[1].uniforms.uPintura.value, izqFrontal: tex.caraIzquierda, detras: mats[5].uniforms.uPintura.value } };
+  }
+  function pintarBorla(e) {
+    const B = n5B.borla, L = BORLA_LIENZO, k = B.lienzo.getContext('2d');
+    k.setTransform(1, 0, 0, 1, 0, 0);
+    k.clearRect(0, 0, B.lienzo.width, B.lienzo.height);
+    k.setTransform(L.escala, 0, 0, L.escala, -L.x * L.escala, -L.y * L.escala);
+    dibujarBorla(k, op.nivel5.borla, e);
+    B.textura.needsUpdate = true;
+  }
+  function actualizarNivel5B() {
+    if (!n5B) return;
+    const est = op.estado(), en5 = est.nivel >= 5, mats = pintada.cuerpo.material;
+    // desde el nivel 5: la espalda con m1 cerrado y el costado sin la borla de abajo (la dibuja el plano)
+    mats[1].uniforms.uPintura.value = en5 ? n5B.texDetras : n5B.originales.izq;
+    mats[1].uniforms.uFrontal.value = en5 ? n5B.texIzq : n5B.originales.izqFrontal;
+    mats[5].uniforms.uPintura.value = en5 ? n5B.texDetras : n5B.originales.detras;
+    const n5 = est.n5;
+    for (const [id, c] of Object.entries(n5B.cajones)) {
+      const k = en5 && op.cajonAbertura('espalda_' + id) || 0, abierto = k > 0.002;
+      c.grupo.visible = c.agujero.visible = abierto;
+      c.grupo.position.z = c.centro.z - Math.max(0, k) * c.sale;
+    }
+    // la ficha coronada del nivel 3 sigue en su hueco: sale con el panel (el hueco era su tirador)
+    if (fichaB && en5) fichaB.position.z = -0.1104 - Math.max(0, op.cajonAbertura('espalda_p')) * n5B.cajones.p.sale;
+    const d = n5B.dentro, hay = (parte, donde) => !!n5 && n5[parte] === donde;
+    if (d.tarjeta) d.tarjeta.visible = hay('tarjeta', 't2');
+    if (d.llave) d.llave.visible = hay('llave', 'c');
+    if (d.cordon) d.cordon.visible = !!n5;
+    if (d.tsukegi) d.tsukegi.visible = en5 && (!n5 || n5.tsukegi === 'c2') && est.nivel === 5;
+    if (d.secreto) d.secreto.visible = hay('secreto', 'c6');
+    // la borla: se repinta cuando cambia (o mientras se mece)
+    const B = n5B.borla;
+    B.plano.visible = en5;
+    if (en5 && op.borla) {
+      const e = op.borla(), firma = [e.desatado, e.aprieto, e.bajada, e.meneo, e.colaNegra].map(v => (typeof v === 'number' ? v.toFixed(3) : v)).join('|');
+      if (firma !== B.firma) { B.firma = firma; pintarBorla(e); }
+    }
+  }
+  // la tetera se vuelca hacia la taza de la izquierda: gira alrededor del centro de su cuerpo, sobre el eje que mira a
+  // la cámara del boceto, y se levanta un poco (la sostiene una mano). La pintura va con ella; la máscara deja fuera
+  // las tazas (si no, se llevaría el borde de la de delante)
+  function prepararTetera(objetos) {
+    const t = objetos.tetera;
+    if (!t) return;
+    t.updateMatrixWorld(true);
+    const o = op.escena3d.objetos.tetera, base = aThree(o.base[0], o.base[1], o.base[2]);
+    const eje = mundo.proyector.position.clone().sub(base); eje.y = 0; eje.normalize();
+    const u = t.material.uniforms;
+    u.uReposo.value.copy(t.matrixWorld); u.uUsarReposo.value = 1;
+    if (op.recortarTetera) u.uMascara.value = siluetaEstrecha(op, 'silueta_te', 2, c => op.recortarTetera(c));
+    teteraB = { malla: t, pos0: t.position.clone(), q0: t.quaternion.clone(), eje, pivote: base.clone().add(new THREE.Vector3(0, o.alto * 0.5, 0)),
+      M0inv: t.matrixWorld.clone().invert() };
+  }
+  function inclinarTetera(k) {
+    if (!teteraB) return;
+    const T = teteraB, q = new THREE.Quaternion().setFromAxisAngle(T.eje, 0.46 * k);
+    T.malla.position.copy(T.pos0).sub(T.pivote).applyQuaternion(q).add(T.pivote);
+    T.malla.position.y += 0.026 * Math.min(1, k * 1.6);
+    T.malla.quaternion.copy(T.q0).premultiply(q);
+    T.malla.updateMatrixWorld(true);
+  }
+
+  // ---- Nivel final: el corazón. Sube por la trampilla y se queda en la tapa: una base de laca con su marco, tres
+  // anillos que giran (el del cuerno, el del ojo y el de la voz) y, en el centro, un hueco cuadrado para la caja pequeña.
+  // juego.js lleva el estado (estado.fin); aquí se pone cada cosa en su sitio
+  function crearCorazonB() {
+    const textura = lienzo => { const t = new THREE.CanvasTexture(lienzo); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; };
+    const plano = (geo, mapa, extra = {}) => {
+      const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: textura(mapa), transparent: true, ...extra }));
+      m.rotation.x = -Math.PI / 2;
+      return m;
+    };
+    const grupo = new THREE.Group();
+    grupo.position.set(0, 0.034 + pintada.alto + 0.0012, 0);
+    grupo.visible = false;
+    // (todo es transparente por los bordes: el orden de dibujo va fijado, de abajo arriba, para que la tinta y los
+    // brillos, que no escriben profundidad, no queden tapados por su propio anillo)
+    const base = plano(new THREE.CircleGeometry(0.106, 96), dibujarBaseCorazon());
+    base.userData.tipo = 'corazon'; base.renderOrder = 1;
+    grupo.add(base);
+    const RADIOS = [[0.086, 0.103], [0.071, 0.085], [0.057, 0.07]];
+    const anillos = RADIOS.map(([r0, r1], i) => {
+      const giro = new THREE.Group(); giro.position.y = 0.0012 * (i + 1);
+      const malla = plano(new THREE.RingGeometry(r0, r1, 128, 1), dibujarAnillo(i, r0 / r1));
+      malla.userData = { tipo: 'corazon', anillo: i }; malla.renderOrder = 2;
+      giro.add(malla);
+      grupo.add(giro);
+      return { giro, malla, r0, r1 };
+    });
+    // la marca del anillo del ojo, en tinta fría (juego.js dice en qué ángulo está y cuánto la alumbra la luz)
+    const tintaOjo = { malla: null, a: null };
+    tintaOjo.poner = a => {
+      if (tintaOjo.a === a) return;
+      tintaOjo.a = a;
+      if (tintaOjo.malla) anillos[1].giro.remove(tintaOjo.malla);
+      tintaOjo.malla = plano(new THREE.RingGeometry(RADIOS[1][0], RADIOS[1][1], 128, 1), dibujarTintaAnillo(RADIOS[1][0] / RADIOS[1][1], a),
+        { opacity: 0, depthWrite: false });
+      tintaOjo.malla.position.y = 0.0004;
+      tintaOjo.malla.raycast = () => {}; tintaOjo.malla.renderOrder = 3;
+      anillos[1].giro.add(tintaOjo.malla);
+    };
+    // el hueco del centro
+    const hueco = plano(new THREE.PlaneGeometry(0.079, 0.079), dibujarHuecoCorazon());
+    hueco.position.y = 0.0005; hueco.userData.tipo = 'corazon'; hueco.renderOrder = 2;
+    grupo.add(hueco);
+    // los brillos: el de la ranura que mira el ojo viejo (rojo), el de cada anillo en su sitio y el del corazón abierto
+    const brillo = (color, tam) => {
+      const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: textura(dibujarBrillo(color)), transparent: true, depthWrite: false,
+        blending: THREE.AdditiveBlending, opacity: 0 }));
+      s.scale.set(tam, tam, 1); s.raycast = () => {}; s.renderOrder = 4;
+      return s;
+    };
+    const ranura = brillo('255, 70, 40', 0.05);
+    grupo.add(ranura);
+    const marcas = anillos.map((a, i) => { const s = brillo(i === 1 ? '190, 215, 255' : '255, 190, 110', 0.045); a.giro.add(s); return s; });
+    const luz = brillo('255, 196, 120', 0.34); luz.position.y = 0.04;
+    grupo.add(luz);
+    caja.add(grupo);
+    corazonB = { grupo, anillos, tintaOjo, hueco, ranura, marcas, luz, RADIOS };
+  }
+  // cada cuadro: la subida, el giro de cada anillo, los brillos y la tinta del anillo del ojo
+  function actualizarCorazonB(dt) {
+    if (!corazonB) return;
+    const f = op.estado().fin, C = corazonB, t = op.reloj();
+    C.grupo.visible = !!f && f.subida > 0.001;
+    if (!C.grupo.visible) return;
+    const k = f.subida;
+    C.grupo.scale.setScalar(Math.max(0.001, k));
+    C.grupo.position.y = 0.034 + pintada.alto + 0.0012 - 0.03 * (1 - k);
+    C.grupo.rotation.y = (1 - k) * 2.4;
+    const RM = C.RADIOS.map(([a, b]) => (a + b) / 2);
+    C.anillos.forEach((a, i) => { a.giro.rotation.y = f.angulos[i]; });
+    // la marca de cada anillo (en su sitio, brilla); el anillo del ojo: su tinta, donde llega la luz
+    const marcaLocal = [0.2, f.marca * Math.PI / 4, 0];
+    C.marcas.forEach((s, i) => {
+      s.position.set(Math.sin(marcaLocal[i]) * RM[i], 0.003, Math.cos(marcaLocal[i]) * RM[i]);
+      const voz = i === 2 && f.vozHasta && t < f.vozHasta ? (f.vozHasta - t) / 0.9 : 0;
+      s.material.opacity = f.bloqueados[i] ? 0.55 + 0.25 * Math.sin(t * 3 + i) : voz;
+    });
+    C.tintaOjo.poner(f.marca * Math.PI / 4);
+    const luz = op.luzCorazon ? op.luzCorazon() : null;
+    let vis = f.bloqueados[1] ? 1 : 0;
+    if (luz && !f.bloqueados[1]) {
+      const dif = Math.atan2(Math.sin(luz.alfa - (marcaLocal[1] + f.angulos[1])), Math.cos(luz.alfa - (marcaLocal[1] + f.angulos[1])));
+      vis = luz.fuerza * Math.max(0, 1 - Math.abs(dif) / 0.6);
+    }
+    C.tintaOjo.malla.material.opacity += (vis - C.tintaOjo.malla.material.opacity) * (1 - Math.exp(-dt * 10));
+    // la ranura que mira el ojo viejo: late en rojo mientras el anillo del cuerno no está en su sitio
+    const a = f.ranura * Math.PI / 4;
+    C.ranura.position.set(Math.sin(a) * 0.1045, 0.004, Math.cos(a) * 0.1045);
+    C.ranura.material.opacity = f.fase === 'anillos' && !f.bloqueados[0] ? 0.5 + 0.35 * Math.sin(t * 2.6) : 0;
+    // el hueco del centro brilla al abrirse; abierto el corazón, late
+    const voz = f.vozHasta && t < f.vozHasta ? 0.3 * (f.vozHasta - t) / 0.9 : 0;
+    C.luz.material.opacity = Math.max(0.35 * f.centro * (0.7 + 0.3 * Math.sin(t * 2)), f.latido || 0, voz);
+    C.luz.scale.setScalar(0.2 + 0.25 * (f.latido || 0));
+  }
+
+  // los cajones de la B: cuánto ha salido cada uno (lo lleva juego.js), su hueco, su sombra y lo que guarda
+  function actualizarCajonesB() {
+    const est = op.estado();
+    for (const [id, c] of Object.entries(cajonesB)) {
+      const k = op.cajonAbertura(id), abierto = k > 0.002;
+      c.grupo.visible = c.agujero.visible = c.sombra.visible = abierto;
+      c.grupo.position.x = Math.max(0, k) * op.cajones.sale;
+      c.sombra.material.opacity = 0.55 * limitar(k * 2.5, 0, 1);
+      if (c.llave) c.llave.visible = est.llave === 'cajon';
+      if (c.nota) c.nota.visible = est.nota === 'cajon';
+    }
+  }
+  // la pintura de frente de los costados y la tapa: nada desde la cámara del boceto, del todo al girar la caja
+  const _camaraEnCaja = new THREE.Vector3(), _hacia = new THREE.Vector3();
+  function mezclarCaras() {
+    caja.updateMatrixWorld();
+    caja.worldToLocal(_camaraEnCaja.copy(mundo.camara.position));
+    for (const c of carasB) {
+      _hacia.copy(_camaraEnCaja).sub(c.centro).normalize();
+      c.mezcla.value = suave(0.1, 0.38, Math.acos(limitar(_hacia.dot(c.desde), -1, 1)));
+    }
+  }
+  // en qué cajón cae un punto del costado derecho (en metros de Blender), con los cajones cerrados
+  function cajonEnCostado(y, z) {
+    const d = op.cajones.cajones.find(c => y >= c.y[0] && y <= c.y[1] && z >= c.z[0] && z <= c.z[1]);
+    return d ? d.id : null;
+  }
+  function centroCajon(id) {
+    const p = op.cajones.cajones.find(c => c.id === id).poligono;
+    return { x: (p[0][0] + p[1][0] + p[2][0] + p[3][0]) / 4, y: (p[0][1] + p[1][1] + p[2][1] + p[3][1]) / 4 };
+  }
+
+  function pintarOjoB() {
+    const { lienzo, sitio: r, escala } = mundo.ojo, c = lienzo.getContext('2d');
+    c.setTransform(escala, 0, 0, escala, -r.x * escala, -r.y * escala);
+    c.drawImage(op.compuesto, r.x, r.y, r.w, r.h, r.x, r.y, r.w, r.h);
+    op.dibujarOjo(c);
+    mundo.ojo.textura.needsUpdate = true;
+  }
+
+  // lo que cambia en el modelo de Blender con el estado
+  let relojBrasas = 0;
+  function actualizarC(dt) {
+    const est = op.estado(), ojo = op.ojo();
+    pistas.llave.visible = est.llave === 'cajon';
+    pistas.cuernoPuesto.visible = est.cuerno === 'puesto';
+    const abierta = est.tapa === 'abierta';
+    pistas.brasas.visible = abierta;
+    pistas.cuernoBrasas.visible = abierta && est.cuerno === 'brasas';
+    relojBrasas += dt;
+    pistas.brasas.material.uniforms.uT.value = relojBrasas;
+    pistas.luzBrasas.intensity = abierta ? 0.12 * (0.75 + 0.25 * Math.sin(relojBrasas * 5.1) * Math.sin(relojBrasas * 2.3 + 1)) : 0;
+    // la tapa: sigue la animación de juego.js (en píxeles del boceto) pero en 3D
+    const tv = op.tapa(), t = pistas.tapa, s = pistas.pxMundo;
+    t.rotation.set(0, 0, 0); t.scale.set(1, 1, 1);
+    if (tv) {
+      const e = limitar((TAPA_ORIGEN.x - tv.x) / (TAPA_ORIGEN.x - TAPA_MESA.x), 0, 1);
+      if (e <= 0) t.position.copy(pistas.tapaReposo).add(new THREE.Vector3(0, (TAPA_ORIGEN.y - tv.y) * s, 0));
+      else {
+        const alzada = pistas.tapaReposo.clone().add(new THREE.Vector3(0, 30 * s, 0));
+        const arco = mezclar(TAPA_ORIGEN.y - 30, TAPA_MESA.y, e) - tv.y;
+        t.position.copy(alzada).lerp(pistas.tapaMesa, e).add(new THREE.Vector3(0, Math.max(0, arco) * s, 0));
+      }
+      t.rotation.z = -tv.ang * 2;
+      t.scale.set(tv.sx, tv.sy, tv.sx);
+    } else t.position.copy(op.conTapaEnMesa() ? pistas.tapaMesa : pistas.tapaReposo);
+    // el ojo
+    const u = tintas.ojo;
+    u.uIris.value.set(ojo.ox * 2.55, ojo.oy * 2.1);
+    u.uCierre.value = ojo.cerrado;
+    const latido = 0.62 + 0.38 * Math.exp(-Math.pow(((op.reloj() % 1.7) - 0.1) / 0.09, 2));
+    u.uRojo.value = op.despertar.ojos * latido;
+    // la trampilla
+    trampilla = op.despertar.trampilla;
+    pistas.bisagra.rotation.x = -1.75 * trampilla;
+    pistas.resplandor.material.uniforms.uFuerza.value = trampilla * (0.85 + 0.15 * Math.sin(op.reloj() * 3.1));
+    pistas.luzTrampilla.intensity = 0.8 * trampilla;
+  }
+
+  // --- toques ----------------------------------------------------------------------------------
+  function tocar(sx, sy) {
+    const ndc = new THREE.Vector2(sx / mundo.ancho * 2 - 1, 1 - sy / mundo.alto * 2);
+    rig.colocar(op.reloj(), 0);
+    mundo.raycaster.setFromCamera(ndc, mundo.camara);
+    const hits = mundo.raycaster.intersectObjects([...objetivosToque, mundo.mesa, mundo.sala], true);
+    const est = op.estado();
+    for (const h of hits) {
+      const o = h.object;
+      if (!esVisible(o) || o.userData.contorno) continue;
+      const tipo = o.userData.tipo;
+      if (esB && tipo === 'hija') {
+        const d = o.userData;
+        return { malla: o, punto: { ...alBoceto(h.point), cara: 'frente', hija: d.parte, tablilla: d.tablilla,
+          caraHija: h.face ? h.face.materialIndex : null } };
+      }
+      if (esB && tipo === 'cajon') return { malla: o, punto: { ...centroCajon(o.userData.cajon), cara: 'frente', cajon: o.userData.cajon } };
+      if (esB && tipo === 'largo') return { malla: o, punto: { x: 852, y: 516, cara: 'detras', largo: o.userData.parte || 'cajon' } };
+      if (esB && tipo === 'zocalo') return { malla: o, punto: { x: 829, y: 610, cara: 'frente', zocalo: o.userData.parte || 'cajon' } };
+      // nivel 5: un cajón de la espalda (abierto) o lo que guarda; la borla, donde esté dibujada (si no, el costado)
+      if (esB && tipo === 'detras5') {
+        const c = n5B.cajones[o.userData.cajon], [x0, y0, x1, y1] = c.rect;
+        return { malla: o, punto: { x: (x0 + x1) / 2, y: (y0 + y1) / 2, cara: 'detras', detras5: o.userData.cajon, parte: o.userData.parte || 'cajon' } };
+      }
+      if (esB && tipo === 'borla' && h.uv && n5B) {
+        const B = n5B.borla, L = BORLA_LIENZO;
+        const px = Math.round(h.uv.x * B.lienzo.width), py = Math.round((1 - h.uv.y) * B.lienzo.height);
+        const k = B.lienzo.getContext('2d'), m = 6;
+        const d = k.getImageData(Math.max(0, px - m), Math.max(0, py - m), 2 * m + 1, 2 * m + 1).data;
+        let alfa = 0; for (let i = 3; i < d.length; i += 4) alfa = Math.max(alfa, d[i]);
+        if (alfa > 40) {
+          const local = caja.worldToLocal(h.point.clone());
+          return { malla: o, punto: { ...alBoceto(new THREE.Vector3(-local.x, local.y, -local.z)), cara: 'izquierda', borla: true,
+            bx: L.x + px / L.escala, by: L.y + py / L.escala } };
+        }
+        continue;
+      }
+      if (esB && tipo === 'corazon') return { malla: o, punto: { ...alBoceto(h.point), cara: 'frente', corazon: true } };
+      if (esB && tipo === 'caja') {
+        const local = caja.worldToLocal(h.point.clone());
+        const detras = h.face && (h.face.materialIndex === 1 || h.face.materialIndex === 5);
+        // el costado de los cajones: el cajón cerrado que hay en ese punto
+        if (o === pintada.cuerpo && h.face && h.face.materialIndex === 0) {
+          const id = cajonEnCostado(-local.z, local.y);
+          if (id) return { malla: o, punto: { ...centroCajon(id), cara: 'frente', cajon: id } };
+        }
+        // (el costado izquierdo, con su sitio en píxeles del repintado: nivel 5, la borla)
+        const izquierda = o === pintada.cuerpo && h.face && h.face.materialIndex === 1;
+        const bx = (local.z + 0.11) / 0.22 * 1024, by = (1 - (local.y - 0.034) / pintada.alto) * 1024;
+        if (detras) local.set(-local.x, local.y, -local.z);
+        return { malla: o, punto: { ...alBoceto(local), cara: detras ? 'detras' : 'frente', ...(izquierda ? { izquierda: true, bx, by } : {}) } };
+      }
+      if (tipo === 'objeto') {
+        const p = alBoceto(h.point);
+        const alfa = o.name === 'incensario' ? mundo.siluetas.incensario(p.x, p.y) : mundo.siluetas.te(p.x, p.y);
+        const [x0, y0, x1, y1] = op.escena3d.objetos[o.name].recorte;
+        if (alfa > 0.5 && p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1) return { malla: o, punto: { ...p, cara: 'frente' } };
+        continue;
+      }
+      if (tipo === 'sala' || tipo === 'mesa') return { malla: o, punto: { ...alBoceto(h.point), cara: 'frente' } };
+      if (!esB) {
+        const nombres = []; for (let a = o; a; a = a.parent) if (a.name) nombres.push(a.name);
+        if (nombres.includes('Cara') && h.uv) return { malla: o, punto: { ...zonaDeCara(h.uv.x * 1024, h.uv.y * 1024), cara: 'frente' } };
+        const z = zonaDePieza(nombres, est);
+        if (z) return { malla: o, punto: z };
+        // otra parte de la caja: según hacia dónde mira la cara tocada
+        let enCaja = false; for (let a = o; a; a = a.parent) if (a === caja) enCaja = true;
+        if (enCaja && h.face) {
+          const n = h.face.normal.clone().transformDirection(o.matrixWorld).applyQuaternion(caja.quaternion.clone().invert());
+          if (n.y > 0.7) return { malla: o, punto: { x: 1100, y: 205, cara: 'frente' } };
+          if (n.z < -0.6) return { malla: o, punto: { x: 900, y: 620, cara: 'detras' } };
+          if (n.x < -0.6) return { malla: o, punto: { x: 1180, y: 400, cara: 'detras' } };
+          if (n.x > 0.6) return { malla: o, punto: { x: 1175, y: 590, cara: 'frente' } };
+          return { malla: o, punto: { x: 980, y: 560, cara: 'frente' } };
+        }
+      }
+    }
+    return null;
+  }
+
+  // --- anclas: un punto del boceto, en la pantalla de ahora (los efectos de juego.js lo usan) --------
+  const _proyectado = new THREE.Vector3(), _derecha = new THREE.Vector3();
+  function puntoReposo(x, y, objeto) {
+    const rayo = rayoDelBoceto(x, y), r = new THREE.Vector3();
+    if (objeto === 'caja' || objeto === 'caja_detras') {
+      let mejor = null;
+      for (const b of mundo.cajasReposo) { const q = rayo.intersectBox(b, new THREE.Vector3()); if (q && (!mejor || q.distanceTo(rayo.origin) < mejor.distanceTo(rayo.origin))) mejor = q; }
+      return mejor || rayo.intersectPlane(planoFrontal(mundo.centroCaja), r);
+    }
+    if (objeto === 'incensario') return rayo.intersectPlane(planoFrontal(mundo.centroIncensario), r);
+    if (objeto === 'te') return rayo.intersectPlane(planoFrontal(mundo.centroTe), r);
+    if (objeto === 'mesa') return rayo.intersectPlane(new THREE.Plane(EJE_Y, -mundo.zTablero), r);
+    // la sala: el suelo o una de las dos paredes, lo primero que encuentre el rayo
+    const e = op.escena3d, planos = [new THREE.Plane(EJE_Y, -e.z_suelo), new THREE.Plane(new THREE.Vector3(0, 0, 1), e.esquina[1]),
+      new THREE.Plane(new THREE.Vector3(1, 0, 0), -e.esquina[0])];
+    let mejor = null;
+    for (const pl of planos) { const q = rayo.intersectPlane(pl, new THREE.Vector3()); if (q && (!mejor || q.distanceTo(rayo.origin) < mejor.distanceTo(rayo.origin))) mejor = q; }
+    return mejor;
+  }
+  function aPantalla(v) {
+    _proyectado.copy(v).project(mundo.camara);
+    return { x: (_proyectado.x + 1) / 2 * mundo.ancho, y: (1 - _proyectado.y) / 2 * mundo.alto, z: _proyectado.z };
+  }
+  // un punto del boceto (con su objeto) o un punto 3D ya calculado, en la pantalla de ahora
+  function ancla(p, objeto = 'caja') {
+    if (p.isVector3) { const s = aPantalla(p); return { x: s.x, y: s.y, k: 1, visible: s.z > -1 && s.z < 1 }; }
+    // un punto de la tetera, que se mueve con ella al volcarla
+    if (objeto === 'tetera') {
+      const r = puntoReposo(p.x, p.y, 'te');
+      if (!r) return null;
+      const profundidad = r.distanceTo(mundo.proyector.position);
+      const actual = teteraB ? r.clone().applyMatrix4(teteraB.M0inv).applyMatrix4(teteraB.malla.matrixWorld) : r;
+      const a = aPantalla(actual);
+      _derecha.set(1, 0, 0).applyQuaternion(mundo.camara.quaternion).multiplyScalar(profundidad / op.camaraBoceto.focal_px);
+      const b = aPantalla(actual.clone().add(_derecha));
+      return { x: a.x, y: a.y, k: Math.hypot(b.x - a.x, b.y - a.y), visible: a.z > -1 && a.z < 1 };
+    }
+    const reposo = puntoReposo(p.x, p.y, objeto);
+    if (!reposo) return null;
+    const profundidad = reposo.distanceTo(mundo.proyector.position);
+    let actual = reposo.clone();
+    if (objeto === 'caja' || objeto === 'caja_detras') {
+      if (objeto === 'caja_detras') actual.set(-actual.x, actual.y, -actual.z);
+      actual = caja.localToWorld(actual);
+    }
+    const a = aPantalla(actual);
+    // cuánto mide en la pantalla un píxel del boceto a esa profundidad
+    _derecha.set(1, 0, 0).applyQuaternion(mundo.camara.quaternion).multiplyScalar(profundidad / op.camaraBoceto.focal_px);
+    const b = aPantalla(actual.clone().add(_derecha));
+    return { x: a.x, y: a.y, k: Math.hypot(b.x - a.x, b.y - a.y), visible: a.z > -1 && a.z < 1 };
+  }
+  // para la prueba automática: dónde tocar en la pantalla para dar en lo que representa un punto del boceto
+  function pantallaDe(x, y, objeto = 'caja') {
+    if (esB) return ancla({ x, y }, objeto);
+    const est = op.estado();
+    const dentroR = (x0, y0, x1, y1) => x >= x0 && x <= x1 && y >= y0 && y <= y1;
+    let nombre = null, puntoCara = null;
+    if (objeto === 'caja_detras') nombre = dentroR(715, 474, 990, 558) ? 'CajonLargo_frente' : dentroR(815, 328, 878, 408) ? 'HuecoFicha' : 'CajonDetras_8_frente';
+    else if (dentroR(1028, 456, 1126, 522)) nombre = est.llave === 'cajon' ? 'LlaveBambu' : 'CajonDerecho_5';
+    else if (dentroR(1104, 426, 1172, 474)) nombre = 'CajonDerecho_1';
+    else if (dentroR(1021, 233, 1074, 312)) nombre = 'CajonDerecho_0';
+    else if (Math.hypot(x - 912, y - 291) < 40) puntoCara = [636, 184];
+    else if (Math.hypot((x - 785) / 38, (y - 370) / 19) < 1) puntoCara = [300, 478];
+    else if (dentroR(566, 444, 620, 516) && est.tapa === 'abierta' && est.cuerno === 'brasas') nombre = 'CuernoBrasas';
+    else if (dentroR(496, 426, 652, 612)) nombre = 'Incensario';
+    if (puntoCara) return ancla(caja.localToWorld(pistas.puntoCara(puntoCara[0], puntoCara[1])));
+    if (!nombre) return ancla({ x, y }, objeto);
+    let malla = null; grupo.traverse(o => { if (!malla && o.name === nombre) malla = o; });
+    if (!malla) return ancla({ x, y }, objeto);
+    // un punto de la pieza que se vea de verdad (que el rayo dé en ella y no en otra cosa)
+    const bb = new THREE.Box3().expandByObject(malla);
+    for (const [fx, fy, fz] of [[0.5, 0.5, 0.5], [0.5, 0.7, 0.5], [0.3, 0.5, 0.7], [0.7, 0.5, 0.7], [0.5, 0.8, 0.8], [0.5, 0.3, 0.5]]) {
+      const v = new THREE.Vector3(mezclar(bb.min.x, bb.max.x, fx), mezclar(bb.min.y, bb.max.y, fy), mezclar(bb.min.z, bb.max.z, fz));
+      const s = aPantalla(v), hit = tocar(s.x, s.y);
+      let es = false; if (hit) for (let a = hit.malla; a; a = a.parent) if (a === malla) es = true;
+      if (es) return { x: s.x, y: s.y, k: 1, visible: true };
+    }
+    const s = aPantalla(bb.getCenter(new THREE.Vector3()));
+    return { x: s.x, y: s.y, k: 1, visible: true };
+  }
+  return tec;
+}

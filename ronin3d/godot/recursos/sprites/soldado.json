@@ -1,0 +1,54 @@
+{
+	"animaciones": {
+		"andar": {
+			"cuadros": 8,
+			"fps": 0.0,
+			"inicio": 1
+		},
+		"correr": {
+			"cuadros": 6,
+			"fps": 0.0,
+			"inicio": 9
+		},
+		"estocada": {
+			"cuadros": 1,
+			"fps": 0.0,
+			"inicio": 21
+		},
+		"muerte": {
+			"cuadros": 4,
+			"fps": 0.0,
+			"inicio": 16
+		},
+		"normal": {
+			"cuadros": 1,
+			"fps": 0.0,
+			"inicio": 0
+		},
+		"preparando": {
+			"cuadros": 1,
+			"fps": 0.0,
+			"inicio": 20
+		},
+		"salto": {
+			"cuadros": 1,
+			"fps": 0.0,
+			"inicio": 15
+		}
+	},
+	"columnas": 18,
+	"cuadros_por_direccion": 22,
+	"direcciones": 8,
+	"elevacion": 20.0,
+	"id": "soldado",
+	"margen": 2,
+	"pies": [
+		52,
+		81
+	],
+	"px_por_metro": 26.0,
+	"tam": [
+		104,
+		88
+	]
+}

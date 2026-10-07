@@ -1,0 +1,7 @@
+# lo que deja construir_apk.py (el APK va a Drive, nunca a GitHub)
+.cache/
+construccion/
+salida/
+*.apk
+*.idsig
+*.keystore
