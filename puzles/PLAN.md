@@ -624,7 +624,8 @@ cerca y que el incensario no desapareciera.
 contenido que tienes, ¿cuántos niveles puedes implementar en el próximo APK?». Respuesta: tres más, para llegar a la curva
 de su método (`METODO_CAJA_VIVA.md` §19: seis niveles y el final).
 
-**DECISIÓN 31 (abierta): los tres niveles nuevos del 0.6.**
+**DECISIÓN 31 (cerrada el 07-10-2026: A, «Si»): los tres niveles nuevos.** El 4 salió en el APK 0.6; el 5 y el 6, con
+el final como nivel 7, van en el 0.7 (fichas en `ilustrada/NIVELES.md` §8 y §9).
 - **OPCIONES:**
   - **A)** 4 · El oro (la mejilla rota, curada con kintsugi), 5 · La cómoda (los dos cajones con cerradura del costado,
     que no ceden desde el nivel 1, y los de la espalda: cajones que se bloquean entre sí, un hueco detrás de otro cajón,
@@ -637,6 +638,7 @@ de su método (`METODO_CAJA_VIVA.md` §19: seis niveles y el final).
 - **COSTE [Estimación]:** A, unos días de trabajo y 0 USD; B, uno; C, unos días más y 0,40-0,60 USD.
 - **RECOMENDACIÓN [Opinión]:** **A**. Duración del juego entero con los seis niveles: 75-110 minutos **[Hipótesis]**.
 - **SIGUIENTE PASO:** el 4 vale para cualquier opción y ya está hecho; el 5 y el 6, cuando el usuario diga si le valen.
+  (Hecho: los aprobó el 07-10-2026.)
 
 **Nivel 4 · El oro (07-10-2026) [Hecho, para el APK 0.6]** (`ilustrada/NIVELES.md` §7): su voz se le quiebra en la mejilla
 rota; tres esquirlas (una cae al cantar, otra se delata por su sombra encima de la lámpara y la tercera está en el cajón

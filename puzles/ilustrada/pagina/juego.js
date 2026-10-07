@@ -6,6 +6,7 @@
 // la luz, los sonidos, la interfaz, los toques y la técnica A.
 import { dibujarFicha, dibujarCampanilla, dibujarBadajo, tintaRollo, tintaTe, tintaSuelo, icono } from './nivel3_arte.js';
 import { maderaMejilla, pintarEsquirla, pintarLaca, pintarOro, dibujarTarroLaca, dibujarSobreOro, iconoEsquirlas, muestrear } from './nivel4_arte.js';
+import { dibujarTarjetaLazo, dibujarTsukegi, parteDeBorla } from './nivel5_arte.js';
 
 // ---------------------------------------------------------------------------------------------
 // Datos de la ilustración (píxeles del boceto de 1376 × 768; ver preparar_capas.py)
@@ -17,12 +18,14 @@ const CAPAS = ['sala', 'sala_vacia', 'sala_mesa_vacia', 'sala_detras', 'tapa', '
   'silueta_te', 'laca_pared'];
 const CAPAS_NIVEL2 = ['cajita', 'ojo2', 'iris2', 'hija_frente'];   // la cajita roja, el ojo nuevo y la cara de la caja pequeña
 const CAPAS_NIVEL4 = ['mejilla'];                                    // la mejilla sin el hueco (herramientas/nivel4_capas.py)
+const CAPAS_NIVEL5 = ['secreto'];                                    // su secreto, a tinta (herramientas/nivel5_capas.py)
 const SONIDOS = ['noche', 'fuego', 'trabado', 'recoger', 'encajar', 'despertar', 'final_caja_viva', 'suspiro', 'ojo_abre',
   'grunido', 'espiritu', 'papel', 'llave', 'candado_abre', 'tope_madera', 'clic_madera', 'acercar', 'pista', 'toque',
   'mecanismo', 'racha', 'bisagra', 'deslizar_madera', 'cajon', 'trampilla', 'cristal', 'viento', 'clic_metal',
   'holgura', 'clac', 'pestillo', 'desbloqueo',                 // el vocabulario (herramientas/sonidos_vocabulario.py)
   'campanilla', 'campanilla_muda', 'tin', 'vertido', 'tarareo', 'canto', 'latido', 'anillo',   // niveles 3 y final
-  'crac', 'pincel', 'oro'];                                    // nivel 4 (herramientas/sonidos_nivel4.py)
+  'crac', 'pincel', 'oro',                                     // nivel 4 (herramientas/sonidos_nivel4.py)
+  'toc', 'toc_hueco', 'clinc', 'ronquido', 'seda', 'azufre', 'soplo', 'mecha'];   // niveles 5 y 6 (sonidos_nivel5.py)
 
 // Encuadres de la técnica A: [x0, y0, x1, y1] de lo que debe verse en horizontal (h) y en vertical (v)
 const VISTAS = {
@@ -42,6 +45,9 @@ const VISTAS = {
   corazon:    { h: [660, 40, 1200, 520], v: [690, 40, 1170, 560] },
   // nivel 4: la peana de cerca, con sus tres olas de oro y el cajón del centro
   zocalo:     { h: [672, 528, 988, 690], v: [690, 520, 970, 700] },
+  // nivel 5: la espalda de cerca (sus cajones) y el costado de la borla (solo cuenta su tamaño: ver tecnica_3d.js)
+  espalda:    { h: [690, 222, 1012, 572], v: [700, 216, 1002, 580] },
+  borla:      { h: [690, 190, 1010, 650], v: [712, 180, 990, 660] },
 };
 const OJO = { x: 784.5, y: 369 };            // iris en reposo
 const CUENCA = { x: 905, y: 378 };
@@ -75,9 +81,11 @@ const NIVELES = {
   2: { titulo: 'La caja de dentro', pieza: 'ojo', texto: 'Ya tiene sus dos ojos. El nuevo mira donde el viejo no mira.' },
   3: { titulo: 'La voz', pieza: 'voz', texto: 'Ya tiene el cuerno, los ojos y la voz. Canta, muy bajo.' },
   4: { titulo: 'El oro', pieza: 'oro', texto: 'Su mejilla, curada con oro. No esconde la grieta: la luce.' },
-  5: { titulo: 'El corazón', texto: 'Late tranquila, con la cara entera. Te ha abierto su corazón.' },
+  5: { titulo: 'La cómoda', pieza: 'secreto', texto: 'Te ha enseñado lo que guarda: le teme a la noche.' },
+  6: { titulo: 'La noche', pieza: 'luz', texto: 'Ya no le teme a la oscuridad.' },
+  7: { titulo: 'El corazón', texto: 'Late tranquila, con la cara entera. Te ha abierto su corazón.' },
 };
-const ULTIMO_NIVEL = 5;
+const ULTIMO_NIVEL = 7;
 const NIVEL_FINAL = ULTIMO_NIVEL;
 const nombreNivel = n => (n >= ULTIMO_NIVEL ? 'Nivel final' : `Nivel ${n}`);
 const CLAVE_PARTIDA = 'caja_viva_partida';
@@ -774,17 +782,17 @@ function bocanada(x, y, dx, dy, cuanto = 1, objeto = 'caja') {
       vida: azar(1.5, 2.4), alfa: 0.6 });
   }
 }
-function polvareda(x, y) {
+function polvareda(x, y, objeto = 'incensario') {
   for (let i = 0; i < 7; i++) {
     const lado = i % 2 ? 1 : -1;
-    nubes.push({ x: x + lado * azar(20, 50), y: y + azar(-4, 2), ax: x, ay: y, objeto: 'incensario', vx: lado * azar(14, 30),
+    nubes.push({ x: x + lado * azar(20, 50), y: y + azar(-4, 2), ax: x, ay: y, objeto, vx: lado * azar(14, 30),
       vy: azar(-10, -3), r0: azar(3, 5), r1: azar(12, 20), t: -i * 0.03, vida: azar(0.8, 1.3), alfa: 0.26, color: '214,196,170' });
   }
 }
 // polvo fino que sale de un cajón viejo al abrirlo: poco, del color de la madera, y se posa enseguida
-function polvoDeCajon(x, y) {
+function polvoDeCajon(x, y, objeto = 'caja') {
   for (let i = 0; i < 6; i++) {
-    nubes.push({ x: x + azar(-6, 6), y: y + azar(-4, 4), ax: x, ay: y, objeto: 'caja', vx: azar(8, 22), vy: azar(-9, 2),
+    nubes.push({ x: x + azar(-6, 6), y: y + azar(-4, 4), ax: x, ay: y, objeto, vx: azar(8, 22), vy: azar(-9, 2),
       r0: azar(2, 3.5), r1: azar(8, 14), t: -i * 0.04, vida: azar(0.7, 1.1), alfa: 0.2, color: '214,196,170' });
   }
 }
@@ -1239,7 +1247,9 @@ function puntoDentro(id) {
   return aBoceto([cajonesDatos.x + s - 0.026, (g.y[0] + g.y[1]) / 2, g.z[0] + 0.006]);
 }
 function textoCajon(id) {
-  const def = CAJONES[id];
+  const def = CAJONES[id], n5 = estado.n5;
+  if (estado.nivel >= 5 && n5 && id === 'c2') return n5.tsukegi === 'c2' ? 'Dentro, un manojo de tiras de ciprés con la punta amarilla.' : 'Vacío. Huele a azufre.';
+  if (estado.nivel >= 5 && n5 && id === 'c6') return n5.secreto === 'c6' ? 'Dentro, un papel doblado. Lo más guardado de la caja.' : 'Vacío.';
   if (def.contiene === 'llave') return estado.llave === 'cajon' ? 'Dentro, una llave de bambú diminuta.' : 'El cajón de la llave. Ahora, vacío.';
   if (def.contiene === 'nota') return estado.nota === 'cajon' ? 'Un papel doblado, con letra fina.' : 'Vacío. Aquí estaba la nota.';
   return def.texto;
@@ -1266,13 +1276,20 @@ function cerrarCajon(id, sinSonido = false) {
 }
 // Un toque en un cajón no lo abre: asoma un poco y vuelve, para enseñar que se tira de él (los de cerradura ni eso)
 function tocarCajon(id) {
-  const def = CAJONES[id];
-  if (def.cerradura) {
+  const def = CAJONES[id], n5 = estado.nivel === 5 ? estado.n5 : null;
+  // nivel 5: la llave metida en c6 se empuja tocándola
+  if (n5 && id === 'c6' && n5.llave === 'metida') { empujarLlave5(); return; }
+  if (tieneCerradura(id)) {
     const c = centroCajon(id);
-    cajonCerrado(id, c.x, c.y, 1, -0.6, 'Tiene una cerradura pequeña. No cede.');
+    cajonCerrado(id, c.x, c.y, 1, -0.6, n5 && id === 'c6' && n5.c6 === 'suelto' ? 'Ya no tiene cerradura, pero algo lo sujeta por dentro.' : 'Tiene una cerradura pequeña. No cede.');
     return;
   }
   const a = cajonAnim[id];
+  if (n5 && id === 'c6' && estado.cajones.c6 !== 'abierto' && !sueno.dormida) { guardarSecreto(); return; }
+  if (n5 && estado.cajones[id] === 'abierto' && a.k >= 0.7) {
+    if (id === 'c2' && n5.tsukegi === 'c2') { cogerTsukegi(); return; }
+    if (id === 'c6' && n5.secreto === 'c6') { cogerSecreto(); return; }
+  }
   if (estado.cajones[id] !== 'abierto') {
     a.v += 1.9;
     sentir('holgura', { tono: 1.1 });
@@ -1888,7 +1905,7 @@ function irA(nombre, duracion = 0.75) {
   estado.vista = nombre;
   tec.irA(nombre, duracion);
   // (de cerca, el mensaje va a un lado para no tapar lo que se toca: la boca, los cajones, la tetera…)
-  $('juego').classList.toggle('mensaje-al-lado', ['hija', 'cajones', 'te', 'largo', 'corazon', 'zocalo'].includes(nombre) || (nombre === 'cara' && estado.nivel >= 3));
+  $('juego').classList.toggle('mensaje-al-lado', ['hija', 'cajones', 'te', 'largo', 'corazon', 'zocalo', 'espalda', 'borla'].includes(nombre) || (nombre === 'cara' && estado.nivel >= 3));
   el.volver.hidden = nombre === 'sala' || estado.fase !== 'jugando';
   if (nombre !== 'sala') sonar('acercar', -16, nombre === 'incensario' ? 1.1 : 1);
   if (mensajeHasta) mensajeHasta = Math.min(mensajeHasta, reloj + 0.3);
@@ -1968,6 +1985,11 @@ const OBJETOS = {
   mejilla: { nombre: 'El pedazo de la mejilla', texto: 'Las tres esquirlas, montadas.', icono: '', capa: 'mejilla_pieza' },
   laca: { nombre: 'Laca de urushi', texto: 'Negra y espesa, con su pincel en la tapa. Pega lo roto… cuando cura.', icono: '', capa: 'laca' },
   oro: { nombre: 'Polvo de oro', texto: 'Un sobre de papel con el sello 金. Pesa casi nada.', icono: '', capa: 'oro' },
+  // nivel 5 (los iconos se dibujan por código: prepararNivel5)
+  tarjeta: { nombre: 'Tarjeta del lazo', texto: 'Un lazo dibujado a tinta. Una flecha tira de la cola de la punta negra.', icono: '', capa: 'tarjeta' },
+  tsukegi: { nombre: 'Manojo de tsukegi', texto: 'Tiras finas de ciprés con la punta de azufre. Prenden con una brasa.', icono: '', capa: 'tsukegi' },
+  secreto: { nombre: 'Su secreto', texto: 'Un dibujo a tinta: esta sala, de noche, con la lámpara apagada. En el dibujo, la caja tiembla.',
+    icono: 'capas/secreto.webp', capa: 'secreto' },
   // nivel final
   hija: { nombre: 'La caja pequeña', texto: 'Cerrada otra vez. Cabe justa en la mano… y en algún hueco.', icono: 'capas/hija_frente.webp', capa: 'hija' },
 };
@@ -2442,8 +2464,18 @@ function tocarEscena(sx, sy) {
   const p = tec.aPintura(sx, sy);
   if (!p) return;                        // de cerca, la cámara se queda: se vuelve con «Sala», atrás o pellizcando
   if (estado.seleccion) { usarObjeto(estado.seleccion, p, null, { x: sx, y: sy }); return; }
-  const v = estado.vista, deCerca = v === 'caja' || v === 'cara' || v === 'cajones' || v === 'hija' || v === 'largo' || v === 'corazon' || v === 'zocalo';
+  const v = estado.vista, deCerca = ['caja', 'cara', 'cajones', 'hija', 'largo', 'corazon', 'zocalo', 'espalda', 'borla'].includes(v);
   if (p.hija) { tocarHija(p); return; }
+  // nivel 5: la borla (o su costado) y la espalda con sus cajones
+  if (estado.nivel === 5 && estado.n5) {
+    if (p.borla || p.izquierda) { tocarBorla5(p); return; }
+    if (p.cara === 'detras' && !p.largo) {
+      if (!deCerca) { acercarCaja(); return; }
+      const id = p.detras5 || cajonDetrasEn(p);
+      if (id) { sonar('toque', -14); tocarDetras5(id); return; }
+      if (v === 'espalda' && !dentro(LARGO, p)) { golpearEspalda(); return; }
+    }
+  }
   if (p.zocalo) { sonar('toque', -14); tocarZocalo(p); return; }        // el cajón de la peana (nivel 4)
   if (p.corazon) { sonar('toque', -14); tocarCorazon(p, { x: sx, y: sy }); return; }
   if (p.cara === 'detras') {
@@ -4042,6 +4074,480 @@ function pistaNivel4() {
 }
 
 // ---------------------------------------------------------------------------------------------
+// Nivel 5 · La cómoda (solo en la B; NIVELES.md §8). Con la cara entera, la caja enseña su cuerpo: la cómoda de su
+// espalda es un mecanismo (cajones que se bloquean, uno de empujar, un panel hueco que es un cajón escondido) y la borla
+// de su costado, un cerrojo: su cordón cruza la caja y sujeta un pasador que traba los dos cajones con cerradura del otro
+// costado. La regla del ojo varía otra vez: tiene sueño; si no la tocas, se duerme, y un ruido la despierta. Pasos:
+//   bosteza y suena «clac» detrás (m1 sale solo) → con m1 fuera, t2 no sale: empujarlo → t2: la tarjeta del lazo → c no
+//   se tira: se empuja → la llave de bambú → golpear el panel del hueco de la ficha (suena hueco; a la tercera cae un
+//   pasador) → el hueco es un tirador: el cajón escondido y el cordón → en el costado, la cola de punta negra deshace el
+//   lazo → tirar de la borla: el pasador sube y la cómoda se suelta (c2: las tsukegi) → c6: la llave no gira, empuja →
+//   esperar a que se duerma → tirar despacio → su secreto.
+// ---------------------------------------------------------------------------------------------
+let nivel5 = null;                                   // capas/nivel5.json: los cajones de la espalda y la borla
+const CAJONES5 = ['t1', 't2', 't3', 'm1', 'm2', 'c', 'r1', 'r2', 'r3'];
+const TEXTOS5 = {
+  t1: 'Vacío. Huele a alcanfor.',
+  t3: 'Un ovillo de seda roja: la misma de la borla del otro costado.',
+  m1: 'Vacío. En el fondo, una muesca con forma de ficha.',
+  m2: 'Serrín fino, como si alguien hubiera trabajado la madera por dentro.',
+  r1: 'Un frasquito que huele a aceite de colza. Casi vacío.',
+  r2: 'Papeles de incienso, doblados.',
+  r3: 'Un dedal de bronce.',
+};
+const M1_FUERA = 0.35;                               // lo que sale m1 solo, al empezar
+const VELOCIDAD_RUIDO = 2.6;                         // un cajón que corre más deprisa (fracción por segundo) hace ruido
+for (const id of [...CAJONES5, 'p']) cajonAnim['espalda_' + id] = { k: 0, v: 0, objetivo: 0, agarrado: false, golpe: 0 };
+const anim5 = id => cajonAnim['espalda_' + id];
+// la borla: cómo se dibuja ahora (tecnica_3d.js la pinta en el costado)
+const borla5 = { desatado: 0, aprieto: 0, bajada: 0, objetivoBajada: 0, vBajada: 0, meneo: 0, vMeneo: 0 };
+const estadoBorla = () => ({ desatado: borla5.desatado, aprieto: borla5.aprieto, bajada: borla5.bajada, meneo: borla5.meneo, colaNegra: 'der' });
+// el sueño: sube si nadie la toca; dormida, un ruido la despierta
+const sueno = { nivel: 0, dormida: false, toque: -99, ruido: -99, avisado: false, seno: 0 };
+function n5Inicial() {
+  return {
+    cajones: Object.fromEntries([...CAJONES5, 'p'].map(id => [id, 'cerrado'])),   // cerrado | abierto (m1, al empezar, fuera)
+    m1: 'dentro',          // dentro | fuera (sale solo al empezar)
+    c: 'trabado',          // trabado (la argolla fija: se empuja) | suelto
+    p: 'escondido',        // escondido (atascado) | suelto | abierto
+    golpes: 0,
+    tarjeta: 't2',         // t2 | mano
+    llave: 'c',            // c | mano | metida (en c6, sin empujar) | usada
+    cordon: false,         // si se ha visto el cordón del cajón escondido
+    lazo: 'atado',         // atado | suelto
+    borla: 'arriba',       // arriba | abajo
+    pasador: 'puesto',     // puesto | quitado (la cómoda se suelta)
+    c6: 'cerrado',         // cerrado | suelto (la llave empujada)
+    tsukegi: 'c2',         // c2 | mano
+    secreto: 'c6',         // c6 | mano
+  };
+}
+// ¿tiene cerradura este cajón del costado? (c2 y c6, desde el nivel 1; en el 5 se sueltan)
+function tieneCerradura(id) {
+  if (!CAJONES[id].cerradura) return false;
+  const n5 = estado.n5;
+  if (estado.nivel >= 5 && n5) {
+    if (id === 'c2') return n5.pasador === 'puesto';
+    if (id === 'c6') return n5.pasador === 'puesto' || n5.c6 === 'cerrado';
+  }
+  return true;
+}
+function prepararNivel5() {
+  if (!nivel5) return;
+  img.tarjeta = dibujarTarjetaLazo(240, 170);
+  img.tsukegi = dibujarTsukegi(200, 150);
+  datos.capas.tarjeta = { x: 0, y: 0, w: 34, h: 24 };
+  datos.capas.tsukegi = { x: 0, y: 0, w: 30, h: 22 };
+  datos.capas.secreto = { x: 0, y: 0, w: 40, h: 22 };
+  OBJETOS.tarjeta.icono = icono(img.tarjeta); OBJETOS.tsukegi.icono = icono(img.tsukegi);
+}
+// el estado al final del nivel 4 está en estadoTrasNivel4; al final del 5, para empezar el 6 sin jugarlo
+function estadoTrasNivel5() {
+  const n5 = estado.n5 = n5Inicial();
+  Object.assign(n5, { c: 'suelto', p: 'suelto', golpes: 3, tarjeta: 'mano', llave: 'usada', cordon: true, lazo: 'suelto', borla: 'abajo',
+    pasador: 'quitado', c6: 'suelto', secreto: 'mano' });
+  estado.inventario = estado.inventario.filter(o => !['tarjeta', 'llave', 'secreto', 'tsukegi'].includes(o));
+  n5.tsukegi = 'c2';
+  for (const id of [...CAJONES5, 'p']) { const a = anim5(id); a.k = a.objetivo = 0; a.v = 0; }
+  Object.assign(borla5, { desatado: 1, aprieto: 0, bajada: 1, objetivoBajada: 1, meneo: 0 });
+  for (const id of ['c2', 'c6']) { estado.cajones[id] = 'cerrado'; cajonAnim[id].k = cajonAnim[id].objetivo = 0; }
+  sueno.dormida = false; sueno.nivel = 0;
+}
+async function empezarNivel5() {
+  ocultarTarjeta();
+  estado.nivel = 5;
+  estado.n5 = n5Inicial();
+  estado.pistasPaso = {}; estado.intentosMirada = 0; estado.insistencia = {};
+  estado.fase = 'jugando'; estado.ocupado = true;
+  el.girar.hidden = false; el.inventario.hidden = false;
+  for (const id of Object.keys(CAJONES)) if (estado.cajones[id] === 'abierto') cerrarCajon(id);
+  if (estado.n3 && estado.n3.largo === 'abierto') { estado.n3.largo = 'suelto'; cajonAnim.largo.objetivo = 0.12; }
+  for (const id of [...CAJONES5, 'p']) { const a = anim5(id); a.k = a.objetivo = 0; a.v = 0; }
+  Object.assign(borla5, { desatado: 0, aprieto: 0, bajada: 0, objetivoBajada: 0, vBajada: 0, meneo: 0, vMeneo: 0 });
+  Object.assign(sueno, { nivel: 0, dormida: false, toque: reloj, ruido: reloj, avisado: false });
+  if (tec.cara() !== 'frente') tec.girar();
+  ojo.punto = null; ojo.distraidoHasta = 0; ojo.parpadoBase = 0; ojo.entornado = 0;
+  Object.assign(ojo2, { visible: 1, parpadoBase: 0 });
+  bucle('noche', -13, 2);
+  irA('cara', 1.4);
+  await esperar(1.7);
+  // bosteza: los párpados le pesan
+  animar(1.1, k => { const e = Math.sin(k * Math.PI); ojo.parpadoBase = 0.65 * e; ojo2.parpadoBase = 0.65 * e; });
+  sonar('suspiro', -5, 0.7);
+  bocanada(BOCA.x, BOCA.y + 8, 0, -1, 0.8);
+  await esperar(1.5);
+  animar(0.5, k => { ojo.parpadoBase = 0.2 * suave(k); ojo2.parpadoBase = 0.2 * suave(k); });
+  // y detrás, un «clac»: un cajón de su espalda sale solo
+  sonar('clac', -6, 0.9); sonar('tope_madera', -12, 1.1); sacudir(1.4, 0.2); vibrar(14);
+  estado.n5.m1 = 'fuera'; estado.n5.cajones.m1 = 'abierto';
+  const a = anim5('m1'); a.objetivo = M1_FUERA; a.v = 2.4;
+  await esperar(0.6);
+  estado.ocupado = false;
+  sueno.toque = reloj;
+  mensaje('Bosteza… le pesan los párpados. Y a su espalda, algo ha hecho «clac».', 5);
+}
+
+// ---- el sueño ----
+function ruido(fuerza = 1) {
+  sueno.ruido = reloj;
+  if (estado.nivel !== 5) return;
+  if (sueno.dormida && fuerza >= 1) despertarse();
+  else sueno.nivel = Math.max(0, sueno.nivel - 0.4 * fuerza);
+}
+function dormirse() {
+  sueno.dormida = true;
+  bucle('ronquido', -22, 1.5);
+  if (!sueno.avisado) { sueno.avisado = true; mensaje('Se ha dormido. Respira despacio, con un ronquido muy bajo.', 4); }
+}
+function despertarse(fuerte = true) {
+  sueno.dormida = false; sueno.nivel = 0;
+  pararBucle('ronquido', 0.3);
+  sonar('ojo_abre', -6, 1.1);
+  ojo.parpadoBase = 0; ojo2.parpadoBase = 0; ojo.parpadeo = null;
+  if (fuerte) { contenerAliento(1.4); sacudir(1.5, 0.2); }
+}
+function actualizarSueno(dt) {
+  const en5 = estado.nivel === 5 && !!estado.n5 && estado.fase === 'jugando';
+  if (!en5) { if (sueno.dormida) { sueno.dormida = false; pararBucle('ronquido', 0.5); } sueno.nivel = 0; return; }
+  if (estado.ocupado || estado.n5.secreto === 'mano') return;
+  const quieto = reloj - sueno.toque > 1.4 && reloj - sueno.ruido > 1.4 && !puntero && el.examinar.hidden;
+  if (!sueno.dormida) {
+    sueno.nivel = quieto ? Math.min(1, sueno.nivel + dt / 5) : Math.max(0, sueno.nivel - dt / 2.5);
+    if (sueno.nivel >= 1) dormirse();
+  }
+  // los párpados: pesados mientras tiene sueño (aún mira), cerrados dormida
+  const objetivo = sueno.dormida ? 1 : 0.16 + 0.32 * suave(sueno.nivel);
+  ojo.parpadoBase = mezclar(ojo.parpadoBase, objetivo, 1 - Math.exp(-dt * 3));
+  ojo2.parpadoBase = mezclar(ojo2.parpadoBase, objetivo, 1 - Math.exp(-dt * 3));
+  // dormida, al soltar el aire, un poco de vaho entre los labios
+  const seno = Math.sin(aliento.fase);
+  if (sueno.dormida && sueno.seno >= 0 && seno < 0) bocanada(BOCA.x, BOCA.y + 6, 0, -1, 0.25);
+  sueno.seno = seno;
+}
+
+// ---- los cajones de la espalda ----
+function cajonDetrasEn(p) {
+  if (!nivel5 || !p) return null;
+  const en = ([x0, y0, x1, y1]) => p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1;
+  for (const id of CAJONES5) if (en(nivel5.cajones[id])) return id;
+  return en(nivel5.panel) ? 'p' : null;
+}
+const centroDetras = id => { const [x0, y0, x1, y1] = id === 'p' ? nivel5.panel : nivel5.cajones[id]; return { x: (x0 + x1) / 2, y: (y0 + y1) / 2 }; };
+// quién bloquea a un cajón: con m1 fuera, t2 no sale (comparten un pasador por dentro)
+function bloqueaA(id) { return id === 't2' && anim5('m1').k > 0.06 ? 'm1' : null; }
+function trabadoPor(id, culpable) {
+  const a = anim5(id), b = anim5(culpable);
+  a.v += 0.9;                                          // sale un pelo y se traba
+  b.v += b.k > 0.1 ? -1.6 : 1.6;                        // el culpable tiembla
+  sonar('trabado', -6, 1.2); vibrar(20); ruido(0.5);
+  const veces = insistir('trabado5');
+  mensaje(veces === 1 ? 'Sale un pelo y se traba. Algo dentro lo sujeta… y el cajón que salió solo tiembla.'
+    : veces === 2 ? 'Cada vez que tiras, tiembla el de la izquierda.' : 'Mientras el de la izquierda esté fuera, este no sale.', 4.5);
+}
+function tocarDetras5(id) {
+  const n5 = estado.n5, a = anim5(id);
+  if (estado.vista !== 'espalda') { irA('espalda', 0.85); return; }
+  if (id === 'p') { if (n5.p === 'abierto' && a.k > 0.6) tocarDentroP(); else golpearPanel(); return; }
+  if (n5.cajones[id] === 'abierto' && a.k > 0.6) { cogerDeDetras(id); return; }
+  if (id === 'c' && n5.c === 'trabado') {
+    sonar('toc', -8, 1.1); ruido(1);
+    mensaje(insistir('argolla') === 1 ? 'Su argolla no se mueve ni un poco. Los otros cajones tienen juego; este, no.' : 'No tiene juego.', 4);
+    return;
+  }
+  const b = bloqueaA(id);
+  if (b) { trabadoPor(id, b); return; }
+  if (id === 'm1' && n5.m1 === 'fuera') { a.v -= 1.2; sentir('holgura'); mensaje(primeraVez('m1-fuera') ? 'Ha salido solo, un poco. Se puede empujar… o tirar de él.' : 'Está un poco fuera.'); return; }
+  a.v += 1.6; sentir('holgura', { tono: 1.15 });
+  mensaje(primeraVez('tirar5') ? 'Tira del cajón hacia fuera: arrastra el dedo.' : 'Tira de él.');
+}
+// tocar la espalda donde no hay cajón: se golpea la madera (y hace ruido)
+function golpearEspalda() {
+  sonar('toc', -6, azar(0.95, 1.05)); vibrar(8); ruido(1);
+  mensaje(primeraVez('toc5') ? 'Toc. Madera maciza.' : 'Toc.', 2);
+}
+function golpearPanel() {
+  const n5 = estado.n5, a = anim5('p');
+  n5.golpes++;
+  ruido(1);
+  sonar('toc_hueco', -4, 1); vibrar(12);
+  a.v += 0.5;
+  const c = centroDetras('p');
+  polvareda(c.x, c.y + 20, 'caja_detras');
+  if (n5.p !== 'escondido') { mensaje('Suena hueco.', 2.5); return; }
+  if (n5.golpes === 1) mensaje('Toc… suena hueco. Y dentro, algo suelto tintinea.', 4);
+  else if (n5.golpes === 2) mensaje('Otra vez: algo pequeño salta dentro, como un pasador atascado.', 4);
+  else {
+    n5.p = 'suelto';
+    setTimeoutReloj(0.35, () => {
+      sonar('clinc', -4); sentir('pestillo', { db: -6 });
+      a.objetivo = 0.05; a.v = 1.2;
+      mensaje('Clinc: algo ha caído dentro. El panel tiene juego… y el hueco de la ficha sirve de tirador.', 5);
+    });
+  }
+}
+function abrirDetras(id) {
+  const n5 = estado.n5, a = anim5(id);
+  n5.cajones[id] = 'abierto';
+  if (id === 'p') n5.p = 'abierto';
+  a.objetivo = 1;
+  sonar('cajon', -6, id === 'p' ? 0.85 : 1.1); vibrar(10);
+  const c = centroDetras(id);
+  setTimeoutReloj(0.25, () => polvoDeCajon(c.x, c.y + 10, 'caja_detras'));
+  if (tec.inclinar) setTimeoutReloj(0.2, () => tec.inclinar(0, 0.4));
+  setTimeoutReloj(0.35, () => {
+    if (id === 't2' && n5.tarjeta === 't2') mensaje('Dentro, una tarjeta de papel con un lazo dibujado.');
+    else if (id === 'c' && n5.llave === 'c') mensaje('Dentro: la llave de bambú del león. Alguien la ha guardado aquí.');
+    else if (id === 'p') tocarDentroP();
+    else mensaje(TEXTOS5[id] || 'Vacío.');
+  });
+}
+function cerrarDetras(id) {
+  const n5 = estado.n5, a = anim5(id);
+  const estaba = n5.cajones[id] === 'abierto';
+  a.objetivo = 0;
+  if (id === 'p' && n5.p === 'abierto') n5.p = 'suelto';
+  n5.cajones[id] = 'cerrado';
+  if (a.k > 0.02) a.v = Math.min(a.v, -1.2);
+  if (id === 'm1' && n5.m1 === 'fuera') {
+    n5.m1 = 'dentro';
+    setTimeoutReloj(0.3, () => { sentir('clac', { tono: 1.3, db: -6 }); if (n5.cajones.t2 !== 'abierto') mensaje('Clic. Al entrar del todo, algo ha cambiado por dentro.', 3); });
+  } else if (estaba) sonar('deslizar_madera', -15, 1.3);
+}
+// el cajón de la argolla fija: no se tira, se empuja; un muelle lo saca
+function soltarArgolla() {
+  const n5 = estado.n5, a = anim5('c');
+  n5.c = 'suelto';
+  sentir('pestillo'); sonar('clic_madera', -6, 1.2); vibrar(16); ruido(0.5);
+  a.objetivo = 0.45; a.v = 3;
+  mensaje('Clic. No se tiraba: se empujaba. Ha salido solo, con un muelle.', 4);
+}
+function cogerDeDetras(id) {
+  const n5 = estado.n5;
+  if (id === 't2' && n5.tarjeta === 't2') { cogerTarjeta(); return; }
+  if (id === 'c' && n5.llave === 'c') { cogerLlave5(); return; }
+  if (id === 'p') { tocarDentroP(); return; }
+  mensaje(TEXTOS5[id] || 'Vacío.');
+}
+function desdeDetras(parte) {
+  const v = tec.puntoDetras ? tec.puntoDetras(parte) : null, m = v ? tec.ancla(v) : null;
+  return m && m.visible ? { x: m.x, y: m.y, k: 1.4, enPantalla: true } : null;
+}
+function cogerTarjeta() {
+  const n5 = estado.n5;
+  const desde = desdeDetras('tarjeta');
+  n5.tarjeta = 'mano';
+  sonar('papel', -6, 1.1);
+  alInventario('tarjeta', 'tarjeta', 'caja_detras', desde || centroDetras('t2'));
+  mensaje('Una tarjeta con un lazo dibujado. Una de sus colas, la de la punta negra, lleva una flecha.', 4.5);
+}
+function cogerLlave5() {
+  const n5 = estado.n5;
+  const desde = desdeDetras('llave');
+  n5.llave = 'mano';
+  sonar('recoger', -3, 1.3);
+  alInventario('llave', 'llave', 'caja_detras', desde || centroDetras('c'));
+  mensaje('La llave de bambú del león, otra vez. Tallada en una caña: es hueca y muy fina.', 4);
+}
+function tocarDentroP() {
+  const n5 = estado.n5;
+  n5.cordon = true;
+  mensaje('Dentro, un cordón rojo cruza la caja de lado a lado, tirante, y sujeta un pasador que baja hacia el costado de los cajones. Es el cordón de la borla.', 6);
+}
+
+// ---- la borla del costado ----
+function irBorla() {
+  irA('borla', 0.9);
+  if (tec.girarA) tec.girarA(Math.PI / 2);
+  if (primeraVez('borla5')) setTimeoutReloj(1.1, () => mensaje('La borla del costado. Su cordón sube por la esquina… y entra en la caja.', 4.5));
+}
+function mecerBorla(fuerza = 0.06) { borla5.vMeneo += fuerza * (Math.random() < 0.5 ? -1 : 1) * 6; }
+function tocarBorla5(p) {
+  const n5 = estado.n5;
+  if (estado.vista !== 'borla') { irBorla(); return; }
+  const parte = p && p.borla ? parteDeBorla(nivel5.borla, estadoBorla(), p.bx, p.by) : null;
+  mecerBorla(0.05);
+  sonar('seda', -16, 1.2);
+  if (!parte) { mensaje('El costado de la borla: mosaico de madera.', 2.5); return; }
+  if (n5.lazo === 'atado') {
+    if (parte === 'nudo') mensaje('Un lazo de seda, muy apretado.');
+    else if (parte.startsWith('lazo')) mensaje('Un lazo. Tirar de él lo aprieta.');
+    else if (parte === 'cola_der') mensaje('Una cola del lazo, con la punta envuelta en hilo negro.');
+    else if (parte === 'cola_izq') mensaje('Una cola del lazo, deshilachada.');
+    else mensaje('La borla pesa. El lazo no deja que baje.');
+    return;
+  }
+  mensaje(n5.borla === 'arriba' ? 'El cordón está suelto. Tira de la borla hacia abajo.' : 'El cordón ha corrido. La borla se queda abajo.');
+}
+function apretarLazo(texto) {
+  borla5.aprieto = Math.min(1, borla5.aprieto + 0.34);
+  sonar('seda', -6, 0.8); vibrar(10); mecerBorla(0.04);
+  mensaje(texto, 3);
+}
+function desatarLazo() {
+  const n5 = estado.n5;
+  n5.lazo = 'suelto';
+  sonar('seda', -2, 1); vibrar([12, 30, 12]);
+  const a0 = borla5.aprieto;
+  animar(0.9, k => { borla5.desatado = suave(k); borla5.aprieto = a0 * (1 - k); });
+  mecerBorla(0.1);
+  mensaje('La cola de la punta negra deshace el lazo: el cordón se suelta.', 4);
+}
+async function tirarBorla() {
+  const n5 = estado.n5;
+  estado.ocupado = true;
+  borla5.objetivoBajada = 1;
+  sonar('seda', -1, 0.75); vibrar(25);
+  await esperar(0.5);
+  sonar('clinc', -6, 0.8);                           // dentro, el pasador sube
+  n5.borla = 'abajo'; n5.pasador = 'quitado';
+  await esperar(0.6);
+  // la cómoda se suelta: en el otro costado, los cajones dan un golpe uno tras otro
+  irA('caja', 1.0);
+  if (tec.girarA) tec.girarA(0);
+  await esperar(1.1);
+  ruido(1);
+  Object.keys(CAJONES).forEach((id, i) => setTimeoutReloj(i * 0.09, () => {
+    sonar('clac', -10, azar(0.9, 1.2));
+    const a = cajonAnim[id]; if (!a.agarrado) a.v += 1.6;
+  }));
+  await esperar(1.0);
+  sentir('desbloqueo', { db: -4 });
+  cajonAnim.c2.objetivo = 0.24; cajonAnim.c2.v = 2;  // el de la cerradura de adorno asoma
+  agitarTe(0.4);
+  await esperar(0.4);
+  estado.ocupado = false;
+  mensaje('El cordón corre por dentro… y en el otro costado: clac, clac, clac. La cómoda entera se ha soltado. Arriba, un cajón asoma.', 5.5);
+}
+function actualizarBorla(dt) {
+  // la bajada sigue al dedo con un muelle (pesa) y el meneo se apaga solo
+  const k = 60, am = 2 * Math.sqrt(k) * 0.7;
+  for (let r = dt; r > 0; r -= 1 / 120) {
+    const h = Math.min(r, 1 / 120);
+    borla5.vBajada += ((borla5.objetivoBajada - borla5.bajada) * k - borla5.vBajada * am) * h;
+    borla5.bajada = limitar(borla5.bajada + borla5.vBajada * h, 0, 1.02);
+    borla5.vMeneo += (-borla5.meneo * 40 - borla5.vMeneo * 2.2) * h;
+    borla5.meneo += borla5.vMeneo * h;
+  }
+}
+// cuánto mide en la pantalla un píxel del costado (para leer el arrastre en la borla)
+function escalaBorla() {
+  if (!tec.pantallaBorla) return 1;
+  const a = tec.pantallaBorla(600, 600), b = tec.pantallaBorla(600, 700);
+  return a && b ? Math.max(0.05, Math.hypot(b.x - a.x, b.y - a.y) / 100) : 1;
+}
+
+// ---- los cajones del costado en el nivel 5: c2 (las tsukegi) y c6 (su secreto, con la llave como varilla) ----
+function usarLlave5(id, desde) {
+  const n5 = estado.n5;
+  if (id === 'c6' && n5.llave === 'mano') { meterLlave5(desde); return; }
+  sonar('trabado', -8, 1.2);
+  mensaje(id === 'c2' ? (n5.pasador === 'puesto' ? 'No entra: esa cerradura es de adorno, no tiene agujero.' : 'Ya está suelto.') : 'Este cajón no tiene cerradura.');
+}
+async function meterLlave5(desde) {
+  const n5 = estado.n5;
+  estado.ocupado = true;
+  if (estado.vista !== 'cajones') irA('cajones', 0.7);
+  await desdeInventario('llave', 'llave', centroCajon('c6'), 'caja', desde);
+  n5.llave = 'metida';
+  sonar('llave', -4, 1.25); vibrar(10);
+  estado.ocupado = false;
+  mensaje('Entra en el agujero… pero no gira. Al fondo, algo cede si empujas.', 4.5);
+}
+function empujarLlave5() {
+  const n5 = estado.n5;
+  n5.llave = 'usada'; n5.c6 = 'suelto';
+  sentir('pestillo'); sonar('clic_madera', -6, 1.3); vibrar(15); ruido(0.5);
+  mirarA(centroCajon('c6'), 2.5);
+  mensaje(n5.pasador === 'puesto' ? 'Empujas la llave como una varilla: ¡clic! Algo ha cedido al fondo… pero el cajón sigue sujeto por dentro.'
+    : 'Empujas la llave como una varilla: ¡clic! Ya no lo sujeta nada… salvo su mirada.', 5);
+}
+// c6, suelto: es lo que más guarda; mientras mira no deja
+function guardarSecreto() {
+  const c = centroCajon('c6'), veces = insistir('c6');
+  resistir(c.x, c.y, 1, -0.6, c, veces);
+  sueno.nivel = 0;
+  mensaje(veces === 1 ? 'Abre el ojo y mira tu mano: es lo que más guarda. Mientras mire, no deja.'
+    : veces === 2 ? 'No aparta el ojo de ese cajón.' : 'Tiene sueño… Si esperas sin tocar nada, quizá se duerma.', 4.5);
+}
+// un tirón fuerte de c6 con ella dormida: hace ruido, se despierta y lo cierra de golpe
+function tironFuerte(g) {
+  const a = cajonAnim.c6;
+  g.estado = 'suelto';
+  a.agarrado = false;
+  despertarse();
+  a.objetivo = 0; a.v = -5;
+  estado.cajones.c6 = 'cerrado';
+  sonar('tope_madera', -3, 1); sacudir(2, 0.25); vibrar(40);
+  mensaje(insistir('tiron') === 1 ? 'Demasiado deprisa: el cajón hace ruido, se despierta… y lo cierra de golpe.' : 'Más despacio. Que no se despierte.', 4.5);
+}
+function cogerTsukegi() {
+  const n5 = estado.n5;
+  n5.tsukegi = 'mano';
+  sonar('recoger', -4, 1.2);
+  const q = puntoDentro('c2');
+  alInventario('tsukegi', 'tsukegi', 'caja', { x: q[0], y: q[1] });
+  mensaje('Un manojo de tsukegi: tiras finas de ciprés con la punta de azufre. Sirven para encender el fuego.', 5);
+}
+async function cogerSecreto() {
+  const n5 = estado.n5;
+  n5.secreto = 'mano';
+  estado.ocupado = true;
+  const q = puntoDentro('c6');
+  sonar('papel', -4, 0.95);
+  await alInventario('secreto', 'secreto', 'caja', { x: q[0], y: q[1] });
+  examinar('secreto');
+  await esperar(2.6);
+  // se despierta despacio, ve su secreto en tu mano… y baja los ojos
+  if (sueno.dormida) { sueno.dormida = false; pararBucle('ronquido', 1); }
+  animar(1.2, k => { ojo.parpadoBase = 1 - 0.55 * suave(k); ojo2.parpadoBase = 1 - 0.55 * suave(k); });
+  sonar('suspiro', -8, 0.75);
+  agitarLampara(1.4, 0.9);                           // la llama tiembla: se acerca la noche
+  await esperar(3.6);
+  cerrarExaminar();
+  estado.ocupado = false;
+  terminarNivel(5);
+}
+// lo que se ve encima en el nivel 5: la llave metida en el agujero de c6
+function dibujarNivel5Encima(conAncla) {
+  const n5 = estado.n5;
+  if (!n5 || estado.nivel !== 5 || n5.llave !== 'metida' || !img.llave) return;
+  const c = centroCajon('c6'), im = img.llave, s = 0.42;
+  conAncla(c.x, c.y, 'caja', () => {
+    ctx.save(); ctx.translate(c.x + 2, c.y - 2); ctx.rotate(-0.5); ctx.scale(s, s);
+    ctx.drawImage(im, -im.width * 0.15, -im.height / 2);
+    ctx.restore();
+  });
+}
+function actualizarNivel5(dt) {
+  actualizarSueno(dt);
+  if (estado.nivel >= 5) actualizarBorla(dt);
+}
+function pistaNivel5() {
+  const n5 = estado.n5;
+  const escalon = (clave, lista) => {
+    const n = estado.pistasPaso[clave] = (estado.pistasPaso[clave] || 0) + 1;
+    return mensaje(lista[Math.min(n, lista.length) - 1], 4.5);
+  };
+  if (!n5) return mensaje('Mira.');
+  const algunoAbierto = Object.entries(n5.cajones).some(([id, e]) => e === 'abierto' && id !== 'm1');
+  if (!algunoAbierto && n5.tarjeta === 't2') return escalon('espalda', ['Algo ha hecho «clac» a su espalda.', 'Gira la caja para ver su espalda.', 'Un cajón de la espalda ha salido solo. Tira de los otros.']);
+  if (n5.tarjeta === 't2') return escalon('t2', ['El de arriba, en el centro, no sale. ¿Qué tiembla cuando tiras de él?', 'Mientras el de la izquierda esté fuera, no sale.',
+    'Empuja hacia dentro el cajón que salió solo, y luego tira del de arriba.']);
+  if (n5.llave === 'c') return escalon('c', ['El cajón de debajo del hueco tiene la argolla fija.', 'Si no se tira, quizá se empuje.', 'Arrástralo hacia dentro con el dedo.']);
+  if (n5.p === 'escondido') return escalon('golpes', ['El panel del hueco de la ficha suena distinto que lo demás.', 'Golpéalo: tócalo varias veces.', 'Tócalo tres veces seguidas.']);
+  if (n5.p === 'suelto' && !n5.cordon) return escalon('p', ['El hueco de la ficha sirve de tirador.', 'Arrastra el panel hacia fuera desde el hueco.']);
+  if (n5.lazo === 'atado') return escalon('lazo', ['El cordón del cajón escondido es el de la borla.', 'Gira la caja: la borla cuelga del otro costado.',
+    'La tarjeta: tira de la cola de la punta negra.']);
+  if (n5.borla === 'arriba') return escalon('borla', ['El lazo está suelto.', 'Tira de la borla hacia abajo, hasta el fondo.']);
+  if (n5.tsukegi === 'c2' && cajonAnim.c2.k < 0.5) return escalon('c2', ['Un cajón de arriba ha asomado en el costado.', 'Tira de él.']);
+  if (n5.llave === 'mano') return escalon('llave5', ['La otra cerradura del costado no es una cerradura: es un agujero.', 'Elige la llave de bambú y tócala en ese cajón.']);
+  if (n5.llave === 'metida') return escalon('empujar', ['La llave no gira.', 'Tócala otra vez para empujarla, como una varilla.']);
+  if (n5.secreto === 'c6') return escalon('c6', ['Es lo que más guarda: mientras mira, no deja.', 'Tiene sueño. Si no tocas nada un rato, se dormirá.',
+    'Cuando duerma, tira de ese cajón muy despacio.']);
+  return mensaje('Mira lo que guardaba.');
+}
+
+// ---------------------------------------------------------------------------------------------
 // Nivel final · El corazón (solo en la B). Con la cara entera, la caja ya no se defiende: respira hondo y su corazón sube
 // por la trampilla y se queda en la tapa, con tres anillos. Ayuda con lo que le has devuelto:
 //   el anillo del cuerno: el ojo viejo mira la ranura donde va el cuerno (y la ranura late en rojo);
@@ -4605,7 +5111,8 @@ function cuadro(ahora) {
 // ---------------------------------------------------------------------------------------------
 const punteros = new Map();
 let puntero = null, arrastre = null, pellizco = null;
-const VISTA_PADRE = { cajones: 'caja', cara: 'caja', incensario: 'sala', caja: 'sala', hija: 'caja', te: 'sala', largo: 'caja', corazon: 'caja', zocalo: 'caja' };
+const VISTA_PADRE = { cajones: 'caja', cara: 'caja', incensario: 'sala', caja: 'sala', hija: 'caja', te: 'sala', largo: 'caja', corazon: 'caja', zocalo: 'caja',
+  espalda: 'caja', borla: 'caja' };
 function posicion(e) { const r = lienzo.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
 lienzo.addEventListener('pointerdown', e => {
   desbloquearAudio();
@@ -4762,6 +5269,11 @@ function gestoEn(p, q) {
   }
   if (!p) return null;
   if (p.cajon && v === 'cajones') return { tipo: 'cajon', id: p.cajon };
+  // nivel 5: los cajones de la espalda (de cerca) y la borla del costado
+  if (estado.nivel === 5 && estado.n5) {
+    if (v === 'espalda' && p.cara === 'detras' && !p.largo) { const id = p.detras5 || cajonDetrasEn(p); if (id) return { tipo: 'detras5', id }; }
+    if (v === 'borla' && p.borla) { const parte = parteDeBorla(nivel5.borla, estadoBorla(), p.bx, p.by); if (parte) return { tipo: 'borla5', parte }; }
+  }
   // nivel 3: el cajón largo de la espalda (suelto o abierto) se tira; la tetera, de cerca, se vuelca
   if (estado.nivel === 3 && estado.n3) {
     if (p.cara === 'detras' && (p.largo || dentro(LARGO, p)) && estado.n3.largo !== 'cerrado' && v !== 'sala') return { tipo: 'largo' };
@@ -4788,11 +5300,22 @@ function empezarGesto(g, dx, dy) {
   const h2 = estado.hija;
   switch (g.tipo) {
     case 'cajon': {
-      if (CAJONES[g.id].cerradura) {
+      const n5 = estado.nivel === 5 ? estado.n5 : null;
+      // nivel 5: con la llave metida en c6, empujar hacia dentro la empuja
+      if (n5 && g.id === 'c6' && n5.llave === 'metida') {
+        const eje = ejeCajon(g.id);
+        if (eje && eje.a && eje.b && cosenoConEje(eje, dx, dy) < -0.3) { empujarLlave5(); g.estado = 'hecho'; return true; }
+      }
+      if (tieneCerradura(g.id)) {
         const c = centroCajon(g.id);
         cajonCerrado(g.id, c.x, c.y, 1, -0.6, 'Tiene una cerradura pequeña. No cede.');
         g.estado = 'bloqueado';
         return true;
+      }
+      // c6, suelto: mientras mira, no deja; dormida, sí… pero despacio
+      if (n5 && g.id === 'c6' && estado.cajones.c6 !== 'abierto') {
+        if (!sueno.dormida) { guardarSecreto(); g.estado = 'bloqueado'; return true; }
+        g.sigilo = true;
       }
       const a = cajonAnim[g.id];
       g.eje = ejeCajon(g.id); g.k0 = a.k; g.kAntes = a.k; g.t = performance.now();
@@ -4809,6 +5332,41 @@ function empezarGesto(g, dx, dy) {
       g.objetivo = g.tipo === 'anillo' ? f.angulos[g.i] : f.giroHija;
       g.paso = Math.round(g.objetivo / PASO_ANILLO);
       sentir('roce', { tono: 0.7, db: -2 });
+      break;
+    }
+    case 'detras5': {
+      const n5 = estado.n5, id = g.id, a = anim5(id);
+      g.eje = tec.pantallaDetras ? { a: tec.pantallaDetras(id, 0), b: tec.pantallaDetras(id, 1) } : null;
+      if (!g.eje || !g.eje.a || !g.eje.b) return false;
+      const coseno = cosenoConEje(g.eje, dx, dy);          // > 0: hacia fuera (tirar); < 0: hacia dentro (empujar)
+      if (id === 'c' && n5.c === 'trabado') {
+        if (coseno < -0.3) { soltarArgolla(); g.estado = 'hecho'; return true; }
+        sonar('toc', -10, 1.15); ruido(1);
+        mensaje(insistir('argolla') === 1 ? 'No sale. Su argolla no se mueve ni un poco.' : 'No se tira…');
+        g.estado = 'bloqueado'; return true;
+      }
+      if (id === 'p' && n5.p === 'escondido') {
+        a.v += 0.6; sonar('trabado', -10, 1.3); ruido(0.5);
+        mensaje(primeraVez('p-atascado') ? 'Se mueve un pelo y se atasca: algo suelto, dentro, no deja.' : 'Se atasca.');
+        g.estado = 'bloqueado'; return true;
+      }
+      const b = bloqueaA(id);
+      if (b && coseno > 0) { trabadoPor(id, b); g.estado = 'bloqueado'; return true; }
+      g.k0 = a.k; g.kAntes = a.k; g.t = performance.now();
+      a.agarrado = true; a.v = 0;
+      sentir('roce', { tono: 1.05 });
+      break;
+    }
+    case 'borla5': {
+      const n5 = estado.n5;
+      g.x0 = puntero.x0; g.y0 = puntero.y0; g.escala = escalaBorla();
+      if (g.parte === 'borla' && n5.lazo === 'atado') {
+        mecerBorla(0.08); sonar('seda', -10, 0.9);
+        mensaje(insistir('borla-atada') === 1 ? 'La borla baja un poco y el lazo la frena.' : 'El lazo no deja que baje.');
+        g.estado = 'bloqueado'; return true;
+      }
+      if (g.parte === 'borla' && n5.borla === 'abajo') return false;
+      sentir('roce', { tono: 1.5, db: -6 });
       break;
     }
     case 'zocalo': {
@@ -4899,8 +5457,10 @@ function moverGesto(g, q) {
       if (g.cede) avance -= g.cede;
       const a = cajonAnim[g.id], k = limitar(g.k0 + avance, 0, 1.04);
       a.v = mezclar(a.v, (k - a.k) / paso, 0.5); a.k = k; g.t = ahora;
+      // nivel 5: c6 con la caja dormida; un tirón deprisa hace ruido (o llegar al tope de golpe)
+      if (g.sigilo && (a.v > VELOCIDAD_RUIDO || (k >= 1 && g.kAntes < 1 && a.v > 1.2))) { tironFuerte(g); break; }
       if (k <= 0 && g.kAntes > 0.015 && reloj > a.golpe) {                  // cerrado de un empujón
-        a.golpe = reloj + 0.25; sonar('tope_madera', -9, 1.15); vibrar(10); agitarTe(0.3);
+        a.golpe = reloj + 0.25; sonar('tope_madera', -9, 1.15); vibrar(10); agitarTe(0.3); ruido(1);
       }
       if (k >= 1 && g.kAntes < 1) sentir('tope', { db: -4, tono: 1.1 });       // el tope de fuera
       g.kAntes = k;
@@ -4918,6 +5478,30 @@ function moverGesto(g, q) {
       a.v = mezclar(a.v, (k - a.k) / paso, 0.5); a.k = k; g.t = ahora;
       if (k >= 1 && g.kAntes < 1) sentir('tope', { db: -4, tono: 0.9 });
       g.kAntes = k;
+      break;
+    }
+    case 'detras5': {
+      const a = anim5(g.id), k = limitar(g.k0 + avanceEnEje(g.eje, dx, dy), 0, 1.04);
+      a.v = mezclar(a.v, (k - a.k) / paso, 0.5); a.k = k; g.t = ahora;
+      if (k >= 1 && g.kAntes < 1) sentir('tope', { db: -4, tono: 1.05 });
+      if (k <= 0 && g.kAntes > 0.015 && reloj > a.golpe) { a.golpe = reloj + 0.25; sonar('tope_madera', -11, 1.2); ruido(0.5); }
+      g.kAntes = k;
+      break;
+    }
+    case 'borla5': {
+      const n5 = estado.n5, s = g.escala || 1, lejos = Math.hypot(dx, dy) / s;
+      if (g.parte === 'cola_der' && lejos > 45) { g.estado = 'hecho'; desatarLazo(); break; }
+      if ((g.parte === 'cola_izq' || g.parte.startsWith('lazo')) && lejos > 35) {
+        g.estado = 'hecho';
+        apretarLazo(g.parte === 'cola_izq' ? 'Esa cola solo aprieta el nudo.' : 'Tirar del lazo lo aprieta más.');
+        break;
+      }
+      if (g.parte === 'nudo' && lejos > 35) { g.estado = 'hecho'; mecerBorla(0.06); mensaje('El nudo no se deshace así: tira de una de sus colas.', 3.5); break; }
+      if (g.parte === 'borla' && n5.lazo === 'suelto' && n5.borla === 'arriba') {
+        borla5.objetivoBajada = limitar(dy / s / 110, 0, 1);
+        borla5.meneo += (dx / s) * 0.00004;
+        if (borla5.objetivoBajada > 0.92) { g.estado = 'hecho'; tirarBorla(); }
+      }
       break;
     }
     case 'largo': {
@@ -5065,6 +5649,22 @@ function soltarGesto(g, cancelado = false) {
       const f = estado.fin, desde = f.giroHija;
       animar(0.3, k => { f.giroHija = desde * (1 - suave(k)); });
       if (!cancelado) mensaje(primeraVez('girar-hija') ? 'Gírala más: un cuarto de vuelta, como una llave.' : 'Más.');
+      break;
+    }
+    case 'detras5': {
+      const a = anim5(g.id);
+      a.agarrado = false;
+      const final = a.k + limitar(a.v, -6, 6) * 0.12;
+      if (!cancelado && final > 0.5) { if (estado.n5.cajones[g.id] !== 'abierto' || g.id === 'm1' && estado.n5.m1 === 'fuera') abrirDetras(g.id); else a.objetivo = 1; }
+      else cerrarDetras(g.id);
+      if (g.id === 'm1' && final > 0.5) estado.n5.m1 = 'dentro';
+      break;
+    }
+    case 'borla5': {
+      if (g.parte === 'borla' && borla5.objetivoBajada < 0.92) {
+        borla5.objetivoBajada = 0;
+        if (!cancelado && estado.n5.lazo === 'suelto') mensaje(primeraVez('borla-mas') ? 'Sube otra vez. Tira más, hasta abajo del todo.' : 'Hasta abajo.', 3);
+      }
       break;
     }
     case 'zocalo': {

@@ -10,6 +10,7 @@ import { aThree, crearProyector, rectanguloUV, cargarTextura, crearSala, crearMe
   crearCajonesPintados, materialPintura } from './escena3d.js';
 import { crearCajaHija, TABLILLAS, LADO as LADO_HIJA, SALE_CAJONCITO } from './caja_hija.js';
 import { dibujarFicha, dibujarCampanilla, dibujarBaseCorazon, dibujarAnillo, dibujarTintaAnillo, dibujarHuecoCorazon, dibujarBrillo } from './nivel3_arte.js';
+import { dibujarBorla, dibujarTarjetaLazo, dibujarTsukegi, dibujarCordonPasador, dibujarOvillo, dibujarFrasquito, dibujarDedal } from './nivel5_arte.js';
 
 const ANCHO = 1376, ALTO = 768;
 const limitar = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -202,6 +203,11 @@ function crearRig(op, limites) {
   const zPeana = -op.escena3d.peana.centro[1] + op.escena3d.peana.medio_y;
   const puntoZocalo = rayoDelBoceto(829, 612).intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -zPeana), new THREE.Vector3())
     || new THREE.Vector3(0, 0.012, zPeana);
+  // nivel 5: los cajones de la espalda (con la caja de espaldas, la espalda queda donde el frente) y el costado de la
+  // borla (con la caja girada un cuarto de vuelta, el costado izquierdo mira a la cámara; la borla va hacia el medio)
+  const puntoEspalda = rayoDelBoceto(852, 392).intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -0.11), new THREE.Vector3())
+    || mundo.centroCaja.clone();
+  const puntoBorla = new THREE.Vector3(-0.11 + 0.22 * 610 / 1024, 0.034 + mundo.altoCaja * (1 - 640 / 1024), 0.11);
   // qué mira cada vista: objetivo T, cuánto se acerca s (1 = donde se pintó) y alrededor de qué gira
   const definiciones = {
     sala: { T: P0.clone().add(adelante0.clone().multiplyScalar(distCaja)), s: 1, pivote: mundo.centroCaja },
@@ -225,6 +231,9 @@ function crearRig(op, limites) {
       pivote: new THREE.Vector3(0, mundo.centroCaja.y + mundo.altoCaja / 2, 0) },
     // nivel 4: la peana, de cerca (con sitio delante para el cajón que sale)
     zocalo: { T: puntoZocalo.clone().add(new THREE.Vector3(0, 0.012, 0.03)), s: 0.4, pivote: puntoZocalo },
+    // nivel 5: la espalda de cerca (sus cajones, con sitio delante para los que salen) y la borla del costado
+    espalda: { T: puntoEspalda.clone().add(new THREE.Vector3(0, 0, 0.025)), s: 0.5, pivote: puntoEspalda },
+    borla: { T: puntoBorla.clone().add(new THREE.Vector3(0, 0, 0.01)), s: 0.46, pivote: puntoBorla },
   };
   function encuadre(nombre) {
     const v = VISTAS[nombre];
@@ -593,7 +602,8 @@ export async function crearTecnica(letra, op) {
         cajones: { th: 0.5, ph: [-0.1, 0.6], lupa: [0.5, 1.25] }, subida: { th: 0.2, ph: [-0.05, 0.15], lupa: [1, 1] },
         hija: { th: 0.3, ph: [-0.05, 0.35], lupa: [0.55, 1.2] }, te: { th: 0.35, ph: [-0.08, 0.4], lupa: [0.5, 1.2] },
         largo: { th: 0.45, ph: [-0.1, 0.6], lupa: [0.5, 1.25] }, corazon: { th: 0.5, ph: [0.12, 0.78], lupa: [0.5, 1.25] },
-        zocalo: { th: 0.4, ph: [-0.08, 0.55], lupa: [0.5, 1.25] } }
+        zocalo: { th: 0.4, ph: [-0.08, 0.55], lupa: [0.5, 1.25] },
+        espalda: { th: 0.45, ph: [-0.1, 0.55], lupa: [0.5, 1.25] }, borla: { th: 0.35, ph: [-0.12, 0.4], lupa: [0.5, 1.25] } }
     : { sala: { th: 0.24, ph: [-0.06, 0.14], lupa: [0.45, 1] }, caja: { th: 0.95, ph: [-0.15, 0.45], lupa: [0.45, 1.25] },
         incensario: { th: 0.7, ph: [-0.12, 0.4], lupa: [0.45, 1.25] }, cara: { th: 0.55, ph: [-0.12, 0.3], lupa: [0.45, 1.25] },
         cajones: { th: 0.7, ph: [-0.12, 0.4], lupa: [0.5, 1.25] } };
@@ -603,7 +613,7 @@ export async function crearTecnica(letra, op) {
   let pintada = null, cajonesB = null, carasB = [], rolloB = null, hija = null, sombraHija = null, incensarioB = null;
   // nivel 3: el cajón largo de la espalda, la ficha en su hueco y la tetera que se vuelca (en el boceto de espaldas, el
   // frente del cajón largo y el hueco de la ficha)
-  let largoB = null, fichaB = null, teteraB = null, corazonB = null, zocaloB = null;
+  let largoB = null, fichaB = null, teteraB = null, corazonB = null, zocaloB = null, n5B = null;
   const RECT_LARGO = [719, 476, 989, 558], RECT_HUECO = [816, 334, 876, 404];
   // nivel 2: dónde sale la caja hija (la trampilla), dónde se posa y dónde está el ojo grande que la vigila
   const ZT = op.escena3d.z_tablero;
@@ -663,6 +673,7 @@ export async function crearTecnica(letra, op) {
     }
     crearNivel3B();
     crearNivel4B();
+    await crearNivel5B(tex);
     prepararTetera(objetos);
     crearCorazonB();
   } else {
@@ -854,6 +865,33 @@ export async function crearTecnica(letra, op) {
       return { x: q.x, y: q.y };
     },
     puntoZocalo(parte) { const s = zocaloB && zocaloB.dentro[parte]; return s ? s.getWorldPosition(new THREE.Vector3()) : null; },
+    // nivel 5: un cajón de la espalda (dónde está su frente en la pantalla, abierto k), lo que guarda, un punto de la
+    // borla (en píxeles del costado) en la pantalla, y girar la caja hasta un ángulo (el más cercano equivalente)
+    hayNivel5: () => !!n5B,
+    pantallaDetras(id, k) {
+      const c = n5B && n5B.cajones[id];
+      if (!c) return null;
+      caja.updateMatrixWorld();
+      rig.colocar(op.reloj(), 0);
+      const q = aPantalla(pintada.caja.localToWorld(c.centro.clone().add(new THREE.Vector3(0, 0, -0.004 - k * c.sale))));
+      return { x: q.x, y: q.y };
+    },
+    puntoDetras(parte) { const s = n5B && n5B.dentro[parte]; return s ? s.getWorldPosition(new THREE.Vector3()) : null; },
+    pantallaBorla(bx, by) {
+      if (!n5B) return null;
+      caja.updateMatrixWorld();
+      rig.colocar(op.reloj(), 0);
+      const alto = pintada.alto, v = new THREE.Vector3(-0.1112, 0.034 + alto * (1 - by / 1024), -0.11 + 0.22 * bx / 1024);
+      const q = aPantalla(pintada.caja.localToWorld(v));
+      return { x: q.x, y: q.y, visible: q.z > -1 && q.z < 1 };
+    },
+    girarA(angulo) { giroObj = angulo + Math.round((giroObj - angulo) / (2 * Math.PI)) * 2 * Math.PI; },
+    // ¿mira el costado izquierdo a la cámara? (de 1 de frente a 0 de canto; negativo, de espaldas)
+    costadoIzquierdo() {
+      caja.updateMatrixWorld();
+      const n = new THREE.Vector3(-1, 0, 0).applyQuaternion(caja.quaternion), c = caja.localToWorld(new THREE.Vector3(-0.11, mundo.centroCaja.y, 0));
+      return n.dot(mundo.camara.position.clone().sub(c).normalize());
+    },
     inclinarTetera,
     // nivel final: dónde cae un punto de la pantalla en el plano del corazón (radio y ángulo, desde el frente, en sentido
     // contrario a las agujas visto desde arriba), un punto del corazón en el boceto y en la pantalla
@@ -974,6 +1012,7 @@ export async function crearTecnica(letra, op) {
         if (rolloB) { const r = op.decoracion.rollo; rolloB.rotation.set(r.a, 0, r.lift); }
         actualizarNivel3B();
         actualizarNivel4B();
+        actualizarNivel5B(dt);
         actualizarCorazonB(dt);
       } else actualizarC(dt);
     },
@@ -1292,6 +1331,144 @@ export async function crearTecnica(letra, op) {
     if (d.laca) d.laca.visible = !!n4 && n4.laca === 'zocalo';
     if (d.oro) d.oro.visible = !!n4 && n4.oro === 'zocalo';
   }
+  // ---- Nivel 5: la cómoda. Los nueve cajones de la espalda y el escondido (el panel del hueco de la ficha), como el
+  // cajón largo: su frente es la pintura de espaldas (desde este nivel, la de capas/sala_detras_l5.webp, con m1 cerrado
+  // y sin la borla de abajo) y salen hacia fuera. La borla del costado izquierdo se dibuja por código (juego.js dice cómo
+  // está) en un plano pegado al costado, sobre su repintado sin ella (capas/cara_izquierda_l5.webp). Y lo que guardan.
+  const BORLA_LIENZO = { x: 280, y: 400, w: 560, h: 700, escala: 0.8 };      // la zona del costado (px de 1024) que dibuja
+  async function crearNivel5B(tex) {
+    const d5 = op.nivel5;
+    if (!d5) return;
+    const [texDetras, texIzq] = await Promise.all([cargarTextura('capas/sala_detras_l5.webp'), cargarTextura('capas/cara_izquierda_l5.webp')]);
+    const color = (r, g, b) => new THREE.MeshBasicMaterial({ color: new THREE.Color().setRGB(r, g, b, THREE.SRGBColorSpace) });
+    const canto = color(0.3, 0.19, 0.11), dentro = color(0.2, 0.08, 0.045), borde = color(0.46, 0.22, 0.13), suelo = color(0.13, 0.05, 0.03);
+    const hueco = color(0.05, 0.03, 0.02);
+    const cajones = {};
+    const crear = (id, [x0, y0, x1, y1], sale, fondo) => {
+      const a = enEspalda(x0, y0), c = enEspalda(x1, y1);
+      const ancho = Math.abs(a.x - c.x), alto = Math.abs(a.y - c.y), grueso = 0.006;
+      const centro = new THREE.Vector3((a.x + c.x) / 2, (a.y + c.y) / 2, -0.11);
+      const cajon = new THREE.Group(); cajon.position.copy(centro);
+      const frente = new THREE.Mesh(new THREE.BoxGeometry(ancho, alto, grueso));
+      frente.position.set(0, 0, grueso / 2 - 0.0006);
+      cajon.updateMatrix(); frente.updateMatrix();
+      const reposo = new THREE.Matrix4().makeRotationY(Math.PI).multiply(cajon.matrix.clone().multiply(frente.matrix));
+      frente.material = [canto, canto, canto, canto, canto, materialPintura(texDetras, mundo.proyector, { reposo })];
+      const t = 0.0022, hw = alto * 0.7, largo = fondo - grueso, zm = grueso + largo / 2, yb = -alto / 2;
+      const tabla = (sx, sy, sz, x, y, z, m) => { const malla = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), m); malla.position.set(x, y, z); return malla; };
+      const piezas = [frente,
+        tabla(t, hw, largo, -ancho / 2 + t / 2, yb + hw / 2, zm, [dentro, dentro, borde, dentro, dentro, dentro]),
+        tabla(t, hw, largo, ancho / 2 - t / 2, yb + hw / 2, zm, [dentro, dentro, borde, dentro, dentro, dentro]),
+        tabla(ancho - 2 * t, t, largo, 0, yb + t / 2, zm, suelo),
+        tabla(ancho - 2 * t, hw, t, 0, yb + hw / 2, fondo - t / 2, [dentro, dentro, borde, dentro, dentro, dentro])];
+      for (const p of piezas) { p.userData = { tipo: 'detras5', cajon: id }; cajon.add(p); }
+      const agujero = new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), hueco);
+      agujero.rotation.y = Math.PI; agujero.position.set(centro.x, centro.y, -0.1101);
+      agujero.userData = { tipo: 'detras5', cajon: id };
+      pintada.caja.add(cajon, agujero);
+      cajon.visible = agujero.visible = false;
+      return { grupo: cajon, agujero, centro, sale, ancho, alto, yb, grueso, rect: [x0, y0, x1, y1] };
+    };
+    for (const [id, r] of Object.entries(d5.cajones)) cajones[id] = crear(id, r, 0.048, 0.075);
+    cajones.p = crear('p', d5.panel, 0.055, 0.085);
+    // lo que guardan: dibujos que miran a la cámara, cerca del frente (lo de dentro del cajón escondido, al fondo)
+    const sprite = (cj, lienzo, h, x, parte, z = null) => {
+      const t = new THREE.CanvasTexture(lienzo); t.colorSpace = THREE.SRGBColorSpace;
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthWrite: false }));
+      sp.scale.set(h * lienzo.width / lienzo.height, h, 1);
+      sp.position.set(x, cj.yb + 0.0025 + h * 0.48, z === null ? cj.grueso + 0.016 : z);
+      sp.userData = { tipo: 'detras5', cajon: cj === cajones.p ? 'p' : Object.keys(cajones).find(k => cajones[k] === cj), parte };
+      cj.grupo.add(sp);
+      return sp;
+    };
+    const im = op.img;
+    const dentroB = {
+      tarjeta: sprite(cajones.t2, dibujarTarjetaLazo(240, 170), 0.026, 0, 'tarjeta'),
+      llave: im.llave ? sprite(cajones.c, im.llave, 0.016, 0, 'llave') : null,
+      ovillo: sprite(cajones.t3, dibujarOvillo(90, 80), 0.016, 0, 'ovillo'),
+      frasquito: sprite(cajones.r1, dibujarFrasquito(60, 90), 0.02, 0, 'frasquito'),
+      dedal: sprite(cajones.r3, dibujarDedal(60, 60), 0.012, 0, 'dedal'),
+      cordon: sprite(cajones.p, dibujarCordonPasador(260, 120), 0.024, 0, 'cordon', 0.05),
+    };
+    // en los cajones del costado: las tsukegi (c2) y su secreto (c6), como la llave y la nota
+    const enCostado = (id, lienzo, h, parte) => {
+      const c = cajonesB && cajonesB[id];
+      if (!c) return null;
+      const t = new THREE.CanvasTexture(lienzo); t.colorSpace = THREE.SRGBColorSpace;
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthWrite: false }));
+      sp.scale.set(h * lienzo.width / lienzo.height, h, 1);
+      sp.position.copy(c.dentro).add(new THREE.Vector3(0, h * 0.42, 0));
+      sp.userData = { tipo: 'cajon', cajon: id, parte };
+      c.grupo.add(sp);
+      return sp;
+    };
+    const papel = (() => {           // su secreto, doblado: un papel con una esquina de tinta
+      const c = document.createElement('canvas'); c.width = 120; c.height = 90;
+      const k = c.getContext('2d');
+      k.fillStyle = '#efe6d2'; k.strokeStyle = 'rgba(80, 60, 40, 0.9)'; k.lineWidth = 2;
+      k.beginPath(); k.moveTo(8, 14); k.lineTo(104, 6); k.lineTo(112, 74); k.lineTo(14, 84); k.closePath(); k.fill(); k.stroke();
+      k.beginPath(); k.moveTo(58, 10); k.lineTo(62, 80); k.strokeStyle = 'rgba(120, 100, 80, 0.6)'; k.stroke();
+      k.fillStyle = 'rgba(30, 30, 44, 0.75)'; k.fillRect(20, 30, 30, 4); k.fillRect(20, 40, 24, 3); k.fillRect(70, 50, 28, 14);
+      return c;
+    })();
+    dentroB.tsukegi = enCostado('c2', dibujarTsukegi(200, 150), 0.026, 'tsukegi');
+    dentroB.secreto = enCostado('c6', papel, 0.022, 'secreto');
+    // la borla: un plano pegado al costado izquierdo (por fuera), con su lienzo
+    const L = BORLA_LIENZO, alto = pintada.alto;
+    const lienzo = document.createElement('canvas');
+    lienzo.width = Math.round(L.w * L.escala); lienzo.height = Math.round(L.h * L.escala);
+    const texB = new THREE.CanvasTexture(lienzo); texB.colorSpace = THREE.SRGBColorSpace; texB.anisotropy = 4;
+    const z0 = -0.11 + 0.22 * L.x / 1024, z1 = -0.11 + 0.22 * (L.x + L.w) / 1024;
+    const yArriba = 0.034 + alto * (1 - L.y / 1024), yAbajo = 0.034 + alto * (1 - (L.y + L.h) / 1024);
+    const plano = new THREE.Mesh(new THREE.PlaneGeometry(z1 - z0, yArriba - yAbajo),
+      new THREE.MeshBasicMaterial({ map: texB, transparent: true, depthWrite: false, side: THREE.FrontSide }));
+    plano.rotation.y = -Math.PI / 2;
+    plano.position.set(-0.1112, (yArriba + yAbajo) / 2, (z0 + z1) / 2);
+    plano.userData.tipo = 'borla';
+    plano.renderOrder = 2;
+    plano.visible = false;
+    pintada.caja.add(plano);
+    const mats = pintada.cuerpo.material;
+    n5B = { texDetras, texIzq, cajones, dentro: dentroB, borla: { plano, lienzo, textura: texB, firma: '' },
+      originales: { izq: mats[1].uniforms.uPintura.value, izqFrontal: tex.caraIzquierda, detras: mats[5].uniforms.uPintura.value } };
+  }
+  function pintarBorla(e) {
+    const B = n5B.borla, L = BORLA_LIENZO, k = B.lienzo.getContext('2d');
+    k.setTransform(1, 0, 0, 1, 0, 0);
+    k.clearRect(0, 0, B.lienzo.width, B.lienzo.height);
+    k.setTransform(L.escala, 0, 0, L.escala, -L.x * L.escala, -L.y * L.escala);
+    dibujarBorla(k, op.nivel5.borla, e);
+    B.textura.needsUpdate = true;
+  }
+  function actualizarNivel5B() {
+    if (!n5B) return;
+    const est = op.estado(), en5 = est.nivel >= 5, mats = pintada.cuerpo.material;
+    // desde el nivel 5: la espalda con m1 cerrado y el costado sin la borla de abajo (la dibuja el plano)
+    mats[1].uniforms.uPintura.value = en5 ? n5B.texDetras : n5B.originales.izq;
+    mats[1].uniforms.uFrontal.value = en5 ? n5B.texIzq : n5B.originales.izqFrontal;
+    mats[5].uniforms.uPintura.value = en5 ? n5B.texDetras : n5B.originales.detras;
+    const n5 = est.n5;
+    for (const [id, c] of Object.entries(n5B.cajones)) {
+      const k = en5 && op.cajonAbertura('espalda_' + id) || 0, abierto = k > 0.002;
+      c.grupo.visible = c.agujero.visible = abierto;
+      c.grupo.position.z = c.centro.z - Math.max(0, k) * c.sale;
+    }
+    // la ficha coronada del nivel 3 sigue en su hueco: sale con el panel (el hueco era su tirador)
+    if (fichaB && en5) fichaB.position.z = -0.1104 - Math.max(0, op.cajonAbertura('espalda_p')) * n5B.cajones.p.sale;
+    const d = n5B.dentro, hay = (parte, donde) => !!n5 && n5[parte] === donde;
+    if (d.tarjeta) d.tarjeta.visible = hay('tarjeta', 't2');
+    if (d.llave) d.llave.visible = hay('llave', 'c');
+    if (d.cordon) d.cordon.visible = !!n5;
+    if (d.tsukegi) d.tsukegi.visible = en5 && (!n5 || n5.tsukegi === 'c2') && est.nivel === 5;
+    if (d.secreto) d.secreto.visible = hay('secreto', 'c6');
+    // la borla: se repinta cuando cambia (o mientras se mece)
+    const B = n5B.borla;
+    B.plano.visible = en5;
+    if (en5 && op.borla) {
+      const e = op.borla(), firma = [e.desatado, e.aprieto, e.bajada, e.meneo, e.colaNegra].map(v => (typeof v === 'number' ? v.toFixed(3) : v)).join('|');
+      if (firma !== B.firma) { B.firma = firma; pintarBorla(e); }
+    }
+  }
   // la tetera se vuelca hacia la taza de la izquierda: gira alrededor del centro de su cuerpo, sobre el eje que mira a
   // la cámara del boceto, y se levanta un poco (la sostiene una mano). La pintura va con ella; la máscara deja fuera
   // las tazas (si no, se llevaría el borde de la de delante)
@@ -1509,6 +1686,24 @@ export async function crearTecnica(letra, op) {
       if (esB && tipo === 'cajon') return { malla: o, punto: { ...centroCajon(o.userData.cajon), cara: 'frente', cajon: o.userData.cajon } };
       if (esB && tipo === 'largo') return { malla: o, punto: { x: 852, y: 516, cara: 'detras', largo: o.userData.parte || 'cajon' } };
       if (esB && tipo === 'zocalo') return { malla: o, punto: { x: 829, y: 610, cara: 'frente', zocalo: o.userData.parte || 'cajon' } };
+      // nivel 5: un cajón de la espalda (abierto) o lo que guarda; la borla, donde esté dibujada (si no, el costado)
+      if (esB && tipo === 'detras5') {
+        const c = n5B.cajones[o.userData.cajon], [x0, y0, x1, y1] = c.rect;
+        return { malla: o, punto: { x: (x0 + x1) / 2, y: (y0 + y1) / 2, cara: 'detras', detras5: o.userData.cajon, parte: o.userData.parte || 'cajon' } };
+      }
+      if (esB && tipo === 'borla' && h.uv && n5B) {
+        const B = n5B.borla, L = BORLA_LIENZO;
+        const px = Math.round(h.uv.x * B.lienzo.width), py = Math.round((1 - h.uv.y) * B.lienzo.height);
+        const k = B.lienzo.getContext('2d'), m = 6;
+        const d = k.getImageData(Math.max(0, px - m), Math.max(0, py - m), 2 * m + 1, 2 * m + 1).data;
+        let alfa = 0; for (let i = 3; i < d.length; i += 4) alfa = Math.max(alfa, d[i]);
+        if (alfa > 40) {
+          const local = caja.worldToLocal(h.point.clone());
+          return { malla: o, punto: { ...alBoceto(new THREE.Vector3(-local.x, local.y, -local.z)), cara: 'izquierda', borla: true,
+            bx: L.x + px / L.escala, by: L.y + py / L.escala } };
+        }
+        continue;
+      }
       if (esB && tipo === 'corazon') return { malla: o, punto: { ...alBoceto(h.point), cara: 'frente', corazon: true } };
       if (esB && tipo === 'caja') {
         const local = caja.worldToLocal(h.point.clone());
@@ -1518,8 +1713,11 @@ export async function crearTecnica(letra, op) {
           const id = cajonEnCostado(-local.z, local.y);
           if (id) return { malla: o, punto: { ...centroCajon(id), cara: 'frente', cajon: id } };
         }
+        // (el costado izquierdo, con su sitio en píxeles del repintado: nivel 5, la borla)
+        const izquierda = o === pintada.cuerpo && h.face && h.face.materialIndex === 1;
+        const bx = (local.z + 0.11) / 0.22 * 1024, by = (1 - (local.y - 0.034) / pintada.alto) * 1024;
         if (detras) local.set(-local.x, local.y, -local.z);
-        return { malla: o, punto: { ...alBoceto(local), cara: detras ? 'detras' : 'frente' } };
+        return { malla: o, punto: { ...alBoceto(local), cara: detras ? 'detras' : 'frente', ...(izquierda ? { izquierda: true, bx, by } : {}) } };
       }
       if (tipo === 'objeto') {
         const p = alBoceto(h.point);
