@@ -64,7 +64,9 @@
 <script>
 // URL del servidor de compras (07-Servidor en Railway). Vacía = la tienda aún no vende.
 const SERVIDOR = "";
-const PAQUETES = [
+// Moneda y precios: los dice el servidor (/v1/web/paquetes). Estos son de reserva (USD).
+let MONEDA = "USD";
+let PAQUETES = [
   {id: "web_250", prismas: 250, base: 200, precio: 1.99},
   {id: "web_690", prismas: 690, base: 550, precio: 4.99},
   {id: "web_1500", prismas: 1500, base: 1200, precio: 9.99},
@@ -75,6 +77,9 @@ document.getElementById("year").textContent = new Date().getFullYear();
 const params = new URLSearchParams(location.search);
 let elegido = params.get("paquete") || "";
 const fmt = (n) => n.toLocaleString("es-CO");
+const precio = (n) => MONEDA === "USD" ? n.toFixed(2).replace(".", ",") + " US$" : fmt(n) + " " + MONEDA;
+// Solo se sale a una página de pago de Mercado Pago.
+const pagoSeguro = (u) => /^https:\/\/(www\.)?mercadopago\.[a-z.]+\//.test(String(u || ""));
 
 function pintar() {
   $("#packs").innerHTML = PAQUETES.map(p => `
@@ -82,14 +87,14 @@ function pintar() {
       <span class="n">${fmt(p.prismas)}</span>
       <span>Prismas</span>
       <span class="b">${fmt(p.base)} + ${fmt(p.prismas - p.base)} de bono</span>
-      <span class="p">${p.precio.toFixed(2).replace(".", ",")} US$</span>
+      <span class="p">${precio(p.precio)}</span>
     </button>`).join("");
   document.querySelectorAll(".pack").forEach(b => b.onclick = () => { elegido = b.dataset.id; pintar(); });
   const btn = $("#pagar");
   if (!SERVIDOR) { btn.disabled = true; btn.textContent = "La tienda abre con el lanzamiento"; return; }
   const p = PAQUETES.find(x => x.id === elegido);
   btn.disabled = !p;
-  btn.textContent = p ? `Pagar ${p.precio.toFixed(2).replace(".", ",")} US$` : "Elige un paquete";
+  btn.textContent = p ? `Pagar ${precio(p.precio)}` : "Elige un paquete";
 }
 
 $("#pagar").onclick = async () => {
@@ -99,6 +104,7 @@ $("#pagar").onclick = async () => {
     const r = await fetch(SERVIDOR + "/v1/web/pedido", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({paquete: elegido})});
     if (!r.ok) throw new Error(r.status);
     const d = await r.json();
+    if (!pagoSeguro(d.pagar)) throw new Error("enlace de pago no válido");
     try { localStorage.setItem("curtzz_pedido", d.pedido); } catch (e) {}
     location.href = d.pagar;
   } catch (e) {
@@ -113,12 +119,20 @@ async function seguir(pid, intentos = 0) {
   try {
     const r = await fetch(SERVIDOR + "/v1/web/pedido/" + encodeURIComponent(pid));
     const d = await r.json();
+    if (d.canjeado) {
+      est.innerHTML = `<div class="box"><strong class="ok">Este código ya se canjeó.</strong> <span class="muted">Los Prismas están en tu juego.</span></div>`;
+      $("#compra").style.display = "none";
+      return;
+    }
     if (d.codigo) {
-      est.innerHTML = `<div class="box"><strong class="ok">¡Pago confirmado!</strong> Tu código para ${fmt(d.prismas)} Prismas:
-        <div class="code" id="codigo">${d.codigo}</div>
+      // Texto, nunca HTML: lo que llega del servidor no se interpreta.
+      est.innerHTML = `<div class="box"><strong class="ok">¡Pago confirmado!</strong> Tu código para <span id="np"></span> Prismas:
+        <div class="code" id="codigo"></div>
         <button class="btn" id="copiar">Copiar código</button>
-        <p class="muted" style="font-size:.85rem">Guárdalo: esta página lo enseña mientras tengas el enlace.</p></div>`;
-      $("#copiar").onclick = () => navigator.clipboard.writeText(d.codigo).then(() => $("#copiar").textContent = "Copiado ✓");
+        <p class="muted" style="font-size:.85rem">Guárdalo: esta página lo enseña hasta que lo canjees.</p></div>`;
+      $("#np").textContent = fmt(Number(d.prismas) || 0);
+      $("#codigo").textContent = String(d.codigo);
+      $("#copiar").onclick = () => navigator.clipboard.writeText(String(d.codigo)).then(() => $("#copiar").textContent = "Copiado ✓");
       $("#compra").style.display = "none";
       return;
     }
@@ -133,7 +147,21 @@ async function seguir(pid, intentos = 0) {
   }
 }
 
+async function cargarPrecios() {
+  if (!SERVIDOR) return;
+  try {
+    const r = await fetch(SERVIDOR + "/v1/web/paquetes");
+    const d = await r.json();
+    if (d && Array.isArray(d.paquetes) && d.paquetes.length) {
+      MONEDA = String(d.moneda || "USD");
+      PAQUETES = d.paquetes.map(p => ({id: String(p.id), prismas: Number(p.prismas), base: Number(p.base) || Math.round(Number(p.prismas) / 1.25), precio: Number(p.precio)}));
+      pintar();
+    }
+  } catch (e) {}
+}
+
 pintar();
+cargarPrecios();
 const pid = params.get("pedido");
 if (SERVIDOR && pid) seguir(pid);
 </script>
