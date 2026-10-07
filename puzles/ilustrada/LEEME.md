@@ -390,6 +390,15 @@ python3 puzles/ilustrada/herramientas/nivel5_capas.py
 python3 puzles/ilustrada/herramientas/nivel6_capas.py
 ```
 
+- **Resultado (07-10-2026, 0.7, los niveles 5 y 6):** en la página, el nivel 1, 43 de 43 en la B y 37 de 37 en la A; el
+  aviso en vertical, 3 de 3; el 2, 31 de 31; el 3, 31 de 31; el 4, 28 de 28; el 5, 35 de 35; el 6, 26 de 26; el final
+  (ahora el 7), 17 de 17. La web del APK 0.7, sin red: el 5, 36 de 36; el 6, 27 de 27 (con la tarjeta de los seis
+  sellos en su letra). Dos lecciones de la tanda:
+  - sin tarjeta gráfica el juego va a unos 3 cuadros por segundo (igual con la versión de antes de los niveles 5 y 6:
+    se midieron las dos), así que un gesto que en la prueba avanza a pasitos puede parecer otro: el arrastre desde la
+    bandeja del nivel 3 se convertía en «mantener pulsado». La prueba arranca ahora como un dedo real;
+  - la rapidez de un tirón se mide en tiempo de juego desde que se pone el dedo (el nivel 5), porque a pocos cuadros
+    por segundo un movimiento entero llega en un solo evento.
 - **Resultado (05-10-2026, 0.5, el juego completo):** en la página, el nivel 1, 43 de 43 en la B y 37 de 37 en la A (en
   horizontal); el aviso en vertical, 3 de 3; el nivel 2, 31 de 31; el nivel 3, 31 de 31; el final, 17 de 17. La web del
   APK 0.5, sin red: el nivel 1, 45 de 45; el 2, 33 de 33; el 3, 32 de 32; el final, 18 de 18 (las tres últimas, con la web
