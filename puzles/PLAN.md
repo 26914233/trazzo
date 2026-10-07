@@ -619,3 +619,27 @@ cerca y que el incensario no desapareciera.
 - Medir los niveles con jugadores, como dice el §3: el tiempo, las pistas y las ganas de seguir.
 - Las DECISIONES 25 (el marco de la historia: la última nota de la caja) y 26 (las pistas), abiertas.
 
+
+**Hacia el APK 0.6: tres niveles más (07-10-2026).** El usuario preguntó: «¿cuántos niveles le vas a meter? Para todo el
+contenido que tienes, ¿cuántos niveles puedes implementar en el próximo APK?». Respuesta: tres más, para llegar a la curva
+de su método (`METODO_CAJA_VIVA.md` §19: seis niveles y el final).
+
+**DECISIÓN 31 (abierta): los tres niveles nuevos del 0.6.**
+- **OPCIONES:**
+  - **A)** 4 · El oro (la mejilla rota, curada con kintsugi), 5 · La cómoda (los dos cajones con cerradura del costado,
+    que no ceden desde el nivel 1, y los de la espalda: cajones que se bloquean entre sí, un hueco detrás de otro cajón,
+    golpear para oír lo hueco, la borla y la llave de bambú otra vez) y 6 · La noche (se apaga la lámpara; a oscuras el
+    ojo viejo no ve, pero tú tampoco: solo alumbra la luz fría del ojo nuevo);
+  - **B)** solo el 4, más pistas y música, para tener el APK antes;
+  - **C)** el 6 como «la sala que se abre» (DECISIÓN 30 B), que pide 8-12 imágenes de Gemini (unos 0,40-0,60 USD).
+- **VENTAJAS:** A llega a la duración de un juego de pago sin gastar; B se prueba antes; C es lo más vistoso.
+- **RIESGOS:** A tarda más; B se queda corto; C cuesta dinero y hay que cuidar el estilo de las imágenes.
+- **COSTE [Estimación]:** A, unos días de trabajo y 0 USD; B, uno; C, unos días más y 0,40-0,60 USD.
+- **RECOMENDACIÓN [Opinión]:** **A**. Duración del juego entero con los seis niveles: 75-110 minutos **[Hipótesis]**.
+- **SIGUIENTE PASO:** el 4 vale para cualquier opción y ya está hecho; el 5 y el 6, cuando el usuario diga si le valen.
+
+**Nivel 4 · El oro (07-10-2026) [Hecho, para el APK 0.6]** (`ilustrada/NIVELES.md` §7): su voz se le quiebra en la mejilla
+rota; tres esquirlas (una cae al cantar, otra se delata por su sombra encima de la lámpara y la tercera está en el cajón
+de la peana, que se abre repitiendo en tres olas de oro la frase que canta la caja); en la mano se montan, se traza la
+laca, se cura con el aliento de la caja (el té ya está tibio) y se espolvorea el oro; y se pone mientras canta con los
+ojos cerrados, porque mientras mira no deja tocarle la cara y ya nada la distrae. El final pasa a ser el nivel 5.

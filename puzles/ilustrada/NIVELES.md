@@ -13,7 +13,9 @@
 - DECISIÓN 29: la técnica **B**.
 
 Este documento es el plan de niveles. **Desde el 05-10-2026 se juegan los cuatro** (el 1, el 2, el 3 y el final) en
-la página privada y en el APK 0.5 (`PLAN.md` §8). Sigue la biblia: plantilla de nueve fases (§8), familias de
+la página privada y en el APK 0.5 (`PLAN.md` §8); **desde el 07-10-2026, también el 4, «El oro»** (§7), entre el 3 y el
+final, que pasa a ser el nivel 5. Los niveles 5 y 6 que propone la DECISIÓN 31 (la cómoda y la noche) esperan a que el
+usuario los apruebe. Sigue la biblia: plantilla de nueve fases (§8), familias de
 puzle (§5), progresión presentar → ampliar → invertir → combinar (§7) y control de originalidad (anexo B).
 Todo es **[Propuesta]** salvo lo marcado **[Hecho]**.
 
@@ -21,11 +23,12 @@ Todo es **[Propuesta]** salvo lo marcado **[Hecho]**.
 
 ## 1. La idea en una frase
 
-> **La caja no te deja tocar mientras te mira. Devuélvele la cara —el cuerno, el ojo y la voz— y te
-> abrirá su corazón.**
+> **La caja no te deja tocar mientras te mira. Devuélvele la cara —el cuerno, el ojo, la voz y la mejilla
+> rota, curada con oro— y te abrirá su corazón.**
 
 - La caja es un *tsukumogami*: un objeto que, a los cien años, cobra alma.
-- Su cara está incompleta: le falta un cuerno, tiene una cuenca vacía y sus labios están sellados.
+- Su cara está incompleta: le falta un cuerno, tiene una cuenca vacía, sus labios están sellados y su mejilla derecha
+  está rota (las cuatro cosas se ven en el boceto desde el principio).
 - Ella misma pide lo que le falta, con notas de su letra: la del nivel 1 ya existe [Hecho]: «Me falta un
   cuerno. Lo guarda el león que respira humo».
 - Las notas son de la caja, así que no chocan con la DECISIÓN 25 (el marco de la historia), que sigue
@@ -43,6 +46,9 @@ NIVEL 2 · La caja de dentro ──► el ojo
 NIVEL 3 · La voz ──► la voz
         │
         ▼
+NIVEL 4 · El oro ──► la mejilla, curada con oro
+        │
+        ▼
    la cara completa ──► NIVEL FINAL · El corazón
 ```
 
@@ -55,16 +61,16 @@ NIVEL 3 · La voz ──► la voz
 
 ## 3. Qué trae cada nivel
 
-| | Nivel 1 · El cuerno | Nivel 2 · La caja de dentro | Nivel 3 · La voz | Final · El corazón |
-|---|---|---|---|---|
-| **Escala y vista** | La sala y la caja por fuera: frente, costado de cajones y espalda | **De grande a pequeña:** una caja hija sale de la trampilla y se gira en la mano; dentro, otra más pequeña | **La sala entera es el puzle:** el rollo, la tetera y el tatami, la espalda de la caja y su boca | **Desde arriba:** el corazón sube por la trampilla y se queda en la tapa |
-| **Idea estructural nueva** | La sala participa (lámpara, incensario) | Trabajar un objeto que se gira en la mano | La mirada como linterna; el ritmo de la respiración | Todo junto; lo guardado vuelve (la caja hija es la llave) |
-| **La mirada** | **Presentar:** no deja tocar mientras te ve; la lámpara la distrae | **Ampliar:** el ojo grande vigila la caja pequeña; lo que mira no se mueve; hay que esconderle lo que haces | **Invertir:** ahora conviene que mire; el ojo nuevo descubre tinta que no se ve, y va al revés del dedo | **Combinar:** el ojo viejo señala, el nuevo alumbra y la voz avisa |
-| **Familias (§5)** | Atención, Manipular, Observar, Montar | Atención, Manipular, Memoria espacial, Bolsillo | Observar, Guiar, Deducir, Manipular, Tiempo (ritmo lento) | Meta, Atención, Oído |
-| **Pasos** | 12 | 12 | 14 | 8 |
-| **Pieza** | El cuerno | El ojo (de piedra de luna) | La voz (una campanilla de bronce) | — |
-| **Sorpresa** | La caja despierta y su trampilla da luz | El ojo nuevo no es como el otro: ve lo que el viejo no ve | La caja escribe con la boca cerrada… y al final canta | Su corazón sube por la trampilla; la sala se aclara |
-| **Duración [Hipótesis]** | 8-12 min | 10-15 min | 12-18 min | 5-8 min |
+| | Nivel 1 · El cuerno | Nivel 2 · La caja de dentro | Nivel 3 · La voz | Nivel 4 · El oro | Final · El corazón |
+|---|---|---|---|---|---|
+| **Escala y vista** | La sala y la caja por fuera: frente, costado de cajones y espalda | **De grande a pequeña:** una caja hija sale de la trampilla y se gira en la mano; dentro, otra más pequeña | **La sala entera es el puzle:** el rollo, la tetera y el tatami, la espalda de la caja y su boca | **De la sala a la mano:** la sombra de la pared, la peana de cerca y el pedazo en la mano | **Desde arriba:** el corazón sube por la trampilla y se queda en la tapa |
+| **Idea estructural nueva** | La sala participa (lámpara, incensario) | Trabajar un objeto que se gira en la mano | La mirada como linterna; el ritmo de la respiración | Un oficio por etapas (montar, laca, curar, oro); el cuerpo de la caja como herramienta (su aliento cura) | Todo junto; lo guardado vuelve (la caja hija es la llave) |
+| **La mirada** | **Presentar:** no deja tocar mientras te ve; la lámpara la distrae | **Ampliar:** el ojo grande vigila la caja pequeña; lo que mira no se mueve; hay que esconderle lo que haces | **Invertir:** ahora conviene que mire; el ojo nuevo descubre tinta que no se ve, y va al revés del dedo | **Variar:** defiende su cara y ya nada la distrae; pero cuando canta, cierra los ojos | **Combinar:** el ojo viejo señala, el nuevo alumbra y la voz avisa |
+| **Familias (§5)** | Atención, Manipular, Observar, Montar | Atención, Manipular, Memoria espacial, Bolsillo | Observar, Guiar, Deducir, Manipular, Tiempo (ritmo lento) | Observar (sombra), Oído (frase), Montar, Manipular (trazar, espolvorear), Tiempo (respiración) | Meta, Atención, Oído |
+| **Pasos** | 12 | 12 | 14 | 14 | 8 |
+| **Pieza** | El cuerno | El ojo (de piedra de luna) | La voz (una campanilla de bronce) | La mejilla, curada con oro | — |
+| **Sorpresa** | La caja despierta y su trampilla da luz | El ojo nuevo no es como el otro: ve lo que el viejo no ve | La caja escribe con la boca cerrada… y al final canta | El centro de la peana es un cajón; el oro corre solo por la grieta | Su corazón sube por la trampilla; la sala se aclara |
+| **Duración [Hipótesis]** | 8-12 min | 10-15 min | 12-18 min | 12-18 min | 5-8 min |
 
 **Lo que el usuario pidió, dónde está:**
 - puntos de vista diferentes: la sala, la caja, el costado, la mano, el interior y el corazón;
@@ -211,7 +217,55 @@ lengua, su badajo).
 espalda, con la pintura de espaldas proyectada en su frente; la ficha en su hueco; la tetera que se vuelca con su
 pintura). Sonidos: `herramientas/sonidos_nivel3.py`. Prueba: `prueba/jugar_nivel3.mjs` (31 de 31).
 
-## 7. Nivel final · El corazón [Hecho, en la B, 05-10-2026]
+## 7. Nivel 4 · El oro [Hecho, en la B, 07-10-2026]
+
+**Qué pidió el usuario** (07-10-2026): «¿cuántos niveles le vas a meter? Para todo el contenido que tienes, ¿cuántos
+niveles puedes implementar en el próximo APK?». Se le propusieron tres niveles nuevos (DECISIÓN 31); este es el
+primero, el que no cambia la historia: la mejilla rota está en el boceto desde el principio y ningún nivel la usaba.
+
+**En una frase:** su voz se le quiebra en la mejilla rota; junta sus esquirlas, cúralas con laca y oro (kintsugi) y
+pónselas mientras canta con los ojos cerrados.
+
+**La regla, variada:** ahora defiende su cara: no deja que se la toques mientras te mira, y ni la llama ni la tetera la
+distraen («no aparta los ojos de su cara»). Pero cuando canta, cierra los ojos (se vio al final del nivel 3, y aquí se
+ve al empezar). El truco del nivel 1 ya no vale; vale lo aprendido después.
+
+**Las nueve fases:**
+1. **Introducción:** canta y la voz se le quiebra: «crac», y una esquirla cae de la mejilla al reborde de la peana.
+2. **Exploración:** la esquirla se coge; probada en la mejilla, «sola no se sostiene: faltan pedazos» (y el ojo mira de
+   reojo la sombra de la pared).
+3. **Primer descubrimiento:** en la pared, encima de la lámpara, una sombra que no es de la lámpara: tiembla con la
+   llama. Encima del marco está la segunda esquirla.
+4. **Aprendizaje:** tocarle la boca mientras suelta el aire la hace cantar tres notas con los ojos cerrados (si toma
+   aire, lo contiene, como en el nivel 3). Con cada nota brilla una de las tres olas de oro de la peana.
+5. **Combinación:** las tres olas, tocadas en el orden de su canto (cada una suena con su nota), sueltan el centro de
+   la peana: es un cajón. Mal orden: las olas vuelven a subir. Dentro, la tercera esquirla, la laca y el oro.
+6. **Desafío, el oficio:** en la mano, las tres esquirlas se arrastran a la sombra con su forma y se giran con un toque
+   hasta que encajan; con la laca se repasan las dos juntas con el dedo; la laca no seca al aire: el té ya está tibio y
+   no echa vapor, así que se cura con el aliento de la caja (el pedazo, a su boca, mientras suelta el aire); entonces el
+   oro, espolvoreado moviendo el dedo, se pega a las juntas (antes, con la laca fresca, resbala).
+7. **Clímax:** el pedazo dorado, en su mejilla, mientras canta con los ojos cerrados (si mira, no deja; ni la llama la
+   distrae). Encaja, y el oro corre solo por el borde y baja por la grieta.
+8. **Recompensa:** canta con los ojos abiertos; la mejilla luce el oro, con un brillo que la recorre de vez en cuando.
+9. **Transición:** tarjeta «Nivel 4 superado · El oro», con los cuatro sellos (角 目 声 金), y «Nivel final · El corazón».
+
+**Cómo está hecho:**
+- `herramientas/nivel4_capas.py` saca del boceto la mejilla sin el hueco (`capas/mejilla.webp`: el hueco relleno con
+  la ecuación de Laplace y la veta fina de la madera de al lado) y las formas (`capas/nivel4.json`: el hueco, las tres
+  esquirlas, las juntas, la grieta, las tres olas, el cajón de la peana y la lámpara).
+- `pagina/nivel4_arte.js` dibuja las esquirlas con esa madera, la laca, el oro, el tarro y el sobre.
+- `pagina/juego.js` (sección «Nivel 4 · El oro»): la mano es el bolsillo en modo «esquirlas»; la mejilla curada se
+  hornea en la pintura de la cara y el oro que corre se dibuja encima.
+- `pagina/tecnica_3d.js`: el cajón de la peana (su frente es la pintura de la peana, que sale con él) y la vista
+  «zocalo». Desde este nivel, la caja pequeña se aparta a un lado de la mesa: delante tapaba la peana.
+- Sonidos nuevos (`herramientas/sonidos_nivel4.py`): el crac, el pincel y el oro. Las notas de las olas y la frase son
+  la campanilla y el tarareo del nivel 3, con otro tono. Sin imágenes nuevas: coste 0.
+- Prueba: `prueba/jugar_nivel4.mjs` (28 de 28).
+
+**Pistas** (de vaga a clara, en el botón «?»): la esquirla de la peana, la sombra, las olas y el canto, el cajón, montar,
+la laca, curar (el té no, su aliento sí), el oro y ponerlo mientras canta.
+
+## 8. Nivel final · El corazón [Hecho, en la B, 05-10-2026; desde el 07-10-2026 es el nivel 5]
 
 **En una frase:** con la cara completa, la caja ya no se defiende: te enseña su corazón y te ayuda a abrirlo.
 
@@ -241,16 +295,17 @@ base, anillos y brillos, dibujados por código en `nivel3_arte.js`). Prueba: `pr
 
 ---
 
-## 8. Registro de variedad (biblia §7.4)
+## 9. Registro de variedad (biblia §7.4)
 
 | Nivel | Familias | Código: cómo se encuentra | Llave: qué tiene de especial | Sistema nuevo | Sorpresa |
 |---|---|---|---|---|---|
 | 1 [Hecho] | Atención, Manipular, Observar, Montar | Ninguno | La llave no se deja coger mientras el ojo mira | La sala participa | La caja despierta |
 | 2 | Atención, Manipular, Memoria espacial, Bolsillo | Ninguno: flechas de marquetería | No hay llave: el orden de las tablillas | El objeto en la mano; esconder del ojo | El ojo nuevo ve otra cosa |
 | 3 [Hecho] | Observar, Guiar, Deducir, Manipular, Tiempo | Tres tintas que solo se ven a la luz del ojo | La ficha coronada (darle la vuelta) | La mirada como linterna; la respiración como ritmo | La caja escribe y, al final, canta |
+| 4 [Hecho] | Observar, Oído, Montar, Manipular, Tiempo | La frase que canta, en tres olas de oro de la peana | No hay llave: un oficio (montar, laca, curar, oro) | La mano como taller; el cuerpo de la caja como herramienta | El centro de la peana es un cajón; el oro corre por la grieta |
 | Final [Hecho] | Meta, Atención, Oído | Lo señala la propia caja: el ojo, la luz y la voz | La caja hija es la última llave | Memoria entre niveles | Su corazón sube por la trampilla |
 
-## 9. Control de originalidad (filas nuevas para el anexo B de la biblia)
+## 10. Control de originalidad (filas nuevas para el anexo B de la biblia)
 
 | Elemento | Principio | ¿Roza una expresión de la referencia? | Qué hacer |
 |---|---|---|---|
@@ -261,13 +316,18 @@ base, anillos y brillos, dibujados por código en `nivel3_arte.js`). Prueba: `pr
 | Tocar la campanilla al ritmo de la respiración | Ritmo lento, con señal visual (el humo del incienso) | Bajo | Sin prisa ni castigo: si falla, la caja solo contiene el aire |
 | El corazón con tres anillos que se alinean | Cerradura final que recoge lo aprendido | **Medio:** los anillos concéntricos son comunes en el género | Cada anillo se resuelve con un sentido de la caja (mirada, luz, voz) y la llave es la caja hija |
 | La cara como cerradura final | Objetivos intermedios bajo uno final | Bajo: los sellos y pirámides de la serie | Lo nuestro son partes del cuerpo del objeto, que se ven volver |
+| Curar la mejilla con kintsugi | Un oficio real por etapas; reparar, no encajar | Bajo como mecánica. **Medio** por la acción final (algo vuelve a la cara: Old Sins pone una talla en una frente) | Lo importante es el oficio (montar, laca, curar con su aliento, oro) y que el oro corre solo por la grieta: la caja lo luce. No repetir «encajar en la cara» en más niveles |
+| La frase que se repite en tres olas | Secuencia de sonido con señal visual | Bajo: es del género (Simon) | La frase la canta la caja y solo con los ojos cerrados; se ve sin sonido (las olas brillan) |
+| La sombra que delata algo | Información por la luz y la sombra | Bajo | Mantener |
 
-## 10. Producción en la B
+## 11. Producción en la B
 
 - **Nivel 2:**
   - la caja hija y la cajita son 3D, con texturas pintadas (Gemini) y el mismo aire de tinta y acuarela;
   - un retoque de la cara con el ojo nuevo en la cuenca, para animarlo como el viejo;
   - unas 5 imágenes, unos 0,25 USD **[Estimación]**.
+- **Nivel 4 [Hecho]:** sin imágenes nuevas: la mejilla curada sale del propio boceto (`herramientas/nivel4_capas.py`) y lo
+  demás se dibuja por código (`pagina/nivel4_arte.js`). Coste: 0 USD.
 - **Nivel 3 y final [Hecho]:** sin imágenes nuevas: lo nuevo se dibuja por código (`pagina/nivel3_arte.js`) y los
   sonidos se sintetizan (`herramientas/sonidos_nivel3.py`). Coste: 0 USD.
 - **La A** (el respaldo sin WebGL) solo llega al nivel 1: los niveles nuevos necesitan la escena 3D.

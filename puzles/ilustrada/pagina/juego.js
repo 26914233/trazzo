@@ -5,6 +5,7 @@
 // Aquí está todo lo que no depende de la técnica: el estado y el recorrido, el ojo, la respiración, el humo y
 // la luz, los sonidos, la interfaz, los toques y la técnica A.
 import { dibujarFicha, dibujarCampanilla, dibujarBadajo, tintaRollo, tintaTe, tintaSuelo, icono } from './nivel3_arte.js';
+import { maderaMejilla, pintarEsquirla, pintarLaca, pintarOro, dibujarTarroLaca, dibujarSobreOro, iconoEsquirlas, muestrear } from './nivel4_arte.js';
 
 // ---------------------------------------------------------------------------------------------
 // Datos de la ilustración (píxeles del boceto de 1376 × 768; ver preparar_capas.py)
@@ -15,11 +16,13 @@ const CAPAS = ['sala', 'sala_vacia', 'sala_mesa_vacia', 'sala_detras', 'tapa', '
   'despierta_humo', 'ojo_vacio', 'iris', 'silueta_mesa', 'silueta_caja', 'silueta_caja_detras', 'silueta_incensario',
   'silueta_te', 'laca_pared'];
 const CAPAS_NIVEL2 = ['cajita', 'ojo2', 'iris2', 'hija_frente'];   // la cajita roja, el ojo nuevo y la cara de la caja pequeña
+const CAPAS_NIVEL4 = ['mejilla'];                                    // la mejilla sin el hueco (herramientas/nivel4_capas.py)
 const SONIDOS = ['noche', 'fuego', 'trabado', 'recoger', 'encajar', 'despertar', 'final_caja_viva', 'suspiro', 'ojo_abre',
   'grunido', 'espiritu', 'papel', 'llave', 'candado_abre', 'tope_madera', 'clic_madera', 'acercar', 'pista', 'toque',
   'mecanismo', 'racha', 'bisagra', 'deslizar_madera', 'cajon', 'trampilla', 'cristal', 'viento', 'clic_metal',
   'holgura', 'clac', 'pestillo', 'desbloqueo',                 // el vocabulario (herramientas/sonidos_vocabulario.py)
-  'campanilla', 'campanilla_muda', 'tin', 'vertido', 'tarareo', 'canto', 'latido', 'anillo'];   // niveles 3 y final
+  'campanilla', 'campanilla_muda', 'tin', 'vertido', 'tarareo', 'canto', 'latido', 'anillo',   // niveles 3 y final
+  'crac', 'pincel', 'oro'];                                    // nivel 4 (herramientas/sonidos_nivel4.py)
 
 // Encuadres de la técnica A: [x0, y0, x1, y1] de lo que debe verse en horizontal (h) y en vertical (v)
 const VISTAS = {
@@ -37,6 +40,8 @@ const VISTAS = {
   largo:      { h: [690, 380, 1020, 640], v: [700, 360, 1010, 660] },
   // nivel final: el corazón en la tapa, mirado desde arriba, con la cara debajo (sus ojos ayudan)
   corazon:    { h: [660, 40, 1200, 520], v: [690, 40, 1170, 560] },
+  // nivel 4: la peana de cerca, con sus tres olas de oro y el cajón del centro
+  zocalo:     { h: [672, 528, 988, 690], v: [690, 520, 970, 700] },
 };
 const OJO = { x: 784.5, y: 369 };            // iris en reposo
 const CUENCA = { x: 905, y: 378 };
@@ -68,10 +73,12 @@ const CAJONES = {
 const NIVELES = {
   1: { titulo: 'El cuerno', pieza: 'cuerno', texto: 'La caja tiene otra vez su cuerno… y ya te ha visto.' },
   2: { titulo: 'La caja de dentro', pieza: 'ojo', texto: 'Ya tiene sus dos ojos. El nuevo mira donde el viejo no mira.' },
-  3: { titulo: 'La voz', pieza: 'voz', texto: 'Canta, muy bajo. Ya tiene su cara entera: el cuerno, los ojos y la voz.' },
-  4: { titulo: 'El corazón', texto: 'Late tranquila, con la cara entera. Te ha abierto su corazón.' },
+  3: { titulo: 'La voz', pieza: 'voz', texto: 'Ya tiene el cuerno, los ojos y la voz. Canta, muy bajo.' },
+  4: { titulo: 'El oro', pieza: 'oro', texto: 'Su mejilla, curada con oro. No esconde la grieta: la luce.' },
+  5: { titulo: 'El corazón', texto: 'Late tranquila, con la cara entera. Te ha abierto su corazón.' },
 };
-const ULTIMO_NIVEL = 4;
+const ULTIMO_NIVEL = 5;
+const NIVEL_FINAL = ULTIMO_NIVEL;
 const nombreNivel = n => (n >= ULTIMO_NIVEL ? 'Nivel final' : `Nivel ${n}`);
 const CLAVE_PARTIDA = 'caja_viva_partida';
 // Nivel 3 · La voz (NIVELES.md §6): la luz fría del ojo de piedra de luna, la ficha del rollo, el cajón largo de la
@@ -373,11 +380,18 @@ function firmaAvance() {
   return [estado.nivel, estado.llave, estado.nota, estado.tapa, estado.cuerno, estado.inventario.length,
     Object.values(estado.cajones).join(''), h ? [h.fase, h.tablillas.join(''), h.cajon, h.cajita, h.ojo].join('') : '',
     n3 ? [n3.nota, Object.keys(n3.tintas).join(''), n3.ficha, n3.fichaCara, n3.largo, n3.campanilla, n3.badajo, n3.toques].join('') : '',
+    estado.n4 ? [estado.n4.esquirlas.join(''), estado.n4.zocalo, estado.n4.laca, estado.n4.oro, estado.n4.pieza, estado.n4.oida].join('') : '',
     estado.fin ? [estado.fin.fase, estado.fin.bloqueados.join(''), estado.fin.hija].join('') : ''].join('|');
 }
 // lo que la caja teme: el frente abierto ahora mismo (o nada, si ya lo vigila)
 function frenteAbierto() {
-  const h = estado.hija, n3 = estado.n3;
+  const h = estado.hija, n3 = estado.n3, n4 = estado.n4;
+  if (estado.nivel === 4 && n4 && nivel4) {
+    if (n4.esquirlas[0] === 'peana') return ESQUIRLA_PEANA;
+    if (n4.esquirlas[1] === 'lampara') return { x: nivel4.lampara.sombra[0], y: nivel4.lampara.sombra[1] };
+    if (n4.zocalo !== 'abierto' || n4.esquirlas[2] === 'zocalo') return { x: nivel4.olas[1].x, y: nivel4.olas[1].y };
+    return null;                                          // lo demás es su propia cara
+  }
   if (estado.nivel === 3 && n3) {
     if (n3.nota === 'boca') return null;                  // (se lo ofrece ella)
     if (n3.ficha === 'rollo') return VARILLA_ROLLO;
@@ -414,7 +428,7 @@ function actualizarOjo(dt) {
   const vigilada = estado.nivel === 2 && estado.hija && estado.hija.fase !== 'dentro' && estado.hija.ojo !== 'puesto' && tec.hijaEnBoceto
     ? tec.hijaEnBoceto() : null;
   // en el nivel final ya no vigila: señala la ranura donde va el cuerno
-  const f = estado.fin, ranura = estado.nivel === 4 && f && f.fase === 'anillos' && !f.bloqueados[0] && tec.corazonEnBoceto
+  const f = estado.fin, ranura = estado.nivel === NIVEL_FINAL && f && f.fase === 'anillos' && !f.bloqueados[0] && tec.corazonEnBoceto
     ? tec.corazonEnBoceto(0.1045, f.ranura * Math.PI / 4) : null;
   if (ranura) objetivo = haciaPunto(ranura);
   else if (reloj < ojo.distraidoHasta) objetivo = haciaPunto(ojo.distraidoPor || LAMPARA);
@@ -550,7 +564,7 @@ const luzActiva = () => estado.nivel >= 3 && estado.fase === 'jugando' && ojo2.v
 function guiarLuz(p) {
   if (!luzActiva() || !p || p.cara === 'detras' || p.hija) return;
   // (en el nivel final la caja ya no se defiende: el ojo nuevo alumbra lo que tocas)
-  luzFria.punto = estado.nivel >= 4 ? { x: p.x, y: p.y } : espejoLuz(p);
+  luzFria.punto = estado.nivel >= NIVEL_FINAL ? { x: p.x, y: p.y } : espejoLuz(p);
   luzFria.guiadaHasta = reloj + 4;
   ojo2.proximoVagar = Math.max(ojo2.proximoVagar, reloj + 4);
   if (primeraVez('luz-guiada')) setTimeoutReloj(1.2, () => { if (!mensajeHasta) mensaje('La luz fría se va al otro lado de tu dedo.', 3.2); });
@@ -610,7 +624,7 @@ function dibujarLuzFria(conAncla) {
   const a = tec.ancla(CUENCA, 'caja');
   let b = tec.ancla({ x: luzFria.x, y: luzFria.y }, objeto);
   // en el final la luz cae en el corazón, encima de la tapa: donde se toca o, si no, en su centro
-  const fin = estado.fin, enCorazon = estado.nivel === 4 && fin && fin.subida > 0.5 && tec.corazonEnPantalla;
+  const fin = estado.fin, enCorazon = estado.nivel === NIVEL_FINAL && fin && fin.subida > 0.5 && tec.corazonEnPantalla;
   if (enCorazon && a) {
     const L = fin.luz && reloj < fin.luz.hasta ? fin.luz : { r: 0, alfa: 0 }, q = tec.corazonEnPantalla(L.r, L.alfa);
     b = q ? { x: q.x, y: q.y, k: a.k * 0.8, visible: true } : null;
@@ -816,7 +830,7 @@ function actualizarLampara() {
   if (estado.fase === 'jugando' && reloj >= lampara.proxima) {
     lampara.proxima = reloj + azar(14, 24);
     agitarLampara(0.9, 0.6);
-    if (reloj > ojo.distraidoHasta && !vigilaLaPequena() && estado.nivel !== 4) { ojo.distraidoPor = LAMPARA; ojo.distraidoHasta = reloj + 1.3; }
+    if (reloj > ojo.distraidoHasta && !vigilaLaPequena() && estado.nivel < 4) { ojo.distraidoPor = LAMPARA; ojo.distraidoHasta = reloj + 1.3; }
   }
 }
 const motas = [];
@@ -971,7 +985,7 @@ function actualizarDecoracion(dt) {
   if (tetera.t < tetera.duracion) tetera.t += dt;
   if (estado.fase === 'jugando' && reloj > tetera.proxima) {
     tetera.proxima = reloj + azar(26, 46); vaporTetera(azar(0.5, 0.8));
-    if (reloj > ojo.distraidoHasta && !vigilaLaPequena() && ojo.parpadoBase < 0.5 && estado.nivel !== 4) { ojo.distraidoPor = TAPA_TETERA; ojo.distraidoHasta = reloj + 1.1; }
+    if (reloj > ojo.distraidoHasta && !vigilaLaPequena() && ojo.parpadoBase < 0.5 && estado.nivel < 4) { ojo.distraidoPor = TAPA_TETERA; ojo.distraidoHasta = reloj + 1.1; }
   }
   for (let i = ondas.length - 1; i >= 0; i--) { ondas[i].t += dt; if (ondas[i].t > 1.5) ondas.splice(i, 1); }
   actualizarPolillas(dt);
@@ -1180,6 +1194,7 @@ let cajonesDatos = null;
 // (con un rebote al abrirse y un golpe seco al cerrarse); mientras el dedo lo agarra, va donde lo lleve el dedo.
 const cajonAnim = Object.fromEntries(Object.keys(CAJONES).map(id => [id, { k: 0, v: 0, objetivo: 0, agarrado: false, golpe: 0 }]));
 cajonAnim.largo = { k: 0, v: 0, objetivo: 0, agarrado: false, golpe: 0 };      // el cajón largo de la espalda (nivel 3)
+cajonAnim.zocalo = { k: 0, v: 0, objetivo: 0, agarrado: false, golpe: 0 };     // el cajón de la peana (nivel 4)
 function actualizarCajones(dt) {
   for (const a of Object.values(cajonAnim)) {
     if (a.agarrado) continue;
@@ -1495,6 +1510,16 @@ function hornear() {
   if (despertar.humo > 0) pintarCapa(c, 'despierta_humo', despertar.humo);
   if (despertar.ojos > 0) pintarCapa(c, 'despierta_ojos', despertar.ojos);
   if (despertar.trampilla > 0) pintarCapa(c, 'despierta_trampilla', despertar.trampilla);
+  // nivel 4: la mejilla, curada con oro (el oro del borde y de la grieta, cuando ya ha corrido)
+  if (estado.n4 && estado.n4.pieza === 'puesta' && img.mejilla && nivel4) {
+    const m = nivel4.mejilla;
+    c.drawImage(img.mejilla, m.x, m.y);
+    for (const j of nivel4.juntas) pintarOro(c, j, null, 1.55, { hasta: 1 });
+    if (oroBorde >= 1) {
+      pintarOro(c, [...nivel4.contorno, nivel4.contorno[0]], null, 1.8, { hasta: 1 });
+      pintarOro(c, nivel4.grieta, null, 1.55, { hasta: 1 });
+    }
+  }
   // capas de la técnica A
   recortar(capas2d.caja || (capas2d.caja = document.createElement('canvas')), compuesto, 'silueta_caja');
   recortar(capas2d.incensario || (capas2d.incensario = document.createElement('canvas')), compuesto, 'silueta_incensario');
@@ -1863,7 +1888,7 @@ function irA(nombre, duracion = 0.75) {
   estado.vista = nombre;
   tec.irA(nombre, duracion);
   // (de cerca, el mensaje va a un lado para no tapar lo que se toca: la boca, los cajones, la tetera…)
-  $('juego').classList.toggle('mensaje-al-lado', ['hija', 'cajones', 'te', 'largo', 'corazon'].includes(nombre) || (nombre === 'cara' && estado.nivel >= 3));
+  $('juego').classList.toggle('mensaje-al-lado', ['hija', 'cajones', 'te', 'largo', 'corazon', 'zocalo'].includes(nombre) || (nombre === 'cara' && estado.nivel >= 3));
   el.volver.hidden = nombre === 'sala' || estado.fase !== 'jugando';
   if (nombre !== 'sala') sonar('acercar', -16, nombre === 'incensario' ? 1.1 : 1);
   if (mensajeHasta) mensajeHasta = Math.min(mensajeHasta, reloj + 0.3);
@@ -1890,12 +1915,14 @@ function dibujarEncima3D() {
   for (const n of nubes) conAncla(n.ax, n.ay, n.objeto, () => dibujarNube(ctx, n));
   for (const lista of [humos.incienso, humos.te, humos.sueltos]) for (const h of lista) conAncla(h.x, h.y, h.objeto, () => h.dibujar(ctx));
   if (estado.nivel >= 3) { dibujarNivel3Encima(conAncla); c.setTransform(ppp, 0, 0, ppp, 0, 0); }
+  if (estado.nivel >= 4) { dibujarNivel4Encima(conAncla); c.setTransform(ppp, 0, 0, ppp, 0, 0); }
   if (despertar.oscuridad > 0) {
     c.setTransform(ppp, 0, 0, ppp, 0, 0);
     c.fillStyle = `rgba(6, 4, 8, ${despertar.oscuridad})`; c.fillRect(0, 0, ancho, alto);
   }
   c.globalCompositeOperation = 'lighter';
   if (estado.nivel >= 3) { dibujarLuzFria(conAncla); c.setTransform(ppp, 0, 0, ppp, 0, 0); }
+  if (estado.nivel === 4) { dibujarLuzOlas(conAncla); c.setTransform(ppp, 0, 0, ppp, 0, 0); }
   for (const objeto of ['sala', 'incensario', 'caja']) {
     if (objeto === 'caja' && tec.cara() !== 'frente') continue;
     for (const [x, y, r, col, a] of luces(objeto)) conAncla(x, y, objeto, () => brillo(ctx, x, y, r, col, a));
@@ -1936,6 +1963,11 @@ const OBJETOS = {
   ficha: { nombre: 'Ficha de shōgi', texto: 'Un peón de madera, 歩. Por detrás tiene otra cara.', icono: '', capa: 'ficha' },
   campanilla: { nombre: 'Campanilla de bronce', texto: 'Pequeña y pesada. No tiene badajo: no suena.', icono: '', capa: 'campanilla' },
   badajo: { nombre: 'Badajo de bronce', texto: 'Mojado de té. La lengua de una campanilla.', icono: '', capa: 'badajo' },
+  // nivel 4 (los iconos se dibujan por código: prepararNivel4)
+  esquirlas: { nombre: 'Esquirlas de la mejilla', texto: 'Madera clara, con la veta de su cara.', icono: '', capa: 'esquirla' },
+  mejilla: { nombre: 'El pedazo de la mejilla', texto: 'Las tres esquirlas, montadas.', icono: '', capa: 'mejilla_pieza' },
+  laca: { nombre: 'Laca de urushi', texto: 'Negra y espesa, con su pincel en la tapa. Pega lo roto… cuando cura.', icono: '', capa: 'laca' },
+  oro: { nombre: 'Polvo de oro', texto: 'Un sobre de papel con el sello 金. Pesa casi nada.', icono: '', capa: 'oro' },
   // nivel final
   hija: { nombre: 'La caja pequeña', texto: 'Cerrada otra vez. Cabe justa en la mano… y en algún hueco.', icono: 'capas/hija_frente.webp', capa: 'hija' },
 };
@@ -2006,16 +2038,18 @@ function examinar(objeto) {
   // en la mano se mueven: la cajita (su tapa gira) y la ficha de shōgi (se le da la vuelta)
   const cajitaSi = objeto === 'cajita' && estado.hija && estado.hija.ojo === 'cajita';
   const fichaSi = objeto === 'ficha' && !!estado.n3;
-  const bolsilloSi = cajitaSi || fichaSi;
-  bolsillo.modo = fichaSi ? 'ficha' : 'cajita';
+  const manoSi = (objeto === 'esquirlas' || objeto === 'mejilla') && !!estado.n4 && !!madera4;
+  const bolsilloSi = cajitaSi || fichaSi || manoSi;
+  bolsillo.modo = fichaSi ? 'ficha' : manoSi ? 'esquirlas' : 'cajita';
   el.examinarImg.hidden = bolsilloSi; el.bolsillo.hidden = !bolsilloSi;
   el.bolsillo.parentElement.classList.toggle('grande', bolsilloSi);
   el.examinarAyuda.textContent = cajitaSi ? 'Gira la tapa con el dedo · toca fuera para guardarla'
-    : fichaSi ? 'Deslízala de lado para darle la vuelta · toca fuera para guardarla' : 'Toca para guardarlo';
+    : fichaSi ? 'Deslízala de lado para darle la vuelta · toca fuera para guardarla' : manoSi ? ayudaMano4() : 'Toca para guardarlo';
   el.bolsillo.setAttribute('aria-label', fichaSi ? 'La ficha en la mano: deslízala de lado o usa las flechas para darle la vuelta'
     : 'La cajita en la mano: gira su tapa con el dedo o con las flechas del teclado');
   if (cajitaSi) abrirBolsillo();
   if (fichaSi) { bolsillo.activo = true; fichaGiro.giro = fichaGiro.objetivo = 0; fichaGiro.inicio = null; medirBolsillo(); }
+  if (manoSi) abrirMano4();
   // lo de detrás no se lee a través del velo
   el.mensaje.classList.remove('visible'); mensajeHasta = 0;
   el.etiqueta.classList.remove('visible'); etiquetaHasta = 0;
@@ -2111,11 +2145,13 @@ el.bolsillo.addEventListener('pointerdown', e => {
   el.bolsillo.setPointerCapture(e.pointerId);
   const q = puntoBolsillo(e);
   if (bolsillo.modo === 'ficha') { fichaGiro.inicio = { id: e.pointerId, x0: q.x, y0: q.y, volteada: false, movido: 0 }; return; }
+  if (bolsillo.modo === 'esquirlas') { manoPulsar(q, e.pointerId); return; }
   bolsillo.dedo = q;
   bolsillo.arrastre = { id: e.pointerId, a0: Math.atan2(q.y, q.x), angulo0: bolsillo.angulo, movido: 0, x0: q.x, y0: q.y };
 });
 el.bolsillo.addEventListener('pointermove', e => {
   const q = puntoBolsillo(e);
+  if (bolsillo.modo === 'esquirlas') { if (bolsillo.activo) manoMover(q, e.pointerId); return; }
   if (bolsillo.modo === 'ficha') {
     // la ficha se voltea deslizándola de lado (hacia donde vaya el dedo)
     const f = fichaGiro.inicio;
@@ -2136,6 +2172,7 @@ el.bolsillo.addEventListener('pointermove', e => {
   if (salto !== bolsillo.ultimoSalto) { bolsillo.ultimoSalto = salto; sonar('clic_madera', -16, 1.9); vibrar(6); }
 });
 function soltarTapa(e) {
+  if (bolsillo.modo === 'esquirlas') { manoSoltar(puntoBolsillo(e), e.pointerId); return; }
   if (bolsillo.modo === 'ficha') {
     const f = fichaGiro.inicio;
     if (f && e.pointerId === f.id && !f.volteada && f.movido < 0.08 && e.type === 'pointerup') voltearFicha(1);   // un toque también la voltea
@@ -2199,6 +2236,7 @@ function dibujarBolsillo(dt) {
   if (!bolsillo.activo || el.examinar.hidden) return;
   medirBolsillo();
   if (bolsillo.modo === 'ficha') { dibujarFichaEnMano(dt); return; }
+  if (bolsillo.modo === 'esquirlas') { dibujarMano4(dt); return; }
   // la tapa se asienta en su salto con un muelle
   if (!bolsillo.arrastre) {
     const k = 120, am = 2 * Math.sqrt(k) * 0.7;
@@ -2309,7 +2347,8 @@ function pista() {
   const n = estado.pistas++;
   if (estado.nivel === 2) return pistaNivel2();
   if (estado.nivel === 3) return pistaNivel3();
-  if (estado.nivel === 4) return pistaFinal();
+  if (estado.nivel === NIVEL_FINAL) return pistaFinal();
+  if (estado.nivel === 4) return pistaNivel4();
   if (estado.llave === 'cajon') {
     if (caraVisible() !== 'frente') return mensaje('Los cajones están junto a la cara. Gira la caja.');
     if (estado.cajones.c8 !== 'abierto') return mensaje(n % 2 ? 'Los cajones del costado se abren tirando de ellos. Prueba los de abajo.' : 'Algunos cajones tienen cerradura y otros no. Tira de ellos y mira dentro.');
@@ -2387,7 +2426,7 @@ const ZONAS_DETRAS = [
 // de la sala a la caja: la primera vez, cómo se mira por encima (la tapa y su trampilla)
 function acercarCaja() {
   irA('caja');
-  if (tec.nombre !== 'A' && estado.nivel !== 4 && primeraVez('vista-arriba')) {
+  if (tec.nombre !== 'A' && estado.nivel !== NIVEL_FINAL && primeraVez('vista-arriba')) {
     // (si hay otro mensaje a la vista, espera a que se vaya)
     const avisar = (intentos) => {
       if (estado.vista !== 'caja' || estado.fase !== 'jugando') return;
@@ -2403,8 +2442,9 @@ function tocarEscena(sx, sy) {
   const p = tec.aPintura(sx, sy);
   if (!p) return;                        // de cerca, la cámara se queda: se vuelve con «Sala», atrás o pellizcando
   if (estado.seleccion) { usarObjeto(estado.seleccion, p, null, { x: sx, y: sy }); return; }
-  const v = estado.vista, deCerca = v === 'caja' || v === 'cara' || v === 'cajones' || v === 'hija' || v === 'largo' || v === 'corazon';
+  const v = estado.vista, deCerca = v === 'caja' || v === 'cara' || v === 'cajones' || v === 'hija' || v === 'largo' || v === 'corazon' || v === 'zocalo';
   if (p.hija) { tocarHija(p); return; }
+  if (p.zocalo) { sonar('toque', -14); tocarZocalo(p); return; }        // el cajón de la peana (nivel 4)
   if (p.corazon) { sonar('toque', -14); tocarCorazon(p, { x: sx, y: sy }); return; }
   if (p.cara === 'detras') {
     if (!deCerca) { acercarCaja(); return; }
@@ -2428,6 +2468,7 @@ function tocarEscena(sx, sy) {
     if (!dentro(z.forma, p)) continue;
     if (z.grupo === 'caja' && !deCerca) { acercarCaja(); return; }
     if (z.grupo === 'incensario' && v !== 'incensario') { irA('incensario'); return; }
+    if (z.grupo === 'zocalo' && v !== 'zocalo') { irA('zocalo', 0.85); return; }
     sonar('toque', -14);
     z.tocar(p);
     return;
@@ -2509,6 +2550,7 @@ function tocarLampara() {
   for (const m of polillas) { m.susto = 1.3; m.posada = 0; }
   agitarLampara(1.5, 1);
   sonar('racha', -14, 1.25);
+  if (estado.nivel === 4 && estado.n4) { tocarLampara4(); return; }
   if (hijaEnMesa() && estado.hija.ojo !== 'puesto') {
     mensaje(primeraVez('lampara2') ? 'La llama tiembla, pero el ojo no se aparta de la caja pequeña.' : 'Ya no se deja engañar por la llama.');
     return;
@@ -2536,6 +2578,7 @@ function tocarTetera() {
     return;
   }
   vaporTetera(1);
+  if (estado.nivel >= 4) { mensaje(estado.nivel === 4 ? 'Té tibio. La caja ni lo mira: está pendiente de su cara.' : 'Té tibio.'); return; }
   if (estado.fase !== 'jugando' || ojo.parpadoBase > 0.5) { mensaje('Té verde. La tapa tiembla: todavía está caliente.'); return; }
   if (vigilaLaPequena()) {
     mensaje(primeraVez('tetera2') ? 'La tapa tintinea, pero el ojo no se aparta de la caja pequeña.' : 'Tintinea. El ojo no se aparta.');
@@ -2654,7 +2697,7 @@ async function subirCajaHija() {
 function tocarHija(p) {
   const h2 = estado.hija;
   if (!h2 || h2.fase !== 'mesa') return;
-  if (estado.nivel === 4 && estado.fin) {
+  if (estado.nivel === NIVEL_FINAL && estado.fin) {
     const f = estado.fin;
     if (f.hija === 'mesa') { cogerHija(); return; }
     if (f.hija === 'puesta') { sentir('holgura', { tono: 0.9 }); mensaje(f.fase === 'abierto' ? 'Late.' : 'Gírala con el dedo, en círculo, como una llave.'); }
@@ -2894,6 +2937,7 @@ async function cogerNota3() {
 }
 function tocarLabios() {
   const n3 = estado.n3;
+  if (estado.nivel === 4 && estado.n4 && n3 && n3.campanilla === 'puesta') { cantar4Caja(); return; }
   if (estado.nivel === 3 && n3) {
     if (n3.nota === 'boca') { cogerNota3(); return; }
     if (n3.campanilla === 'puesta') { sonar('campanilla', -12, 1.02); mensaje('La campanilla, en su boca. Canta bajito.'); return; }
@@ -3273,6 +3317,731 @@ function pistaNivel3() {
 }
 
 // ---------------------------------------------------------------------------------------------
+// Nivel 4 · El oro (solo en la B). La cara ya tiene cuerno, ojos y voz, pero su mejilla derecha está rota (se ve en el
+// boceto desde el principio). Se cura con kintsugi: tres esquirlas, laca en las juntas, el aliento de la caja para
+// curarla y polvo de oro. La regla del ojo varía: ahora defiende su cara, y ni la llama ni la tetera lo distraen; pero
+// cuando canta, cierra los ojos. Pasos:
+//   canta → se le suelta una esquirla a la peana → cogerla → probarla en la mejilla (faltan dos) → la sombra en la
+//   pared → la esquirla de encima de la lámpara → la frase que canta (con los ojos cerrados), en las tres olas de oro
+//   de la peana → el cajón de la peana (la tercera esquirla, la laca y el oro) → montar las esquirlas en la mano →
+//   trazar la laca en las juntas → curarla con su aliento (el té ya no echa vapor) → espolvorear el oro → ponerla en la
+//   mejilla mientras canta con los ojos cerrados → el oro corre por el borde y la grieta.
+// ---------------------------------------------------------------------------------------------
+let nivel4 = null;                              // capas/nivel4.json: la mejilla, las olas, el cajón y la lámpara
+const NOTAS_OLAS = [0.8909, 1, 1.3348];         // las olas de la peana, de izquierda a derecha: grave, media y aguda
+const ESQUIRLA_PEANA = { x: 958, y: 567 };      // donde cae la primera esquirla: en el reborde de la peana
+const ESCALA4 = 4;                              // las esquirlas en la bandeja y en los vuelos: 4 píxeles por píxel del boceto
+const MUESTRAS_JUNTA = 16;                      // cada junta se repasa (laca, oro) por trozos
+const DURA_CANTO = 4.8;                         // lo que canta con los ojos cerrados
+// dónde empiezan las esquirlas en la mano (el bolsillo es redondo: dentro del círculo y fuera del hueco)
+const SITIOS_MANO = [{ x: -12.5, y: 33.5 }, { x: 0, y: -30 }, { x: 30, y: 25 }];
+const cantar4 = { hasta: 0 };
+const olas4 = { hundida: [0, 0, 0], brillo: [0, 0, 0] };
+const esquirlaCae = { x: 0, y: 0, ang: 0, activa: false };
+let oroBorde = 0;                               // el oro que corre por el borde y la grieta al poner el pedazo (0 … 1)
+let madera4 = null;                             // la madera de la mejilla, ampliada (bandeja y vuelos) y la de la mano
+const centroDe = poli => ({ x: poli.reduce((a, q) => a + q[0], 0) / poli.length, y: poli.reduce((a, q) => a + q[1], 0) / poli.length });
+const centroMejilla = () => centroDe(nivel4.contorno);
+const enMano4 = () => (estado.n4 ? estado.n4.esquirlas.map((e, i) => (e === 'mano' ? i : -1)).filter(i => i >= 0) : []);
+const cantando4 = () => reloj < cantar4.hasta;
+function barajar(lista) {
+  const r = [...lista];
+  for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; }
+  return r;
+}
+function n4Inicial() {
+  // la frase: tres notas que no suenan de grave a aguda (eso sería demasiado fácil de adivinar)
+  let frase;
+  do { frase = barajar([0, 1, 2]); } while (frase.join('') === '012' || frase.join('') === '210');
+  return {
+    esquirlas: ['mejilla', 'lampara', 'zocalo'],   // dónde está cada una: mejilla (aún sin caer) | cayendo | peana | mano
+    frase, oida: false, pulsadas: [],
+    zocalo: 'cerrado',                             // el cajón de la peana: cerrado | suelto | abierto
+    laca: 'zocalo', oro: 'zocalo',
+    pieza: 'sueltas',                              // sueltas | montada | lacada | curada | dorada | puesta
+    // en la mano, cada esquirla empieza lejos de su sitio y girada (x, y: cuánto se ha movido su centro, en píxeles del boceto)
+    montaje: nivel4.esquirlas.map((p, i) => {
+      const cc = centroDe(relativo(p, centroMejilla())), sitio = SITIOS_MANO[i];
+      return { x: sitio.x - cc.x, y: sitio.y - cc.y, a: [2 * Math.PI / 3, -Math.PI / 3, Math.PI][i], puesta: false };
+    }),
+    juntas: [Array(MUESTRAS_JUNTA).fill(false), Array(MUESTRAS_JUNTA).fill(false)],
+    dorado: [Array(MUESTRAS_JUNTA).fill(false), Array(MUESTRAS_JUNTA).fill(false)],
+    probada: false,
+  };
+}
+// las imágenes: las esquirlas con la madera de la cara (bandeja, vuelos y la mano), el tarro de laca y el sobre de oro
+function prepararNivel4() {
+  if (!nivel4 || !img.mejilla) return;
+  const m = nivel4.mejilla;
+  madera4 = { origen: [m.x, m.y], bandeja: maderaMejilla(img.mejilla, ESCALA4), mano: null, ladoMano: 0 };
+  img.esquirla = imagenEsquirla(0);
+  img.laca = dibujarTarroLaca(100, 120); img.oro = dibujarSobreOro(110, 100);
+  const c = centroMejilla();
+  datos.capas.esquirla = { x: ESQUIRLA_PEANA.x - 6, y: ESQUIRLA_PEANA.y - 5, w: 12, h: 10 };
+  datos.capas.laca = { x: 0, y: 0, w: 20, h: 24 };
+  datos.capas.oro = { x: 0, y: 0, w: 22, h: 20 };
+  datos.capas.mejilla_pieza = { x: c.x - 26, y: c.y - 19, w: 52, h: 38 };
+  OBJETOS.laca.icono = icono(img.laca); OBJETOS.oro.icono = icono(img.oro);
+  // las zonas del nivel 4 (con las formas de nivel4.json), delante de las demás
+  const enN4 = () => estado.nivel === 4 && !!estado.n4;
+  ZONAS.unshift(
+    { grupo: 'caja', forma: ['elipse', ESQUIRLA_PEANA.x + 3, ESQUIRLA_PEANA.y, 26, 16], si: () => enN4() && estado.n4.esquirlas[0] === 'peana',
+      tocar: () => cogerEsquirla(0, { x: ESQUIRLA_PEANA.x + 3, y: ESQUIRLA_PEANA.y }) },
+    { grupo: 'caja', forma: ['poli', nivel4.contorno], si: () => estado.nivel >= 4, tocar: tocarMejilla },
+    ...nivel4.olas.map((o, i) => ({ grupo: 'zocalo', forma: ['elipse', o.x, o.y, o.r * 1.7, o.r * 1.3], si: enN4, tocar: () => pulsarOla(i) })),
+    { grupo: 'zocalo', forma: ['rect', 668, 552, 1000, 684], si: enN4, tocar: p => tocarZocalo(p) },
+    { grupo: 'sala', forma: ['elipse', nivel4.lampara.sombra[0], nivel4.lampara.sombra[1], 60, 45], si: enN4, tocar: tocarSombra4 },
+  );
+  ponerPiezaMejilla();
+}
+// una esquirla sola (o el pedazo entero, con sus juntas como estén), recortada a su tamaño
+function imagenEsquirla(i, s = ESCALA4) {
+  const p = nivel4.esquirlas[i], xs = p.map(q => q[0]), ys = p.map(q => q[1]);
+  const x0 = Math.min(...xs) - 2, y0 = Math.min(...ys) - 2, w = Math.max(...xs) + 2 - x0, h = Math.max(...ys) + 2 - y0;
+  const c = document.createElement('canvas'); c.width = Math.ceil(w * s); c.height = Math.ceil(h * s);
+  pintarEsquirla(c.getContext('2d'), p.map(([x, y]) => [x - x0, y - y0]), madera4.bandeja, [madera4.origen[0] - x0, madera4.origen[1] - y0], s, { sombra: false });
+  return c;
+}
+function imagenPedazo(s = ESCALA4) {
+  const n4 = estado.n4, cont = nivel4.contorno, xs = cont.map(q => q[0]), ys = cont.map(q => q[1]);
+  const x0 = Math.min(...xs) - 2, y0 = Math.min(...ys) - 2, w = Math.max(...xs) + 2 - x0, h = Math.max(...ys) + 2 - y0;
+  const c = document.createElement('canvas'); c.width = Math.ceil(w * s); c.height = Math.ceil(h * s);
+  const k = c.getContext('2d'), mover = pts => pts.map(([x, y]) => [(x - x0) * s, (y - y0) * s]);
+  for (const p of nivel4.esquirlas) pintarEsquirla(k, p.map(([x, y]) => [x - x0, y - y0]), madera4.bandeja, [madera4.origen[0] - x0, madera4.origen[1] - y0], s, { sombra: false });
+  if (n4) {
+    nivel4.juntas.forEach((j, i) => {
+      pintarLaca(k, mover(j), n4.juntas[i], s * 1.1);
+      pintarOro(k, mover(j), n4.dorado[i], s * 0.9);
+    });
+  }
+  return c;
+}
+// el icono y el texto de lo que llevas: las esquirlas (las que tengas) o el pedazo montado, según cómo vaya
+function ponerPiezaMejilla() {
+  if (!madera4) return;
+  const n4 = estado.n4, cuales = n4 ? enMano4() : [0];
+  OBJETOS.esquirlas.icono = icono(iconoEsquirlas(nivel4.esquirlas, cuales.length ? cuales : [0], madera4.bandeja, madera4.origen, ESCALA4));
+  OBJETOS.esquirlas.texto = cuales.length >= 3 ? 'Las tres esquirlas de su mejilla. Encajan entre ellas: móntalas en la mano.'
+    : `Madera clara, con la veta de su cara. ${cuales.length === 1 ? 'Una esquirla' : 'Dos esquirlas'}: faltan pedazos.`;
+  const pieza = n4 ? n4.pieza : 'montada';
+  img.mejilla_pieza = imagenPedazo();
+  OBJETOS.mejilla.icono = icono(img.mejilla_pieza);
+  OBJETOS.mejilla.texto = { montada: 'Las tres esquirlas, montadas. Las juntas están abiertas: así no se sostiene.',
+    lacada: 'Laca en las juntas, todavía fresca. La laca no seca al aire: cura con humedad.',
+    curada: 'La laca, tibia y pegajosa: es el momento del oro.',
+    dorada: 'Oro en las juntas. Un solo pedazo otra vez: el de su mejilla.' }[pieza] || OBJETOS.mejilla.texto;
+  pintarInventario();
+}
+
+// el estado al final del nivel 3, para empezar el 4 sin jugarlo, y al final del 4, para el final
+function estadoTrasNivel4() {
+  const n4 = estado.n4 = n4Inicial();
+  Object.assign(n4, { esquirlas: ['mano', 'mano', 'mano'], oida: true, pulsadas: [...n4.frase], zocalo: 'abierto', laca: 'mano', oro: 'mano',
+    pieza: 'puesta', juntas: n4.juntas.map(j => j.map(() => true)), dorado: n4.dorado.map(j => j.map(() => true)) });
+  n4.montaje.forEach(m => Object.assign(m, { x: 0, y: 0, a: 0, puesta: true }));
+  estado.inventario = estado.inventario.filter(o => !['esquirlas', 'mejilla', 'laca', 'oro'].includes(o));
+  oroBorde = 1;
+  cajonAnim.zocalo.k = cajonAnim.zocalo.objetivo = 0;
+  ponerPiezaMejilla();
+  hornear();
+}
+async function empezarNivel4() {
+  ocultarTarjeta();
+  estado.nivel = 4;
+  estado.n4 = n4Inicial();
+  estado.pistasPaso = {}; estado.intentosMirada = 0; estado.insistencia = {};
+  estado.fase = 'jugando'; estado.ocupado = true;
+  el.girar.hidden = false; el.inventario.hidden = false;
+  for (const id of Object.keys(CAJONES)) if (estado.cajones[id] === 'abierto') cerrarCajon(id);
+  if (estado.n3 && estado.n3.largo === 'abierto') { estado.n3.largo = 'suelto'; cajonAnim.largo.objetivo = 0.12; }
+  cajonAnim.zocalo.k = cajonAnim.zocalo.objetivo = 0;
+  olas4.hundida = [0, 0, 0]; olas4.brillo = [0, 0, 0]; oroBorde = 0; cantar4.hasta = 0; esquirlaCae.activa = false;
+  if (tec.cara() !== 'frente') tec.girar();
+  ojo.punto = null; ojo.distraidoHasta = 0; ojo.parpadoBase = 0; ojo.entornado = 0;
+  Object.assign(ojo2, { visible: 1, parpadoBase: 0 });
+  ponerPiezaMejilla();
+  bucle('noche', -13, 2);
+  irA('cara', 1.4);
+  await esperar(1.8);
+  // canta… y la voz se le quiebra en la mejilla rota: se suelta una esquirla, que cae a la peana
+  animar(0.4, k => { ojo.parpadoBase = 0.7 * suave(k); ojo2.parpadoBase = 0.7 * suave(k); });
+  sonar('tarareo', -5, 1); sonar('campanilla', -13, 1.02);
+  bocanada(BOCA.x, BOCA.y + 8, 0, -1, 0.5);
+  await esperar(1.1);
+  sonar('crac', -1); sacudir(2.5, 0.25); vibrar([18, 30, 10]);
+  const c = centroMejilla();
+  bocanada(c.x + 4, c.y + 4, 0.6, 0.2, 0.6);
+  animar(0.25, k => { ojo.parpadoBase = 0.7 + 0.3 * k; ojo2.parpadoBase = 0.7 + 0.3 * k; });
+  caerEsquirla();
+  irA('caja', 1.1);                                // (la cámara se aparta para que se vea dónde cae)
+  await esperar(1.3);
+  animar(0.5, k => { ojo.parpadoBase = 1 - salida(k); ojo2.parpadoBase = 1 - salida(k); });
+  await esperar(0.5);
+  estado.ocupado = false;
+  mensaje('Canta… y la voz se le quiebra en la mejilla rota. Se le ha soltado una esquirla.', 4.5);
+}
+function caerEsquirla() {
+  const n4 = estado.n4, a = centroMejilla(), b = ESQUIRLA_PEANA;
+  n4.esquirlas[0] = 'cayendo';
+  Object.assign(esquirlaCae, { x: a.x, y: a.y, ang: 0, activa: true });
+  animar(0.6, k => {
+    if (k < 0.75) { const q = k / 0.75; esquirlaCae.x = mezclar(a.x, b.x, q); esquirlaCae.y = a.y + (b.y - a.y) * q * q; esquirlaCae.ang = q * 5.2; }
+    else { const q = (k - 0.75) / 0.25; esquirlaCae.x = b.x + 3 * q; esquirlaCae.y = b.y - Math.sin(q * Math.PI) * 6; esquirlaCae.ang = 5.2 + q * 1.1; }
+  }, () => {
+    n4.esquirlas[0] = 'peana';
+    Object.assign(esquirlaCae, { x: b.x + 3, y: b.y, ang: 6.3 });
+    sentir('tope', { db: -6, tono: 1.7 }); sonar('clic_madera', -10, 1.5);
+    polvareda(b.x, b.y);
+    mirarA(b, 2);
+  });
+}
+async function cogerEsquirla(i, punto, ancla = 'caja') {
+  const n4 = estado.n4;
+  n4.esquirlas[i] = 'mano';
+  if (i === 0) esquirlaCae.activa = false;
+  ponerPiezaMejilla();
+  sonar('recoger', -3, 1.3);
+  await alInventario('esquirlas', 'esquirla', ancla, punto);
+  const n = enMano4().length;
+  mensaje(n === 1 ? 'Una esquirla de madera clara, con la veta de su cara.' : n === 2 ? 'Otra esquirla de su mejilla.'
+    : 'La tercera esquirla. Encajan entre ellas: tócalas dos veces en la bandeja para montarlas.', 4);
+}
+// la mejilla: lo que pasa al tocarla, según cómo vaya
+function tocarMejilla() {
+  const n4 = estado.n4;
+  if (estado.nivel !== 4 || !n4) {
+    mensaje(n4 && n4.pieza === 'puesta' ? 'La mejilla, curada con oro. La grieta brilla.' : 'La mejilla está rota: le falta un pedazo.');
+    return;
+  }
+  if (n4.pieza === 'puesta') { mensaje('La mejilla, curada con oro.'); return; }
+  if (laCajaMira()) {
+    const c = centroMejilla(), veces = insistir('cara4');
+    resistir(c.x, c.y - 4, 0.3, -1, c, veces);
+    mensaje(veces === 1 ? 'Le duele: no deja que le toques la cara mientras te mira.' : veces === 2 ? 'Te sigue la mano con el ojo.' : 'Ni la llama la distrae: es su cara.');
+    return;
+  }
+  mensaje('El hueco de la mejilla: la madera, rota y astillada.');
+}
+// cantar (tocándole la boca, con la campanilla dentro): solo mientras suelta el aire; canta tres notas con los ojos
+// cerrados, y en la peana brillan tres olas de oro con ellas
+function cantar4Caja() {
+  const n4 = estado.n4;
+  if (cantando4()) { mensaje('Está cantando, con los ojos cerrados.', 2.5); return; }
+  if (!exhalando()) {
+    contenerAliento(1.6); entornar(1.2);
+    mensaje(primeraVez('cantar4-aire') ? 'Estaba tomando aire: lo contiene, y no canta.' : 'Lo contiene. No canta.', 3.5);
+    return;
+  }
+  cantar4.hasta = reloj + DURA_CANTO;
+  sonar('campanilla', -12, 1.02);
+  animar(0.35, k => { ojo.parpadoBase = Math.max(ojo.parpadoBase, suave(k)); ojo2.parpadoBase = Math.max(ojo2.parpadoBase, suave(k)); });
+  setTimeoutReloj(DURA_CANTO - 0.5, () => animar(0.5, k => { if (estado.n4.pieza !== 'puesta') { ojo.parpadoBase = 1 - salida(k); ojo2.parpadoBase = 1 - salida(k); } }));
+  n4.frase.forEach((i, j) => setTimeoutReloj(0.45 + j * 0.7, () => {
+    sonar('tarareo', -4, NOTAS_OLAS[i] * 0.98); sonar('campanilla', -13, NOTAS_OLAS[i] * 1.5);
+    olas4.brillo[i] = 1;
+    bocanada(BOCA.x + (j - 1) * 6, BOCA.y + 8, 0, -1, 0.35);
+  }));
+  const primera = !n4.oida;
+  n4.oida = true;
+  if (estado.seleccion === 'mejilla' && n4.pieza === 'dorada') mensaje('Canta con los ojos cerrados. Ahora: su mejilla.', 3);
+  else mensaje(primera ? 'Canta tres notas con los ojos cerrados. Abajo, en la peana, tres olas de oro brillan con ellas.'
+    : 'Canta con los ojos cerrados, y las tres olas de la peana brillan con su voz.', 4.5);
+}
+// las tres olas de la peana: cada una, una nota; en el orden de su canto, sueltan el cajón
+function pulsarOla(i) {
+  const n4 = estado.n4;
+  if (estado.vista !== 'zocalo') { irA('zocalo', 0.85); return; }
+  sonar('campanilla', -9, NOTAS_OLAS[i] * 1.5);
+  if (n4.zocalo !== 'cerrado') { olas4.brillo[i] = 0.6; mensaje('La ola suena. El cajón ya está suelto.', 2.5); return; }
+  sonar('clic_madera', -16, 1.4); vibrar(8);
+  if (n4.pulsadas.includes(i)) { mensaje('Esa ola ya está hundida.', 2.5); return; }
+  n4.pulsadas.push(i);
+  const k = n4.pulsadas.length - 1;
+  if (n4.pulsadas[k] !== n4.frase[k]) {
+    setTimeoutReloj(0.35, () => {
+      n4.pulsadas = [];
+      sentir('trabado', { db: -6 });
+      const veces = insistir('olas');
+      mensaje(!n4.oida ? 'Las olas vuelven a subir. ¿En qué orden suenan?' : veces === 1 ? 'Las olas vuelven a subir: no es ese orden.' : 'No es el orden de su canto.', 3.5);
+    });
+    return;
+  }
+  if (n4.pulsadas.length === 3) soltarZocalo();
+  else if (primeraVez('ola')) mensaje('La ola cede un poco y suena: una nota. Tres olas de la peana brillan más que las demás.', 4);
+}
+async function soltarZocalo() {
+  const n4 = estado.n4;
+  estado.ocupado = true;
+  await esperar(0.35);
+  sentir('pestillo'); await esperar(0.25);
+  sentir('mecanismo', { db: -4 }); sacudir(2, 0.2);
+  n4.zocalo = 'suelto';
+  olas4.brillo = [1, 1, 1];
+  cajonAnim.zocalo.objetivo = 0.14; cajonAnim.zocalo.v = 2.2;
+  bocanada(830, 600, 0, -1, 0.6);
+  estado.ocupado = false;
+  mensaje('En el orden de su canto. Clac: el centro de la peana es un cajón, y se ha soltado.', 4.5);
+}
+function tocarZocalo(p = {}) {
+  const n4 = estado.n4;
+  if (estado.vista !== 'zocalo') { irA('zocalo', 0.85); return; }
+  if (!n4 || n4.zocalo === 'cerrado') {
+    sonar('tope_madera', -12, 0.9);
+    mensaje(primeraVez('peana4') ? 'La peana suena hueca. Tres de sus olas de oro brillan más que las demás.' : 'Suena hueca.');
+    return;
+  }
+  const a = cajonAnim.zocalo;
+  if (n4.zocalo === 'suelto') {
+    a.v += 1.6; sentir('holgura', { tono: 1.05 });
+    mensaje(primeraVez('tirar-zocalo') ? 'Se ha soltado. Tira de él hacia fuera: arrastra el dedo.' : 'Tira de él.');
+    return;
+  }
+  if (a.k < 0.7) return;
+  // abierto: lo que se toca, o lo siguiente que quede
+  const parte = p.zocalo && p.zocalo !== 'cajon' ? p.zocalo
+    : n4.esquirlas[2] === 'zocalo' ? 'esquirla' : n4.laca === 'zocalo' ? 'laca' : n4.oro === 'zocalo' ? 'oro' : null;
+  if (!parte) { mensaje('Vacío. Huele a laca vieja.'); return; }
+  cogerDelZocalo(parte);
+}
+function abrirZocalo() {
+  const n4 = estado.n4, a = cajonAnim.zocalo;
+  n4.zocalo = 'abierto';
+  a.objetivo = 1;
+  sonar('cajon', -4, 0.8); vibrar(15);
+  setTimeoutReloj(0.3, () => polvoDeCajon(830, 620));
+  setTimeoutReloj(0.35, () => mensaje('Dentro: una esquirla, un tarro de laca con su pincel y un sobre de papel con el sello 金.', 4.5));
+  if (tec.inclinar) setTimeoutReloj(0.25, () => tec.inclinar(0, 0.45));
+}
+function cogerDelZocalo(parte) {
+  const n4 = estado.n4;
+  const v = tec.puntoZocalo ? tec.puntoZocalo(parte) : null, m = v ? tec.ancla(v) : null;
+  const desde = m && m.visible ? { x: m.x, y: m.y, k: 1.6, enPantalla: true } : { x: 830, y: 615 };
+  if (parte === 'esquirla') { cogerEsquirla(2, desde, 'caja'); return; }
+  n4[parte] = 'mano';
+  sonar('recoger', -3, parte === 'laca' ? 0.9 : 1.4);
+  if (parte === 'oro') sonar('oro', -12);
+  alInventario(parte, parte, 'caja', desde);
+  mensaje(parte === 'laca' ? 'Laca de urushi, negra y espesa, con su pincel en la tapa. Pega lo roto… cuando cura.' : 'Un sobre de papel, con el sello 金. Dentro, polvo de oro.', 4);
+}
+// la lámpara, en el nivel 4: encima de su marco está la segunda esquirla (su sombra la delata en la pared); ya no
+// distrae al ojo, que no aparta la vista de su cara
+function tocarLampara4() {
+  const n4 = estado.n4;
+  if (n4.esquirlas[1] === 'lampara') {
+    const q = nivel4.lampara.esquirla;
+    cogerEsquirla(1, { x: q[0], y: q[1] }, 'sala');
+    setTimeoutReloj(0.2, () => mensaje(primeraVez('lampara4') ? 'Encima del marco de la lámpara había otra esquirla: era su sombra la de la pared.' : 'Otra esquirla.', 4));
+    return;
+  }
+  mensaje(primeraVez('lampara4-ojo') ? 'La llama tiembla, pero ya no la distrae: no aparta los ojos de su cara.' : 'La llama tiembla.', 3.5);
+}
+function tocarSombra4() {
+  const n4 = estado.n4;
+  if (n4 && n4.esquirlas[1] === 'lampara') { mirarA({ x: 604, y: 214 }, 1.5); mensaje('Una sombra extraña en la pared, sobre la lámpara. Algo pequeño está encima de su marco.', 4); }
+  else mensaje('La pared, tibia de la lámpara.');
+}
+
+// ---- en la mano: montar las esquirlas, trazar la laca y espolvorear el oro (el bolsillo, modo «esquirlas») ----
+// Las coordenadas de la mano: píxeles del boceto, con el centro del hueco en el (0, 0); en el lienzo, el hueco va en el
+// centro, un poco arriba (abajo quedan la laca y el oro)
+const mano4 = { arrastre: null, trazo: null, herramienta: null, motas: [], brillo: 0, ultimoPincel: 0, ultimoOro: 0 };
+function escalaMano() { return el.bolsillo.width / 100; }
+function aMano(q) {                                       // de −1…1 del bolsillo a coordenadas de la mano
+  const W = el.bolsillo.width, s = escalaMano();
+  return { x: (q.x + 1) / 2 * W / s - W / 2 / s, y: (q.y + 1) / 2 * W / s - W * 0.44 / s };
+}
+const relativo = (poli, c) => poli.map(([x, y]) => [x - c.x, y - c.y]);
+function girarPunto(p, a) { const s = Math.sin(a), c = Math.cos(a); return [p[0] * c - p[1] * s, p[0] * s + p[1] * c]; }
+// el polígono de la esquirla i tal como está en la mano (movida y girada alrededor de su centro)
+function esquirlaEnMano(i) {
+  const c = centroMejilla(), poli = relativo(nivel4.esquirlas[i], c), cc = centroDe(poli), m = estado.n4.montaje[i];
+  return poli.map(p => { const q = girarPunto([p[0] - cc.x, p[1] - cc.y], m.a); return [q[0] + cc.x + m.x, q[1] + cc.y + m.y]; });
+}
+const herramientas4 = () => {
+  const n4 = estado.n4, r = [];
+  if (!n4 || n4.pieza === 'sueltas') return r;
+  if (estado.inventario.includes('laca')) r.push({ id: 'laca', x: -0.5, y: 0.64 });
+  if (estado.inventario.includes('oro')) r.push({ id: 'oro', x: 0.5, y: 0.64 });
+  return r;
+};
+function ayudaMano4() {
+  const n4 = estado.n4;
+  if (!n4) return '';
+  if (n4.pieza === 'sueltas') return enMano4().length < 3 ? `Faltan ${3 - enMano4().length === 1 ? 'una esquirla' : 'dos esquirlas'} · toca fuera para guardarlas`
+    : 'Arrastra cada esquirla a su sitio · tócala para girarla';
+  if (n4.pieza === 'montada') return estado.inventario.includes('laca') ? 'Toca la laca y repasa las juntas con el dedo' : 'Las juntas están abiertas: hace falta con qué pegarlas';
+  if (n4.pieza === 'lacada') return 'La laca cura con humedad, no al aire · toca fuera para guardarlo';
+  if (n4.pieza === 'curada') return estado.inventario.includes('oro') ? 'Toca el oro y espolvoréalo sobre las juntas' : 'La laca está pegajosa: falta el oro';
+  return 'Oro en las juntas · toca fuera para guardarlo';
+}
+function abrirMano4() {
+  bolsillo.activo = true; bolsillo.modo = 'esquirlas';
+  mano4.arrastre = null; mano4.trazo = null; mano4.motas.length = 0;
+  mano4.herramienta = null;                     // (al abrirla, nada elegido: se elige con un toque)
+  medirBolsillo();
+}
+function manoPulsar(q, id) {
+  const n4 = estado.n4;
+  // las herramientas (con el pedazo montado)
+  for (const h of herramientas4()) {
+    if (Math.hypot(q.x - h.x, q.y - h.y) < 0.19) {
+      mano4.herramienta = mano4.herramienta === h.id ? null : h.id;
+      sonar(h.id === 'laca' ? 'pincel' : 'oro', -14, 1.1); vibrar(6);
+      el.examinarAyuda.textContent = mano4.herramienta === 'laca' ? 'Repasa con el dedo las dos juntas del pedazo'
+        : mano4.herramienta === 'oro' ? 'Espolvorea: mueve el dedo de un lado a otro sobre las juntas' : ayudaMano4();
+      return;
+    }
+  }
+  if (n4.pieza !== 'sueltas') {
+    if (mano4.herramienta) { mano4.trazo = { id }; aplicarHerramienta(q); }
+    return;
+  }
+  // una esquirla suelta (la de encima primero)
+  const p = aMano(q), orden = [...enMano4()].reverse();
+  for (const i of orden) {
+    const m = n4.montaje[i];
+    if (m.puesta) continue;
+    if (dentro(['poli', esquirlaEnMano(i)], p)) {
+      mano4.arrastre = { i, id, x0: q.x, y0: q.y, mx: m.x, my: m.y, movido: 0 };
+      sentir('roce', { tono: 1.6, db: -6 });
+      return;
+    }
+  }
+}
+function manoMover(q, id) {
+  const n4 = estado.n4, a = mano4.arrastre;
+  if (a && a.id === id) {
+    const W = el.bolsillo.width, s = escalaMano(), m = n4.montaje[a.i];
+    a.movido = Math.max(a.movido, Math.hypot(q.x - a.x0, q.y - a.y0));
+    m.x = a.mx + (q.x - a.x0) / 2 * W / s; m.y = a.my + (q.y - a.y0) / 2 * W / s;
+    return;
+  }
+  if (mano4.trazo && mano4.trazo.id === id) aplicarHerramienta(q);
+}
+function manoSoltar(q, id) {
+  const n4 = estado.n4, a = mano4.arrastre;
+  if (mano4.trazo && mano4.trazo.id === id) mano4.trazo = null;
+  if (!a || a.id !== id) return;
+  mano4.arrastre = null;
+  const m = n4.montaje[a.i];
+  if (a.movido < 0.05) {                       // un toque: la esquirla gira un sexto de vuelta
+    m.a = (m.a + Math.PI / 3) % (2 * Math.PI);
+    sonar('clic_madera', -12, 1.6); vibrar(5);
+  }
+  // cerca de su sitio y bien girada, encaja
+  const giroBien = Math.abs(Math.atan2(Math.sin(m.a), Math.cos(m.a))) < 0.05;
+  if (Math.hypot(m.x, m.y) < 6 && giroBien) {
+    Object.assign(m, { x: 0, y: 0, a: 0, puesta: true });
+    sentir('clac', { tono: 1.35 }); mano4.brillo = 1;
+    if (n4.montaje.every((mm, i) => mm.puesta || n4.esquirlas[i] !== 'mano') && enMano4().length === 3) montarPedazo();
+    else el.examinarAyuda.textContent = enMano4().length < 3 ? 'Encaja. Faltan esquirlas' : 'Encaja. Sigue con las otras';
+  } else if (Math.hypot(m.x, m.y) < 10 && !giroBien && a.movido >= 0.05) {
+    sentir('tope', { db: -10, tono: 1.5, sinVibrar: true });
+    el.examinarAyuda.textContent = 'Casi: gírala (tócala) hasta que encaje';
+  }
+}
+function montarPedazo() {
+  const n4 = estado.n4;
+  n4.pieza = 'montada';
+  estado.inventario = estado.inventario.map(o => (o === 'esquirlas' ? 'mejilla' : o));
+  if (estado.seleccion === 'esquirlas') estado.seleccion = null;
+  ponerPiezaMejilla();
+  sonar('encajar', -6, 1.2);
+  el.examinarNombre.textContent = OBJETOS.mejilla.nombre;
+  el.examinarTexto.textContent = OBJETOS.mejilla.texto;
+  el.examinarAyuda.textContent = ayudaMano4();
+}
+// la herramienta, donde está el dedo: la laca marca las juntas que repasa; el oro cae y se pega a la laca curada
+function aplicarHerramienta(q) {
+  const n4 = estado.n4, p = aMano(q), c = centroMejilla();
+  if (mano4.herramienta === 'laca') {
+    if (n4.pieza === 'curada' || n4.pieza === 'dorada') { el.examinarAyuda.textContent = 'La laca ya está puesta'; return; }
+    let alguna = false;
+    nivel4.juntas.forEach((j, i) => {
+      muestrear(relativo(j, c), MUESTRAS_JUNTA).forEach(([x, y], k) => {
+        if (!n4.juntas[i][k] && Math.hypot(x - p.x, y - p.y) < 4) { n4.juntas[i][k] = true; alguna = true; }
+      });
+    });
+    if (alguna && reloj > mano4.ultimoPincel) { sonar('pincel', -10, azar(0.9, 1.1)); mano4.ultimoPincel = reloj + 0.3; }
+    if (n4.juntas.every(j => j.every(Boolean)) && n4.pieza === 'montada') {
+      n4.pieza = 'lacada'; ponerPiezaMejilla();
+      mano4.herramienta = null;
+      el.examinarTexto.textContent = OBJETOS.mejilla.texto; el.examinarAyuda.textContent = ayudaMano4();
+      sentir('tope', { db: -10, tono: 1.4, sinVibrar: true });
+    }
+    return;
+  }
+  if (mano4.herramienta === 'oro') {
+    // las motas caen desde el dedo y se quedan donde haya laca curada
+    for (let i = 0; i < 3; i++) mano4.motas.push({ x: p.x + azar(-2, 2), y: p.y - azar(0, 2.5), vy: azar(5, 14), suelo: p.y + azar(0, 1.6), t: 0, vida: azar(0.6, 1.2), pega: n4.pieza === 'curada' });
+    if (reloj > mano4.ultimoOro) { sonar('oro', -16, azar(0.95, 1.1)); mano4.ultimoOro = reloj + 0.8; }
+    if (n4.pieza !== 'curada' && primeraVez('oro-no-pega')) el.examinarAyuda.textContent = n4.pieza === 'lacada' ? 'El oro resbala: la laca aún está fresca. Tiene que curar' : 'El oro no se pega a la madera: necesita laca';
+  }
+}
+function actualizarMano4(dt) {
+  const n4 = estado.n4, c = centroMejilla();
+  for (const m of mano4.motas) {
+    m.t += dt;
+    if (m.y < m.suelo) { m.vy += 60 * dt; m.y = Math.min(m.suelo, m.y + m.vy * dt); }
+    else if (!m.posada) {
+      m.posada = true;
+      if (m.pega) nivel4.juntas.forEach((j, i) => muestrear(relativo(j, c), MUESTRAS_JUNTA).forEach(([x, y], k) => {
+        if (n4.juntas[i][k] && Math.hypot(x - m.x, y - m.y) < 3) n4.dorado[i][k] = true;
+      }));
+    }
+  }
+  for (let i = mano4.motas.length - 1; i >= 0; i--) if (mano4.motas[i].t > mano4.motas[i].vida + (mano4.motas[i].pega ? 0.5 : 0)) mano4.motas.splice(i, 1);
+  if (n4.pieza === 'curada' && n4.dorado.every(j => j.every(Boolean))) {
+    n4.pieza = 'dorada'; ponerPiezaMejilla();
+    mano4.herramienta = null; mano4.brillo = 1;
+    sonar('campanilla', -10, 1.5); sentir('desbloqueo', { db: -10 });
+    el.examinarTexto.textContent = OBJETOS.mejilla.texto; el.examinarAyuda.textContent = ayudaMano4();
+  }
+  mano4.brillo = Math.max(0, mano4.brillo - dt * 0.8);
+}
+function dibujarMano4(dt) {
+  const n4 = estado.n4;
+  if (!n4 || !madera4) return;
+  actualizarMano4(dt);
+  const c = el.bolsillo.getContext('2d'), W = el.bolsillo.width, s = escalaMano(), cx = W / 2, cy = W * 0.44;
+  // la madera de la mano, a su tamaño (se rehace si cambia el lienzo)
+  if (madera4.ladoMano !== W) { madera4.mano = maderaMejilla(img.mejilla, s); madera4.ladoMano = W; }
+  c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, W, W);
+  // un paño de seda oscuro (fukusa), donde se trabaja
+  const r = W * 0.04;
+  c.fillStyle = '#1d2433';
+  c.beginPath(); c.roundRect ? c.roundRect(W * 0.03, W * 0.03, W * 0.94, W * 0.94, r) : c.rect(W * 0.03, W * 0.03, W * 0.94, W * 0.94); c.fill();
+  const v = c.createRadialGradient(cx, cy, W * 0.1, cx, cy, W * 0.7);
+  v.addColorStop(0, 'rgba(70, 86, 120, 0.35)'); v.addColorStop(1, 'rgba(0, 0, 0, 0.4)');
+  c.fillStyle = v; c.fill();
+  c.translate(cx, cy);
+  const cen = centroMejilla(), origen = [madera4.origen[0] - cen.x, madera4.origen[1] - cen.y];
+  // el hueco donde van: la forma de la mejilla, en sombra (hasta que está montado)
+  if (n4.pieza === 'sueltas') {
+    const hueco = relativo(nivel4.contorno, cen).map(([x, y]) => [x * s, y * s]);
+    c.beginPath(); hueco.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y))); c.closePath();
+    c.fillStyle = 'rgba(8, 10, 16, 0.55)'; c.fill();
+    c.setLineDash([W * 0.012, W * 0.01]); c.strokeStyle = 'rgba(214, 190, 140, 0.45)'; c.lineWidth = W * 0.004; c.stroke(); c.setLineDash([]);
+  }
+  // las esquirlas: primero las puestas, luego las sueltas (la que se arrastra, encima)
+  const orden = enMano4().sort((a, b) => (n4.montaje[b].puesta - n4.montaje[a].puesta) || (mano4.arrastre && a === mano4.arrastre.i ? 1 : mano4.arrastre && b === mano4.arrastre.i ? -1 : 0));
+  for (const i of orden) {
+    const m = n4.montaje[i], poli = relativo(nivel4.esquirlas[i], cen), cc = centroDe(poli);
+    c.save();
+    c.translate((cc.x + m.x) * s, (cc.y + m.y) * s); c.rotate(m.a); c.translate(-cc.x * s, -cc.y * s);
+    pintarEsquirla(c, poli, madera4.mano, origen, s, { sombra: !m.puesta, brillo: m.puesta ? mano4.brillo : 0 });
+    c.restore();
+  }
+  // las juntas: abiertas (oscuras), con laca y con oro
+  if (n4.pieza !== 'sueltas') {
+    nivel4.juntas.forEach((j, i) => {
+      const pts = relativo(j, cen).map(([x, y]) => [x * s, y * s]);
+      if (n4.pieza === 'montada') {
+        c.save(); c.strokeStyle = 'rgba(18, 9, 4, 0.85)'; c.lineWidth = s * 0.5; c.lineCap = 'round';
+        c.beginPath(); pts.forEach(([x, y], k) => (k ? c.lineTo(x, y) : c.moveTo(x, y))); c.stroke(); c.restore();
+      }
+      pintarLaca(c, pts, n4.juntas[i], s * 0.9);
+      if (n4.pieza === 'curada' || n4.pieza === 'dorada') {
+        // la laca curada brilla un poco más (pegajosa)
+        c.save(); c.globalAlpha = 0.35; pintarLaca(c, pts, n4.juntas[i], s * 1.15); c.restore();
+      }
+      pintarOro(c, pts, n4.dorado[i], s * 0.75, { chispa: n4.pieza === 'dorada' ? (reloj * 0.35) % 1 : 0 });
+    });
+  }
+  // las motas de oro
+  for (const m of mano4.motas) {
+    const a = m.posada ? Math.max(0, 1 - (m.t - m.vida) * 2) : 1;
+    c.fillStyle = `rgba(${m.pega ? '246, 214, 140' : '230, 200, 130'}, ${a})`;
+    c.fillRect(m.x * s - s * 0.12, m.y * s - s * 0.12, s * 0.24, s * 0.24);
+  }
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  // las herramientas, abajo
+  for (const h of herramientas4()) {
+    const x = (h.x + 1) / 2 * W, y = (h.y + 1) / 2 * W, rr = W * 0.075, elegida = mano4.herramienta === h.id;
+    c.save();
+    c.fillStyle = elegida ? 'rgba(214, 170, 92, 0.35)' : 'rgba(10, 12, 20, 0.55)';
+    c.beginPath(); c.arc(x, y, rr, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = elegida ? 'rgba(246, 222, 160, 0.95)' : 'rgba(214, 190, 140, 0.5)'; c.lineWidth = W * 0.005; c.stroke();
+    const im = h.id === 'laca' ? img.laca : img.oro, e = rr * 1.4 / Math.max(im.width, im.height);
+    c.drawImage(im, x - im.width * e / 2, y - im.height * e / 2, im.width * e, im.height * e);
+    c.restore();
+  }
+  if (mano4.trazo && mano4.herramienta === 'laca') { /* (el pincel se nota en el sonido y en la laca que aparece) */ }
+}
+
+// la boca, en el nivel 4: canta (con la campanilla dentro), y con el pedazo lacado, le echa el aliento
+function usarMejillaEnBoca(desde) {
+  const n4 = estado.n4;
+  if (n4.pieza === 'dorada') { cantar4Caja(); return; }
+  if (n4.pieza === 'sueltas') { mensaje('Primero, monta las esquirlas.'); return; }
+  if (n4.pieza === 'montada') { vaho(); mensaje('Le echa el aliento, pero sin laca no hay nada que curar.', 3.5); return; }
+  if (n4.pieza === 'curada') { mensaje('Ya está curada: la laca, tibia y pegajosa. Es el momento del oro.', 3.5); return; }
+  if (!exhalando()) {
+    contenerAliento(1.6); entornar(1.2);
+    mensaje(primeraVez('curar-aire') ? 'Estaba tomando aire: lo contiene.' : 'Lo contiene.', 3);
+    return;
+  }
+  curarPedazo(desde);
+}
+async function curarPedazo(desde) {
+  const n4 = estado.n4;
+  estado.ocupado = true;
+  if (estado.seleccion === 'mejilla') { estado.seleccion = null; pintarInventario(); }
+  if (estado.vista !== 'cara') { irA('cara', 0.7); await esperar(0.6); }
+  const delante = { x: BOCA.x + 4, y: BOCA.y + 18 };
+  await desdeInventario('mejilla', 'mejilla_pieza', delante, 'caja', desde);
+  pedazoEnBoca = { x: delante.x, y: delante.y };
+  vaho(); sonar('suspiro', -8, 1.05);
+  setTimeoutReloj(0.9, () => vaho());
+  await esperar(1.9);
+  n4.pieza = 'curada';
+  ponerPiezaMejilla();
+  pedazoEnBoca = null;
+  await alInventario('mejilla', 'mejilla_pieza', 'caja', delante);
+  estado.ocupado = false;
+  mensaje('Le echa el aliento, tibio y húmedo: la laca se pone pegajosa. Es el momento del oro.', 4.5);
+}
+let pedazoEnBoca = null;
+// el pedazo dorado, en su sitio: solo si la caja no mira (cierra los ojos cuando canta)
+async function ponerMejilla(desde) {
+  const n4 = estado.n4, c = centroMejilla();
+  if (laCajaMira()) {
+    const veces = insistir('mejilla');
+    resistir(c.x, c.y - 4, 0.3, -1, c, veces);
+    mensaje(veces === 1 ? 'Te mira la mano: no deja que le toques la cara.' : veces === 2 ? 'Ni la llama la distrae: es su cara.' : 'Cuando canta, cierra los ojos.', 4);
+    return;
+  }
+  estado.ocupado = true;
+  if (estado.seleccion) { estado.seleccion = null; pintarInventario(); }
+  if (estado.vista !== 'cara') { irA('cara', 0.6); await esperar(0.5); }
+  await desdeInventario('mejilla', 'mejilla_pieza', c, 'caja', desde);
+  n4.pieza = 'puesta';
+  estado.inventario = estado.inventario.filter(o => o !== 'laca' && o !== 'oro');
+  pintarInventario();
+  hornear();
+  sentir('clac', { tono: 1.1 }); sonar('encajar', -4);
+  await esperar(0.45);
+  // el oro corre por el borde del pedazo y baja por la grieta
+  sonar('oro', -3);
+  await animarPromesa(2.4, k => { oroBorde = suave(k); });
+  oroBorde = 1;
+  hornear();
+  destello(c.x, c.y, 100, '255,215,140', 0.8, 1.8);
+  // y canta, con los ojos abiertos
+  cantar4.hasta = 0;
+  animar(0.6, k => { ojo.parpadoBase = Math.min(ojo.parpadoBase, 1 - salida(k)); ojo2.parpadoBase = Math.min(ojo2.parpadoBase, 1 - salida(k)); });
+  sonar('canto', -2);
+  for (let i = 0; i < 5; i++) setTimeoutReloj(0.3 + i * 1.1, () => bocanada(BOCA.x + azar(-8, 8), BOCA.y + 8, azar(-0.3, 0.3), -1, 0.6));
+  destello(c.x, c.y, 140, '255,215,150', 0.45, 6);
+  agitarLampara(2, 0.4);
+  await esperar(6.6);
+  estado.ocupado = false;
+  terminarNivel(4);
+}
+// lo que se dibuja encima en el nivel 4 (y después): la esquirla que cae y la de la peana, la sombra de la pared, las
+// olas de oro, el pedazo delante de la boca y el oro que corre (luego, un brillo de vez en cuando)
+function dibujarNivel4Encima(conAncla) {
+  const n4 = estado.n4;
+  if (!n4 || !nivel4) return;
+  const deFrente = tec.cara() === 'frente';
+  if (estado.nivel === 4 && (n4.esquirlas[0] === 'cayendo' || n4.esquirlas[0] === 'peana') && img.esquirla) conAncla(esquirlaCae.x, esquirlaCae.y, 'caja', () => {
+    const d = datos.capas.esquirla;
+    ctx.save(); ctx.translate(esquirlaCae.x, esquirlaCae.y); ctx.rotate(esquirlaCae.ang);
+    ctx.drawImage(img.esquirla, -d.w / 2, -d.h / 2, d.w, d.h);
+    ctx.restore();
+  });
+  if (estado.nivel === 4 && n4.esquirlas[1] === 'lampara') {
+    const [sx, sy] = nivel4.lampara.sombra, cen = centroDe(nivel4.esquirlas[1]);
+    conAncla(sx, sy, 'sala', () => {
+      // la sombra de la esquirla, grande y temblando con la llama (al revés: la luz viene de abajo)
+      const tiembla = 0.75 + 0.25 * Math.sin(reloj * 9.1) * Math.sin(reloj * 3.7);
+      ctx.save(); ctx.translate(sx + Math.sin(reloj * 7.3) * 1.2, sy + Math.sin(reloj * 5.1) * 0.8); ctx.scale(3.3, -3.3);
+      ctx.beginPath(); nivel4.esquirlas[1].forEach(([x, y], i) => (i ? ctx.lineTo(x - cen.x, y - cen.y) : ctx.moveTo(x - cen.x, y - cen.y))); ctx.closePath();
+      ctx.filter = 'blur(0.5px)';
+      ctx.fillStyle = `rgba(34, 18, 9, ${0.55 * tiembla * (1 - lampara.apagada)})`; ctx.fill();
+      ctx.restore();
+    });
+  }
+  if (deFrente && estado.nivel === 4) {
+    // las tres olas: brillan con su nota (y, cuando la caja suelta el aire, un poco, para que se distingan)
+    nivel4.olas.forEach((o, i) => {
+      const hundida = olas4.hundida[i];
+      // tres olas de oro más vivo, incrustadas: arcos concéntricos sobre las pintadas
+      conAncla(o.x, o.y, 'caja', () => {
+        ctx.save(); ctx.lineCap = 'round';
+        for (let k = 0; k < 3; k++) {
+          const r = o.r * (1 - k * 0.3);
+          ctx.strokeStyle = `rgba(${k ? '236, 200, 120' : '250, 222, 150'}, ${0.85 - 0.15 * k - 0.4 * hundida})`;
+          ctx.lineWidth = k ? 0.9 : 1.3;
+          ctx.beginPath(); ctx.arc(o.x, o.y + o.r * 0.35 + 1.5 * hundida, r, Math.PI * 1.08, Math.PI * 1.92); ctx.stroke();
+        }
+        ctx.restore();
+      });
+      if (hundida > 0.01) conAncla(o.x, o.y, 'caja', () => {
+        ctx.save(); ctx.fillStyle = `rgba(6, 3, 2, ${0.38 * hundida})`;
+        ctx.beginPath(); ctx.ellipse(o.x, o.y + 1, o.r * 1.15, o.r * 0.7, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+      });
+    });
+  }
+  if (pedazoEnBoca && img.mejilla_pieza) conAncla(pedazoEnBoca.x, pedazoEnBoca.y, 'caja', () => {
+    const d = datos.capas.mejilla_pieza;
+    ctx.drawImage(img.mejilla_pieza, pedazoEnBoca.x - d.w / 2, pedazoEnBoca.y - d.h / 2, d.w, d.h);
+  });
+  if (deFrente && n4.pieza === 'puesta') {
+    const cerrado = [...nivel4.contorno, nivel4.contorno[0]], c = centroMejilla();
+    if (oroBorde < 1) conAncla(c.x, c.y, 'caja', () => {
+      pintarOro(ctx, cerrado, null, 1.8, { hasta: Math.min(1, oroBorde / 0.7) });
+      pintarOro(ctx, nivel4.grieta, null, 1.55, { hasta: Math.max(0, (oroBorde - 0.6) / 0.4) });
+    });
+    else {
+      const t = reloj % 7;
+      if (t < 1.4) conAncla(c.x, c.y, 'caja', () => pintarOro(ctx, cerrado, null, 1.8, { hasta: 1, chispa: t / 1.4 }));
+    }
+  }
+}
+// el brillo de las olas (con luz: se dibuja en modo «lighter»)
+function dibujarLuzOlas(conAncla) {
+  const n4 = estado.n4;
+  if (!n4 || !nivel4 || estado.nivel !== 4 || tec.cara() !== 'frente') return;
+  const pulso = n4.zocalo === 'cerrado' ? 0.1 + 0.08 * Math.sin(reloj * 1.7) : 0;
+  nivel4.olas.forEach((o, i) => {
+    const a = Math.max(olas4.brillo[i], pulso);
+    if (a < 0.02) return;
+    conAncla(o.x, o.y, 'caja', () => brillo(ctx, o.x, o.y, o.r * 2.2, '255,215,140', a * 0.9));
+  });
+}
+function actualizarNivel4(dt) {
+  if (!estado.n4) return;
+  for (let i = 0; i < 3; i++) {
+    olas4.brillo[i] = Math.max(0, olas4.brillo[i] - dt * 1.1);
+    const meta = estado.n4.pulsadas.includes(i) && estado.n4.zocalo === 'cerrado' ? 1 : 0;
+    olas4.hundida[i] = mezclar(olas4.hundida[i], meta, 1 - Math.exp(-dt * 14));
+  }
+}
+// las pistas del nivel 4, de vagas a claras
+function pistaNivel4() {
+  const n4 = estado.n4;
+  const escalon = (clave, lista) => {
+    const n = estado.pistasPaso[clave] = (estado.pistasPaso[clave] || 0) + 1;
+    return mensaje(lista[Math.min(n, lista.length) - 1], 4.5);
+  };
+  if (!n4) return mensaje('Mira.');
+  if (n4.esquirlas[0] === 'peana' || n4.esquirlas[0] === 'cayendo') return escalon('peana', ['Algo pequeño cayó de su mejilla.', 'Está en el reborde de la peana, bajo la cara. Tócalo.']);
+  if (n4.esquirlas[1] === 'lampara') return escalon('sombra', ['Faltan más pedazos de su mejilla. Mira las sombras de la sala.', 'Sobre la lámpara, en la pared, hay una sombra que no es de la lámpara.', 'Toca la lámpara: encima de su marco hay algo.']);
+  if (n4.zocalo === 'cerrado') return escalon('olas', ['La peana suena hueca. Tres de sus olas de oro brillan más.', 'Cuando la caja canta, esas olas brillan, una con cada nota.',
+    'Tócale la boca mientras suelta el aire: canta tres notas. Luego toca las tres olas en ese orden.']);
+  if (n4.zocalo === 'suelto') return escalon('zocalo', ['El centro de la peana se ha soltado.', 'Tira de él hacia fuera con el dedo.']);
+  if (n4.esquirlas[2] === 'zocalo' || n4.laca === 'zocalo' || n4.oro === 'zocalo') return escalon('dentro', ['En el cajón de la peana queda algo.', 'Tócalo para cogerlo.']);
+  if (n4.pieza === 'sueltas') return escalon('montar', ['Tres esquirlas que encajan entre ellas.', 'Tócalas dos veces en la bandeja para tenerlas en la mano.', 'Arrastra cada una a la sombra con su forma; tócala para girarla.']);
+  if (n4.pieza === 'montada') return escalon('laca', ['Las juntas están abiertas: ¿con qué se pega la madera?', 'Con el pedazo en la mano, toca la laca y repasa las juntas con el dedo.']);
+  if (n4.pieza === 'lacada') return escalon('curar', ['La laca japonesa no seca al aire: cura con humedad.', 'El té ya está tibio. ¿Qué más da humedad en esta sala?', 'Su aliento. Lleva el pedazo a su boca mientras suelta el aire.']);
+  if (n4.pieza === 'curada') return escalon('oro', ['La laca está pegajosa: es el momento del oro.', 'Con el pedazo en la mano, toca el oro y espolvoréalo moviendo el dedo sobre las juntas.']);
+  if (n4.pieza === 'dorada') return escalon('poner', ['El pedazo va en su mejilla, pero no deja que le toques la cara mientras te mira.', 'La llama ya no la distrae. Cuando canta, cierra los ojos.',
+    'Tócale la boca mientras suelta el aire y, mientras canta, pon el pedazo en la mejilla.']);
+  return mensaje('Mira cómo brilla el oro.');
+}
+
+// ---------------------------------------------------------------------------------------------
 // Nivel final · El corazón (solo en la B). Con la cara entera, la caja ya no se defiende: respira hondo y su corazón sube
 // por la trampilla y se queda en la tapa, con tres anillos. Ayuda con lo que le has devuelto:
 //   el anillo del cuerno: el ojo viejo mira la ranura donde va el cuerno (y la ranura late en rojo);
@@ -3300,7 +4069,7 @@ function estadoTrasNivel3() {
 }
 async function empezarFinal() {
   ocultarTarjeta();
-  estado.nivel = 4;
+  estado.nivel = NIVEL_FINAL;
   const paso = () => Math.floor(Math.random() * 8);
   const f = estado.fin = { fase: 'subiendo', subida: 0, angulos: [0, 0, 0], bloqueados: [false, false, false],
     ranura: 1 + Math.floor(Math.random() * 7), marca: paso(), voz: paso(), hija: 'mesa', giroHija: 0, centro: 0, latido: 0, luz: null };
@@ -3337,7 +4106,7 @@ async function empezarFinal() {
 }
 function actualizarFinal(dt) {
   const f = estado.fin;
-  if (estado.nivel !== 4 || !f) return;
+  if (estado.nivel !== NIVEL_FINAL || !f) return;
   actualizarLuzFria(dt);
   // abierto, el corazón late y sus anillos giran solos
   if (f.fase === 'abierto') { f.angulos[0] += 0.5 * dt; f.angulos[1] -= 0.8 * dt; f.angulos[2] += 1.2 * dt; }
@@ -3442,7 +4211,7 @@ async function abrirCorazon() {
   irA('sala', 4.5);
   await esperar(4.5);
   estado.ocupado = false;
-  terminarNivel(4);
+  terminarNivel(NIVEL_FINAL);
 }
 function pistaFinal() {
   const f = estado.fin;
@@ -3483,7 +4252,9 @@ function seleccionar(objeto) {
     cajita: 'La cajita roja. Tócala otra vez para mirarla de cerca.', ojo: 'El ojo de piedra de luna. ¿Dónde va?',
     ficha: 'La ficha de shōgi. Tócala otra vez para mirarla de cerca.',
     campanilla: n3 && n3.completa ? 'La campanilla. Toca donde quieras hacerla sonar.' : 'La campanilla, sin badajo. Tócala otra vez para mirarla.',
-    badajo: 'El badajo. ¿Dónde va?', hija: 'La caja pequeña. ¿Dónde cabe?' };
+    badajo: 'El badajo. ¿Dónde va?', hija: 'La caja pequeña. ¿Dónde cabe?',
+    esquirlas: 'Las esquirlas. Tócalas otra vez para tenerlas en la mano.', mejilla: 'El pedazo de la mejilla. Tócalo otra vez para mirarlo.',
+    laca: 'La laca. Se usa con el pedazo en la mano.', oro: 'El polvo de oro. Se usa con el pedazo en la mano.' };
   mensaje(textos[objeto], 2.4);
 }
 // (desde: de dónde sale volando, si se arrastró desde la bandeja; toque: el punto de la pantalla donde se usa)
@@ -3512,6 +4283,32 @@ function usarObjeto(objeto, p, desde = null, toque = desde) {
     return;
   }
   if (objeto === 'badajo' && p && p.cara !== 'detras' && dentro(['poli', CAJA], p)) { deseleccionar(); sonar('trabado', -8, 1.2); mensaje('El badajo solo, no. Va dentro de algo.'); return; }
+  // nivel 4: las esquirlas y el pedazo en la mejilla o en la boca (su aliento cura la laca); la laca y el oro, en la mano
+  if (estado.nivel === 4 && estado.n4 && ['esquirlas', 'mejilla', 'laca', 'oro'].includes(objeto)) {
+    const n4 = estado.n4, enMejilla = deFrente && p && dentro(['poli', nivel4.contorno], p);
+    const enBoca = deFrente && p && dentro(['elipse', BOCA.x, BOCA.y + 4, 56, 30], p);
+    const enTe = p && (dentro(['rect', 1206, 476, 1376, 626], p) || dentro(['rect', 1140, 592, 1336, 698], p));
+    if (objeto === 'mejilla' && enBoca && n4.pieza === 'dorada') { cantar4Caja(); return; }      // (sigue elegido: ahora, la mejilla)
+    deseleccionar();
+    if (objeto === 'mejilla' && enMejilla && n4.pieza === 'dorada') { ponerMejilla(desde); return; }
+    if (objeto === 'mejilla' && enBoca) { usarMejillaEnBoca(desde); return; }
+    sonar('trabado', -8, 1.2);
+    if (objeto === 'esquirlas' && enMejilla) {
+      if (!n4.probada && n4.esquirlas[1] === 'lampara') { n4.probada = true; setTimeoutReloj(1.2, () => mirarA({ x: nivel4.lampara.sombra[0], y: nivel4.lampara.sombra[1] }, 1.4)); }
+      n4.probada = true;
+      mensaje(enMano4().length < 3 ? 'Es de su mejilla, pero sola no se sostiene: faltan pedazos.' : 'Son los tres pedazos, sueltos. Móntalos primero en la mano: tócalos dos veces en la bandeja.', 4);
+      return;
+    }
+    if (objeto === 'mejilla' && enMejilla) {
+      mensaje({ montada: 'Encaja, pero se caería: las juntas están abiertas.', lacada: 'La laca aún está fresca: no sujeta. Tiene que curar.',
+        curada: 'Curada, pero sin oro las juntas se ven negras. ¿Qué falta?' }[n4.pieza] || 'Todavía no.', 4);
+      return;
+    }
+    if (objeto === 'mejilla' && enTe) { mensaje(n4.pieza === 'lacada' ? 'El té ya está tibio: no echa vapor.' : 'Ahí no.', 3.5); return; }
+    if (objeto === 'laca' || objeto === 'oro') { mensaje(n4.pieza === 'sueltas' ? 'Primero hay que montar las esquirlas.' : 'Se usa con el pedazo en la mano: tócalo dos veces en la bandeja.', 3.5); return; }
+    mensaje(enMejilla ? 'Todavía no.' : 'Ahí no.');
+    return;
+  }
   deseleccionar();
   sonar('trabado', -8, 1.2);
   const enCaja = p && (p.cara === 'detras' || dentro(['poli', CAJA], p));
@@ -3688,7 +4485,7 @@ function terminarNivel(n) {
     pieza.classList.toggle('recuperada', i <= n);
     pieza.classList.toggle('nueva', i === n);
   }
-  el.tarjeta.querySelector('.marcador').setAttribute('aria-label', `La cara: ${Math.min(n, 3)} de 3 piezas`);
+  el.tarjeta.querySelector('.marcador').setAttribute('aria-label', `La cara: ${Math.min(n, 4)} de 4 piezas`);
   const puede = n < ULTIMO_NIVEL && hay3D();
   el.tarjetaHecho.textContent = `${nombreNivel(n)} superado`;
   el.tarjetaSiguiente.textContent = n >= ULTIMO_NIVEL ? 'Fin de la primera caja. Gracias por jugar.'
@@ -3766,6 +4563,7 @@ function actualizar(dt) {
   if (puntero && puntero.gesto) actualizarGesto(puntero.gesto, dt);
   actualizarHolguraHija();
   actualizarNivel3(dt);
+  actualizarNivel4(dt);
   actualizarTetera3(dt);
   actualizarFinal(dt);
   actualizarOjo(dt);
@@ -3807,7 +4605,7 @@ function cuadro(ahora) {
 // ---------------------------------------------------------------------------------------------
 const punteros = new Map();
 let puntero = null, arrastre = null, pellizco = null;
-const VISTA_PADRE = { cajones: 'caja', cara: 'caja', incensario: 'sala', caja: 'sala', hija: 'caja', te: 'sala', largo: 'caja', corazon: 'caja' };
+const VISTA_PADRE = { cajones: 'caja', cara: 'caja', incensario: 'sala', caja: 'sala', hija: 'caja', te: 'sala', largo: 'caja', corazon: 'caja', zocalo: 'caja' };
 function posicion(e) { const r = lienzo.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
 lienzo.addEventListener('pointerdown', e => {
   desbloquearAudio();
@@ -3828,9 +4626,9 @@ lienzo.addEventListener('pointerdown', e => {
   const v = estado.vista;
   puntero = { ...q, x0: q.x, y0: q.y, inicio: performance.now(), id: e.pointerId, movido: 0, gesto: gestoEn(p, q),
     // (en el final no se gira: su corazón está en la tapa y los ojos tienen que verlo)
-    enCaja: (v === 'sala' || v === 'caja') && !hijaEnMesa() && estado.nivel !== 4 && !!(p && (p.cara === 'detras' || p.cajon || dentro(['poli', CAJA], p))),
+    enCaja: (v === 'sala' || v === 'caja') && !hijaEnMesa() && estado.nivel !== NIVEL_FINAL && !!(p && (p.cara === 'detras' || p.cajon || dentro(['poli', CAJA], p))),
     enHija: hijaEnMesa() && v === 'hija' };
-  if (estado.fase === 'jugando' && p && p.cara === 'frente') { if (estado.nivel !== 4) mirarA(p); guiarLuz(p); alumbrarCorazon(q); }
+  if (estado.fase === 'jugando' && p && p.cara === 'frente') { if (estado.nivel !== NIVEL_FINAL) mirarA(p); guiarLuz(p); alumbrarCorazon(q); }
 });
 lienzo.addEventListener('pointermove', e => {
   const q = posicion(e);
@@ -3839,7 +4637,7 @@ lienzo.addEventListener('pointermove', e => {
   if ((e.pointerType === 'mouse' || puntero) && estado.fase === 'jugando') {
     const p = tec.aPintura(q.x, q.y);
     moverDedo(p);
-    if (p && p.cara === 'frente') { if (estado.nivel !== 4) mirarA(p); if (puntero) { guiarLuz(p); alumbrarCorazon(q); } }
+    if (p && p.cara === 'frente') { if (estado.nivel !== NIVEL_FINAL) mirarA(p); if (puntero) { guiarLuz(p); alumbrarCorazon(q); } }
   }
   if (!puntero || e.pointerId !== puntero.id) return;
   const dx = q.x - puntero.x, dy = q.y - puntero.y;
@@ -3957,7 +4755,7 @@ function gestoEn(p, q) {
     if (c && ((p && dentro(INCENSARIO, p)) || Math.hypot(q.x - c.x, q.y - c.y) < 120)) return { tipo: 'llave' };
   }
   // nivel final: los anillos del corazón se giran en círculo, y la caja pequeña puesta en él, también
-  if (estado.nivel === 4 && estado.fin && v === 'corazon' && tec.puntoEnCorazon) {
+  if (estado.nivel === NIVEL_FINAL && estado.fin && v === 'corazon' && tec.puntoEnCorazon) {
     const f = estado.fin, c = tec.puntoEnCorazon(q.x, q.y);
     if (c && f.fase === 'anillos' && anilloEn(c.r) >= 0) return { tipo: 'anillo', i: anilloEn(c.r) };
     if (c && f.fase === 'centro' && f.hija === 'puesta' && c.r < 0.075) return { tipo: 'llaveHija' };
@@ -3969,6 +4767,9 @@ function gestoEn(p, q) {
     if (p.cara === 'detras' && (p.largo || dentro(LARGO, p)) && estado.n3.largo !== 'cerrado' && v !== 'sala') return { tipo: 'largo' };
     if (v === 'te' && tec.inclinarTetera && p.cara === 'frente' && dentro(['rect', 1196, 466, 1376, 632], p)) return { tipo: 'tetera' };
   }
+  // nivel 4: el cajón de la peana (suelto o abierto) se tira, de cerca
+  if (estado.nivel === 4 && estado.n4 && estado.n4.zocalo !== 'cerrado' && v === 'zocalo' && p.cara === 'frente'
+    && (p.zocalo || dentro(['rect', ...nivel4.cajon_zocalo], p))) return { tipo: 'zocalo' };
   if (p.hija && v === 'hija' && hijaEnMesa()) {
     if (p.hija === 'tablilla') return { tipo: 'tablilla', i: p.tablilla };
     if (p.hija === 'cajon') return { tipo: 'cajoncito' };
@@ -4008,6 +4809,15 @@ function empezarGesto(g, dx, dy) {
       g.objetivo = g.tipo === 'anillo' ? f.angulos[g.i] : f.giroHija;
       g.paso = Math.round(g.objetivo / PASO_ANILLO);
       sentir('roce', { tono: 0.7, db: -2 });
+      break;
+    }
+    case 'zocalo': {
+      const a = cajonAnim.zocalo;
+      g.eje = tec.pantallaZocalo ? { a: tec.pantallaZocalo(0), b: tec.pantallaZocalo(1) } : null;
+      if (!g.eje || !g.eje.a || !g.eje.b) return false;
+      g.k0 = a.k; g.kAntes = a.k; g.t = performance.now();
+      a.agarrado = true; a.v = 0;
+      sentir('roce', { tono: 0.95 });
       break;
     }
     case 'largo': {
@@ -4101,6 +4911,13 @@ function moverGesto(g, q) {
       if (!c || c.r < 0.012) break;                       // en el centro mismo, el ángulo salta
       g.objetivo += angular(c.alfa - g.alfa); g.alfa = c.alfa;
       if (g.tipo === 'llaveHija' && Math.abs(g.objetivo) > 1.35) { g.estado = 'hecho'; girarLlaveHija(Math.sign(g.objetivo)); }
+      break;
+    }
+    case 'zocalo': {
+      const a = cajonAnim.zocalo, k = limitar(g.k0 + avanceEnEje(g.eje, dx, dy), 0, 1.04);
+      a.v = mezclar(a.v, (k - a.k) / paso, 0.5); a.k = k; g.t = ahora;
+      if (k >= 1 && g.kAntes < 1) sentir('tope', { db: -4, tono: 0.9 });
+      g.kAntes = k;
       break;
     }
     case 'largo': {
@@ -4250,6 +5067,17 @@ function soltarGesto(g, cancelado = false) {
       if (!cancelado) mensaje(primeraVez('girar-hija') ? 'Gírala más: un cuarto de vuelta, como una llave.' : 'Más.');
       break;
     }
+    case 'zocalo': {
+      const a = cajonAnim.zocalo, n4 = estado.n4;
+      a.agarrado = false;
+      const final = a.k + limitar(a.v, -6, 6) * 0.12;
+      if (!cancelado && final > 0.5) { if (n4.zocalo !== 'abierto') abrirZocalo(); else a.objetivo = 1; }
+      else {
+        n4.zocalo = 'suelto'; a.objetivo = 0.14;
+        if (a.k > 0.2) a.v = Math.min(a.v, -1.2);
+      }
+      break;
+    }
     case 'largo': {
       const a = cajonAnim.largo, n3 = estado.n3;
       a.agarrado = false;
@@ -4300,7 +5128,7 @@ function soltarGesto(g, cancelado = false) {
 }
 
 function girarCaja() {
-  if (estado.fase !== 'jugando' || estado.ocupado || estado.nivel === 2 || estado.nivel === 4) return;
+  if (estado.fase !== 'jugando' || estado.ocupado || estado.nivel === 2 || estado.nivel === NIVEL_FINAL) return;
   sonar('deslizar_madera', -10, 1.1);
   tec.girar();
   // desde la sala o desde el costado de los cajones, la cámara se aparta para ver la caja entera girar
@@ -4383,7 +5211,7 @@ function prepararTecnica(letra) {
       modulo3d = modulo3d || await import('./tecnica_3d.js');
       opciones3d = opciones3d || { lienzo3d, camaraBoceto, escena3d, img, datos, compuesto, planchas, dibujarOjo, vistas: VISTAS, ojo: () => ojo,
         cajones: cajonesDatos, CAJONES, cajonAbertura: id => cajonAnim[id].k,
-        decoracion: { sombrasBambu, rollo, ROLLO, VENTANAS }, recortarTe, nivel2,
+        decoracion: { sombrasBambu, rollo, ROLLO, VENTANAS }, recortarTe, nivel2, nivel4,
         recortarTetera: (l, dx = 0, dy = 0) => recortarTe(l, dx, dy, true),
         // nivel final: dónde alumbra el ojo nuevo en el corazón (lo que tocas) y con cuánta fuerza
         luzCorazon: () => { const f = estado.fin; return f && f.luz && reloj < f.luz.hasta ? { alfa: f.luz.alfa, fuerza: luzFria.fuerza * (1 - ojo2.cerrado) } : null; },
@@ -4451,11 +5279,13 @@ async function entrar(nivel = 1) {
   if (nivel >= 2 && hay3D()) {
     estadoTrasNivel1();
     if (nivel >= 3) estadoTrasNivel2();
-    if (nivel >= 4 && typeof estadoTrasNivel3 === 'function') estadoTrasNivel3();
+    if (nivel >= 4) estadoTrasNivel3();
+    if (nivel >= 5) estadoTrasNivel4();
     await esperar(1.2);
     if (nivel === 2) empezarNivel2();
     else if (nivel === 3) empezarNivel3();
-    else if (typeof empezarFinal === 'function') empezarFinal();
+    else if (nivel === 4) empezarNivel4();
+    else empezarFinal();
     return;
   }
   lampara.proxima = reloj + 12;
@@ -4474,6 +5304,8 @@ function reiniciar(nivel = 1) {
   luzFria.guiadaHasta = 0; luzFria.fuerza = 0; tetera3.inclinacion = 0; tetera3.vertido = 0; tetera3.chorro = 0;
   if (tec && tec.inclinarTetera) tec.inclinarTetera(0);
   notaSale = 0; labiosTiemblan = 0;
+  oroBorde = 0; cantar4.hasta = 0; esquirlaCae.activa = false; olas4.hundida = [0, 0, 0]; olas4.brillo = [0, 0, 0];
+  pedazoEnBoca = null; mano4.herramienta = null; mano4.motas.length = 0;
   for (const t of Object.values(TINTAS)) { t.vis = 0; t.acum = 0; }
   if (img.ficha_peon) { img.ficha = img.ficha_peon; OBJETOS.ficha.icono = OBJETOS.ficha.iconoPeon; ponerCampanillaCompleta(false); }
   ponerTextoNota(1);
@@ -4501,7 +5333,8 @@ function siguienteNivel() {
   const n = estado.nivel + 1;
   if (n === 2) empezarNivel2();
   else if (n === 3) empezarNivel3();
-  else if (n === 4 && typeof empezarFinal === 'function') empezarFinal();
+  else if (n === 4) empezarNivel4();
+  else if (n === NIVEL_FINAL) empezarFinal();
 }
 el.seguir.addEventListener('click', () => { desbloquearAudio(); siguienteNivel(); });
 el.quedarse.addEventListener('click', () => {
@@ -4535,8 +5368,17 @@ function restaurar(guardado) {
       if (n3.nota === 'mano') ponerTextoNota(3);
       if (img.ficha_peon) { ponerCaraFicha(n3.fichaCara); ponerCampanillaCompleta(n3.completa); }
     }
+    // nivel 4: lo que estaba a medias
+    const n4 = estado.n4;
+    if (estado.nivel >= 4 && n4) {
+      if (n4.esquirlas[0] === 'cayendo') n4.esquirlas[0] = 'peana';
+      if (n4.esquirlas[0] === 'peana') Object.assign(esquirlaCae, { x: ESQUIRLA_PEANA.x + 3, y: ESQUIRLA_PEANA.y, ang: 6.3, activa: true });
+      cajonAnim.zocalo.k = cajonAnim.zocalo.objetivo = n4.zocalo === 'abierto' ? 1 : n4.zocalo === 'suelto' ? 0.14 : 0;
+      if (n4.pieza === 'puesta') oroBorde = 1;
+      ponerPiezaMejilla();
+    }
     if (estado.fin && estado.fin.fase === 'subiendo') { estado.fin.subida = 1; estado.fin.fase = 'anillos'; }
-    el.girar.hidden = estado.nivel === 2 || estado.nivel === 4; el.inventario.hidden = false;
+    el.girar.hidden = estado.nivel === 2 || estado.nivel === NIVEL_FINAL; el.inventario.hidden = false;
     el.portada.hidden = true;
     ojo.parpadoBase = 0;
     pintarInventario();
@@ -4560,21 +5402,22 @@ async function arrancar(guardado) {
   el.cargando.hidden = false; el.cargando.textContent = 'Preparando la sala…';
   prepararAudio();
   try {
-    const [d, cam, esc, caj, n2, ...imagenes] = await Promise.all([
+    const [d, cam, esc, caj, n2, n4, ...imagenes] = await Promise.all([
       fetch('capas/capas.json').then(r => r.json()),
       fetch('capas/camara.json').then(r => r.json()),
       fetch('capas/escena.json').then(r => r.json()),
       fetch('capas/cajones.json').then(r => r.json()),
       fetch('capas/nivel2.json').then(r => r.json()),
-      ...[...CAPAS, ...CAPAS_NIVEL2].map(n => new Promise((ok, mal) => {
+      fetch('capas/nivel4.json').then(r => r.json()),
+      ...[...CAPAS, ...CAPAS_NIVEL2, ...CAPAS_NIVEL4].map(n => new Promise((ok, mal) => {
         const i = new Image();
         i.onload = () => ok(i);
         i.onerror = () => mal(new Error(n));
         i.src = 'capas/' + n + '.webp';
       })),
     ]);
-    [...CAPAS, ...CAPAS_NIVEL2].forEach((n, i) => { img[n] = imagenes[i]; });
-    datos = d; camaraBoceto = cam; escena3d = esc; cajonesDatos = caj; nivel2 = n2;
+    [...CAPAS, ...CAPAS_NIVEL2, ...CAPAS_NIVEL4].forEach((n, i) => { img[n] = imagenes[i]; });
+    datos = d; camaraBoceto = cam; escena3d = esc; cajonesDatos = caj; nivel2 = n2; nivel4 = n4;
     if (datos.caja) CAJA = datos.caja;
   } catch (e) {
     el.cargando.textContent = 'No se pudo cargar la ilustración. Recarga la página.';
@@ -4583,6 +5426,7 @@ async function arrancar(guardado) {
   compuesto.width = ANCHO; compuesto.height = ALTO;
   prepararOjo(); prepararOjoLuna(); prepararMotas(); prepararPuntoLuz(); prepararCapasFijas(); prepararLaca(); prepararDecoracion();
   prepararNivel3();
+  prepararNivel4();
   pintarInventario();
   const restaurado = restaurar(guardado);
   hornear();
@@ -4680,5 +5524,24 @@ window.__prueba = {
   enSitio: i => !!(estado.fin && enSitio(estado.fin, i)),
   sitioAnillo: i => (estado.fin ? sitioAnillo(estado.fin, i) : 0),
   puntoCorazon: (r, alfa) => (tec.corazonEnPantalla ? tec.corazonEnPantalla(r, alfa) : null),
+  // nivel 4: su estado, dónde están las cosas en la pantalla, si canta, y la mano (dónde está cada esquirla y cada junta,
+  // de −1 a 1 en el bolsillo)
+  n4: () => (estado.n4 ? JSON.parse(JSON.stringify(estado.n4)) : null),
+  nivel4: () => nivel4,
+  cantando: () => cantando4(),
+  ojoCerrado: () => ojo.cerrado,
+  zocalo: () => ({ ...cajonAnim.zocalo }),
+  pantallaZocalo: k => (tec.pantallaZocalo ? tec.pantallaZocalo(k) : null),
+  puntoZocalo: parte => { const v = tec.puntoZocalo && tec.puntoZocalo(parte), m = v ? tec.ancla(v) : null; return m ? { x: m.x, y: m.y } : null; },
+  mano: () => {
+    const n4 = estado.n4, W = el.bolsillo.width, s = escalaMano(), aBolsillo = (x, y) => ({ x: (x * s + W / 2) / W * 2 - 1, y: (y * s + W * 0.44) / W * 2 - 1 });
+    const c = centroMejilla();
+    return {
+      esquirlas: n4.montaje.map((m, i) => { const cc = centroDe(esquirlaEnMano(i)); return { ...aBolsillo(cc.x, cc.y), a: m.a, puesta: m.puesta }; }),
+      sitios: nivel4.esquirlas.map(p => { const cc = centroDe(relativo(p, c)); return aBolsillo(cc.x, cc.y); }),
+      juntas: nivel4.juntas.map(j => muestrear(relativo(j, c), 8).map(([x, y]) => aBolsillo(x, y))),
+      herramientas: herramientas4(), herramienta: mano4.herramienta,
+    };
+  },
 };
 window.__tec = () => tec;

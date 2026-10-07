@@ -688,6 +688,11 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
       es la última llave. Prueba: `prueba/jugar_final.mjs horizontal`;
     - sin imágenes nuevas: dibujo por código (`pagina/nivel3_arte.js`) y sonidos sintetizados (`herramientas/sonidos_nivel3.py`).
       `?nivel=3` y `?nivel=4` empiezan en cada uno. La última nota de la caja espera a la DECISIÓN 25.
+  - **Nivel 4, «El oro» (07-10-2026, para el APK 0.6)** (`NIVELES.md` §7): la mejilla rota se cura con kintsugi (esquirlas,
+    laca, el aliento de la caja y oro); la regla varía: defiende su cara y nada la distrae, pero cierra los ojos al cantar.
+    El final pasa a ser el nivel 5 (`?nivel=5`). Prueba: `prueba/jugar_nivel4.mjs horizontal`.
+  - **DECISIÓN 31 (abierta, 07-10-2026):** el usuario preguntó cuántos niveles caben en el próximo APK; se le propusieron
+    tres (4 El oro, 5 La cómoda y 6 La noche), recomendada la A (`PLAN.md` §8). El 4 ya está; el 5 y el 6 esperan su sí.
 - **Gestos y horizontal (pedidos por el usuario al probar el APK 0.1, 03-10-2026, noche; hechos, APK 0.2):**
   - **El juego es horizontal:** la app siempre (`sensorLandscape`); la página, en un móvil en vertical, pide girarlo.
   - **De cerca, la cámara se queda fija:** arrastrar no la mueve y tocar fuera no devuelve a la sala (se vuelve con

@@ -198,6 +198,10 @@ function crearRig(op, limites) {
   // el cajón largo de la espalda, con la caja de espaldas: el boceto de espaldas pinta la espalda donde está el frente
   const puntoLargo = rayoDelBoceto(854, 517).intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -0.11), new THREE.Vector3())
     || new THREE.Vector3(0, mundo.centroCaja.y - 0.05, 0.11);
+  // nivel 4: la peana de frente (sus tres olas de oro y el cajón del centro), en el plano de su frente
+  const zPeana = -op.escena3d.peana.centro[1] + op.escena3d.peana.medio_y;
+  const puntoZocalo = rayoDelBoceto(829, 612).intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -zPeana), new THREE.Vector3())
+    || new THREE.Vector3(0, 0.012, zPeana);
   // qué mira cada vista: objetivo T, cuánto se acerca s (1 = donde se pintó) y alrededor de qué gira
   const definiciones = {
     sala: { T: P0.clone().add(adelante0.clone().multiplyScalar(distCaja)), s: 1, pivote: mundo.centroCaja },
@@ -219,6 +223,8 @@ function crearRig(op, limites) {
     // nivel final: el corazón, en la tapa de la caja (se mira desde arriba: juego.js inclina la vista al llegar)
     corazon: { T: new THREE.Vector3(0, mundo.centroCaja.y + mundo.altoCaja / 2 + 0.002, 0.03), s: 0.45,
       pivote: new THREE.Vector3(0, mundo.centroCaja.y + mundo.altoCaja / 2, 0) },
+    // nivel 4: la peana, de cerca (con sitio delante para el cajón que sale)
+    zocalo: { T: puntoZocalo.clone().add(new THREE.Vector3(0, 0.012, 0.03)), s: 0.4, pivote: puntoZocalo },
   };
   function encuadre(nombre) {
     const v = VISTAS[nombre];
@@ -586,7 +592,8 @@ export async function crearTecnica(letra, op) {
         incensario: { th: 0.42, ph: [-0.1, 0.45], lupa: [0.45, 1.25] }, cara: { th: 0.36, ph: [-0.1, 0.35], lupa: [0.45, 1.25] },
         cajones: { th: 0.5, ph: [-0.1, 0.6], lupa: [0.5, 1.25] }, subida: { th: 0.2, ph: [-0.05, 0.15], lupa: [1, 1] },
         hija: { th: 0.3, ph: [-0.05, 0.35], lupa: [0.55, 1.2] }, te: { th: 0.35, ph: [-0.08, 0.4], lupa: [0.5, 1.2] },
-        largo: { th: 0.45, ph: [-0.1, 0.6], lupa: [0.5, 1.25] }, corazon: { th: 0.5, ph: [0.12, 0.78], lupa: [0.5, 1.25] } }
+        largo: { th: 0.45, ph: [-0.1, 0.6], lupa: [0.5, 1.25] }, corazon: { th: 0.5, ph: [0.12, 0.78], lupa: [0.5, 1.25] },
+        zocalo: { th: 0.4, ph: [-0.08, 0.55], lupa: [0.5, 1.25] } }
     : { sala: { th: 0.24, ph: [-0.06, 0.14], lupa: [0.45, 1] }, caja: { th: 0.95, ph: [-0.15, 0.45], lupa: [0.45, 1.25] },
         incensario: { th: 0.7, ph: [-0.12, 0.4], lupa: [0.45, 1.25] }, cara: { th: 0.55, ph: [-0.12, 0.3], lupa: [0.45, 1.25] },
         cajones: { th: 0.7, ph: [-0.12, 0.4], lupa: [0.5, 1.25] } };
@@ -596,11 +603,14 @@ export async function crearTecnica(letra, op) {
   let pintada = null, cajonesB = null, carasB = [], rolloB = null, hija = null, sombraHija = null, incensarioB = null;
   // nivel 3: el cajón largo de la espalda, la ficha en su hueco y la tetera que se vuelca (en el boceto de espaldas, el
   // frente del cajón largo y el hueco de la ficha)
-  let largoB = null, fichaB = null, teteraB = null, corazonB = null;
+  let largoB = null, fichaB = null, teteraB = null, corazonB = null, zocaloB = null;
   const RECT_LARGO = [719, 476, 989, 558], RECT_HUECO = [816, 334, 876, 404];
   // nivel 2: dónde sale la caja hija (la trampilla), dónde se posa y dónde está el ojo grande que la vigila
   const ZT = op.escena3d.z_tablero;
   const POS_HIJA = new THREE.Vector3(0, ZT + LADO_HIJA / 2, 0.245);          // en la mesa, delante de la caja
+  // desde el nivel 4, a un lado de la mesa (delante tapaba la peana y sus olas de oro)
+  const POS_HIJA_LADO = new THREE.Vector3(0.205, ZT + LADO_HIJA / 2, 0.19);
+  const posHija = new THREE.Vector3().copy(POS_HIJA);
   const TRAMPILLA_3D = new THREE.Vector3(0.0005, 0.255, -0.005);
   const OJO_3D = new THREE.Vector3(-0.0431, 0.1588, 0.11);                     // el ojo grande, en el frente
   const animHija = { subida: null, qObjetivo: new THREE.Quaternion(), vAngular: new THREE.Vector3(), tablillas: [], cajon: null };
@@ -652,6 +662,7 @@ export async function crearTecnica(letra, op) {
       objetivosToque.push(hija.grupo);
     }
     crearNivel3B();
+    crearNivel4B();
     prepararTetera(objetos);
     crearCorazonB();
   } else {
@@ -833,6 +844,16 @@ export async function crearTecnica(letra, op) {
       return { x: q.x, y: q.y };
     },
     puntoCampanillaLargo() { return largoB ? largoB.campanilla.getWorldPosition(new THREE.Vector3()) : null; },
+    // nivel 4: el cajón de la peana (dónde está su frente en la pantalla, abierto k) y lo que guarda
+    pantallaZocalo(k) {
+      if (!zocaloB) return null;
+      caja.updateMatrixWorld();
+      rig.colocar(op.reloj(), 0);
+      const v = zocaloB.centro.clone().add(new THREE.Vector3(0, 0, 0.004 + k * zocaloB.sale));
+      const q = aPantalla(pintada.caja.localToWorld(v));
+      return { x: q.x, y: q.y };
+    },
+    puntoZocalo(parte) { const s = zocaloB && zocaloB.dentro[parte]; return s ? s.getWorldPosition(new THREE.Vector3()) : null; },
     inclinarTetera,
     // nivel final: dónde cae un punto de la pantalla en el plano del corazón (radio y ángulo, desde el frente, en sentido
     // contrario a las agujas visto desde arriba), un punto del corazón en el boceto y en la pantalla
@@ -952,6 +973,7 @@ export async function crearTecnica(letra, op) {
         }
         if (rolloB) { const r = op.decoracion.rollo; rolloB.rotation.set(r.a, 0, r.lift); }
         actualizarNivel3B();
+        actualizarNivel4B();
         actualizarCorazonB(dt);
       } else actualizarC(dt);
     },
@@ -1078,7 +1100,10 @@ export async function crearTecnica(letra, op) {
       hija.cuerpo.rotation.y = (1 - curvaSuave(k)) * 1.6;
       if (k >= 1) { animHija.subida = null; hija.cuerpo.rotation.set(0, 0, 0); animHija.qObjetivo.identity(); hija.cuerpo.quaternion.identity(); animHija.vAngular.set(0, 0, 0); if (a.fin) a.fin(); }
     } else if (fuera) {
-      hija.grupo.position.copy(POS_HIJA);
+      // (al empezar el nivel 4, se desliza hasta su sitio nuevo)
+      posHija.lerp(est.nivel >= 4 ? POS_HIJA_LADO : POS_HIJA, est.nivel >= 4 && posHija.distanceTo(POS_HIJA_LADO) > 0.0005 ? 1 - Math.exp(-dt * 2.5) : 1);
+      hija.grupo.position.copy(posHija);
+      sombraHija.position.x = posHija.x; sombraHija.position.z = posHija.z;
       // un leve vaivén, como si respirara también
       hija.grupo.position.y += 0.0012 * Math.sin(op.reloj() * 1.3);
       girarConMuelle(hija.cuerpo.quaternion, animHija.qObjetivo, animHija.vAngular, dt);
@@ -1203,6 +1228,69 @@ export async function crearTecnica(letra, op) {
     largoB.grupo.position.z = largoB.centro.z - Math.max(0, k) * largoB.sale;
     largoB.campanilla.visible = !!n3 && n3.campanilla === 'cajon';
     fichaB.visible = !!n3 && n3.ficha === 'puesta';
+  }
+  // ---- Nivel 4: el cajón de la peana. Su frente es un trozo de la peana pintada (con sus olas de oro), que sale hacia
+  // ti con la pintura pegada; dentro, de laca negra, una esquirla, el tarro de laca y el sobre de oro (dibujos que miran
+  // a la cámara, como lo de los cajones del costado)
+  function crearNivel4B() {
+    const n4d = op.nivel4;
+    if (!n4d) return;
+    const p = op.escena3d.peana, zF = -p.centro[1] + p.medio_y;
+    const plano = new THREE.Plane(new THREE.Vector3(0, 0, 1), -zF);
+    const [x0, y0, x1, y1] = n4d.cajon_zocalo;
+    const a = rayoDelBoceto(x0, y0).intersectPlane(plano, new THREE.Vector3()), c = rayoDelBoceto(x1, y1).intersectPlane(plano, new THREE.Vector3());
+    if (!a || !c) return;
+    const ancho = Math.abs(a.x - c.x), alto = Math.abs(a.y - c.y), grueso = 0.005, fondo = 0.07;
+    const centro = new THREE.Vector3((a.x + c.x) / 2, (a.y + c.y) / 2, zF);
+    const cajon = new THREE.Group(); cajon.position.copy(centro);
+    const frente = new THREE.Mesh(new THREE.BoxGeometry(ancho, alto, grueso));
+    frente.position.set(0, 0, -grueso / 2 + 0.0006);
+    cajon.updateMatrix(); frente.updateMatrix();
+    const reposo = cajon.matrix.clone().multiply(frente.matrix);
+    const color = (r, g, b) => new THREE.MeshBasicMaterial({ color: new THREE.Color().setRGB(r, g, b, THREE.SRGBColorSpace) });
+    const canto = color(0.1, 0.07, 0.05), dentro = color(0.08, 0.04, 0.03), borde = color(0.22, 0.14, 0.08), suelo = color(0.05, 0.025, 0.018);
+    // caras de BoxGeometry: +x, −x, +y, −y, +z (fuera, hacia ti), −z (dentro de la peana)
+    frente.material = [canto, canto, canto, canto, materialPintura(mundo.tex.frente, mundo.proyector, { reposo }), canto];
+    const t = 0.0022, hw = alto * 0.85, yb = -alto / 2, zm = -grueso - fondo / 2;
+    const tabla = (sx, sy, sz, x, y, z, m) => { const malla = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), m); malla.position.set(x, y, z); return malla; };
+    const piezas = [frente,
+      tabla(t, hw, fondo, -ancho / 2 + t / 2, yb + hw / 2, zm, [dentro, dentro, borde, dentro, dentro, dentro]),
+      tabla(t, hw, fondo, ancho / 2 - t / 2, yb + hw / 2, zm, [dentro, dentro, borde, dentro, dentro, dentro]),
+      tabla(ancho - 2 * t, t, fondo, 0, yb + t / 2, zm, suelo),
+      tabla(ancho - 2 * t, hw, t, 0, yb + hw / 2, -grueso - fondo + t / 2, [dentro, dentro, borde, dentro, dentro, dentro])];
+    for (const q of piezas) { q.userData.tipo = 'zocalo'; cajon.add(q); }
+    // lo que guarda: cerca del frente, para que se vea al abrirlo
+    const dibujo = (lienzo, h, x, parte) => {
+      if (!lienzo) return null;
+      const tex = new THREE.CanvasTexture(lienzo); tex.colorSpace = THREE.SRGBColorSpace;
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+      sp.scale.set(h * lienzo.width / lienzo.height, h, 1);
+      sp.position.set(x, yb + t + h * 0.48, -grueso - 0.016);
+      sp.userData = { tipo: 'zocalo', parte };
+      cajon.add(sp);
+      return sp;
+    };
+    const im = op.img;
+    const dentroB = { esquirla: dibujo(im.esquirla, 0.011, -ancho * 0.3, 'esquirla'), laca: dibujo(im.laca, 0.02, 0, 'laca'),
+      oro: dibujo(im.oro, 0.016, ancho * 0.3, 'oro') };
+    // el hueco que deja en la peana (no se mueve con el cajón)
+    const agujero = new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), color(0.03, 0.02, 0.015));
+    agujero.position.set(centro.x, centro.y, zF + 0.0003);
+    agujero.userData.tipo = 'zocalo';
+    pintada.caja.add(cajon, agujero);
+    cajon.visible = agujero.visible = false;
+    zocaloB = { grupo: cajon, agujero, centro, sale: 0.06, dentro: dentroB };
+  }
+  function actualizarNivel4B() {
+    if (!zocaloB) return;
+    const n4 = op.estado().n4, k = op.cajonAbertura('zocalo');
+    const abierto = k > 0.002;
+    zocaloB.grupo.visible = zocaloB.agujero.visible = abierto;
+    zocaloB.grupo.position.z = zocaloB.centro.z + Math.max(0, k) * zocaloB.sale;
+    const d = zocaloB.dentro;
+    if (d.esquirla) d.esquirla.visible = !!n4 && n4.esquirlas[2] === 'zocalo';
+    if (d.laca) d.laca.visible = !!n4 && n4.laca === 'zocalo';
+    if (d.oro) d.oro.visible = !!n4 && n4.oro === 'zocalo';
   }
   // la tetera se vuelca hacia la taza de la izquierda: gira alrededor del centro de su cuerpo, sobre el eje que mira a
   // la cámara del boceto, y se levanta un poco (la sostiene una mano). La pintura va con ella; la máscara deja fuera
@@ -1420,6 +1508,7 @@ export async function crearTecnica(letra, op) {
       }
       if (esB && tipo === 'cajon') return { malla: o, punto: { ...centroCajon(o.userData.cajon), cara: 'frente', cajon: o.userData.cajon } };
       if (esB && tipo === 'largo') return { malla: o, punto: { x: 852, y: 516, cara: 'detras', largo: o.userData.parte || 'cajon' } };
+      if (esB && tipo === 'zocalo') return { malla: o, punto: { x: 829, y: 610, cara: 'frente', zocalo: o.userData.parte || 'cajon' } };
       if (esB && tipo === 'corazon') return { malla: o, punto: { ...alBoceto(h.point), cara: 'frente', corazon: true } };
       if (esB && tipo === 'caja') {
         const local = caja.worldToLocal(h.point.clone());

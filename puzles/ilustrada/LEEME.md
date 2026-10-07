@@ -180,6 +180,23 @@ pegada: anclada a su sitio sí, pero que se pudiera girar en la misma vista para
   (de 2 a 4) empiezan en el que toca; al final, «Quedarse en la sala» o «Volver a empezar».
 - **Respiración sin saltos:** al soltar el aire contenido, la caja volvía de golpe a «llena»; ahora sigue desde vacía.
 
+## Nivel 4, «El oro» (07-10-2026, para el APK 0.6)
+
+**Qué pidió el usuario:** «¿cuántos niveles le vas a meter? Para todo el contenido que tienes, ¿cuántos niveles puedes
+implementar en el próximo APK?». Se le propusieron tres niveles nuevos para el 0.6 (DECISIÓN 31: el oro, la cómoda y la
+noche, `../PLAN.md` §8). Este es el primero: la mejilla rota de la cara, que está en el boceto desde el principio, se
+cura con kintsugi. Diseño entero en `NIVELES.md` §7.
+
+**Qué cambió:**
+- **El nivel 4** entre el 3 y el final, que pasa a ser el nivel 5 (`?nivel=4` y `?nivel=5`). La tarjeta lleva un cuarto
+  sello, 金.
+- **La regla del ojo, variada:** defiende su cara (ni la llama ni la tetera lo distraen), pero cierra los ojos al cantar.
+- **La mano como taller** (el bolsillo, modo «esquirlas»): montar las esquirlas arrastrándolas y girándolas con un toque,
+  la laca trazada con el dedo y el oro espolvoreado; dos herramientas abajo, que se eligen con un toque.
+- **El cajón de la peana**, que sale con su pintura, y la vista de la peana de cerca.
+- **La caja pequeña se aparta** a un lado de la mesa desde el nivel 4 (delante tapaba la peana).
+- **La mejilla curada** se hornea en la pintura de la cara (con `capas/mejilla.webp`) y el oro brilla de vez en cuando.
+
 ## Qué hay
 
 | Ruta | Qué es |
@@ -198,12 +215,15 @@ pegada: anclada a su sitio sí, pero que se pudiera girar en la misma vista para
 | `pagina/caja_hija.js` | La caja hija del nivel 2: el cubo con sus tablillas, sus flechas, el cajoncito y la cajita |
 | `pagina/nivel3_arte.js` | Lo que se dibuja por código en el nivel 3 y el final: la ficha, la campanilla, el badajo, las tintas y el corazón |
 | `herramientas/sonidos_nivel3.py` | Los sonidos del nivel 3 y el final: campanilla, tintineo, vertido, murmullo, canto, latido y anillo |
+| `pagina/nivel4_arte.js` | Lo que se dibuja por código en el nivel 4: las esquirlas con la madera de la cara, la laca, el oro, el tarro y el sobre |
+| `herramientas/nivel4_capas.py` | La mejilla sin el hueco (`capas/mejilla.webp`) y las formas del nivel 4 (`capas/nivel4.json`) |
+| `herramientas/sonidos_nivel4.py` | Los sonidos del nivel 4: el crac, el pincel y el oro |
 | `herramientas/nivel2_capas.py` | Las capas del nivel 2: las caras de la caja hija, la cajita y el ojo nuevo (`capas/nivel2.json`) |
 | `NIVELES.md` | El plan de niveles: la cara como puzle grande y los cuatro niveles |
 | `apk/` | El APK de Android: la página dentro de un WebView, sin conexión (`apk/LEEME.md`) |
 | `pagina/escena3d.js` | La sala del boceto en 3D, el material que proyecta la pintura, la caja pintada y sus cajones |
 | `pagina/capas/`, `pagina/sonidos/` | Lo que generan los guiones |
-| `prueba/` | `servir.py` (servidor local), `jugar.mjs` (prueba del nivel 1), `jugar_nivel2.mjs`, `jugar_nivel3.mjs` y `jugar_final.mjs` |
+| `prueba/` | `servir.py` (servidor local), `jugar.mjs` (prueba del nivel 1), `jugar_nivel2.mjs`, `jugar_nivel3.mjs`, `jugar_nivel4.mjs` y `jugar_final.mjs` |
 
 ### Las fuentes
 
@@ -333,6 +353,8 @@ node puzles/ilustrada/prueba/jugar_final.mjs horizontal <carpeta de capturas>
 
 # los sonidos del nivel 3 y el final (22 kHz)
 python3 puzles/ilustrada/herramientas/sonidos_nivel3.py
+python3 puzles/ilustrada/herramientas/sonidos_nivel4.py
+python3 puzles/ilustrada/herramientas/nivel4_capas.py
 ```
 
 - **Resultado (05-10-2026, 0.5, el juego completo):** en la página, el nivel 1, 43 de 43 en la B y 37 de 37 en la A (en

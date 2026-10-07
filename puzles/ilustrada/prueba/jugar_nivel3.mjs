@@ -242,7 +242,7 @@ await espera(1.5);
 await foto('11_tarjeta');
 comprobar('la campanilla en la boca: canta y cierra el nivel 3', (await pagina.textContent('#tarjeta-titulo')) === 'La voz', await pagina.textContent('#tarjeta-hecho'));
 comprobar('la cara ya tiene sus tres piezas', (await pagina.$$eval('.pieza.recuperada', l => l.length)) === 3);
-comprobar('la tarjeta ofrece el nivel final', /final/i.test(await pagina.textContent('#tarjeta-siguiente')), await pagina.textContent('#tarjeta-siguiente'));
+comprobar('la tarjeta ofrece el nivel 4', /Nivel 4/.test(await pagina.textContent('#tarjeta-siguiente')), await pagina.textContent('#tarjeta-siguiente'));
 comprobar('sin errores en la página', errores.length === 0, errores.slice(0, 3).join(' | '));
 if (SIN_RED) comprobar('sin pedir nada a internet', fuera.length === 0, fuera.slice(0, 3).join(' | '));
 console.log(`\n${bien} de ${total} comprobaciones bien`);

@@ -1,7 +1,7 @@
 // Juega el nivel final de la caja viva («El corazón») con gestos de móvil, comprueba cada paso y saca capturas.
 //   python3 puzles/ilustrada/prueba/servir.py &
 //   node puzles/ilustrada/prueba/jugar_final.mjs [horizontal] [carpeta de capturas]
-// Empieza en el final con «?nivel=4» (el botón «Seguir» de la portada). Solo existe en la B (3D): sin tarjeta gráfica
+// Empieza en el final con «?nivel=5» (el botón «Seguir» de la portada). Solo existe en la B (3D): sin tarjeta gráfica
 // se usa SwiftShader y las esperas van en tiempo de juego. El juego es horizontal.
 // Los anillos del corazón se giran arrastrando el dedo en círculo sobre ellos (la prueba sigue el círculo de cada uno,
 // proyectado en la pantalla); la caja pequeña se coge de la mesa, se pone en el hueco del centro y se gira como una llave.
@@ -118,11 +118,11 @@ async function aSuSitio(i) {
   await girarEnCorazon(RADIO[i], 0, angular(objetivo - f.angulos[i]));
 }
 
-await pagina.goto(BASE + '?nivel=4');
+await pagina.goto(BASE + '?nivel=5');
 await pagina.waitForFunction(() => !document.getElementById('boton-entrar').disabled, null, { timeout: 60000 });
 comprobar('la portada ofrece seguir en el nivel final', /final/.test(await pagina.textContent('#boton-continuar')), await pagina.textContent('#boton-continuar'));
 await pagina.tap('#boton-continuar');
-await hasta(() => window.__prueba.estado().nivel === 4 && window.__prueba.fin() && window.__prueba.fin().fase === 'anillos');
+await hasta(() => window.__prueba.estado().nivel === 5 && window.__prueba.fin() && window.__prueba.fin().fase === 'anillos');
 await espera(1.5);
 await foto('01_corazon');
 comprobar('el corazón sube por la trampilla y se queda en la tapa', (await fin()).subida > 0.99 && await vista() === 'corazon', await mensaje());
