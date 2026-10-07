@@ -746,8 +746,9 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
     APK).
   - Las esperas de la prueba van en tiempo real y comprobando el estado: sin tarjeta gráfica, un
     cuadro puede tardar segundos mientras compila sombreadores.
-- **APK de prueba:** el de hoy es `caja-viva-0.5-prueba.apk` (La caja viva ilustrada, arriba), en la raíz de Drive ›
-  `Respaldos Claude/puzles/`; de la 0.1 a la 0.4 están en «Versiones anteriores (puzles)».
+- **APK de prueba:** el de hoy es `caja-viva-0.6-prueba.apk` (La caja viva ilustrada, arriba), en la raíz de Drive ›
+  `Respaldos Claude/puzles/`; de la 0.1 a la 0.5 están en «Versiones anteriores (puzles)».
+  - 0.6 (07-10-2026): **el nivel 4, «El oro»** (kintsugi de la mejilla); el final pasa a ser el 5 (`?nivel=5`).
   - 0.5 (05-10-2026): **el juego completo** (niveles 3 y final), la vista hacia arriba (arrastrar la caja hacia abajo la
     enseña por encima; antes el arrastre vertical sobre la caja se perdía), la cámara que gira de cerca sin salir de la
     vista y se asoma a los cajones al abrirlos, y el incensario que ya no desaparece al destaparlo.
