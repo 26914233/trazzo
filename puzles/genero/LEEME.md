@@ -4,6 +4,10 @@ Lo que salió del encargo del usuario del 04-10-2026 (el método entero está en
 género, sacar los principios y convertirlos en un banco de ideas para La caja viva. **Principios sí; expresiones
 concretas (assets, textos, escenarios, soluciones exactas) no.**
 
+**Para otros juegos:** el 07-10-2026 el usuario pidió que esta investigación sirva también de inspiración para
+**Curtzz**; se le pasó a esa sesión (dónde está y lo más transferible: `jugadores_y_principios.md`). Lo que vale para
+cualquier juego está sobre todo en ese documento y en `05_gramatica_y_sistemas.md`.
+
 **Marcas** que usan todos los documentos: [Hecho] (sale de una fuente, que se cita) · [Interpretación] ·
 [Opinión] · [Estimación] · [Supuesto].
 
@@ -28,6 +32,9 @@ concretas (assets, textos, escenarios, soluciones exactas) no.**
 | `catalogo_mecanicas.csv` | Las 330 mecánicas de todo lo anterior en una sola tabla (`../herramientas/unir_mecanicas.py`) |
 
 ## La síntesis y el banco de diseño
+
+**A medias (07-10-2026):** de esta tabla existen `05_gramatica_y_sistemas.md` y `banco_mecanicas.csv` (25 de las 100
+mecánicas); la matriz y los demás bancos están por hacer.
 
 | Archivo | Qué es |
 |---|---|
