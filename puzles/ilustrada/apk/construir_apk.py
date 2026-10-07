@@ -60,10 +60,13 @@ FUENTES = {
     SHIPPORI + 'files/shippori-mincho-latin-ext-400-normal.woff2': '6c66b797c70240e1d93c3f3da25b3c8b028d5b92b646315b766d6fbbcfb5c96c',
     SHIPPORI + 'files/shippori-mincho-latin-ext-600-normal.woff2': 'e0d7eaf88d8a4fb9c0937c4f980bde426e6ff1f7c558e46417cd42c8bd02d088',
     SHIPPORI + 'files/shippori-mincho-latin-ext-800-normal.woff2': 'b3ed82e3e240b877ae18d0f42b80f763181e40ab8139d9affd3afb70d4ef2cb2',
-    # los sellos: 箱 (portada y nota), 角, 目 y 声 (la tarjeta de nivel), en Shippori Mincho 800
+    # los sellos: 箱 (portada y nota), 角, 目, 声, 金, 秘 y 灯 (la tarjeta de nivel), en Shippori Mincho 800
+    SHIPPORI + 'files/shippori-mincho-89-800-normal.woff2': 'e8809c8bbdde34dc6c554f071cb3fa3610a81e995d30c30d7a394a5fb2ee2770',
     SHIPPORI + 'files/shippori-mincho-99-800-normal.woff2': '6ff47f39b8ceabdf442f5337d7932b4cb900ba735e0cd42c745ed159eba3a19d',
+    SHIPPORI + 'files/shippori-mincho-100-800-normal.woff2': '51add677959c3a00343eb6cbf700af467b49e4d0cde646d69cf84565b0044cab',
     SHIPPORI + 'files/shippori-mincho-102-800-normal.woff2': '275194defdfe0faae78acc47791f7126829da331d17f67fee765613dfffaf37c',
     SHIPPORI + 'files/shippori-mincho-108-800-normal.woff2': '3bb2e33a56af66df01bada12857b71a8fd00abead1258618fc397a341efd1de1',
+    SHIPPORI + 'files/shippori-mincho-116-800-normal.woff2': '2dda293b18d8eded28d3392ea5e7e39c98651e8b58d84d1ca106b068ab03f39f',
     SHIPPORI + 'files/shippori-mincho-117-800-normal.woff2': '3089d3e819284f385efa61d93476b815d04f9e97d04397c27cd555aaa21096e4',
     ZEN + 'files/zen-kaku-gothic-new-latin-400-normal.woff2': '5b1bfc34d603aef66d247bd22b8344f19de165da7ea07d114d87fe7ff4cdc770',
     ZEN + 'files/zen-kaku-gothic-new-latin-500-normal.woff2': 'e4ab8e9dc6984461551cf416f31f8e976cccee7359464ba4b86163c62d233251',
@@ -74,7 +77,7 @@ RANGO_LATIN = ('U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,
                'U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD')
 RANGO_LATIN_EXT = ('U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,'
                    'U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF')
-SELLOS = {99: 'U+7BB1', 102: 'U+89D2', 108: 'U+58F0', 117: 'U+76EE'}
+SELLOS = {89: 'U+706F', 99: 'U+7BB1', 100: 'U+79D8', 102: 'U+89D2', 108: 'U+58F0', 116: 'U+91D1', 117: 'U+76EE'}
 
 # Lo que la página publicada recibe del servidor alrededor del fragmento (prueba/servir.py hace lo mismo), con el zoom
 # de la página bloqueado: en el móvil, pellizcar es cosa del juego
