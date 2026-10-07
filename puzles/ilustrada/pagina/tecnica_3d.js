@@ -11,6 +11,8 @@ import { aThree, crearProyector, rectanguloUV, cargarTextura, crearSala, crearMe
 import { crearCajaHija, TABLILLAS, LADO as LADO_HIJA, SALE_CAJONCITO } from './caja_hija.js';
 import { dibujarFicha, dibujarCampanilla, dibujarBaseCorazon, dibujarAnillo, dibujarTintaAnillo, dibujarHuecoCorazon, dibujarBrillo } from './nivel3_arte.js';
 import { dibujarBorla, dibujarTarjetaLazo, dibujarTsukegi, dibujarCordonPasador, dibujarOvillo, dibujarFrasquito, dibujarDedal } from './nivel5_arte.js';
+// nivel 5: la zona del costado izquierdo (px de su repintado, 1024 × 1024) que dibuja el plano de la borla
+const BORLA_LIENZO = { x: 280, y: 400, w: 560, h: 700, escala: 0.8 };
 
 const ANCHO = 1376, ALTO = 768;
 const limitar = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -207,7 +209,7 @@ function crearRig(op, limites) {
   // borla (con la caja girada un cuarto de vuelta, el costado izquierdo mira a la cámara; la borla va hacia el medio)
   const puntoEspalda = rayoDelBoceto(852, 392).intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -0.11), new THREE.Vector3())
     || mundo.centroCaja.clone();
-  const puntoBorla = new THREE.Vector3(-0.11 + 0.22 * 610 / 1024, 0.034 + mundo.altoCaja * (1 - 640 / 1024), 0.11);
+  const puntoBorla = new THREE.Vector3(-0.11 + 0.22 * 610 / 1024, 0.034 + mundo.altoCaja * (1 - 700 / 1024), 0.11);
   // qué mira cada vista: objetivo T, cuánto se acerca s (1 = donde se pintó) y alrededor de qué gira
   const definiciones = {
     sala: { T: P0.clone().add(adelante0.clone().multiplyScalar(distCaja)), s: 1, pivote: mundo.centroCaja },
@@ -1335,7 +1337,6 @@ export async function crearTecnica(letra, op) {
   // cajón largo: su frente es la pintura de espaldas (desde este nivel, la de capas/sala_detras_l5.webp, con m1 cerrado
   // y sin la borla de abajo) y salen hacia fuera. La borla del costado izquierdo se dibuja por código (juego.js dice cómo
   // está) en un plano pegado al costado, sobre su repintado sin ella (capas/cara_izquierda_l5.webp). Y lo que guardan.
-  const BORLA_LIENZO = { x: 280, y: 400, w: 560, h: 700, escala: 0.8 };      // la zona del costado (px de 1024) que dibuja
   async function crearNivel5B(tex) {
     const d5 = op.nivel5;
     if (!d5) return;
@@ -1372,11 +1373,11 @@ export async function crearTecnica(letra, op) {
     for (const [id, r] of Object.entries(d5.cajones)) cajones[id] = crear(id, r, 0.048, 0.075);
     cajones.p = crear('p', d5.panel, 0.055, 0.085);
     // lo que guardan: dibujos que miran a la cámara, cerca del frente (lo de dentro del cajón escondido, al fondo)
-    const sprite = (cj, lienzo, h, x, parte, z = null) => {
+    const sprite = (cj, lienzo, h, x, parte, z = null, y = null) => {
       const t = new THREE.CanvasTexture(lienzo); t.colorSpace = THREE.SRGBColorSpace;
       const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthWrite: false }));
       sp.scale.set(h * lienzo.width / lienzo.height, h, 1);
-      sp.position.set(x, cj.yb + 0.0025 + h * 0.48, z === null ? cj.grueso + 0.016 : z);
+      sp.position.set(x, y === null ? cj.yb + 0.0025 + h * 0.48 : y, z === null ? cj.grueso + 0.016 : z);
       sp.userData = { tipo: 'detras5', cajon: cj === cajones.p ? 'p' : Object.keys(cajones).find(k => cajones[k] === cj), parte };
       cj.grupo.add(sp);
       return sp;
@@ -1388,7 +1389,8 @@ export async function crearTecnica(letra, op) {
       ovillo: sprite(cajones.t3, dibujarOvillo(90, 80), 0.016, 0, 'ovillo'),
       frasquito: sprite(cajones.r1, dibujarFrasquito(60, 90), 0.02, 0, 'frasquito'),
       dedal: sprite(cajones.r3, dibujarDedal(60, 60), 0.012, 0, 'dedal'),
-      cordon: sprite(cajones.p, dibujarCordonPasador(260, 120), 0.024, 0, 'cordon', 0.05),
+      // (el cordón cruza el escondite por arriba, justo detrás del panel: se ve al asomarse)
+      cordon: sprite(cajones.p, dibujarCordonPasador(260, 120), 0.024, 0, 'cordon', cajones.p.grueso + 0.012, cajones.p.alto / 2 - 0.024 * 0.5),
     };
     // en los cajones del costado: las tsukegi (c2) y su secreto (c6), como la llave y la nota
     const enCostado = (id, lienzo, h, parte) => {
@@ -1454,12 +1456,15 @@ export async function crearTecnica(letra, op) {
       c.grupo.position.z = c.centro.z - Math.max(0, k) * c.sale;
     }
     // la ficha coronada del nivel 3 sigue en su hueco: sale con el panel (el hueco era su tirador)
-    if (fichaB && en5) fichaB.position.z = -0.1104 - Math.max(0, op.cajonAbertura('espalda_p')) * n5B.cajones.p.sale;
+    if (fichaB && en5) {                                // (abierto, delante del frente del panel, que asoma un poco más)
+      const k = Math.max(0, op.cajonAbertura('espalda_p'));
+      fichaB.position.z = (k > 0.002 ? -0.111 : -0.1104) - k * n5B.cajones.p.sale;
+    }
     const d = n5B.dentro, hay = (parte, donde) => !!n5 && n5[parte] === donde;
     if (d.tarjeta) d.tarjeta.visible = hay('tarjeta', 't2');
     if (d.llave) d.llave.visible = hay('llave', 'c');
     if (d.cordon) d.cordon.visible = !!n5;
-    if (d.tsukegi) d.tsukegi.visible = en5 && (!n5 || n5.tsukegi === 'c2') && est.nivel === 5;
+    if (d.tsukegi) d.tsukegi.visible = en5 && hay('tsukegi', 'c2') && est.nivel <= 6;
     if (d.secreto) d.secreto.visible = hay('secreto', 'c6');
     // la borla: se repinta cuando cambia (o mientras se mece)
     const B = n5B.borla;

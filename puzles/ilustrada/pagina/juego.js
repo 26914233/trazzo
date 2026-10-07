@@ -47,7 +47,7 @@ const VISTAS = {
   zocalo:     { h: [672, 528, 988, 690], v: [690, 520, 970, 700] },
   // nivel 5: la espalda de cerca (sus cajones) y el costado de la borla (solo cuenta su tamaño: ver tecnica_3d.js)
   espalda:    { h: [690, 222, 1012, 572], v: [700, 216, 1002, 580] },
-  borla:      { h: [690, 190, 1010, 650], v: [712, 180, 990, 660] },
+  borla:      { h: [770, 250, 1010, 580], v: [760, 230, 1020, 610] },      // la borla entera, también tirada hacia abajo
 };
 const OJO = { x: 784.5, y: 369 };            // iris en reposo
 const CUENCA = { x: 905, y: 378 };
@@ -389,11 +389,17 @@ function firmaAvance() {
     Object.values(estado.cajones).join(''), h ? [h.fase, h.tablillas.join(''), h.cajon, h.cajita, h.ojo].join('') : '',
     n3 ? [n3.nota, Object.keys(n3.tintas).join(''), n3.ficha, n3.fichaCara, n3.largo, n3.campanilla, n3.badajo, n3.toques].join('') : '',
     estado.n4 ? [estado.n4.esquirlas.join(''), estado.n4.zocalo, estado.n4.laca, estado.n4.oro, estado.n4.pieza, estado.n4.oida].join('') : '',
+    estado.n5 ? [Object.values(estado.n5.cajones).join(''), ...['m1', 'c', 'p', 'tarjeta', 'llave', 'cordon', 'lazo', 'borla', 'c6', 'tsukegi', 'secreto'].map(k => estado.n5[k])].join('') : '',
     estado.fin ? [estado.fin.fase, estado.fin.bloqueados.join(''), estado.fin.hija].join('') : ''].join('|');
 }
 // lo que la caja teme: el frente abierto ahora mismo (o nada, si ya lo vigila)
 function frenteAbierto() {
-  const h = estado.hija, n3 = estado.n3, n4 = estado.n4;
+  const h = estado.hija, n3 = estado.n3, n4 = estado.n4, n5 = estado.n5;
+  if (estado.nivel === 5 && n5) {
+    if (n5.pasador === 'quitado' && n5.tsukegi === 'c2') return centroCajon('c2');
+    if (n5.secreto === 'c6' && n5.c6 === 'suelto') return centroCajon('c6');
+    return null;                                          // lo demás está a su espalda y en el otro costado
+  }
   if (estado.nivel === 4 && n4 && nivel4) {
     if (n4.esquirlas[0] === 'peana') return ESQUIRLA_PEANA;
     if (n4.esquirlas[1] === 'lampara') return { x: nivel4.lampara.sombra[0], y: nivel4.lampara.sombra[1] };
@@ -669,7 +675,7 @@ function actualizarAliento(dt) {
     aliento.valor = mezclar(aliento.valor, 0, 1 - Math.exp(-dt * 9));
     if (aliento.soltando <= 0) aliento.fase = 0;            // vuelve a tomar aire desde vacía (sin saltos)
   } else {
-    aliento.fase += dt * (Math.PI * 2 / 4.8) * (1 + 0.15 * Math.sin(reloj * 0.21));
+    aliento.fase += dt * (Math.PI * 2 / 4.8) * (1 + 0.15 * Math.sin(reloj * 0.21)) * (sueno.dormida ? 0.62 : 1);
     aliento.valor = 0.5 - 0.5 * Math.cos(aliento.fase);
   }
   // cuánto aire mueve (positivo al tomarlo): en el nivel 3 tira del humo del incienso, y al empezar a soltarlo sale vaho
@@ -1933,6 +1939,7 @@ function dibujarEncima3D() {
   for (const lista of [humos.incienso, humos.te, humos.sueltos]) for (const h of lista) conAncla(h.x, h.y, h.objeto, () => h.dibujar(ctx));
   if (estado.nivel >= 3) { dibujarNivel3Encima(conAncla); c.setTransform(ppp, 0, 0, ppp, 0, 0); }
   if (estado.nivel >= 4) { dibujarNivel4Encima(conAncla); c.setTransform(ppp, 0, 0, ppp, 0, 0); }
+  if (estado.nivel === 5) { dibujarNivel5Encima(conAncla); c.setTransform(ppp, 0, 0, ppp, 0, 0); }
   if (despertar.oscuridad > 0) {
     c.setTransform(ppp, 0, 0, ppp, 0, 0);
     c.fillStyle = `rgba(6, 4, 8, ${despertar.oscuridad})`; c.fillRect(0, 0, ancho, alto);
@@ -2371,6 +2378,8 @@ function pista() {
   if (estado.nivel === 3) return pistaNivel3();
   if (estado.nivel === NIVEL_FINAL) return pistaFinal();
   if (estado.nivel === 4) return pistaNivel4();
+  if (estado.nivel === 5) return pistaNivel5();
+  if (estado.nivel === 6) return pistaNivel6();
   if (estado.llave === 'cajon') {
     if (caraVisible() !== 'frente') return mensaje('Los cajones están junto a la cara. Gira la caja.');
     if (estado.cajones.c8 !== 'abierto') return mensaje(n % 2 ? 'Los cajones del costado se abren tirando de ellos. Prueba los de abajo.' : 'Algunos cajones tienen cerradura y otros no. Tira de ellos y mira dentro.');
@@ -2468,6 +2477,10 @@ function tocarEscena(sx, sy) {
   if (p.hija) { tocarHija(p); return; }
   // nivel 5: la borla (o su costado) y la espalda con sus cajones
   if (estado.nivel === 5 && estado.n5) {
+    // dormida, tocarle la cara la despierta
+    if (sueno.dormida && deCerca && p.cara === 'frente' && !p.cajon && dentro(['rect', 720, 240, 980, 540], p)) {
+      despertarse(); mensaje('La has despertado. Abre los ojos… y te mira.', 3.5); return;
+    }
     if (p.borla || p.izquierda) { tocarBorla5(p); return; }
     if (p.cara === 'detras' && !p.largo) {
       if (!deCerca) { acercarCaja(); return; }
@@ -4096,7 +4109,7 @@ const TEXTOS5 = {
   r3: 'Un dedal de bronce.',
 };
 const M1_FUERA = 0.35;                               // lo que sale m1 solo, al empezar
-const VELOCIDAD_RUIDO = 2.6;                         // un cajón que corre más deprisa (fracción por segundo) hace ruido
+const VELOCIDAD_RUIDO = 1.6;                         // un cajón que corre más deprisa (fracción por segundo) hace ruido
 for (const id of [...CAJONES5, 'p']) cajonAnim['espalda_' + id] = { k: 0, v: 0, objetivo: 0, agarrado: false, golpe: 0 };
 const anim5 = id => cajonAnim['espalda_' + id];
 // la borla: cómo se dibuja ahora (tecnica_3d.js la pinta en el costado)
@@ -4205,6 +4218,16 @@ function despertarse(fuerte = true) {
   sonar('ojo_abre', -6, 1.1);
   ojo.parpadoBase = 0; ojo2.parpadoBase = 0; ojo.parpadeo = null;
   if (fuerte) { contenerAliento(1.4); sacudir(1.5, 0.2); }
+  // si su cajón está abierto, lo cierra de golpe
+  const n5 = estado.n5;
+  if (n5 && n5.secreto === 'c6' && estado.cajones.c6 === 'abierto') {
+    setTimeoutReloj(0.35, () => {
+      if (cajonAnim.c6.agarrado) return;
+      cerrarCajon('c6', true); cajonAnim.c6.v = -5;
+      mirarA(centroCajon('c6'), 2.5);
+      mensaje('Se despierta… y cierra su cajón de golpe.', 3.5);
+    });
+  }
 }
 function actualizarSueno(dt) {
   const en5 = estado.nivel === 5 && !!estado.n5 && estado.fase === 'jugando';
@@ -4293,7 +4316,7 @@ function abrirDetras(id) {
   sonar('cajon', -6, id === 'p' ? 0.85 : 1.1); vibrar(10);
   const c = centroDetras(id);
   setTimeoutReloj(0.25, () => polvoDeCajon(c.x, c.y + 10, 'caja_detras'));
-  if (tec.inclinar) setTimeoutReloj(0.2, () => tec.inclinar(0, 0.4));
+  if (tec.inclinar) setTimeoutReloj(0.2, () => tec.inclinar(0, id === 'p' ? 0.55 : 0.4));
   setTimeoutReloj(0.35, () => {
     if (id === 't2' && n5.tarjeta === 't2') mensaje('Dentro, una tarjeta de papel con un lazo dibujado.');
     else if (id === 'c' && n5.llave === 'c') mensaje('Dentro: la llave de bambú del león. Alguien la ha guardado aquí.');
@@ -4308,9 +4331,10 @@ function cerrarDetras(id) {
   if (id === 'p' && n5.p === 'abierto') n5.p = 'suelto';
   n5.cajones[id] = 'cerrado';
   if (a.k > 0.02) a.v = Math.min(a.v, -1.2);
-  if (id === 'm1' && n5.m1 === 'fuera') {
+  // m1, al entrar del todo, suelta el pasador que comparte con t2 (cada vez suena; el aviso, la primera)
+  if (id === 'm1' && (estaba || n5.m1 === 'fuera') && n5.tarjeta === 't2') {
     n5.m1 = 'dentro';
-    setTimeoutReloj(0.3, () => { sentir('clac', { tono: 1.3, db: -6 }); if (n5.cajones.t2 !== 'abierto') mensaje('Clic. Al entrar del todo, algo ha cambiado por dentro.', 3); });
+    setTimeoutReloj(0.3, () => { sentir('clac', { tono: 1.3, db: -6 }); if (primeraVez('m1-clic')) mensaje('Clic. Al entrar del todo, algo ha cambiado por dentro.', 3); });
   } else if (estaba) sonar('deslizar_madera', -15, 1.3);
 }
 // el cajón de la argolla fija: no se tira, se empuja; un muelle lo saca
@@ -4390,6 +4414,8 @@ function desatarLazo() {
   const a0 = borla5.aprieto;
   animar(0.9, k => { borla5.desatado = suave(k); borla5.aprieto = a0 * (1 - k); });
   mecerBorla(0.1);
+  // la tarjeta ya ha servido: se queda en el costado, junto a la borla (deja sitio en la bandeja)
+  if (estado.inventario.includes('tarjeta')) { estado.inventario = estado.inventario.filter(o => o !== 'tarjeta'); if (estado.seleccion === 'tarjeta') estado.seleccion = null; pintarInventario(); }
   mensaje('La cola de la punta negra deshace el lazo: el cordón se suelta.', 4);
 }
 async function tirarBorla() {
@@ -4760,7 +4786,10 @@ function seleccionar(objeto) {
     campanilla: n3 && n3.completa ? 'La campanilla. Toca donde quieras hacerla sonar.' : 'La campanilla, sin badajo. Tócala otra vez para mirarla.',
     badajo: 'El badajo. ¿Dónde va?', hija: 'La caja pequeña. ¿Dónde cabe?',
     esquirlas: 'Las esquirlas. Tócalas otra vez para tenerlas en la mano.', mejilla: 'El pedazo de la mejilla. Tócalo otra vez para mirarlo.',
-    laca: 'La laca. Se usa con el pedazo en la mano.', oro: 'El polvo de oro. Se usa con el pedazo en la mano.' };
+    laca: 'La laca. Se usa con el pedazo en la mano.', oro: 'El polvo de oro. Se usa con el pedazo en la mano.',
+    tarjeta: 'La tarjeta del lazo. Tócala otra vez para mirarla.',
+    tsukegi: estado.nivel >= 6 ? 'Las tsukegi. Prenden con una brasa.' : 'Las tsukegi. Tócalas otra vez para mirarlas.',
+    secreto: 'Su secreto. Tócalo otra vez para mirarlo.' };
   mensaje(textos[objeto], 2.4);
 }
 // (desde: de dónde sale volando, si se arrastró desde la bandeja; toque: el punto de la pantalla donde se usa)
@@ -4768,9 +4797,11 @@ function usarObjeto(objeto, p, desde = null, toque = desde) {
   const deseleccionar = () => { estado.seleccion = null; pintarInventario(); };
   const deFrente = p && p.cara !== 'detras';
   if (objeto === 'nota') { deseleccionar(); leerNota(); return; }
+  // nivel 5: la llave de bambú en el costado (en c6 entra, pero no gira: se empuja)
+  if (estado.nivel === 5 && estado.n5 && objeto === 'llave' && p && p.cajon && deFrente) { deseleccionar(); usarLlave5(p.cajon, desde); return; }
   if (p && p.cajon && deFrente) {
     deseleccionar(); sonar('trabado', -8, 1.2);
-    mensaje(objeto === 'llave' ? (CAJONES[p.cajon].cerradura ? 'La cerradura de este cajón es aún más pequeña.' : 'Este cajón no tiene cerradura.') : 'Ahí no encaja.');
+    mensaje(objeto === 'llave' ? (tieneCerradura(p.cajon) ? 'La cerradura de este cajón es aún más pequeña.' : 'Este cajón no tiene cerradura.') : 'Ahí no encaja.');
     return;
   }
   if (objeto === 'llave' && deFrente && dentro(INCENSARIO, p) && estado.tapa === 'puesta') { deseleccionar(); meterLlave(desde); return; }
@@ -4815,6 +4846,15 @@ function usarObjeto(objeto, p, desde = null, toque = desde) {
     mensaje(enMejilla ? 'Todavía no.' : 'Ahí no.');
     return;
   }
+  // nivel 5: la tarjeta es una pista (no se usa, se mira); su secreto, igual
+  if (objeto === 'tarjeta' || objeto === 'secreto') {
+    deseleccionar(); sonar('papel', -12, 1.2);
+    if (objeto === 'secreto') { examinar('secreto'); return; }
+    mensaje(p && (p.borla || estado.vista === 'borla') ? 'Es este lazo. En la tarjeta, la flecha tira de la cola de la punta negra.'
+      : 'Es un dibujo: no se usa, se mira. Un lazo… ¿dónde hay uno?', 4);
+    return;
+  }
+  if (objeto === 'tsukegi' && estado.nivel === 5) { deseleccionar(); sonar('trabado', -10, 1.3); mensaje('Para prenderlas hace falta una brasa. Aún hay luz.', 3.5); return; }
   deseleccionar();
   sonar('trabado', -8, 1.2);
   const enCaja = p && (p.cara === 'detras' || dentro(['poli', CAJA], p));
@@ -4991,7 +5031,7 @@ function terminarNivel(n) {
     pieza.classList.toggle('recuperada', i <= n);
     pieza.classList.toggle('nueva', i === n);
   }
-  el.tarjeta.querySelector('.marcador').setAttribute('aria-label', `La cara: ${Math.min(n, 4)} de 4 piezas`);
+  el.tarjeta.querySelector('.marcador').setAttribute('aria-label', `La cara: ${Math.min(n, 6)} de 6 piezas`);
   const puede = n < ULTIMO_NIVEL && hay3D();
   el.tarjetaHecho.textContent = `${nombreNivel(n)} superado`;
   el.tarjetaSiguiente.textContent = n >= ULTIMO_NIVEL ? 'Fin de la primera caja. Gracias por jugar.'
@@ -5070,6 +5110,7 @@ function actualizar(dt) {
   actualizarHolguraHija();
   actualizarNivel3(dt);
   actualizarNivel4(dt);
+  actualizarNivel5(dt);
   actualizarTetera3(dt);
   actualizarFinal(dt);
   actualizarOjo(dt);
@@ -5116,6 +5157,7 @@ const VISTA_PADRE = { cajones: 'caja', cara: 'caja', incensario: 'sala', caja: '
 function posicion(e) { const r = lienzo.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
 lienzo.addEventListener('pointerdown', e => {
   desbloquearAudio();
+  sueno.toque = reloj;
   const q = posicion(e);
   punteros.set(e.pointerId, q);
   if (punteros.size >= 2) {
@@ -5131,7 +5173,7 @@ lienzo.addEventListener('pointerdown', e => {
   // la caja grande se gira arrastrándola desde la sala o la vista de la caja (de más cerca, se queda quieta para poder
   // tirar de sus cajones); en el nivel 2, con la caja pequeña en la mesa, no se gira: arrastrar gira la pequeña en la mano
   const v = estado.vista;
-  puntero = { ...q, x0: q.x, y0: q.y, inicio: performance.now(), id: e.pointerId, movido: 0, gesto: gestoEn(p, q),
+  puntero = { ...q, x0: q.x, y0: q.y, inicio: performance.now(), reloj0: reloj, id: e.pointerId, movido: 0, gesto: gestoEn(p, q),
     // (en el final no se gira: su corazón está en la tapa y los ojos tienen que verlo)
     enCaja: (v === 'sala' || v === 'caja') && !hijaEnMesa() && estado.nivel !== NIVEL_FINAL && !!(p && (p.cara === 'detras' || p.cajon || dentro(['poli', CAJA], p))),
     enHija: hijaEnMesa() && v === 'hija' };
@@ -5455,10 +5497,18 @@ function moverGesto(g, q) {
         else { g.asentado = false; g.cede = 0.08 * 0.85; sentir('holgura'); sentir('roce', { tono: 1.05, db: 2 }); }
       }
       if (g.cede) avance -= g.cede;
-      const a = cajonAnim[g.id], k = limitar(g.k0 + avance, 0, 1.04);
-      a.v = mezclar(a.v, (k - a.k) / paso, 0.5); a.k = k; g.t = ahora;
-      // nivel 5: c6 con la caja dormida; un tirón deprisa hace ruido (o llegar al tope de golpe)
-      if (g.sigilo && (a.v > VELOCIDAD_RUIDO || (k >= 1 && g.kAntes < 1 && a.v > 1.2))) { tironFuerte(g); break; }
+      const a = cajonAnim[g.id], k = limitar(g.k0 + avance, 0, 1.04), rapidez = (k - a.k) / paso;
+      // (el primer movimiento trae de golpe lo que el dedo recorrió antes de que empezara el gesto: no es rapidez)
+      a.v = g.movido ? mezclar(a.v, rapidez, 0.5) : 0;
+      g.rapidez = g.movido ? mezclar(g.rapidez, rapidez, 1 - Math.exp(-paso / 0.12)) : 0;      // media de unos 0,1 s
+      g.movido = true; a.k = k; g.t = ahora;
+      // nivel 5: c6 con la caja dormida; un tirón deprisa hace ruido (o llegar al tope de golpe). La rapidez, de dos
+      // maneras: la de ahora (media de 0,1 s) y la de todo el tirón desde que se puso el dedo, en tiempo de juego (un
+      // movimiento muy rápido puede llegar en un solo evento, y en un móvil lento los cuadros tardan)
+      if (g.sigilo) {
+        const media = (k - g.k0) / Math.max(0.05, reloj - puntero.reloj0);
+        if (g.rapidez > VELOCIDAD_RUIDO || (k - g.k0 > 0.3 && media > VELOCIDAD_RUIDO) || (k >= 1 && g.kAntes < 1 && g.rapidez > 1)) { tironFuerte(g); break; }
+      }
       if (k <= 0 && g.kAntes > 0.015 && reloj > a.golpe) {                  // cerrado de un empujón
         a.golpe = reloj + 0.25; sonar('tope_madera', -9, 1.15); vibrar(10); agitarTe(0.3); ruido(1);
       }
@@ -5732,7 +5782,7 @@ function girarCaja() {
   sonar('deslizar_madera', -10, 1.1);
   tec.girar();
   // desde la sala o desde el costado de los cajones, la cámara se aparta para ver la caja entera girar
-  if (estado.vista === 'sala' || estado.vista === 'cajones' || estado.vista === 'largo' || estado.vista === 'cara') irA('caja');
+  if (['sala', 'cajones', 'largo', 'cara', 'espalda', 'borla'].includes(estado.vista)) irA('caja');
   setTimeoutReloj(0.45, () => bocanada(EJE_CAJA, 600, 0, -1, 0.5));
 }
 
@@ -5811,7 +5861,7 @@ function prepararTecnica(letra) {
       modulo3d = modulo3d || await import('./tecnica_3d.js');
       opciones3d = opciones3d || { lienzo3d, camaraBoceto, escena3d, img, datos, compuesto, planchas, dibujarOjo, vistas: VISTAS, ojo: () => ojo,
         cajones: cajonesDatos, CAJONES, cajonAbertura: id => cajonAnim[id].k,
-        decoracion: { sombrasBambu, rollo, ROLLO, VENTANAS }, recortarTe, nivel2, nivel4,
+        decoracion: { sombrasBambu, rollo, ROLLO, VENTANAS }, recortarTe, nivel2, nivel4, nivel5, borla: () => estadoBorla(),
         recortarTetera: (l, dx = 0, dy = 0) => recortarTe(l, dx, dy, true),
         // nivel final: dónde alumbra el ojo nuevo en el corazón (lo que tocas) y con cuánta fuerza
         luzCorazon: () => { const f = estado.fin; return f && f.luz && reloj < f.luz.hasta ? { alfa: f.luz.alfa, fuerza: luzFria.fuerza * (1 - ojo2.cerrado) } : null; },
@@ -5881,10 +5931,14 @@ async function entrar(nivel = 1) {
     if (nivel >= 3) estadoTrasNivel2();
     if (nivel >= 4) estadoTrasNivel3();
     if (nivel >= 5) estadoTrasNivel4();
+    if (nivel >= 6) estadoTrasNivel5();
+    if (nivel >= 7) estadoTrasNivel6();
     await esperar(1.2);
     if (nivel === 2) empezarNivel2();
     else if (nivel === 3) empezarNivel3();
     else if (nivel === 4) empezarNivel4();
+    else if (nivel === 5) empezarNivel5();
+    else if (nivel === 6) empezarNivel6();
     else empezarFinal();
     return;
   }
@@ -5906,6 +5960,8 @@ function reiniciar(nivel = 1) {
   notaSale = 0; labiosTiemblan = 0;
   oroBorde = 0; cantar4.hasta = 0; esquirlaCae.activa = false; olas4.hundida = [0, 0, 0]; olas4.brillo = [0, 0, 0];
   pedazoEnBoca = null; mano4.herramienta = null; mano4.motas.length = 0;
+  Object.assign(borla5, { desatado: 0, aprieto: 0, bajada: 0, objetivoBajada: 0, vBajada: 0, meneo: 0, vMeneo: 0 });
+  Object.assign(sueno, { nivel: 0, dormida: false, avisado: false }); pararBucle('ronquido', 0.3);
   for (const t of Object.values(TINTAS)) { t.vis = 0; t.acum = 0; }
   if (img.ficha_peon) { img.ficha = img.ficha_peon; OBJETOS.ficha.icono = OBJETOS.ficha.iconoPeon; ponerCampanillaCompleta(false); }
   ponerTextoNota(1);
@@ -5934,6 +5990,8 @@ function siguienteNivel() {
   if (n === 2) empezarNivel2();
   else if (n === 3) empezarNivel3();
   else if (n === 4) empezarNivel4();
+  else if (n === 5) empezarNivel5();
+  else if (n === 6) empezarNivel6();
   else if (n === NIVEL_FINAL) empezarFinal();
 }
 el.seguir.addEventListener('click', () => { desbloquearAudio(); siguienteNivel(); });
@@ -5977,6 +6035,19 @@ function restaurar(guardado) {
       if (n4.pieza === 'puesta') oroBorde = 1;
       ponerPiezaMejilla();
     }
+    // nivel 5: los cajones de la espalda y del costado, y la borla, como estaban (despierta)
+    const n5 = estado.n5;
+    if (estado.nivel >= 5 && n5) {
+      for (const id of [...CAJONES5, 'p']) {
+        const a = anim5(id);
+        a.k = a.objetivo = n5.cajones[id] === 'abierto' ? 1 : id === 'm1' && n5.m1 === 'fuera' ? M1_FUERA : id === 'p' && n5.p === 'suelto' ? 0.05 : 0;
+      }
+      for (const [id, st] of Object.entries(estado.cajones)) if (cajonAnim[id]) cajonAnim[id].k = cajonAnim[id].objetivo = st === 'abierto' ? 1 : 0;
+      if (estado.nivel === 5 && n5.pasador === 'quitado' && n5.tsukegi === 'c2' && estado.cajones.c2 !== 'abierto') cajonAnim.c2.k = cajonAnim.c2.objetivo = 0.24;
+      const suelto = n5.lazo === 'suelto', abajo = n5.borla === 'abajo';
+      Object.assign(borla5, { desatado: suelto ? 1 : 0, aprieto: 0, bajada: abajo ? 1 : 0, objetivoBajada: abajo ? 1 : 0, vBajada: 0, meneo: 0, vMeneo: 0 });
+      Object.assign(sueno, { nivel: 0, dormida: false, toque: reloj, ruido: reloj });
+    }
     if (estado.fin && estado.fin.fase === 'subiendo') { estado.fin.subida = 1; estado.fin.fase = 'anillos'; }
     el.girar.hidden = estado.nivel === 2 || estado.nivel === NIVEL_FINAL; el.inventario.hidden = false;
     el.portada.hidden = true;
@@ -6002,22 +6073,23 @@ async function arrancar(guardado) {
   el.cargando.hidden = false; el.cargando.textContent = 'Preparando la sala…';
   prepararAudio();
   try {
-    const [d, cam, esc, caj, n2, n4, ...imagenes] = await Promise.all([
+    const [d, cam, esc, caj, n2, n4, n5, ...imagenes] = await Promise.all([
       fetch('capas/capas.json').then(r => r.json()),
       fetch('capas/camara.json').then(r => r.json()),
       fetch('capas/escena.json').then(r => r.json()),
       fetch('capas/cajones.json').then(r => r.json()),
       fetch('capas/nivel2.json').then(r => r.json()),
       fetch('capas/nivel4.json').then(r => r.json()),
-      ...[...CAPAS, ...CAPAS_NIVEL2, ...CAPAS_NIVEL4].map(n => new Promise((ok, mal) => {
+      fetch('capas/nivel5.json').then(r => r.json()),
+      ...[...CAPAS, ...CAPAS_NIVEL2, ...CAPAS_NIVEL4, ...CAPAS_NIVEL5].map(n => new Promise((ok, mal) => {
         const i = new Image();
         i.onload = () => ok(i);
         i.onerror = () => mal(new Error(n));
         i.src = 'capas/' + n + '.webp';
       })),
     ]);
-    [...CAPAS, ...CAPAS_NIVEL2, ...CAPAS_NIVEL4].forEach((n, i) => { img[n] = imagenes[i]; });
-    datos = d; camaraBoceto = cam; escena3d = esc; cajonesDatos = caj; nivel2 = n2; nivel4 = n4;
+    [...CAPAS, ...CAPAS_NIVEL2, ...CAPAS_NIVEL4, ...CAPAS_NIVEL5].forEach((n, i) => { img[n] = imagenes[i]; });
+    datos = d; camaraBoceto = cam; escena3d = esc; cajonesDatos = caj; nivel2 = n2; nivel4 = n4; nivel5 = n5;
     if (datos.caja) CAJA = datos.caja;
   } catch (e) {
     el.cargando.textContent = 'No se pudo cargar la ilustración. Recarga la página.';
@@ -6027,6 +6099,7 @@ async function arrancar(guardado) {
   prepararOjo(); prepararOjoLuna(); prepararMotas(); prepararPuntoLuz(); prepararCapasFijas(); prepararLaca(); prepararDecoracion();
   prepararNivel3();
   prepararNivel4();
+  prepararNivel5();
   pintarInventario();
   const restaurado = restaurar(guardado);
   hornear();
@@ -6143,5 +6216,16 @@ window.__prueba = {
       herramientas: herramientas4(), herramienta: mano4.herramienta,
     };
   },
+  // nivel 5: su estado, el sueño, los cajones de la espalda (dónde está su frente en la pantalla, cerrado y abierto) y la
+  // borla (dónde está en la pantalla un punto del costado, en píxeles de capas/cara_izquierda.webp)
+  n5: () => (estado.n5 ? JSON.parse(JSON.stringify(estado.n5)) : null),
+  nivel5: () => nivel5,
+  sueno: () => ({ ...sueno }),
+  cajonDetras: id => ({ ...anim5(id) }),
+  pantallaDetras: (id, k) => (tec.pantallaDetras ? tec.pantallaDetras(id, k) : null),
+  pantallaBorla: (bx, by) => (tec.pantallaBorla ? tec.pantallaBorla(bx, by) : null),
+  borla: () => ({ ...borla5 }),
+  escalaBorla: () => escalaBorla(),
+  ejeCajonLado: id => { const e = ejeCajon(id); return e && e.a && e.b ? { a: { x: e.a.x, y: e.a.y }, b: { x: e.b.x, y: e.b.y } } : null; },
 };
 window.__tec = () => tec;

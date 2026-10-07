@@ -268,7 +268,7 @@ await espera(1.5);
 await foto('11_tarjeta');
 comprobar('la tarjeta cierra el nivel 4: el oro', (await pagina.textContent('#tarjeta-titulo')) === 'El oro', await pagina.textContent('#tarjeta-hecho'));
 comprobar('la cara tiene sus cuatro sellos', (await pagina.$$eval('.pieza.recuperada', l => l.length)) === 4);
-comprobar('la tarjeta ofrece el nivel final', /final/i.test(await pagina.textContent('#tarjeta-siguiente')), await pagina.textContent('#tarjeta-siguiente'));
+comprobar('la tarjeta ofrece el nivel 5: la cómoda', /Nivel 5 · La cómoda/.test(await pagina.textContent('#tarjeta-siguiente')), await pagina.textContent('#tarjeta-siguiente'));
 comprobar('sin errores en la página', errores.length === 0, errores.slice(0, 3).join(' | '));
 if (SIN_RED) comprobar('sin pedir nada a internet', fuera.length === 0, fuera.slice(0, 3).join(' | '));
 console.log(`\n${bien} de ${total} comprobaciones bien`);
