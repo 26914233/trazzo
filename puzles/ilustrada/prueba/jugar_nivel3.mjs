@@ -85,6 +85,19 @@ async function arrastrar(x0, y0, dx, dy, pasos = 10, aguantar = 0) {
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   await espera(0.5);
 }
+// arrastrar de un hueco de la bandeja a otro: el primer movimiento ya pasa de los 12 px (como un dedo real, que los
+// recorre en menos de una décima), y después sigue a pasos
+async function arrastrarBandeja(a, b, pasos = 6) {
+  const dx = b.x - a.x, dy = b.y - a.y, L = Math.hypot(dx, dy) || 1, ux = dx / L, uy = dy / L;
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: a.x, y: a.y }] });
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: a.x + ux * 18, y: a.y + uy * 18 }] });
+  for (let i = 1; i <= pasos; i++) {
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: a.x + dx * i / pasos, y: a.y + dy * i / pasos }] });
+    await espera(0.02);
+  }
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await espera(0.5);
+}
 async function hueco(objeto) {
   const h = await pagina.$(`#hueco-${objeto}`);
   if (!h) throw new Error(`«${objeto}» no está en la bandeja`);
@@ -202,9 +215,10 @@ comprobar('al soltarla, la tetera vuelve a su sitio', (await pagina.evaluate(() 
 await tocarBoceto(1190, 612, 'te', 1);
 comprobar('el badajo se saca de la taza', (await n3()).badajo === 'mano');
 
-// 8. en la bandeja, el badajo encima de la campanilla: ya tiene lengua
+// 8. en la bandeja, el badajo encima de la campanilla: ya tiene lengua (el dedo arranca como uno de verdad: pasa de
+// los 12 px enseguida; sin tarjeta gráfica, a pocos cuadros por segundo, ir a pasitos lo convertía en «mantener pulsado»)
 const hb = await hueco('badajo'), hc = await hueco('campanilla');
-await arrastrar(hb.x, hb.y, hc.x - hb.x, hc.y - hb.y, 8);
+await arrastrarBandeja(hb, hc);
 await espera(0.8);
 comprobar('arrastrado encima, el badajo encaja en la campanilla', (await n3()).completa && !(await pagina.evaluate(() => window.__prueba.inventario())).includes('badajo'), await mensaje());
 
