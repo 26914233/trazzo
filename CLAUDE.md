@@ -760,10 +760,13 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
     APK).
   - Las esperas de la prueba van en tiempo real y comprobando el estado: sin tarjeta gráfica, un
     cuadro puede tardar segundos mientras compila sombreadores.
-- **APK de prueba:** el de hoy es `caja-viva-0.7-prueba.apk` (La caja viva ilustrada, arriba), en la raíz de Drive ›
-  `Respaldos Claude/puzles/`; de la 0.1 a la 0.6 están en «Versiones anteriores (puzles)». Los documentos de la caja viva
+- **APK de prueba:** el de hoy es `caja-viva-0.7.1-prueba.apk` (La caja viva ilustrada, arriba), en la raíz de Drive ›
+  `Respaldos Claude/puzles/`; de la 0.1 a la 0.7 están en «Versiones anteriores (puzles)». Los documentos de la caja viva
   (niveles, LEEME, LEEME del APK y la hoja de prueba) están en `puzles/Documentos/`; los del 03-10, en su «Versiones
   anteriores (documentos)».
+  - 0.7.1 (07-10-2026, código 8): la partida guardada apunta cuántos niveles tiene el juego; una de la 0.6 con el final
+    hecho (entonces el 5) sigue en «La cómoda» en vez de saltársela (`prueba/partida_antigua.mjs`). **Si se renumeran
+    los niveles, hay que poner al día las partidas viejas.**
   - 0.7 (07-10-2026, código 7, 7,3 MB): **los niveles 5, «La cómoda», y 6, «La noche»**; el final pasa a ser el 7
     (`?nivel=7`); la fuente de los sellos del APK trae 金, 秘 y 灯 (en la 0.6 el 金 salía con otra letra).
   - 0.6 (07-10-2026): **el nivel 4, «El oro»** (kintsugi de la mejilla); el final pasa a ser el 5 (`?nivel=5`).

@@ -1,11 +1,11 @@
 # Hoja de prueba: La caja viva 0.7 (niveles 5 y 6)
 
-Para apuntar lo que pase al jugar el APK 0.7 en el móvil. Basta con contestar lo que se recuerde, en el chat o aquí
+Para apuntar lo que pase al jugar el APK 0.7.1 en el móvil. Basta con contestar lo que se recuerde, en el chat o aquí
 mismo; lo importante es **dónde te atascas y qué no se entiende**. (Adaptada de la guía «playtest-report» de la carpeta
 `.claude` de la rama `claude/omniroute-repo-setup-379r7i`, que se leyó sin instalarla.)
 
 ## La partida
-- **Fecha y versión:** 0.7 (código 7)
+- **Fecha y versión:** 0.7.1 (código 8)
 - **Móvil:**
 - **Desde qué nivel:** (portada → «Seguir», o desde el principio)
 - **Cuánto tiempo:** nivel 5 ___ min · nivel 6 ___ min

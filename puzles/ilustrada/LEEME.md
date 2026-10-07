@@ -217,6 +217,9 @@ entero en `NIVELES.md` §8 y §9.
   nueva: «lampara».
 - **La luz fría** se apaga sola en los niveles 4 y 5 (antes, viniendo del 3, se quedaba quieta encima).
 - **El primer movimiento de un arrastre** ya no cuenta como un tirón instantáneo (salía al pasar la zona muerta).
+- **La partida guardada (0.7.1):** guarda también cuántos niveles tiene el juego. Una partida de antes, con el 5
+  superado, es de la 0.6 (donde el 5 era el final): sigue en «La cómoda» en vez de saltársela. Lo comprueba
+  `prueba/partida_antigua.mjs` (10 de 10, en la página y en la web del APK sin red).
 
 ## Qué hay
 
@@ -249,7 +252,7 @@ entero en `NIVELES.md` §8 y §9.
 | `apk/` | El APK de Android: la página dentro de un WebView, sin conexión (`apk/LEEME.md`) |
 | `pagina/escena3d.js` | La sala del boceto en 3D, el material que proyecta la pintura, la caja pintada y sus cajones |
 | `pagina/capas/`, `pagina/sonidos/` | Lo que generan los guiones |
-| `prueba/` | `servir.py` (servidor local), `jugar.mjs` (prueba del nivel 1), `jugar_nivel2.mjs` … `jugar_nivel6.mjs` y `jugar_final.mjs` (el 7) |
+| `prueba/` | `servir.py` (servidor local), `jugar.mjs` (prueba del nivel 1), `jugar_nivel2.mjs` … `jugar_nivel6.mjs`, `jugar_final.mjs` (el 7) y `partida_antigua.mjs` (la partida guardada en la portada) |
 
 ### Las fuentes
 
@@ -379,6 +382,7 @@ node puzles/ilustrada/prueba/jugar_nivel4.mjs horizontal <carpeta de capturas>
 node puzles/ilustrada/prueba/jugar_nivel5.mjs horizontal <carpeta de capturas>
 node puzles/ilustrada/prueba/jugar_nivel6.mjs horizontal <carpeta de capturas>
 node puzles/ilustrada/prueba/jugar_final.mjs horizontal <carpeta de capturas>
+node puzles/ilustrada/prueba/partida_antigua.mjs        # la portada con partidas de antes y de ahora («Seguir»)
 
 # los sonidos del nivel 3 y el final (22 kHz)
 python3 puzles/ilustrada/herramientas/sonidos_nivel3.py

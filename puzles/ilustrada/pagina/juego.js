@@ -5433,13 +5433,22 @@ async function despertarCaja() {
 // Los niveles: la tarjeta que cierra cada uno (con la cara como marcador: las piezas que ya ha recuperado), la
 // partida guardada al terminarlo y el paso al siguiente
 // ---------------------------------------------------------------------------------------------
+// La partida guarda el último nivel superado y cuántos niveles tenía el juego. Hasta la 0.7 no guardaba cuántos, y en la
+// 0.6 el final era el nivel 5: una partida de entonces con el 5 superado terminó aquel final, no «La cómoda», así que
+// sigue en «La cómoda» en vez de saltársela
 function leerProgreso() {
-  try { const g = JSON.parse(localStorage.getItem(CLAVE_PARTIDA)); return g && g.superado ? g : null; } catch (e) { return null; }
+  try {
+    const g = JSON.parse(localStorage.getItem(CLAVE_PARTIDA));
+    if (!g || !g.superado) return null;
+    if (!g.niveles && g.superado === 5) g.superado = 4;
+    return g;
+  } catch (e) { return null; }
 }
 function guardarProgreso(superado) {
   try {
     const antes = leerProgreso();
-    localStorage.setItem(CLAVE_PARTIDA, JSON.stringify({ superado: Math.max(superado, antes ? antes.superado : 0), fecha: Date.now() }));
+    localStorage.setItem(CLAVE_PARTIDA, JSON.stringify({ superado: Math.max(superado, antes ? antes.superado : 0),
+      niveles: ULTIMO_NIVEL, fecha: Date.now() }));
   } catch (e) { /* sin almacenamiento: se juega igual */ }
 }
 const hay3D = () => tec.nombre !== 'A' && !!tec.hayHija && tec.hayHija();
@@ -6727,5 +6736,7 @@ window.__prueba = {
   frenteCajon: id => { const c = frenteCajonEnBoceto(id); return c ? { x: c.x, y: c.y } : null; },
   llama: () => llamaEnMano(),
   lampara: () => ({ apagada: lampara.apagada, intensidad: lampara.intensidad }),
+  // la partida guardada: cómo se lee (con las de antes de la 0.7 ya puestas al día) y guardar un nivel superado
+  partida: () => leerProgreso(), guardarPartida: n => guardarProgreso(n),
 };
 window.__tec = () => tec;
