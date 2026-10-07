@@ -20,3 +20,11 @@ coding-standards error-handling deployment-patterns docker-patterns search-first
 agent-introspection-debugging click-path-audit codebase-onboarding documentation-lookup
 Agentes: code-reviewer python-reviewer typescript-reviewer security-reviewer silent-failure-hunter tdd-guide
 build-error-resolver e2e-runner performance-optimizer refactor-cleaner doc-updater planner code-explorer a11y-architect
+
+## agent-skills (Addy Osmani) y Ponytail
+Origen: https://github.com/addyosmani/agent-skills (ver LICENSE-agent-skills) y https://github.com/DietrichGebert/ponytail (MIT, ver LICENSE-ponytail).
+agent-skills: 25 skills, 3 agentes (security-auditor, test-engineer, web-performance-auditor; se omitio code-reviewer porque ya existe el de ECC) y los comandos de .claude/commands (/build /plan /review /spec /test /ship...).
+Ponytail: solo las 6 skills (ponytail, ponytail-audit, -debt, -gain, -help, -review). NO se copiaron sus hooks (activate, mode-tracker, subagent),
+que son los que activan el modo de forma automatica; para eso hay que instalar el plugin completo en Claude Code:
+  /plugin marketplace add DietrichGebert/ponytail
+  /plugin install ponytail@ponytail   (dos mensajes separados)
