@@ -15,7 +15,7 @@
 Este documento es el plan de niveles. **Desde el 05-10-2026 se juegan los cuatro** (el 1, el 2, el 3 y el final) en
 la página privada y en el APK 0.5 (`PLAN.md` §8); **desde el 07-10-2026, también el 4, «El oro»** (§7), entre el 3 y el
 final. El mismo día el usuario aprobó los niveles 5 y 6 de la DECISIÓN 31 (opción A): **5 · La cómoda** (§8) y **6 · La
-noche** (§9). El final pasa a ser el nivel 7. Sigue la biblia: plantilla de nueve fases (§8), familias de
+noche** (§9), hechos esa misma noche para el APK 0.7. El final pasa a ser el nivel 7. Sigue la biblia: plantilla de nueve fases (§8), familias de
 puzle (§5), progresión presentar → ampliar → invertir → combinar (§7) y control de originalidad (anexo B).
 Todo es **[Propuesta]** salvo lo marcado **[Hecho]**.
 
@@ -277,7 +277,7 @@ ve al empezar). El truco del nivel 1 ya no vale; vale lo aprendido después.
 **Pistas** (de vaga a clara, en el botón «?»): la esquirla de la peana, la sombra, las olas y el canto, el cajón, montar,
 la laca, curar (el té no, su aliento sí), el oro y ponerlo mientras canta.
 
-## 8. Nivel 5 · La cómoda [Aprobado el 07-10-2026, DECISIÓN 31 A]
+## 8. Nivel 5 · La cómoda [Hecho, en la B, 07-10-2026; aprobado ese día, DECISIÓN 31 A]
 
 **En una frase:** la caja te enseña su cuerpo: la cómoda de su espalda es un mecanismo, la borla de su costado
 también, y su cajón más guardado solo se abre mientras duerme.
@@ -344,7 +344,24 @@ también, y su cajón más guardado solo se abre mientras duerme.
 **Pistas** (de vaga a clara): la espalda, el cajón que tiembla, empujar, lo hueco, el lazo y su cola negra, tirar de
 la borla, la llave como varilla, el sueño y tirar despacio.
 
-## 9. Nivel 6 · La noche [Aprobado el 07-10-2026, DECISIÓN 31 A]
+**Cómo está hecho:**
+- `herramientas/nivel5_capas.py` saca del boceto lo que el nivel cambia: el costado izquierdo sin la borla
+  (`capas/cara_izquierda_l5.webp`), la sala de espaldas con `m1` cerrado y sin la borla de abajo
+  (`capas/sala_detras_l5.webp`, proyectando el costado ya limpio), su secreto a tinta (`capas/secreto.webp`) y las
+  medidas (`capas/nivel5.json`). Los huecos se rellenan con parches de la misma pintura
+  (`herramientas/rellenar_parches.py`: PatchMatch con votación por capas).
+- `pagina/nivel5_arte.js` dibuja la borla (lazo, colas, cabeza y flecos, que se desata y baja), la tarjeta, las
+  *tsukegi*, el cordón con su pasador y las cosas de los cajones.
+- `pagina/tecnica_3d.js`: los nueve cajones de la espalda y el escondido en 3D (su frente es la pintura de espaldas),
+  la borla en un plano pegado al costado, y las vistas «espalda» y «borla».
+- `pagina/juego.js` (sección «Nivel 5 · La cómoda»): las dependencias entre cajones, el sueño (se duerme tras unos 6 s
+  sin tocar nada; un ruido o tocarle la cara la despierta) y el tirón despacio (más de 1,6 cajones por segundo hace
+  ruido, medido en tiempo de juego desde que se pone el dedo).
+- Sonidos nuevos (`herramientas/sonidos_nivel5.py`, también para el nivel 6): toc, toc hueco, clinc, ronquido, seda,
+  azufre, soplo y mecha. Sin imágenes nuevas: coste 0.
+- Prueba: `prueba/jugar_nivel5.mjs` (35 de 35).
+
+## 9. Nivel 6 · La noche [Hecho, en la B, 07-10-2026; aprobado ese día, DECISIÓN 31 A]
 
 **En una frase:** se apaga la lámpara; a oscuras el ojo viejo no ve, pero tú tampoco: solo alumbra la luz fría del ojo
 nuevo. Enciende otra vez la lámpara: el viento que la apagó aviva las brasas.
@@ -389,6 +406,25 @@ nuevo. Enciende otra vez la lámpara: el viento que la apagó aviva las brasas.
 
 **Pistas:** mover la luz, lo que no se ve no se encuentra, la lámpara, las brasas, la tinta de la llamita, el aire del
 shoji, encender la *tsukegi*, cerrar el shoji y abrir la puertecilla antes de llevar la llama.
+
+**Cómo está hecho:**
+- La oscuridad es una capa casi negra encima de la escena con huecos de luz (la luz fría y su ojo, las brasas, la luna
+  por el shoji y la mecha). Lo que se ve es lo que se puede tocar: las brasas y el shoji, siempre; lo demás, si lo
+  alumbra la luz fría (unos 105 px del boceto). Un parpadeo del ojo nuevo apaga la luz un instante, pero no cuenta.
+- La luz fría se mueve **arrastrando, al revés del dedo, como en un espejo**, y se queda donde se deja; un toque no la
+  mueve. Es relativa (no hay que poner el dedo en el punto opuesto, como en el nivel 3), para poder apuntar también
+  de cerca. A oscuras, arrastrar no mueve la cámara ni gira la caja; las polillas siguen la luz.
+- La lámpara: `herramientas/nivel6_capas.py` saca la lámpara apagada del boceto (`capas/lampara_apagada.webp`: el
+  papel sin el resplandor y la madera más oscura) y las medidas (`capas/nivel6.json`). Hay una vista de cerca
+  («lampara»), un recorte del boceto como la sala; su puertecilla se desliza a la izquierda y deja ver el platillo y la
+  mecha con un rescoldo.
+- El shoji: su hoja de la derecha se arrastra desde la sala; el hueco enseña la noche (luna y bambú que el viento mece).
+  Abierto, entra el viento a ráfagas (cada 2,5-4 s): las brasas se avivan un momento (unos 1,5 s), y si llevas la
+  llama, la apaga.
+- La *tsukegi* prende en las brasas solo mientras brillan; arde 25 s, en la bandeja (el hueco se ilumina). El manojo
+  trae más: si se apaga o se consume, se prende otra.
+- `pagina/juego.js` (sección «Nivel 6 · La noche»). Sin imágenes nuevas: coste 0.
+- Prueba: `prueba/jugar_nivel6.mjs` (26 de 26).
 
 ## 10. Nivel final · El corazón [Hecho, en la B, 05-10-2026; desde el 07-10-2026 es el nivel 7]
 

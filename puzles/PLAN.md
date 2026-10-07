@@ -645,3 +645,15 @@ rota; tres esquirlas (una cae al cantar, otra se delata por su sombra encima de 
 de la peana, que se abre repitiendo en tres olas de oro la frase que canta la caja); en la mano se montan, se traza la
 laca, se cura con el aliento de la caja (el té ya está tibio) y se espolvorea el oro; y se pone mientras canta con los
 ojos cerrados, porque mientras mira no deja tocarle la cara y ya nada la distrae. El final pasa a ser el nivel 5.
+
+**Niveles 5 · La cómoda y 6 · La noche (07-10-2026) [Hechos, para el APK 0.7]** (`ilustrada/NIVELES.md` §8 y §9).
+El final pasa a ser el nivel 7.
+- **La cómoda:** la espalda de la caja es un mecanismo (cajones que se bloquean y tiemblan, uno que se abre empujando y
+  un panel hueco que es un cajón escondido), la borla del costado es un cerrojo (se desata con la cola de punta negra y,
+  al tirar de ella, la cómoda entera se suelta) y su cajón más guardado solo se abre con ella dormida, tirando despacio.
+- **La noche:** la lámpara se apaga; solo alumbra la luz fría (se arrastra al revés del dedo y se queda) y solo se toca
+  lo alumbrado. El shoji entreabierto aviva las brasas, la *tsukegi* prende en ellas y hay que cerrar el shoji y abrir la
+  puertecilla de la lámpara antes de llevar la llama.
+- Sin imágenes nuevas: coste 0. Pruebas: el 5, 35 de 35; el 6, 26 de 26.
+- **Siguiente [Opinión]:** que el usuario los juegue en el móvil y diga dónde se atasca (hoja de prueba:
+  `ilustrada/PRUEBA_0.7.md`); medir el tiempo de cada nivel; las DECISIONES 25 y 26 siguen abiertas.

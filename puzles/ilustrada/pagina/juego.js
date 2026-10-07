@@ -19,6 +19,7 @@ const CAPAS = ['sala', 'sala_vacia', 'sala_mesa_vacia', 'sala_detras', 'tapa', '
 const CAPAS_NIVEL2 = ['cajita', 'ojo2', 'iris2', 'hija_frente'];   // la cajita roja, el ojo nuevo y la cara de la caja pequeña
 const CAPAS_NIVEL4 = ['mejilla'];                                    // la mejilla sin el hueco (herramientas/nivel4_capas.py)
 const CAPAS_NIVEL5 = ['secreto'];                                    // su secreto, a tinta (herramientas/nivel5_capas.py)
+const CAPAS_NIVEL6 = ['lampara_apagada'];                            // la lámpara apagada (herramientas/nivel6_capas.py)
 const SONIDOS = ['noche', 'fuego', 'trabado', 'recoger', 'encajar', 'despertar', 'final_caja_viva', 'suspiro', 'ojo_abre',
   'grunido', 'espiritu', 'papel', 'llave', 'candado_abre', 'tope_madera', 'clic_madera', 'acercar', 'pista', 'toque',
   'mecanismo', 'racha', 'bisagra', 'deslizar_madera', 'cajon', 'trampilla', 'cristal', 'viento', 'clic_metal',
@@ -48,6 +49,8 @@ const VISTAS = {
   // nivel 5: la espalda de cerca (sus cajones) y el costado de la borla (solo cuenta su tamaño: ver tecnica_3d.js)
   espalda:    { h: [690, 222, 1012, 572], v: [700, 216, 1002, 580] },
   borla:      { h: [770, 250, 1010, 580], v: [760, 230, 1020, 610] },      // la borla entera, también tirada hacia abajo
+  // nivel 6: la lámpara de cerca (un recorte del boceto, como la sala), con su puertecilla
+  lampara:    { h: [446, 196, 766, 444], v: [500, 190, 710, 450] },
 };
 const OJO = { x: 784.5, y: 369 };            // iris en reposo
 const CUENCA = { x: 905, y: 378 };
@@ -390,11 +393,13 @@ function firmaAvance() {
     n3 ? [n3.nota, Object.keys(n3.tintas).join(''), n3.ficha, n3.fichaCara, n3.largo, n3.campanilla, n3.badajo, n3.toques].join('') : '',
     estado.n4 ? [estado.n4.esquirlas.join(''), estado.n4.zocalo, estado.n4.laca, estado.n4.oro, estado.n4.pieza, estado.n4.oida].join('') : '',
     estado.n5 ? [Object.values(estado.n5.cajones).join(''), ...['m1', 'c', 'p', 'tarjeta', 'llave', 'cordon', 'lazo', 'borla', 'c6', 'tsukegi', 'secreto'].map(k => estado.n5[k])].join('') : '',
+    estado.n6 ? [...['lampara', 'puerta', 'tinta', 'mecha', 'brasas'].map(k => estado.n6[k]), Math.round(noche.shoji * 3)].join('') : '',
     estado.fin ? [estado.fin.fase, estado.fin.bloqueados.join(''), estado.fin.hija].join('') : ''].join('|');
 }
 // lo que la caja teme: el frente abierto ahora mismo (o nada, si ya lo vigila)
 function frenteAbierto() {
   const h = estado.hija, n3 = estado.n3, n4 = estado.n4, n5 = estado.n5;
+  if (estado.nivel === 6) return null;                    // (a oscuras no ve)
   if (estado.nivel === 5 && n5) {
     if (n5.pasador === 'quitado' && n5.tsukegi === 'c2') return centroCajon('c2');
     if (n5.secreto === 'c6' && n5.c6 === 'suelto') return centroCajon('c6');
@@ -574,9 +579,10 @@ function dibujarParpado(c, p, geo) {
 // ---------------------------------------------------------------------------------------------
 const luzFria = { x: 1100, y: 40, vx: 0, vy: 0, fuerza: 0, guiadaHasta: 0, punto: null };
 const espejoLuz = p => ({ x: limitar(CUENCA.x + (CUENCA.x - p.x) * 1.6, 10, ANCHO - 10), y: limitar(CUENCA.y + (CUENCA.y - p.y) * 1.6, 10, ALTO - 10) });
-const luzActiva = () => estado.nivel >= 3 && estado.fase === 'jugando' && ojo2.visible > 0.5 && caraVisible() === 'frente';
+const luzActiva = () => (estado.nivel === 3 || estado.nivel === 6 || estado.nivel >= NIVEL_FINAL) && estado.fase === 'jugando' && ojo2.visible > 0.5
+  && caraVisible() === 'frente' && !(estado.nivel === 6 && estado.n6 && estado.n6.lampara === 'encendida');
 function guiarLuz(p) {
-  if (!luzActiva() || !p || p.cara === 'detras' || p.hija) return;
+  if (estado.nivel === 6 || !luzActiva() || !p || p.cara === 'detras' || p.hija) return;      // (en el 6 la mueve moverLuz6)
   // (en el nivel final la caja ya no se defiende: el ojo nuevo alumbra lo que tocas)
   luzFria.punto = estado.nivel >= NIVEL_FINAL ? { x: p.x, y: p.y } : espejoLuz(p);
   luzFria.guiadaHasta = reloj + 4;
@@ -893,7 +899,7 @@ function luces(objeto) {
     l.push([LAMPARA.x, LAMPARA.y, 230, '255,176,96', 0.12 * li], [LAMPARA.x, LAMPARA.y - 6, 70, '255,214,150', 0.16 * li]);
   }
   if (objeto === 'incensario' && estado.tapa === 'abierta') {
-    const f = 0.75 + 0.25 * Math.sin(reloj * 5.1) * Math.sin(reloj * 2.3 + 1);
+    const f = (0.75 + 0.25 * Math.sin(reloj * 5.1) * Math.sin(reloj * 2.3 + 1)) * (enLaNoche() ? 0.25 + 1.2 * noche.brasa : 1);
     l.push([578, 500, 44, '255,120,40', 0.28 * f], [578, 530, 110, '255,110,40', 0.08 * f]);
   }
   if (objeto === 'caja' && despertar.ojos > 0) {
@@ -1020,7 +1026,7 @@ function apartarDelDedo(o, radio, fuerza, dt) {
 
 // Las polillas: vuelan alrededor de la lámpara, a veces se posan en el papel; el dedo, el viento o la llama las espantan
 function actualizarPolillas(dt) {
-  const L = LAMPARA, agitada = reloj < lampara.agitadaHasta;
+  const oscuras = enLaNoche(), L = oscuras ? { x: luzFria.x, y: luzFria.y + 14 } : LAMPARA, agitada = reloj < lampara.agitadaHasta;
   for (const p of polillas) {
     p.aleteo += dt * (p.posada > 0 ? 2 : 38 + 8 * Math.sin(p.fase));
     if (p.posada > 0) {
@@ -1042,7 +1048,7 @@ function actualizarPolillas(dt) {
     p.x += p.vx * dt; p.y += p.vy * dt;
     p.rumbo = Math.atan2(p.vy, p.vx);
     // a veces se posa en el papel de la lámpara
-    if (!agitada && p.susto <= 0 && Math.random() < dt * 0.07 && Math.abs(p.x - L.x) < 48 && p.y > 228 && p.y < 410) {
+    if (!oscuras && !agitada && p.susto <= 0 && Math.random() < dt * 0.07 && Math.abs(p.x - L.x) < 48 && p.y > 228 && p.y < 410) {
       p.posada = azar(2.5, 6); p.vx = p.vy = 0; p.rumbo = -Math.PI / 2 + azar(-0.5, 0.5);
     }
   }
@@ -1282,19 +1288,19 @@ function cerrarCajon(id, sinSonido = false) {
 }
 // Un toque en un cajón no lo abre: asoma un poco y vuelve, para enseñar que se tira de él (los de cerradura ni eso)
 function tocarCajon(id) {
-  const def = CAJONES[id], n5 = estado.nivel === 5 ? estado.n5 : null;
+  const def = CAJONES[id], n5 = estado.nivel >= 5 ? estado.n5 : null, en5 = estado.nivel === 5 && !!n5;
   // nivel 5: la llave metida en c6 se empuja tocándola
-  if (n5 && id === 'c6' && n5.llave === 'metida') { empujarLlave5(); return; }
+  if (en5 && id === 'c6' && n5.llave === 'metida') { empujarLlave5(); return; }
   if (tieneCerradura(id)) {
     const c = centroCajon(id);
     cajonCerrado(id, c.x, c.y, 1, -0.6, n5 && id === 'c6' && n5.c6 === 'suelto' ? 'Ya no tiene cerradura, pero algo lo sujeta por dentro.' : 'Tiene una cerradura pequeña. No cede.');
     return;
   }
   const a = cajonAnim[id];
-  if (n5 && id === 'c6' && estado.cajones.c6 !== 'abierto' && !sueno.dormida) { guardarSecreto(); return; }
+  if (en5 && id === 'c6' && estado.cajones.c6 !== 'abierto' && !sueno.dormida) { guardarSecreto(); return; }
   if (n5 && estado.cajones[id] === 'abierto' && a.k >= 0.7) {
-    if (id === 'c2' && n5.tsukegi === 'c2') { cogerTsukegi(); return; }
-    if (id === 'c6' && n5.secreto === 'c6') { cogerSecreto(); return; }
+    if (id === 'c2' && n5.tsukegi === 'c2' && estado.nivel <= 6) { cogerTsukegi(); return; }
+    if (en5 && id === 'c6' && n5.secreto === 'c6') { cogerSecreto(); return; }
   }
   if (estado.cajones[id] !== 'abierto') {
     a.v += 1.9;
@@ -1940,6 +1946,7 @@ function dibujarEncima3D() {
   if (estado.nivel >= 3) { dibujarNivel3Encima(conAncla); c.setTransform(ppp, 0, 0, ppp, 0, 0); }
   if (estado.nivel >= 4) { dibujarNivel4Encima(conAncla); c.setTransform(ppp, 0, 0, ppp, 0, 0); }
   if (estado.nivel === 5) { dibujarNivel5Encima(conAncla); c.setTransform(ppp, 0, 0, ppp, 0, 0); }
+  if (estado.nivel === 6) { dibujarNivel6Debajo(conAncla); c.setTransform(ppp, 0, 0, ppp, 0, 0); dibujarNoche(); }
   if (despertar.oscuridad > 0) {
     c.setTransform(ppp, 0, 0, ppp, 0, 0);
     c.fillStyle = `rgba(6, 4, 8, ${despertar.oscuridad})`; c.fillRect(0, 0, ancho, alto);
@@ -1959,6 +1966,7 @@ function dibujarEncima3D() {
     conAncla(mo.x, mo.y, 'sala', () => { ctx.globalAlpha = a; const r = mo.r * 2.6; ctx.drawImage(puntoLuz, mo.x - r, mo.y - r, r * 2, r * 2); ctx.globalAlpha = 1; });
   }
   c.globalCompositeOperation = 'source-over';
+  if (estado.nivel === 6) { dibujarNivel6Encima(conAncla); c.setTransform(ppp, 0, 0, ppp, 0, 0); }
   conAncla(LAMPARA.x, LAMPARA.y, 'sala', () => dibujarPolillas(ctx));
 }
 
@@ -2475,6 +2483,18 @@ function tocarEscena(sx, sy) {
   if (estado.seleccion) { usarObjeto(estado.seleccion, p, null, { x: sx, y: sy }); return; }
   const v = estado.vista, deCerca = ['caja', 'cara', 'cajones', 'hija', 'largo', 'corazon', 'zocalo', 'espalda', 'borla'].includes(v);
   if (p.hija) { tocarHija(p); return; }
+  // nivel 6, a oscuras: solo se encuentra lo alumbrado; la caja, sin ver, se asusta
+  if (enLaNoche()) {
+    if (!iluminado(p)) { tocarANoche(p); return; }
+    if (dentro(INCENSARIO, p)) { if (v !== 'incensario') irA('incensario'); else { sonar('toque', -14); tocarBrasas6(); } return; }
+    if (dentro(zonaShoji6(), p)) { sonar('toque', -14); tocarShoji6(); return; }
+    if (dentro(zonaLampara6(), p)) {
+      if (v !== 'lampara') { irA('lampara', 0.9); if (!estado.n6.mecha) setTimeoutReloj(1, () => tocarLampara6(p)); return; }
+      sonar('toque', -14); tocarLampara6(p); return;
+    }
+    if (!p.cajon && dentro(['poli', CAJA], p)) { tocarANoche(p); return; }
+    if (!p.cajon && dentro(['rect', ...VENTANAS], p)) { sonar('toque', -16); mensaje('El shoji, a la luz de la luna. Su hoja de la derecha se desliza.', 3); return; }
+  }
   // nivel 5: la borla (o su costado) y la espalda con sus cajones
   if (estado.nivel === 5 && estado.n5) {
     // dormida, tocarle la cara la despierta
@@ -2995,7 +3015,6 @@ function tocarLabios() {
 function actualizarNivel3(dt) {
   const n3 = estado.n3;
   if (estado.nivel !== 3 || !n3) return;
-  actualizarLuzFria(dt);
   // con el rollo muy mecido, la ficha se sale de la varilla
   if (n3.ficha === 'rollo' && estado.fase === 'jugando' && Math.abs(rollo.a) > UMBRAL_ROLLO) caerFicha();
   // lo de dentro de la varilla golpea en cada vaivén
@@ -4455,6 +4474,11 @@ function actualizarBorla(dt) {
     borla5.meneo += borla5.vMeneo * h;
   }
 }
+// cuánto mide en la pantalla un píxel del boceto de la sala (para leer los arrastres del nivel 6)
+function escalaSala() {
+  const a = tec.ancla({ x: 600, y: 300 }, 'sala'), b = tec.ancla({ x: 700, y: 300 }, 'sala');
+  return a && b ? Math.max(0.05, Math.hypot(b.x - a.x, b.y - a.y) / 100) : 0.6;
+}
 // cuánto mide en la pantalla un píxel del costado (para leer el arrastre en la borla)
 function escalaBorla() {
   if (!tec.pantallaBorla) return 1;
@@ -4574,6 +4598,397 @@ function pistaNivel5() {
 }
 
 // ---------------------------------------------------------------------------------------------
+// Nivel 6 · La noche (solo en la B; NIVELES.md §9). Una ráfaga apaga la lámpara: a oscuras, el ojo viejo no ve… y tú
+// tampoco. Solo alumbra la luz fría del ojo nuevo, que se mueve arrastrando el dedo (al revés, como en el nivel 3) y se
+// queda donde la dejas; solo se encuentra lo que está alumbrado. La luna da una penumbra por el shoji y las brasas se
+// ven siempre. Para encender la lámpara: una tsukegi (del cajón de arriba del costado: lo marca una llamita de tinta
+// fría), las brasas avivadas por el viento del shoji entreabierto, y llevar la llama con el shoji cerrado (si no, una
+// ráfaga la apaga) hasta la mecha, con la puertecilla de papel de la lámpara abierta.
+// ---------------------------------------------------------------------------------------------
+let nivel6 = null;                                   // capas/nivel6.json: la lámpara, su puertecilla, el shoji y las brasas
+const noche = { oscuridad: 0, brasa: 0.25, shoji: 0, puerta: 0, tinta: 0, proximaRafaga: 0, proximoVagar: 0, proximoTemblor: 0, humo: null };
+const DURA_LLAMA = 25;                               // lo que arde una tsukegi (s)
+const RADIO_LUZ6 = 105;                              // lo que alumbra la luz fría (px del boceto)
+const BRASA_BASE = 0.22;                             // las brasas, casi apagadas, sin aire
+function n6Inicial() {
+  return { lampara: 'apagada', puerta: 'cerrada', shoji: 0, llama: 0, tinta: false, mecha: false, brasas: false, apagadas: 0 };
+}
+const enLaNoche = () => estado.nivel === 6 && !!estado.n6 && estado.n6.lampara !== 'encendida';
+const llamaEnMano = () => enLaNoche() && estado.n6.llama > reloj && estado.inventario.includes('tsukegi');
+const zonaShoji6 = () => { const [x0, y0, x1, y1] = nivel6.shoji.hueco; return ['rect', x0 - 46, y0, x1, y1]; };
+const zonaLampara6 = () => ['rect', ...nivel6.lampara.zona];
+// ¿se ve ese punto (del boceto)? Las brasas y el shoji, siempre; lo demás, si lo alumbra la luz fría
+function iluminado(p) {
+  if (!enLaNoche() || !p) return true;
+  if (dentro(INCENSARIO, p) || dentro(zonaShoji6(), p)) return true;
+  // (un parpadeo del ojo nuevo apaga la luz un instante, pero lo alumbrado no se pierde por eso)
+  return luzFria.fuerza > 0.4 && Math.hypot(p.x - luzFria.x, p.y - luzFria.y) < RADIO_LUZ6;
+}
+// la luz fría en el nivel 6: solo la mueve un arrastre (un toque no), al revés del dedo, como en un espejo (se aleja
+// por donde el dedo viene), y se queda donde se deja. Así se apunta también de cerca, en cualquier vista
+function moverLuz6(dx, dy) {
+  if (!luzActiva()) return;
+  const base = luzFria.punto || { x: luzFria.x, y: luzFria.y };
+  const m = tec.ancla(base, 'sala'), k = m && m.k > 0.05 ? m.k : 0.6;
+  luzFria.punto = { x: limitar(base.x - dx / k, 10, ANCHO - 10), y: limitar(base.y - dy / k, 10, ALTO - 10) };
+  luzFria.guiadaHasta = Infinity;
+  if (primeraVez('luz6')) setTimeoutReloj(1.4, () => mensaje('La luz va al revés de tu dedo y se queda donde la dejas. Lo que no alumbra, no se encuentra.', 4.5));
+}
+function prepararNivel6() {
+  if (!nivel6) return;
+  const [x0, y0, x1, y1] = nivel6.lampara.recorte;
+  datos.capas.lampara_apagada = { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+  img.tsukegi_encendida = dibujarTsukegi(200, 150, { encendida: 1, t: 0.3 });
+  OBJETOS.tsukegi.iconoApagada = OBJETOS.tsukegi.icono;
+  OBJETOS.tsukegi.iconoEncendida = icono(img.tsukegi_encendida);
+}
+function ponerLlamaEnBandeja(arde) {
+  const o = OBJETOS.tsukegi;
+  if (o.iconoEncendida) o.icono = arde ? o.iconoEncendida : o.iconoApagada;
+  pintarInventario();
+  const h = huecoDe('tsukegi');
+  for (const x of huecosBandeja()) x.classList.remove('arde');
+  if (h && arde) h.classList.add('arde');
+}
+// el estado al final del nivel 6, para empezar el final sin jugarlo (o al seguir una partida)
+function estadoTrasNivel6() {
+  estado.n6 = Object.assign(n6Inicial(), { lampara: 'encendida', puerta: 'cerrada', tinta: true, mecha: true, brasas: true });
+  estado.inventario = estado.inventario.filter(o => !['tsukegi', 'secreto', 'tarjeta'].includes(o));
+  if (estado.n5) estado.n5.tsukegi = 'lampara';
+  Object.assign(noche, { oscuridad: 0, brasa: BRASA_BASE, shoji: 0, puerta: 0, tinta: 0 });
+  lampara.apagada = 0;
+  ponerLlamaEnBandeja(false);
+}
+async function empezarNivel6() {
+  ocultarTarjeta();
+  estado.nivel = 6;
+  const n6 = estado.n6 = n6Inicial();
+  estado.pistasPaso = {}; estado.intentosMirada = 0; estado.insistencia = {};
+  estado.inventario = estado.inventario.filter(o => o !== 'secreto' && o !== 'tarjeta');
+  if (estado.n5 && estado.n5.tsukegi !== 'mano') estado.n5.tsukegi = 'c2';
+  estado.fase = 'jugando'; estado.ocupado = true;
+  el.girar.hidden = true; el.inventario.hidden = false;             // a oscuras, la caja no se gira
+  for (const id of Object.keys(CAJONES)) if (estado.cajones[id] === 'abierto') cerrarCajon(id);
+  for (const id of [...CAJONES5, 'p']) { const a = anim5(id); a.objetivo = 0; }
+  if (estado.n3 && estado.n3.largo === 'abierto') { estado.n3.largo = 'suelto'; cajonAnim.largo.objetivo = 0.12; }
+  if (tec.cara() !== 'frente') tec.girar();
+  if (tec.enderezar) tec.enderezar();
+  Object.assign(noche, { oscuridad: 0, brasa: BRASA_BASE, shoji: 0, puerta: 0, tinta: 0, proximaRafaga: 0, proximoVagar: reloj + 3, proximoTemblor: reloj + 6 });
+  luzFria.guiadaHasta = 0; luzFria.punto = null;
+  ojo.punto = null; ojo.distraidoHasta = 0; ojo.parpadoBase = 0; ojo.entornado = 0;
+  Object.assign(ojo2, { visible: 1, parpadoBase: 0 });
+  ponerLlamaEnBandeja(false);
+  bucle('noche', -11, 2);
+  irA('sala', 1.4);
+  await esperar(1.8);
+  // una ráfaga entra por el shoji y la llama de la lámpara se encoge… y se apaga
+  soplar(1.3); sonar('soplo', -2, 0.9); sonar('racha', -8, 0.8);
+  agitarLampara(0.9, 1);
+  await esperar(0.7);
+  sonar('soplo', -6, 1.2);
+  const ap0 = lampara.apagada;
+  animar(0.5, k => { lampara.apagada = mezclar(ap0, 1, suave(k)); });
+  animar(1.4, k => { noche.oscuridad = suave(k); });
+  pararBucle('fuego', 1);
+  contenerAliento(3); sacudir(1.2, 0.3);
+  await esperar(1.2);
+  // la mecha humea
+  noche.humo = new Cinta(nivel6.lampara.humo[0], nivel6.lampara.humo[1], { ritmo: 7, vida: 3.4, vel: 10, ancho: 2.4, alfa: 0.2,
+    tinta: 0.06, rizo: 0.9, objeto: 'sala' });
+  humos.sueltos.push(noche.humo);
+  // solo queda la luz fría, hacia el suelo, delante de la caja
+  luzFria.punto = { x: 760, y: 640 }; luzFria.guiadaHasta = Infinity;
+  sonar('cristal', -16, 0.7);
+  await esperar(1.2);
+  estado.ocupado = false;
+  mensaje('Una ráfaga ha apagado la lámpara. A oscuras, la caja no ve… y tú tampoco. Solo alumbra su ojo nuevo: arrastra el dedo para mover su luz.', 7);
+}
+// cada poco, a oscuras, tiembla (le teme a la noche) y su ojo viejo busca sin ver
+function actualizarNivel6(dt) {
+  const n6 = estado.n6, de6 = estado.nivel === 6 && !!n6;
+  const oscura = de6 && n6.lampara !== 'encendida' && estado.fase === 'jugando';
+  if (!de6) { noche.oscuridad = Math.max(0, noche.oscuridad - dt); return; }
+  // las brasas: casi apagadas; cada ráfaga las aviva un momento
+  noche.brasa = mezclar(noche.brasa, BRASA_BASE, 1 - Math.exp(-dt * 0.55));
+  // la tinta de la llamita (en el cajón de arriba del costado): solo bajo la luz fría
+  const f = luzFria.fuerza * (1 - ojo2.cerrado), c = frenteCajonEnBoceto('c2');
+  const vis = oscura && c ? limitar(1 - (Math.hypot(luzFria.x - c.x, luzFria.y - c.y) - 40) / 70, 0, 1) * f : 0;
+  noche.tinta = mezclar(noche.tinta, vis, 1 - Math.exp(-dt * 6));
+  if (oscura && noche.tinta > 0.6 && !n6.tinta) {
+    n6.tinta = true; sonar('cristal', -14, 0.9); sonar('espiritu', -20, 1.4);
+    mensaje(estado.n5 && estado.n5.tsukegi === 'mano' ? 'En el cajón de arriba del costado brilla una tinta fría: una llamita. Es el de las tsukegi… y ya las llevas.'
+      : 'En el cajón de arriba del costado brilla una tinta fría: una llamita.', 4.5);
+  }
+  if (!oscura) return;
+  // el viento: con el shoji entreabierto entra a ráfagas
+  if (noche.shoji > 0.3) {
+    if (!noche.proximaRafaga) noche.proximaRafaga = reloj + azar(1.2, 2);
+    if (reloj >= noche.proximaRafaga) { noche.proximaRafaga = reloj + azar(2.4, 3.8) / (0.6 + 0.4 * noche.shoji); rafaga6(); }
+  } else noche.proximaRafaga = 0;
+  // la tsukegi encendida se consume
+  if (n6.llama && reloj >= n6.llama) apagarLlama('La tsukegi se ha consumido. El manojo trae más.');
+  // el ojo viejo no ve: busca, perdido
+  if (reloj >= noche.proximoVagar) {
+    noche.proximoVagar = reloj + azar(1.6, 3.4);
+    ojo.punto = { x: azar(300, 1300), y: azar(120, 620) }; ojo.ultimoToque = reloj;
+  }
+  // y tiembla de vez en cuando
+  if (reloj >= noche.proximoTemblor) {
+    noche.proximoTemblor = reloj + azar(7, 12);
+    sacudir(0.5, 0.35); if (Math.random() < 0.5) sonar('suspiro', -24, 1.3);
+  }
+}
+function rafaga6() {
+  const n6 = estado.n6;
+  soplar(0.45 + 0.5 * noche.shoji); sonar('soplo', -12 + 4 * noche.shoji, azar(0.9, 1.1));
+  noche.brasa = 1;
+  setTimeoutReloj(0.15, () => sonar('fuego', -20, 1.3));
+  if (llamaEnMano()) setTimeoutReloj(0.25, () => apagarLlama('Una ráfaga entra por el shoji… y apaga la llama.'));
+  else if (!n6.brasas && reloj > 2) { n6.brasas = true; mensaje('Con el aire, las brasas del incensario se avivan un momento.', 3.5); }
+}
+// dónde está ahora el frente de un cajón del costado (en el boceto), abierto lo que esté
+function frenteCajonEnBoceto(id) {
+  if (!cajonesDatos) return null;
+  const g = geometriaCajon(id), s = cajonAnim[id].k * cajonesDatos.sale;
+  const [x, y] = aBoceto([cajonesDatos.x + s, (g.y[0] + g.y[1]) / 2, (g.z[0] + g.z[1]) / 2]);
+  return { x, y };
+}
+// tocar a oscuras: lo no alumbrado no se encuentra; la caja, sin ver, se asusta
+function tocarANoche(p) {
+  if (p && (dentro(['poli', CAJA], p) || p.cajon) && !p.hija) {
+    contenerAliento(1.6); sacudir(1.4, 0.25); sonar('trabado', -12, 1.4); vibrar(20);
+    const veces = insistir('noche-caja');
+    mensaje(veces === 1 ? 'Da un respingo: no ve nada, y algo la ha tocado.' : veces === 2 ? 'Tiembla. A oscuras, todo la asusta.'
+      : 'Alumbra antes con su luz lo que quieras tocar.', 3.5);
+    return;
+  }
+  sonar('toque', -22, 0.7);
+  const veces = insistir('noche');
+  mensaje(veces === 1 ? 'A oscuras no encuentras nada.' : veces === 2 ? 'Mueve su luz: arrastra el dedo, al otro lado de lo que quieras ver.'
+    : 'Solo lo alumbrado se encuentra.', 3);
+}
+function tocarLampara6(p) {
+  const n6 = estado.n6;
+  if (dentro(['rect', ...nivel6.lampara.puerta], p) && n6.puerta !== 'abierta') {
+    noche.puerta = Math.max(noche.puerta, 0.12); setTimeoutReloj(0.25, () => { if (n6.puerta !== 'abierta') noche.puerta = 0; });
+    sentir('holgura', { tono: 1.3, db: -4 }); sonar('papel', -16, 1.4);
+    mensaje(primeraVez('puerta6') ? 'Una puertecilla de papel, abajo. Se desliza hacia un lado.' : 'Deslízala con el dedo.', 3.5);
+    return;
+  }
+  if (!n6.mecha) { n6.mecha = true; mensaje('La lámpara: la mecha aún humea, pero no queda fuego. ¿Dónde queda algo encendido?', 4.5); return; }
+  mensaje(n6.puerta === 'abierta' ? 'Dentro, la mecha humea. Le falta una llama.' : 'La mecha humea dentro. Abajo, en el papel, hay una puertecilla.', 3.5);
+}
+function tocarBrasas6() {
+  const n6 = estado.n6;
+  sonar('fuego', -18, 1.2);
+  if (noche.brasa > 0.55) { mensaje('Las brasas brillan con el aire.', 2.5); return; }
+  mensaje(n6.brasas ? 'Las brasas, otra vez casi apagadas. Necesitan aire.' : 'Unas brasas casi apagadas, sin fuerza para prender nada. Les falta aire.', 3.5);
+}
+function tocarShoji6() {
+  mensaje(noche.shoji > 0.3 ? 'Fuera, la noche y el bambú. El viento entra a ráfagas.' : 'El shoji. Fuera, la luna. Se desliza.', 3);
+  if (primeraVez('shoji6')) soplar(0.25, false);
+}
+// la tsukegi en las brasas: prende si están avivadas (azufre, una chispa azul y la llama)
+function prenderTsukegi() {
+  const n6 = estado.n6;
+  if (llamaEnMano()) { mensaje('Ya arde.'); return; }
+  if (noche.brasa < 0.55) {
+    sonar('trabado', -12, 1.3); sonar('fuego', -20, 0.9);
+    mensaje(insistir('prender') === 1 ? 'La punta de azufre toca las brasas… y no prende. Están casi apagadas.' : 'No prende. Las brasas necesitan aire.', 3.5);
+    return;
+  }
+  n6.llama = reloj + DURA_LLAMA;
+  sonar('azufre', -3); vibrar([10, 30, 16]);
+  destello(nivel6.brasas[0], nivel6.brasas[1] - 6, 46, '140,180,255', 0.9, 0.35, 'incensario');
+  setTimeoutReloj(0.3, () => destello(nivel6.brasas[0], nivel6.brasas[1] - 10, 70, '255,190,90', 0.7, 0.8, 'incensario'));
+  ponerLlamaEnBandeja(true);
+  const abierto = noche.shoji > 0.3;
+  mensaje(abierto ? 'Azufre: una chispa azul… y una llama. Pero con el shoji abierto, el viento la apagará.'
+    : 'Azufre: una chispa azul… y una llama. Arde poco: llévala deprisa.', 4.5);
+}
+function apagarLlama(texto) {
+  const n6 = estado.n6;
+  if (!n6 || !n6.llama) return;
+  n6.llama = 0; n6.apagadas++;
+  sonar('soplo', -8, 1.6);
+  ponerLlamaEnBandeja(false);
+  mensaje(texto, 4);
+}
+// la llama a la mecha: la lámpara se enciende y vuelve la luz cálida
+async function encenderLampara() {
+  const n6 = estado.n6;
+  if (n6.puerta !== 'abierta') { sonar('papel', -12, 1.2); mensaje('La puertecilla de papel está cerrada: así no llegas a la mecha.', 3.5); return; }
+  estado.ocupado = true;
+  estado.seleccion = null;
+  n6.lampara = 'encendida'; n6.llama = 0;
+  estado.inventario = estado.inventario.filter(o => o !== 'tsukegi');
+  if (estado.n5) estado.n5.tsukegi = 'lampara';
+  ponerLlamaEnBandeja(false);
+  sonar('mecha', -2); vibrar([12, 40, 20]);
+  if (noche.humo) { noche.humo.duracion = noche.humo.edad; noche.humo = null; }
+  const ap0 = lampara.apagada, os0 = noche.oscuridad;
+  animar(1.6, k => { lampara.apagada = ap0 * (1 - suave(k)); });
+  animar(2.6, k => { noche.oscuridad = os0 * (1 - suave(k)); });
+  bucle('fuego', -21, 2);
+  setTimeoutReloj(0.9, () => { const p0 = noche.puerta; animar(0.6, k => { noche.puerta = p0 * (1 - suave(k)); }); n6.puerta = 'cerrada'; sonar('papel', -16, 1.3); });
+  await esperar(1.4);
+  // el ojo viejo vuelve a ver: busca la llama… y se calma
+  mirarA({ x: LAMPARA.x, y: LAMPARA.y }, 4);
+  luzFria.guiadaHasta = 0;
+  for (const m of polillas) { m.susto = 0; m.posada = 0; }
+  await esperar(1.6);
+  sonar('suspiro', -4, 0.85);
+  await esperar(1.2);
+  sonar('tarareo', -6);
+  mensaje('La luz cálida vuelve a la sala. Su ojo busca la llama… y se calma.', 4.5);
+  await esperar(4);
+  estado.ocupado = false;
+  terminarNivel(6);
+}
+// lo que se dibuja debajo de la oscuridad: la lámpara apagada, el hueco del shoji (la noche de fuera) y la puertecilla
+function dibujarNivel6Debajo(conAncla) {
+  if (estado.nivel !== 6 || !nivel6) return;
+  const L = nivel6.lampara, apagada = lampara.apagada;
+  if (apagada > 0.01 && img.lampara_apagada) {
+    const d = datos.capas.lampara_apagada;
+    conAncla(L.centro[0], L.centro[1], 'sala', () => { ctx.globalAlpha = apagada; ctx.drawImage(img.lampara_apagada, d.x, d.y, d.w, d.h); ctx.globalAlpha = 1; });
+  }
+  if (noche.shoji > 0.004) conAncla(nivel6.shoji.poste, 220, 'sala', dibujarShoji6);
+  if (apagada > 0.01) conAncla(L.mecha[0], L.mecha[1], 'sala', () => { ctx.globalAlpha = apagada; dibujarPuerta6(); ctx.globalAlpha = 1; });
+}
+function dibujarShoji6() {
+  const S = nivel6.shoji, [, y0, , y1] = S.hueco, x0 = S.poste, g = S.abre * noche.shoji, c = ctx;
+  // fuera: la noche azul, la luna arriba y unas cañas de bambú que el viento mece
+  const cielo = c.createLinearGradient(0, y0, 0, y1);
+  cielo.addColorStop(0, 'rgb(96, 122, 176)'); cielo.addColorStop(0.45, 'rgb(52, 70, 112)'); cielo.addColorStop(1, 'rgb(20, 26, 44)');
+  c.save();
+  c.beginPath(); c.rect(x0, y0, g, y1 - y0); c.clip();
+  c.fillStyle = cielo; c.fillRect(x0, y0, g, y1 - y0);
+  brillo(c, x0 + 40, y0 + 70, 110, '215,228,255', 0.6);
+  c.beginPath(); c.arc(x0 + 46, y0 + 64, 13, 0, Math.PI * 2); c.fillStyle = 'rgba(236, 240, 255, 0.92)'; c.fill();
+  const mece = viento.rafaga * 9 + Math.sin(reloj * 0.9) * 2;
+  for (const [bx, ancho] of [[x0 + 14, 7], [x0 + 46, 9], [x0 + 70, 6]]) {
+    c.strokeStyle = 'rgba(8, 16, 14, 0.95)'; c.lineWidth = ancho;
+    c.beginPath(); c.moveTo(bx, y1); c.quadraticCurveTo(bx + mece * 0.3, (y0 + y1) / 2, bx + mece, y0); c.stroke();
+    for (let y = y1 - 60; y > y0; y -= 70) {
+      const dx = mece * (1 - (y - y0) / (y1 - y0));
+      c.strokeStyle = 'rgba(30, 44, 40, 0.9)'; c.lineWidth = 1.6;
+      c.beginPath(); c.moveTo(bx + dx - ancho / 2 - 1, y); c.lineTo(bx + dx + ancho / 2 + 1, y); c.stroke();
+      c.fillStyle = 'rgba(10, 20, 18, 0.9)';
+      c.beginPath(); c.ellipse(bx + dx + 14, y - 8, 15, 3.2, -0.5 + viento.rafaga * 0.4, 0, Math.PI * 2); c.fill();
+    }
+  }
+  c.restore();
+  // el canto de la hoja que se ha corrido
+  c.fillStyle = 'rgba(44, 30, 20, 0.95)'; c.fillRect(x0 + g - 3, y0, 6, y1 - y0);
+  c.fillStyle = 'rgba(0, 0, 0, 0.35)'; c.fillRect(x0 + g + 3, y0, 6, y1 - y0);
+}
+function dibujarPuerta6() {
+  const [x0, y0, x1, y1] = nivel6.lampara.puerta, c = ctx, k = noche.puerta, w = x1 - x0, s = k * (w - 8);
+  const [mx, my] = nivel6.lampara.mecha;
+  // dentro (lo que deja ver la puertecilla corrida): oscuro, con el platillo de aceite y la mecha
+  if (s > 0.5) {
+    c.save();
+    c.beginPath(); c.rect(x1 - s, y0, s, y1 - y0); c.clip();
+    c.fillStyle = 'rgba(22, 13, 8, 0.97)'; c.fillRect(x1 - s, y0, s, y1 - y0);
+    c.fillStyle = 'rgba(88, 60, 38, 0.95)'; c.beginPath(); c.ellipse(mx, my + 4, 9, 3, 0, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = 'rgba(20, 12, 8, 1)'; c.lineWidth = 1.6; c.beginPath(); c.moveTo(mx, my + 3); c.lineTo(mx + 1, my - 1.5); c.stroke();
+    if (enLaNoche()) brillo(c, mx + 1, my - 2, 4, '255,90,40', 0.8 * (0.7 + 0.3 * Math.sin(reloj * 3.3)));     // un rescoldo
+    c.restore();
+  }
+  // la puertecilla: papel con su marquito, corrida hacia la izquierda (detrás del poste)
+  c.save();
+  c.beginPath(); c.rect(nivel6.lampara.recorte[0] + 13, y0 - 2, x1 - nivel6.lampara.recorte[0] - 13 + 1, y1 - y0 + 4); c.clip();
+  c.fillStyle = 'rgba(150, 141, 124, 0.96)'; c.fillRect(x0 - s, y0, w, y1 - y0);
+  c.strokeStyle = 'rgba(60, 40, 24, 0.95)'; c.lineWidth = 1.6; c.strokeRect(x0 - s + 0.8, y0 + 0.8, w - 1.6, y1 - y0 - 1.6);
+  c.beginPath(); c.arc(x0 - s + w - 6, (y0 + y1) / 2, 1.6, 0, Math.PI * 2); c.fillStyle = 'rgba(60, 40, 24, 0.9)'; c.fill();
+  c.restore();
+}
+// la oscuridad: una capa casi negra, con huecos donde hay luz (la luz fría y su ojo, las brasas, la luna y la mecha)
+let lienzoNoche = null;
+function lucesNoche() {
+  const l = [], f = luzFria.fuerza * (1 - ojo2.cerrado);
+  if (f > 0.01) {
+    l.push({ x: luzFria.x, y: luzFria.y, objeto: objetoBajo(luzFria), r: RADIO_LUZ6 + 20, a: 0.95 * f });
+    l.push({ x: CUENCA.x, y: CUENCA.y, objeto: 'caja', r: 34, a: 0.75 * f });
+  }
+  const b = noche.brasa, [bx, by] = nivel6.brasas;
+  l.push({ x: bx, y: by, objeto: 'incensario', r: 42 + 70 * b, a: 0.4 + 0.5 * b });
+  l.push({ x: 1300, y: 170, objeto: 'sala', r: 260, a: 0.48 });                 // la luna, por el papel del shoji
+  if (noche.shoji > 0.02) l.push({ x: nivel6.shoji.poste + 30, y: 250, objeto: 'sala', r: 150 + 80 * noche.shoji, a: 0.55 * noche.shoji });
+  const [mx, my] = nivel6.lampara.mecha;
+  l.push({ x: mx, y: my - 30, objeto: 'sala', r: 30, a: 0.18 });
+  return l;
+}
+function dibujarNoche() {
+  const o = noche.oscuridad;
+  if (o <= 0.002 || !nivel6) return;
+  if (!lienzoNoche) lienzoNoche = document.createElement('canvas');
+  const W = Math.max(1, Math.round(ancho * ppp)), H = Math.max(1, Math.round(alto * ppp));
+  if (lienzoNoche.width !== W || lienzoNoche.height !== H) { lienzoNoche.width = W; lienzoNoche.height = H; }
+  const k = lienzoNoche.getContext('2d');
+  k.setTransform(1, 0, 0, 1, 0, 0);
+  k.globalCompositeOperation = 'source-over';
+  k.clearRect(0, 0, W, H);
+  k.fillStyle = `rgba(3, 5, 12, ${0.92 * o})`; k.fillRect(0, 0, W, H);
+  k.globalCompositeOperation = 'destination-out';
+  for (const L of lucesNoche()) {
+    const m = tec.ancla({ x: L.x, y: L.y }, L.objeto);
+    if (!m || !m.visible) continue;
+    const r = L.r * m.k * ppp, x = m.x * ppp, y = m.y * ppp;
+    const g = k.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, `rgba(0,0,0,${L.a})`); g.addColorStop(0.5, `rgba(0,0,0,${L.a * 0.72})`); g.addColorStop(1, 'rgba(0,0,0,0)');
+    k.fillStyle = g; k.fillRect(x - r, y - r, 2 * r, 2 * r);
+  }
+  k.globalCompositeOperation = 'source-over';
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.drawImage(lienzoNoche, 0, 0);
+  ctx.setTransform(ppp, 0, 0, ppp, 0, 0);
+}
+// encima de la oscuridad: la llamita de tinta fría del cajón de arriba del costado (solo bajo la luz fría)
+function dibujarNivel6Encima(conAncla) {
+  if (estado.nivel !== 6 || noche.tinta < 0.01) return;
+  const c = frenteCajonEnBoceto('c2');
+  if (!c) return;
+  conAncla(c.x, c.y, 'caja', () => {
+    const a = noche.tinta, x = c.x + 2, y = c.y - 1, h = 15;
+    brillo(ctx, x, y, 26, '150,190,255', 0.35 * a);
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x, y - h);
+    ctx.bezierCurveTo(x + 6, y - h * 0.45, x + 7.5, y - 1, x, y + h * 0.42);
+    ctx.bezierCurveTo(x - 7.5, y - 1, x - 6, y - h * 0.45, x, y - h);
+    ctx.fillStyle = `rgba(170, 205, 255, ${0.28 * a})`; ctx.fill();
+    ctx.strokeStyle = `rgba(200, 225, 255, ${0.95 * a})`; ctx.lineWidth = 1.7; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, y - h * 0.35); ctx.quadraticCurveTo(x + 2.5, y, x, y + h * 0.25);
+    ctx.strokeStyle = `rgba(220, 235, 255, ${0.7 * a})`; ctx.lineWidth = 1.1; ctx.stroke();
+    ctx.restore();
+  });
+}
+function pistaNivel6() {
+  const n6 = estado.n6, n5 = estado.n5;
+  const escalon = (clave, lista) => {
+    const n = estado.pistasPaso[clave] = (estado.pistasPaso[clave] || 0) + 1;
+    return mensaje(lista[Math.min(n, lista.length) - 1], 4.5);
+  };
+  if (!n6) return mensaje('Mira.');
+  if (!luzFria.punto || luzFria.guiadaHasta !== Infinity) return escalon('luz', ['Su ojo nuevo da luz. Arrastra el dedo para moverla.', 'La luz va al revés de tu dedo, como antes.']);
+  const llevaTsukegi = estado.inventario.includes('tsukegi');
+  if (!llevaTsukegi) return escalon('tsukegi', ['Para encender algo hace falta con qué. Recuerda lo que guardaba la cómoda.',
+    'Alumbra los cajones del costado de la caja.', 'Una tinta fría marca el cajón de arriba: dentro están las tsukegi.']);
+  if (!n6.mecha) return escalon('lampara', ['¿Qué daba luz en esta sala?', 'Alumbra la lámpara y tócala.']);
+  if (llamaEnMano()) {
+    if (noche.shoji > 0.3) return escalon('cerrar', ['Con el shoji abierto, el viento apagará la llama.', 'Ciérralo antes de llevarla: desliza la hoja otra vez.']);
+    if (n6.puerta !== 'abierta') return escalon('puerta', ['¿Cómo llega la llama a la mecha?', 'La lámpara tiene una puertecilla de papel abajo: alúmbrala y deslízala.']);
+    return escalon('llevar', ['Lleva la llama a la mecha: elige la tsukegi y toca la lámpara.']);
+  }
+  if (noche.shoji < 0.3) return escalon('aire', ['Las brasas del incensario están casi apagadas. Les falta aire.', 'El viento de fuera… El shoji se desliza.',
+    'Entreabre el shoji: arrastra su hoja de la derecha.']);
+  return escalon('prender', ['Con cada ráfaga, las brasas se avivan.', 'Elige la tsukegi y tócale las brasas justo cuando brillen.',
+    n6.puerta !== 'abierta' ? 'Y antes de llevar la llama: abre la puertecilla de la lámpara y cierra el shoji.' : 'Luego, cierra el shoji antes de llevar la llama.']);
+}
+
+// ---------------------------------------------------------------------------------------------
 // Nivel final · El corazón (solo en la B). Con la cara entera, la caja ya no se defiende: respira hondo y su corazón sube
 // por la trampilla y se queda en la tapa, con tres anillos. Ayuda con lo que le has devuelto:
 //   el anillo del cuerno: el ojo viejo mira la ranura donde va el cuerno (y la ranura late en rojo);
@@ -4639,7 +5054,6 @@ async function empezarFinal() {
 function actualizarFinal(dt) {
   const f = estado.fin;
   if (estado.nivel !== NIVEL_FINAL || !f) return;
-  actualizarLuzFria(dt);
   // abierto, el corazón late y sus anillos giran solos
   if (f.fase === 'abierto') { f.angulos[0] += 0.5 * dt; f.angulos[1] -= 0.8 * dt; f.angulos[2] += 1.2 * dt; }
 }
@@ -4855,6 +5269,18 @@ function usarObjeto(objeto, p, desde = null, toque = desde) {
     return;
   }
   if (objeto === 'tsukegi' && estado.nivel === 5) { deseleccionar(); sonar('trabado', -10, 1.3); mensaje('Para prenderlas hace falta una brasa. Aún hay luz.', 3.5); return; }
+  // nivel 6: la tsukegi en las brasas (prende si están avivadas) y, encendida, en la mecha
+  if (objeto === 'tsukegi' && enLaNoche()) {
+    deseleccionar();
+    if (p && dentro(INCENSARIO, p)) { prenderTsukegi(); return; }
+    if (p && dentro(zonaLampara6(), p)) {
+      if (llamaEnMano()) { encenderLampara(); return; }
+      sonar('trabado', -10, 1.3); mensaje(estado.n6.mecha ? 'Sin llama no prende. ¿Dónde queda algo encendido?' : 'La mecha humea, pero sin fuego no prende.', 3.5);
+      return;
+    }
+    sonar('trabado', -10, 1.3); mensaje(llamaEnMano() ? 'Ahí no. La llama se consume…' : 'Ahí no.', 2.5);
+    return;
+  }
   deseleccionar();
   sonar('trabado', -8, 1.2);
   const enCaja = p && (p.cara === 'detras' || dentro(['poli', CAJA], p));
@@ -5111,6 +5537,8 @@ function actualizar(dt) {
   actualizarNivel3(dt);
   actualizarNivel4(dt);
   actualizarNivel5(dt);
+  actualizarNivel6(dt);
+  if (estado.nivel >= 3) actualizarLuzFria(dt);
   actualizarTetera3(dt);
   actualizarFinal(dt);
   actualizarOjo(dt);
@@ -5153,7 +5581,7 @@ function cuadro(ahora) {
 const punteros = new Map();
 let puntero = null, arrastre = null, pellizco = null;
 const VISTA_PADRE = { cajones: 'caja', cara: 'caja', incensario: 'sala', caja: 'sala', hija: 'caja', te: 'sala', largo: 'caja', corazon: 'caja', zocalo: 'caja',
-  espalda: 'caja', borla: 'caja' };
+  espalda: 'caja', borla: 'caja', lampara: 'sala' };
 function posicion(e) { const r = lienzo.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
 lienzo.addEventListener('pointerdown', e => {
   desbloquearAudio();
@@ -5177,7 +5605,7 @@ lienzo.addEventListener('pointerdown', e => {
     // (en el final no se gira: su corazón está en la tapa y los ojos tienen que verlo)
     enCaja: (v === 'sala' || v === 'caja') && !hijaEnMesa() && estado.nivel !== NIVEL_FINAL && !!(p && (p.cara === 'detras' || p.cajon || dentro(['poli', CAJA], p))),
     enHija: hijaEnMesa() && v === 'hija' };
-  if (estado.fase === 'jugando' && p && p.cara === 'frente') { if (estado.nivel !== NIVEL_FINAL) mirarA(p); guiarLuz(p); alumbrarCorazon(q); }
+  if (estado.fase === 'jugando' && p && p.cara === 'frente') { if (estado.nivel !== NIVEL_FINAL && !enLaNoche()) mirarA(p); guiarLuz(p); alumbrarCorazon(q); }
 });
 lienzo.addEventListener('pointermove', e => {
   const q = posicion(e);
@@ -5186,7 +5614,7 @@ lienzo.addEventListener('pointermove', e => {
   if ((e.pointerType === 'mouse' || puntero) && estado.fase === 'jugando') {
     const p = tec.aPintura(q.x, q.y);
     moverDedo(p);
-    if (p && p.cara === 'frente') { if (estado.nivel !== NIVEL_FINAL) mirarA(p); if (puntero) { guiarLuz(p); alumbrarCorazon(q); } }
+    if (p && p.cara === 'frente') { if (estado.nivel !== NIVEL_FINAL && !enLaNoche()) mirarA(p); if (puntero) { guiarLuz(p); alumbrarCorazon(q); } }
   }
   if (!puntero || e.pointerId !== puntero.id) return;
   const dx = q.x - puntero.x, dy = q.y - puntero.y;
@@ -5195,6 +5623,12 @@ lienzo.addEventListener('pointermove', e => {
   const ahoraMov = performance.now(), pasoMov = Math.max(0.008, (ahoraMov - (puntero.tMov || puntero.inicio)) / 1000);
   puntero.vx = mezclar(puntero.vx || 0, dx / pasoMov, 0.5); puntero.tMov = ahoraMov;
   if (puntero.gesto && moverGesto(puntero.gesto, q)) { puntero.x = q.x; puntero.y = q.y; return; }
+  // nivel 6, a oscuras: arrastrar mueve la luz fría (al revés del dedo), no la cámara ni la caja
+  if (enLaNoche() && estado.fase === 'jugando') {
+    if (puntero.movido > 8 && !estado.ocupado) moverLuz6(dx, dy);
+    puntero.x = q.x; puntero.y = q.y;
+    return;
+  }
   if (puntero.movido > 10 && estado.fase !== 'portada' && !estado.ocupado) {
     if (puntero.enHija) tec.girarHija(dx, dy);
     else if (puntero.enCaja) {
@@ -5310,6 +5744,13 @@ function gestoEn(p, q) {
     if (c && f.fase === 'centro' && f.hija === 'puesta' && c.r < 0.075) return { tipo: 'llaveHija' };
   }
   if (!p) return null;
+  // nivel 6, a oscuras: el shoji (desde la sala) y la puertecilla de la lámpara; lo no alumbrado no se coge
+  if (enLaNoche()) {
+    if (v === 'sala' && dentro(zonaShoji6(), p)) return { tipo: 'shoji6' };
+    const [x0, y0, x1, y1] = nivel6.lampara.puerta;
+    if ((v === 'lampara' || v === 'sala') && dentro(['rect', x0 - 8, y0 - 8, x1 + 8, y1 + 8], p) && iluminado(p)) return { tipo: 'puerta6' };
+    if (!iluminado(p)) return null;
+  }
   if (p.cajon && v === 'cajones') return { tipo: 'cajon', id: p.cajon };
   // nivel 5: los cajones de la espalda (de cerca) y la borla del costado
   if (estado.nivel === 5 && estado.n5) {
@@ -5397,6 +5838,12 @@ function empezarGesto(g, dx, dy) {
       g.k0 = a.k; g.kAntes = a.k; g.t = performance.now();
       a.agarrado = true; a.v = 0;
       sentir('roce', { tono: 1.05 });
+      break;
+    }
+    case 'shoji6': case 'puerta6': {
+      g.k0 = g.tipo === 'shoji6' ? noche.shoji : noche.puerta; g.escala = escalaSala();
+      if (g.tipo === 'shoji6') { sentir('roce', { tono: 0.75 }); sonar('deslizar_madera', -12, 0.75); }
+      else { sentir('roce', { tono: 1.6, db: -6 }); sonar('papel', -18, 1.5); }
       break;
     }
     case 'borla5': {
@@ -5536,6 +5983,15 @@ function moverGesto(g, q) {
       if (k >= 1 && g.kAntes < 1) sentir('tope', { db: -4, tono: 1.05 });
       if (k <= 0 && g.kAntes > 0.015 && reloj > a.golpe) { a.golpe = reloj + 0.25; sonar('tope_madera', -11, 1.2); ruido(0.5); }
       g.kAntes = k;
+      break;
+    }
+    case 'shoji6': {
+      noche.shoji = estado.n6.shoji = limitar(g.k0 + dx / (nivel6.shoji.abre * g.escala), 0, 1);
+      break;
+    }
+    case 'puerta6': {
+      const [x0, , x1] = nivel6.lampara.puerta;
+      noche.puerta = limitar(g.k0 - dx / ((x1 - x0 - 8) * g.escala), 0, 1);
       break;
     }
     case 'borla5': {
@@ -5710,6 +6166,24 @@ function soltarGesto(g, cancelado = false) {
       if (g.id === 'm1' && final > 0.5) estado.n5.m1 = 'dentro';
       break;
     }
+    case 'shoji6': {
+      const n6 = estado.n6;
+      if (noche.shoji < 0.08) { noche.shoji = n6.shoji = 0; sentir('tope', { db: -8, tono: 0.9 }); }
+      if (noche.shoji > 0.3) {
+        sonar('viento', -12, 0.95);
+        if (g.k0 <= 0.3) mensaje(primeraVez('shoji-abierto') ? 'Entra el aire de la noche, a ráfagas.' : 'Entra el viento.', 3);
+      } else if (g.k0 > 0.3) mensaje('El shoji, cerrado: ya no entra el viento.', 2.5);
+      break;
+    }
+    case 'puerta6': {
+      const n6 = estado.n6, abrir = !cancelado && noche.puerta > 0.5, desde = noche.puerta;
+      animar(0.25, k => { noche.puerta = mezclar(desde, abrir ? 1 : 0, suave(k)); });
+      if (abrir && n6.puerta !== 'abierta') {
+        n6.puerta = 'abierta'; sonar('papel', -8, 1.3); sentir('tope', { db: -10, tono: 1.5 });
+        mensaje('La puertecilla se corre: dentro, el platillo de aceite y la mecha, que aún humea.', 4);
+      } else if (!abrir && n6.puerta === 'abierta') { n6.puerta = 'cerrada'; sonar('papel', -12, 1.2); }
+      break;
+    }
     case 'borla5': {
       if (g.parte === 'borla' && borla5.objetivoBajada < 0.92) {
         borla5.objetivoBajada = 0;
@@ -5778,7 +6252,7 @@ function soltarGesto(g, cancelado = false) {
 }
 
 function girarCaja() {
-  if (estado.fase !== 'jugando' || estado.ocupado || estado.nivel === 2 || estado.nivel === NIVEL_FINAL) return;
+  if (estado.fase !== 'jugando' || estado.ocupado || estado.nivel === 2 || estado.nivel === NIVEL_FINAL || enLaNoche()) return;
   sonar('deslizar_madera', -10, 1.1);
   tec.girar();
   // desde la sala o desde el costado de los cajones, la cámara se aparta para ver la caja entera girar
@@ -5962,6 +6436,9 @@ function reiniciar(nivel = 1) {
   pedazoEnBoca = null; mano4.herramienta = null; mano4.motas.length = 0;
   Object.assign(borla5, { desatado: 0, aprieto: 0, bajada: 0, objetivoBajada: 0, vBajada: 0, meneo: 0, vMeneo: 0 });
   Object.assign(sueno, { nivel: 0, dormida: false, avisado: false }); pararBucle('ronquido', 0.3);
+  Object.assign(noche, { oscuridad: 0, brasa: BRASA_BASE, shoji: 0, puerta: 0, tinta: 0, proximaRafaga: 0, humo: null });
+  luzFria.punto = null;
+  ponerLlamaEnBandeja(false);
   for (const t of Object.values(TINTAS)) { t.vis = 0; t.acum = 0; }
   if (img.ficha_peon) { img.ficha = img.ficha_peon; OBJETOS.ficha.icono = OBJETOS.ficha.iconoPeon; ponerCampanillaCompleta(false); }
   ponerTextoNota(1);
@@ -6048,8 +6525,19 @@ function restaurar(guardado) {
       Object.assign(borla5, { desatado: suelto ? 1 : 0, aprieto: 0, bajada: abajo ? 1 : 0, objetivoBajada: abajo ? 1 : 0, vBajada: 0, meneo: 0, vMeneo: 0 });
       Object.assign(sueno, { nivel: 0, dormida: false, toque: reloj, ruido: reloj });
     }
+    // nivel 6: a oscuras (o con la lámpara ya encendida), el shoji y la puertecilla como estaban; la llama no dura
+    const n6 = estado.n6;
+    if (estado.nivel === 6 && n6) {
+      n6.llama = 0;
+      noche.shoji = n6.shoji || 0; noche.puerta = n6.puerta === 'abierta' ? 1 : 0;
+      if (n6.lampara !== 'encendida') {
+        lampara.apagada = 1; noche.oscuridad = 1; noche.proximoVagar = reloj + 2; noche.proximoTemblor = reloj + 6;
+        luzFria.punto = { x: 760, y: 640 }; luzFria.guiadaHasta = Infinity;
+        if (nivel6) { noche.humo = new Cinta(nivel6.lampara.humo[0], nivel6.lampara.humo[1], { ritmo: 7, vida: 3.4, vel: 10, ancho: 2.4, alfa: 0.2, tinta: 0.06, rizo: 0.9, objeto: 'sala' }); humos.sueltos.push(noche.humo); }
+      }
+    }
     if (estado.fin && estado.fin.fase === 'subiendo') { estado.fin.subida = 1; estado.fin.fase = 'anillos'; }
-    el.girar.hidden = estado.nivel === 2 || estado.nivel === NIVEL_FINAL; el.inventario.hidden = false;
+    el.girar.hidden = estado.nivel === 2 || estado.nivel === NIVEL_FINAL || enLaNoche(); el.inventario.hidden = false;
     el.portada.hidden = true;
     ojo.parpadoBase = 0;
     pintarInventario();
@@ -6073,7 +6561,7 @@ async function arrancar(guardado) {
   el.cargando.hidden = false; el.cargando.textContent = 'Preparando la sala…';
   prepararAudio();
   try {
-    const [d, cam, esc, caj, n2, n4, n5, ...imagenes] = await Promise.all([
+    const [d, cam, esc, caj, n2, n4, n5, n6, ...imagenes] = await Promise.all([
       fetch('capas/capas.json').then(r => r.json()),
       fetch('capas/camara.json').then(r => r.json()),
       fetch('capas/escena.json').then(r => r.json()),
@@ -6081,15 +6569,16 @@ async function arrancar(guardado) {
       fetch('capas/nivel2.json').then(r => r.json()),
       fetch('capas/nivel4.json').then(r => r.json()),
       fetch('capas/nivel5.json').then(r => r.json()),
-      ...[...CAPAS, ...CAPAS_NIVEL2, ...CAPAS_NIVEL4, ...CAPAS_NIVEL5].map(n => new Promise((ok, mal) => {
+      fetch('capas/nivel6.json').then(r => r.json()),
+      ...[...CAPAS, ...CAPAS_NIVEL2, ...CAPAS_NIVEL4, ...CAPAS_NIVEL5, ...CAPAS_NIVEL6].map(n => new Promise((ok, mal) => {
         const i = new Image();
         i.onload = () => ok(i);
         i.onerror = () => mal(new Error(n));
         i.src = 'capas/' + n + '.webp';
       })),
     ]);
-    [...CAPAS, ...CAPAS_NIVEL2, ...CAPAS_NIVEL4, ...CAPAS_NIVEL5].forEach((n, i) => { img[n] = imagenes[i]; });
-    datos = d; camaraBoceto = cam; escena3d = esc; cajonesDatos = caj; nivel2 = n2; nivel4 = n4; nivel5 = n5;
+    [...CAPAS, ...CAPAS_NIVEL2, ...CAPAS_NIVEL4, ...CAPAS_NIVEL5, ...CAPAS_NIVEL6].forEach((n, i) => { img[n] = imagenes[i]; });
+    datos = d; camaraBoceto = cam; escena3d = esc; cajonesDatos = caj; nivel2 = n2; nivel4 = n4; nivel5 = n5; nivel6 = n6;
     if (datos.caja) CAJA = datos.caja;
   } catch (e) {
     el.cargando.textContent = 'No se pudo cargar la ilustración. Recarga la página.';
@@ -6100,6 +6589,7 @@ async function arrancar(guardado) {
   prepararNivel3();
   prepararNivel4();
   prepararNivel5();
+  prepararNivel6();
   pintarInventario();
   const restaurado = restaurar(guardado);
   hornear();
@@ -6182,6 +6672,7 @@ window.__prueba = {
   // nivel 3: la luz fría y las tintas, el rollo, la respiración, la tetera, el cajón largo y la ficha en la mano
   n3: () => (estado.n3 ? JSON.parse(JSON.stringify(estado.n3)) : null),
   luz: () => ({ x: luzFria.x, y: luzFria.y, fuerza: luzFria.fuerza, guiada: reloj < luzFria.guiadaHasta }),
+  luzObjetivo: () => (luzFria.punto ? { ...luzFria.punto } : null),
   espejoLuz: (x, y) => espejoLuz({ x, y }),
   tinta: id => ({ x: TINTAS[id].x, y: TINTAS[id].y, vis: TINTAS[id].vis || 0 }),
   rollo: () => ({ a: rollo.a, v: rollo.v }),
@@ -6227,5 +6718,14 @@ window.__prueba = {
   borla: () => ({ ...borla5 }),
   escalaBorla: () => escalaBorla(),
   ejeCajonLado: id => { const e = ejeCajon(id); return e && e.a && e.b ? { a: { x: e.a.x, y: e.a.y }, b: { x: e.b.x, y: e.b.y } } : null; },
+  // nivel 6: su estado, la noche (oscuridad, brasas, shoji, puertecilla, tinta), si un punto del boceto se ve, dónde
+  // está el frente de un cajón del costado en el boceto, y si la llama sigue encendida
+  n6: () => (estado.n6 ? JSON.parse(JSON.stringify(estado.n6)) : null),
+  nivel6: () => nivel6,
+  noche: () => ({ oscuridad: noche.oscuridad, brasa: noche.brasa, shoji: noche.shoji, puerta: noche.puerta, tinta: noche.tinta }),
+  iluminado: (x, y) => iluminado({ x, y }),
+  frenteCajon: id => { const c = frenteCajonEnBoceto(id); return c ? { x: c.x, y: c.y } : null; },
+  llama: () => llamaEnMano(),
+  lampara: () => ({ apagada: lampara.apagada, intensidad: lampara.intensidad }),
 };
 window.__tec = () => tec;

@@ -177,7 +177,7 @@ pegada: anclada a su sitio sí, pero que se pudiera girar en la misma vista para
 - **Sin imágenes nuevas:** lo nuevo se dibuja por código (`pagina/nivel3_arte.js`: la ficha, la campanilla, el
   badajo, las tintas y el corazón) y los ocho sonidos nuevos se sintetizan (`herramientas/sonidos_nivel3.py`).
 - **Los niveles en la página:** cada tarjeta lleva al siguiente («Seguir»); la partida guardada y «?nivel=N»
-  (de 2 a 4) empiezan en el que toca; al final, «Quedarse en la sala» o «Volver a empezar».
+  (de 2 a 7, desde el 07-10-2026) empiezan en el que toca; al final, «Quedarse en la sala» o «Volver a empezar».
 - **Respiración sin saltos:** al soltar el aire contenido, la caja volvía de golpe a «llena»; ahora sigue desde vacía.
 
 ## Nivel 4, «El oro» (07-10-2026, para el APK 0.6)
@@ -196,6 +196,27 @@ cura con kintsugi. Diseño entero en `NIVELES.md` §7.
 - **El cajón de la peana**, que sale con su pintura, y la vista de la peana de cerca.
 - **La caja pequeña se aparta** a un lado de la mesa desde el nivel 4 (delante tapaba la peana).
 - **La mejilla curada** se hornea en la pintura de la cara (con `capas/mejilla.webp`) y el oro brilla de vez en cuando.
+
+## Niveles 5 y 6, «La cómoda» y «La noche» (07-10-2026, para el APK 0.7)
+
+**Qué pidió el usuario:** «Si» a la DECISIÓN 31 A: los niveles 5 y 6 en el próximo APK, y el final como nivel 7. Diseño
+entero en `NIVELES.md` §8 y §9.
+
+**Qué cambió:**
+- **Siete niveles** (`?nivel=2` … `?nivel=7`) y seis sellos en la tarjeta: 角 目 声 金 秘 灯.
+- **Nivel 5, la cómoda:** los nueve cajones de la espalda en 3D (se tiran y se empujan; uno bloquea a otro y tiembla
+  al tirar; uno se abre empujando; el panel del hueco de la ficha suena hueco y, golpeado tres veces, es un cajón
+  escondido), la borla del costado izquierdo (se desata con la cola de punta negra y se tira hacia abajo: la cómoda
+  entera se suelta) y su cajón más guardado, que solo se abre con ella dormida y tirando despacio. Vistas nuevas:
+  «espalda» y «borla».
+- **El sueño:** si no se toca nada unos 6 s se duerme (párpados cerrados, ronquido); un ruido o tocarle la cara la
+  despierta.
+- **Nivel 6, la noche:** la lámpara se apaga; una capa de oscuridad con huecos de luz. La luz fría se arrastra al
+  revés del dedo y se queda; solo se toca lo alumbrado. El shoji se entreabre (viento a ráfagas que aviva las brasas
+  y apaga la llama), la *tsukegi* prende en las brasas y la puertecilla de papel de la lámpara se desliza. Vista
+  nueva: «lampara».
+- **La luz fría** se apaga sola en los niveles 4 y 5 (antes, viniendo del 3, se quedaba quieta encima).
+- **El primer movimiento de un arrastre** ya no cuenta como un tirón instantáneo (salía al pasar la zona muerta).
 
 ## Qué hay
 
@@ -218,12 +239,17 @@ cura con kintsugi. Diseño entero en `NIVELES.md` §7.
 | `pagina/nivel4_arte.js` | Lo que se dibuja por código en el nivel 4: las esquirlas con la madera de la cara, la laca, el oro, el tarro y el sobre |
 | `herramientas/nivel4_capas.py` | La mejilla sin el hueco (`capas/mejilla.webp`) y las formas del nivel 4 (`capas/nivel4.json`) |
 | `herramientas/sonidos_nivel4.py` | Los sonidos del nivel 4: el crac, el pincel y el oro |
+| `pagina/nivel5_arte.js` | Lo que se dibuja por código en los niveles 5 y 6: la borla, la tarjeta del lazo, las *tsukegi* (y su llama), el cordón con el pasador y las cosas de los cajones |
+| `herramientas/nivel5_capas.py` | El costado sin la borla, la sala de espaldas con `m1` cerrado, su secreto y las medidas (`capas/nivel5.json`) |
+| `herramientas/rellenar_parches.py` | Rellena un hueco de la pintura con parches de la misma pintura (PatchMatch con votación por capas) |
+| `herramientas/sonidos_nivel5.py` | Los sonidos de los niveles 5 y 6: toc, toc hueco, clinc, ronquido, seda, azufre, soplo y mecha |
+| `herramientas/nivel6_capas.py` | La lámpara apagada (`capas/lampara_apagada.webp`) y las medidas del nivel 6 (`capas/nivel6.json`) |
 | `herramientas/nivel2_capas.py` | Las capas del nivel 2: las caras de la caja hija, la cajita y el ojo nuevo (`capas/nivel2.json`) |
-| `NIVELES.md` | El plan de niveles: la cara como puzle grande y los cuatro niveles |
+| `NIVELES.md` | El plan de niveles: la cara como puzle grande y los siete niveles |
 | `apk/` | El APK de Android: la página dentro de un WebView, sin conexión (`apk/LEEME.md`) |
 | `pagina/escena3d.js` | La sala del boceto en 3D, el material que proyecta la pintura, la caja pintada y sus cajones |
 | `pagina/capas/`, `pagina/sonidos/` | Lo que generan los guiones |
-| `prueba/` | `servir.py` (servidor local), `jugar.mjs` (prueba del nivel 1), `jugar_nivel2.mjs`, `jugar_nivel3.mjs`, `jugar_nivel4.mjs` y `jugar_final.mjs` |
+| `prueba/` | `servir.py` (servidor local), `jugar.mjs` (prueba del nivel 1), `jugar_nivel2.mjs` … `jugar_nivel6.mjs` y `jugar_final.mjs` (el 7) |
 
 ### Las fuentes
 
@@ -349,12 +375,19 @@ node puzles/ilustrada/prueba/jugar.mjs A horizontal <carpeta de capturas>
 node puzles/ilustrada/prueba/jugar.mjs B vertical <carpeta de capturas>
 node puzles/ilustrada/prueba/jugar_nivel2.mjs horizontal <carpeta de capturas>
 node puzles/ilustrada/prueba/jugar_nivel3.mjs horizontal <carpeta de capturas>
+node puzles/ilustrada/prueba/jugar_nivel4.mjs horizontal <carpeta de capturas>
+node puzles/ilustrada/prueba/jugar_nivel5.mjs horizontal <carpeta de capturas>
+node puzles/ilustrada/prueba/jugar_nivel6.mjs horizontal <carpeta de capturas>
 node puzles/ilustrada/prueba/jugar_final.mjs horizontal <carpeta de capturas>
 
 # los sonidos del nivel 3 y el final (22 kHz)
 python3 puzles/ilustrada/herramientas/sonidos_nivel3.py
 python3 puzles/ilustrada/herramientas/sonidos_nivel4.py
 python3 puzles/ilustrada/herramientas/nivel4_capas.py
+# los niveles 5 y 6 (las capas del 5 tardan unos 2 minutos: el relleno por parches)
+python3 puzles/ilustrada/herramientas/sonidos_nivel5.py
+python3 puzles/ilustrada/herramientas/nivel5_capas.py
+python3 puzles/ilustrada/herramientas/nivel6_capas.py
 ```
 
 - **Resultado (05-10-2026, 0.5, el juego completo):** en la página, el nivel 1, 43 de 43 en la B y 37 de 37 en la A (en

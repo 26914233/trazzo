@@ -668,8 +668,8 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   - la luz de la reliquia se retira al núcleo (si duerme, el núcleo late una vez);
   - en el farero responde la tormenta: racha y la llama del quinqué que se agacha.
 - **Los niveles de la caja viva (03-10-2026, noche):** plan en `puzles/ilustrada/NIVELES.md`; estado en
-  `PLAN.md` §8. La cara es el puzle grande: cada nivel le devuelve una pieza (cuerno, ojo y voz) y el final, «El
-  corazón», solo se abre con las tres.
+  `PLAN.md` §8. La cara es el puzle grande: cada nivel le devuelve una pieza (cuerno, ojo, voz, oro, secreto y luz:
+  los sellos 角 目 声 金 秘 灯) y el final, «El corazón» (desde el 07-10-2026, el nivel 7), solo se abre con todas.
   - Hechos en la página: el nivel 1 (El cuerno) y el **nivel 2 (La caja de dentro, solo en la B)**: una caja
     pequeña sale de la trampilla, se gira en la mano y sus cinco tablillas corren en orden; la cara que ve el
     ojo grande no se mueve; dentro, una cajita roja (puzle de bolsillo) con un ojo de piedra de luna para la
@@ -690,9 +690,23 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
       `?nivel=3` y `?nivel=4` empiezan en cada uno. La última nota de la caja espera a la DECISIÓN 25.
   - **Nivel 4, «El oro» (07-10-2026, para el APK 0.6)** (`NIVELES.md` §7): la mejilla rota se cura con kintsugi (esquirlas,
     laca, el aliento de la caja y oro); la regla varía: defiende su cara y nada la distrae, pero cierra los ojos al cantar.
-    El final pasa a ser el nivel 5 (`?nivel=5`). Prueba: `prueba/jugar_nivel4.mjs horizontal`.
-  - **DECISIÓN 31 (abierta, 07-10-2026):** el usuario preguntó cuántos niveles caben en el próximo APK; se le propusieron
-    tres (4 El oro, 5 La cómoda y 6 La noche), recomendada la A (`PLAN.md` §8). El 4 ya está; el 5 y el 6 esperan su sí.
+    Prueba: `prueba/jugar_nivel4.mjs horizontal`.
+  - **DECISIÓN 31 (cerrada el 07-10-2026: A, «Si»):** tres niveles más (4 El oro, 5 La cómoda y 6 La noche); el final pasa
+    a ser el **nivel 7** (`?nivel=7`). Los tres están hechos (`PLAN.md` §8):
+    - **nivel 5, «La cómoda»** (`NIVELES.md` §8): los cajones de la espalda en 3D (se bloquean y tiemblan, uno se empuja,
+      un panel hueco es un cajón escondido), la borla del costado (se desata con la cola de punta negra y, al tirar, la
+      cómoda se suelta) y su cajón más guardado, que solo se abre con ella **dormida** (se duerme tras unos 6 s sin tocar
+      nada) y tirando **despacio**. Prueba: `prueba/jugar_nivel5.mjs horizontal` (35 de 35);
+    - **nivel 6, «La noche»** (`NIVELES.md` §9): la lámpara se apaga; capa de oscuridad con huecos de luz; la luz fría se
+      arrastra al revés del dedo y se queda; solo se toca lo alumbrado; el shoji entreabierto aviva las brasas (y apaga la
+      llama), la *tsukegi* prende en ellas y la puertecilla de la lámpara se desliza. Prueba: `prueba/jugar_nivel6.mjs
+      horizontal` (26 de 26);
+    - herramientas: `nivel5_capas.py` (con `rellenar_parches.py`, unos 2 min), `nivel6_capas.py` y `sonidos_nivel5.py`.
+      Sin imágenes nuevas: coste 0. Hoja para la prueba del usuario: `ilustrada/PRUEBA_0.7.md`.
+  - **La carpeta `.claude` de la rama `claude/omniroute-repo-setup-379r7i`** (CCGS y ECC): el usuario dijo que sí a
+    traerla y usarla (07-10-2026), pero el clasificador de permisos bloqueó copiarla al repositorio («Self-Modification»).
+    Sus guías se leen con `git show origin/claude/omniroute-repo-setup-379r7i:.claude/skills/<nombre>/SKILL.md`, sin
+    instalarlas; dependen de su marco (`project.yaml`, hooks), así que se aplican sus ideas, no sus comandos.
 - **Gestos y horizontal (pedidos por el usuario al probar el APK 0.1, 03-10-2026, noche; hechos, APK 0.2):**
   - **El juego es horizontal:** la app siempre (`sensorLandscape`); la página, en un móvil en vertical, pide girarlo.
   - **De cerca, la cámara se queda fija:** arrastrar no la mueve y tocar fuera no devuelve a la sala (se vuelve con

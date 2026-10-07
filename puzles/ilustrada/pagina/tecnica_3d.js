@@ -236,6 +236,8 @@ function crearRig(op, limites) {
     // nivel 5: la espalda de cerca (sus cajones, con sitio delante para los que salen) y la borla del costado
     espalda: { T: puntoEspalda.clone().add(new THREE.Vector3(0, 0, 0.025)), s: 0.5, pivote: puntoEspalda },
     borla: { T: puntoBorla.clone().add(new THREE.Vector3(0, 0, 0.01)), s: 0.46, pivote: puntoBorla },
+    // nivel 6: la lámpara de cerca, como la sala (un recorte del boceto, sin mover la cámara)
+    lampara: { T: P0.clone().add(adelante0.clone().multiplyScalar(distCaja)), s: 1, pivote: mundo.centroCaja },
   };
   function encuadre(nombre) {
     const v = VISTAS[nombre];
@@ -605,7 +607,8 @@ export async function crearTecnica(letra, op) {
         hija: { th: 0.3, ph: [-0.05, 0.35], lupa: [0.55, 1.2] }, te: { th: 0.35, ph: [-0.08, 0.4], lupa: [0.5, 1.2] },
         largo: { th: 0.45, ph: [-0.1, 0.6], lupa: [0.5, 1.25] }, corazon: { th: 0.5, ph: [0.12, 0.78], lupa: [0.5, 1.25] },
         zocalo: { th: 0.4, ph: [-0.08, 0.55], lupa: [0.5, 1.25] },
-        espalda: { th: 0.45, ph: [-0.1, 0.55], lupa: [0.5, 1.25] }, borla: { th: 0.35, ph: [-0.12, 0.4], lupa: [0.5, 1.25] } }
+        espalda: { th: 0.45, ph: [-0.1, 0.55], lupa: [0.5, 1.25] }, borla: { th: 0.35, ph: [-0.12, 0.4], lupa: [0.5, 1.25] },
+        lampara: { th: 0.06, ph: [-0.03, 0.05], lupa: [0.5, 1] } }
     : { sala: { th: 0.24, ph: [-0.06, 0.14], lupa: [0.45, 1] }, caja: { th: 0.95, ph: [-0.15, 0.45], lupa: [0.45, 1.25] },
         incensario: { th: 0.7, ph: [-0.12, 0.4], lupa: [0.45, 1.25] }, cara: { th: 0.55, ph: [-0.12, 0.3], lupa: [0.45, 1.25] },
         cajones: { th: 0.7, ph: [-0.12, 0.4], lupa: [0.5, 1.25] } };
