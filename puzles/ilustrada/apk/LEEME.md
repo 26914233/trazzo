@@ -17,7 +17,8 @@ sola pantalla (un WebView).
 | Nombre | «La caja viva», con la cara de la caja como icono |
 | Android | 7.0 o más (SDK mínimo 24; objetivo 34; compilado con la plataforma 35) |
 | Versión 0.5 | código 5, 6,2 MB, `caja-viva-0.5-prueba.apk` (05-10-2026): **el juego completo**: el nivel 3 («La voz») y el final («El corazón»), la vista hacia arriba (arrastrar la caja hacia abajo la enseña por encima), la cámara que gira de cerca y se asoma a los cajones, y el incensario que ya no desaparece. SHA-256 `7e8813c2…fa14b6` |
-| Versión 0.6 | código 6, 6,3 MB, `caja-viva-0.6-prueba.apk` (07-10-2026): **el nivel 4, «El oro»** (la mejilla rajada, las olas del zócalo, el cajón de la base, la sombra de la lámpara y el kintsugi en la mano: montar, lacar, curar con el aliento y dorar); el final pasa a ser el 5. SHA-256 `9660bcb7…0dff86` |
+| Versión 0.7 | código 7, 7,3 MB, `caja-viva-0.7-prueba.apk` (07-10-2026): **los niveles 5, «La cómoda»** (los cajones de la espalda, el panel escondido, la borla y el cajón que solo se abre con ella dormida) **y 6, «La noche»** (a oscuras con la luz fría, el shoji, las brasas, la *tsukegi* y la lámpara); el final pasa a ser el 7; la fuente de los sellos trae 金, 秘 y 灯. SHA-256 `9ea9249e…7166d2` |
+| Versión 0.6 | código 6, 6,3 MB, `caja-viva-0.6-prueba.apk` (07-10-2026): **el nivel 4, «El oro»** (la mejilla rajada, las olas del zócalo, el cajón de la base, la sombra de la lámpara y el kintsugi en la mano: montar, lacar, curar con el aliento y dorar); el final pasa a ser el 5. SHA-256 `9660bcb7…0dff86` (en «Versiones anteriores (puzles)») |
 | Versión 0.4 | código 4, 5,4 MB, `caja-viva-0.4-prueba.apk` (05-10-2026): señales sin texto sacadas de la investigación (el ojo mira de reojo el frente abierto, la tablilla que toca se afloja cuando el ojo no la ve, la tetera también distrae al ojo) (en «Versiones anteriores (puzles)») |
 | Versión 0.3 | código 3, 5,4 MB, `caja-viva-0.3-prueba.apk` (05-10-2026): tacto con peso (holgura, muescas, retraso y topes), vocabulario de sonido y vibración, la cerradura del león a la vista, menos texto repetido y «Girar» arriba (en «Versiones anteriores (puzles)») |
 | Versión 0.2 | código 2, 5,3 MB, `caja-viva-0.2-prueba.apk`: gestos (tirar de los cajones, girar la llave, levantar la tapa, deslizar las tablillas), pellizcar para acercar o alejar, la cámara fija de cerca y en horizontal (en «Versiones anteriores (puzles)») |
@@ -32,7 +33,7 @@ sola pantalla (un WebView).
 # y la clave de prueba en /root/.local/share/caja_viva/firma (de Drive; ver «La firma»)
 
 python3 puzles/ilustrada/apk/herramientas/icono_apk.py        # el icono (solo si cambia)
-python3 puzles/ilustrada/apk/construir_apk.py --version 0.6 --codigo 6
+python3 puzles/ilustrada/apk/construir_apk.py --version 0.7 --codigo 7
 ```
 
 El guion (`construir_apk.py`):
@@ -71,6 +72,7 @@ En el contenedor no hay un Android donde instalarlo. Se comprueba esto:
 python3 -m http.server 8766 -d puzles/ilustrada/apk/construccion/assets/web &
 CAJA_VIVA_URL=http://localhost:8766/index.html SIN_RED=1 node puzles/ilustrada/prueba/jugar.mjs B horizontal <capturas>
 CAJA_VIVA_URL=http://localhost:8766/index.html SIN_RED=1 node puzles/ilustrada/prueba/jugar_nivel2.mjs horizontal <capturas>
+# (y lo mismo con jugar_nivel3.mjs … jugar_nivel6.mjs y jugar_final.mjs; la 0.7 se probó así con los niveles 5 y 6)
 ```
 
 Con `SIN_RED=1`, cualquier petición fuera de `localhost` falla. Además, la prueba comprueba que nada sale de la
