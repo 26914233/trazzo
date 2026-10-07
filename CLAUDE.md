@@ -11,3 +11,5 @@ Este repo tiene la web de Curtzz y los juegos (RONIN en Pygame y la campaña de 
 - Web: `frontend-patterns`, `frontend-ui-engineering`, `seo`, `browser-qa`.
 
 Reglas: no inventes datos ni resultados de pruebas; di lo que no pudiste verificar. Si una skill pide aprobación humana, pídela al dueño en vez de saltarla. Responde en español.
+
+Diseño visual (web de Curtzz, menús y HUD de los juegos): `ui-ux-pro-max` (estilos, paletas, tipografías y reglas de UX), `ui-styling` (Tailwind y shadcn/ui) y `banner-design`. El script de `ui-ux-pro-max` se ejecuta desde la raíz del repo: `python3 .claude/skills/ui-ux-pro-max/scripts/search.py "<consulta>" --design-system` (si la variable CLAUDE_PLUGIN_ROOT no está definida, usa esa ruta relativa). Origen: nextlevelbuilder/ui-ux-pro-max-skill (MIT).
