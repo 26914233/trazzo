@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.WindowManager;
+import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -58,6 +59,8 @@ public class ActividadCaja extends Activity {
         ajustes.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
         pagina.setWebViewClient(new ClienteLocal());
+        // el menú del juego («Salir del juego», con confirmación) cierra la app con window.CajaViva.salir()
+        pagina.addJavascriptInterface(new Puente(), "CajaViva");
         setContentView(pagina);
         pantallaCompleta();
         pagina.loadUrl(INICIO);
@@ -86,8 +89,8 @@ public class ActividadCaja extends Activity {
         if (conFoco) pantallaCompleta();
     }
 
-    // El botón «atrás»: el juego cierra lo que esté abierto o vuelve a la sala; si ya no hay nada que cerrar, la app
-    // pasa a segundo plano sin perder la partida en curso
+    // El botón «atrás»: el juego cierra lo que esté abierto, vuelve a la sala o abre su menú de pausa; solo en el menú
+    // de inicio la app pasa a segundo plano (sin perder la partida)
     @Override
     public void onBackPressed() {
         pagina.evaluateJavascript("(window.__atras ? window.__atras() : false)", new ValueCallback<String>() {
@@ -123,6 +126,17 @@ public class ActividadCaja extends Activity {
             pagina = null;
         }
         super.onDestroy();
+    }
+
+    // Lo único que la página puede pedirle a Android: cerrar el juego (desde su menú, después de confirmarlo)
+    private class Puente {
+        @JavascriptInterface
+        public void salir() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() { finish(); }
+            });
+        }
     }
 
     // Sirve la página desde assets/web/ (la ruta de la dirección es la ruta dentro de assets)

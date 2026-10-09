@@ -36,7 +36,7 @@ body {
 
 button { font: inherit; color: inherit; }
 .boton-redondo {
-  width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+  width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center;
   background: var(--sumi-velo); border: 1px solid rgba(201, 164, 93, 0.55);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45); cursor: pointer;
   transition: border-color 0.2s, transform 0.15s;
@@ -48,8 +48,8 @@ button { font: inherit; color: inherit; }
 
 #arriba { position: absolute; top: 12px; right: 16px; display: flex; gap: 10px; z-index: 3; }
 #volver {
-  position: absolute; top: 12px; left: 16px; z-index: 3; height: 46px; padding-inline: 16px 18px;
-  display: flex; align-items: center; gap: 8px; border-radius: 23px;
+  position: absolute; top: 12px; left: 16px; z-index: 3; height: 48px; padding-inline: 16px 18px;
+  display: flex; align-items: center; gap: 8px; border-radius: 24px;
   background: var(--sumi-velo); border: 1px solid rgba(201, 164, 93, 0.55); cursor: pointer;
   font-size: 15px; letter-spacing: 0.04em; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
 }
@@ -125,6 +125,7 @@ button { font: inherit; color: inherit; }
 @keyframes gira-lento { 0%, 100% { transform: rotateY(-24deg) rotateZ(-4deg); } 50% { transform: rotateY(24deg) rotateZ(4deg) translateY(-6px); } }
 @keyframes barrido-luz { 0% { transform: translateX(-60%); } 100% { transform: translateX(60%); } }
 .vitrina.grande { width: min(66vmin, 340px); }
+.vitrina > img, .vitrina > canvas { grid-area: 1 / 1; }          /* el dibujo, el bolsillo y la vitrina 3D, en el mismo sitio */
 .vitrina canvas { position: relative; width: 100%; height: 100%; touch-action: none; cursor: grab; border-radius: 50%; }
 .vitrina canvas:focus-visible { outline: 2px solid var(--laton); outline-offset: 4px; }
 #examinar h3 { margin: 0; font-family: var(--fuente-titulo); font-weight: 800; font-size: clamp(22px, 3.4vw, 30px); letter-spacing: 0.04em; }
@@ -187,7 +188,52 @@ button { font: inherit; color: inherit; }
 .papel .sello { position: absolute; right: 18px; bottom: 16px; width: 36px; height: 36px; font-size: 21px; }
 .papel small { display: block; margin-top: 14px; font-family: var(--fuente-ui); font-size: 13px; color: #6b5640; }
 
-.boton-texto.secundario { background: rgba(20, 14, 10, 0.55); border-color: rgba(201, 164, 93, 0.45); box-shadow: none; font-size: 16px; min-height: 44px; }
+.boton-texto.secundario { background: rgba(20, 14, 10, 0.55); border-color: rgba(201, 164, 93, 0.45); box-shadow: none; font-size: 16px; min-height: 48px; }
+
+/* Los menús (inicio, pausa, niveles, opciones y la confirmación): la misma bandeja lacada que la tarjeta */
+.menu-inicio { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.menu-inicio .boton-texto { margin-top: 0; min-width: 260px; }
+.fila-botones { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.fila-botones .boton-texto { min-width: 0; margin-top: 0; padding-inline: 22px; }
+#menu, #niveles, #opciones { z-index: 7; background: radial-gradient(ellipse 80% 70% at 50% 50%, rgba(10, 7, 5, 0.55), rgba(10, 7, 5, 0.92)); transition-duration: 0.35s; }
+#confirmar { z-index: 8; background: rgba(8, 6, 4, 0.6); transition-duration: 0.25s; }
+.tarjeta.menu { width: min(400px, 100%); gap: 10px; max-height: calc(100% - 20px); overflow-y: auto; }
+.tarjeta.menu h2 { margin: 0; font-family: var(--fuente-titulo); font-weight: 800; font-size: clamp(24px, 4.5vw, 32px); letter-spacing: 0.06em; }
+.menu-pie { font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--laton); }
+.menu-lista { display: grid; gap: 8px; width: 100%; }
+.menu-lista .boton-texto { margin-top: 0; width: 100%; }
+.ajustes { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 2px; }
+.interruptor {
+  min-height: 48px; padding: 0 16px; border-radius: 24px; cursor: pointer; font-family: var(--fuente-titulo); font-size: 15px;
+  background: rgba(20, 14, 10, 0.55); border: 1px solid rgba(201, 164, 93, 0.45); letter-spacing: 0.03em;
+}
+.interruptor b { margin-left: 6px; color: var(--laton); font-weight: 600; }
+.interruptor[aria-pressed="false"] b { color: var(--washi-tenue); }
+.interruptor:focus-visible, #boton-mirar:focus-visible { outline: 2px solid var(--laton); outline-offset: 3px; }
+.confirmar p { margin: 4px 0 0; font-family: var(--fuente-titulo); font-size: 20px; line-height: 1.4; text-wrap: balance; }
+.confirmar small { font-size: 14px; line-height: 1.45; color: var(--washi-tenue); text-wrap: balance; }
+.confirmar .fila-botones { margin-top: 6px; }
+.lista-niveles { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; width: 100%; }
+.lista-niveles button {
+  width: 100%; min-height: 48px; display: flex; align-items: center; gap: 12px; padding: 4px 14px 4px 8px; cursor: pointer;
+  border-radius: 12px; background: rgba(20, 14, 10, 0.55); border: 1px solid rgba(201, 164, 93, 0.4);
+  font-family: var(--fuente-titulo); font-size: 16px; text-align: left;
+}
+.lista-niveles button b {
+  flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 6px; font-size: 19px; font-weight: 800;
+  background: var(--bermellon); color: #f6e9d6; box-shadow: inset 0 0 0 2px rgba(246, 233, 214, 0.35); transform: rotate(-4deg);
+}
+.lista-niveles button small { margin-left: auto; font-size: 12px; letter-spacing: 0.08em; color: var(--washi-tenue); }
+.lista-niveles button[disabled] { cursor: default; opacity: 0.45; }
+.lista-niveles button[disabled] b { background: transparent; color: var(--washi-tenue); border: 1.5px dashed rgba(201, 164, 93, 0.6); box-shadow: none; }
+/* «Mirar»: junto al objeto elegido de la bandeja, para verlo de cerca y girarlo */
+#boton-mirar {
+  position: absolute; z-index: 4; left: var(--x, 0); top: var(--y, 0); transform: translate(38px, 18px);   /* bajo el nombre */
+  height: 44px; padding-inline: 12px 16px; border-radius: 22px; display: flex; align-items: center; gap: 7px; cursor: pointer;
+  background: rgba(20, 14, 10, 0.92); border: 1.5px solid var(--laton); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+  font-family: var(--fuente-titulo); font-size: 16px; letter-spacing: 0.04em;
+}
+#boton-mirar svg { width: 20px; height: 20px; fill: none; stroke: var(--washi); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 
 /* La tarjeta de cada nivel: una bandeja lacada como la del inventario, con la cara como marcador (las piezas que ya
    ha recuperado, selladas en bermellón) y el paso al siguiente */
@@ -231,7 +277,7 @@ button { font: inherit; color: inherit; }
 
 /* arriba, junto a la pista y el sonido: abajo a la izquierda tapaba el pie del incensario y se llevaba sus toques */
 #boton-girar {
-  position: absolute; z-index: 3; right: 128px; top: 12px; height: 46px; padding-inline: 14px 18px; border-radius: 23px;
+  position: absolute; z-index: 3; right: 132px; top: 12px; height: 48px; padding-inline: 14px 18px; border-radius: 24px;
   display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 15px; letter-spacing: 0.04em;
   background: var(--sumi-velo); border: 1px solid rgba(201, 164, 93, 0.55); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
 }
@@ -263,6 +309,7 @@ button { font: inherit; color: inherit; }
   .hueco { width: 50px; height: 50px; }
   .hueco.elegido { transform: translateY(-7px) scale(1.07); }
   #etiqueta-objeto, #etiqueta-objeto.visible { transform: translate(-50%, calc(-100% - 40px)); }
+  #boton-mirar { transform: translate(-50%, calc(-100% - 86px)); }
   #mensaje { bottom: 96px; }
   #boton-girar { top: auto; bottom: 16px; right: 16px; padding-inline: 13px; }
   #boton-girar span { display: none; }
@@ -275,13 +322,18 @@ button { font: inherit; color: inherit; }
   #portada { gap: 10px; }
   #portada h1 { font-size: 40px; }
   #portada .sello { width: 34px; height: 34px; font-size: 20px; }
-  #portada small { display: none; }
+  #portada small { font-size: 12px; }
+  .menu-inicio { gap: 6px; }
+  .menu-inicio .boton-texto { min-height: 46px; }
+  .tarjeta.menu { padding: 14px 18px; gap: 7px; }
+  .menu-lista { gap: 6px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .capa, #mensaje, .hueco { transition-duration: 0.01s; }
   #girar-movil svg { animation: none; transform: rotate(-90deg); }
   .pieza.nueva b { animation: none; }
   .hueco.arde { animation: none; box-shadow: 0 0 16px rgba(255, 170, 80, 0.8); }
+  .vitrina img, .vitrina::after, .bandeja.brilla .destello::before, .hueco.llega img { animation: none; }
 }
 </style>
 
@@ -294,8 +346,8 @@ button { font: inherit; color: inherit; }
   </button>
   <div id="arriba">
     <button class="boton-redondo" id="boton-pista" type="button" aria-label="Pista"><span aria-hidden="true">?</span></button>
-    <button class="boton-redondo" id="boton-sonido" type="button" aria-label="Quitar el sonido" aria-pressed="true">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path id="onda" d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11"/><path id="tachado" d="M16 9l5 6M21 9l-5 6" hidden/></svg>
+    <button class="boton-redondo" id="boton-menu" type="button" aria-label="Menú: pausa, reiniciar, inicio y salir" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14"/></svg>
     </button>
   </div>
   <button id="boton-girar" type="button" hidden aria-label="Girar la caja">
@@ -317,9 +369,16 @@ button { font: inherit; color: inherit; }
     <span class="sello" aria-hidden="true">箱</span>
     <h1>La caja viva</h1>
     <p>Una caja secreta que respira, te mira y no se deja abrir mientras te ve.</p>
-    <button class="boton-texto" id="boton-continuar" type="button" hidden>Seguir</button>
-    <button class="boton-texto" id="boton-entrar" type="button" disabled>Cargando la sala…</button>
-    <small>Con sonido · en horizontal</small>
+    <div class="menu-inicio">
+      <button class="boton-texto" id="boton-continuar" type="button" hidden>Seguir</button>
+      <button class="boton-texto" id="boton-entrar" type="button" disabled>Cargando la sala…</button>
+      <div class="fila-botones">
+        <button class="boton-texto secundario" id="boton-niveles" type="button" hidden>Niveles</button>
+        <button class="boton-texto secundario" id="boton-opciones" type="button">Opciones</button>
+        <button class="boton-texto secundario" id="boton-salir" type="button" hidden>Salir</button>
+      </div>
+    </div>
+    <small id="portada-nota">Con sonido · en horizontal</small>
   </div>
 
   <div class="capa oculta" id="nota" hidden>
@@ -332,7 +391,8 @@ button { font: inherit; color: inherit; }
 
   <div class="capa oculta" id="examinar" hidden>
     <div class="vitrina"><img id="examinar-img" alt=""><canvas id="bolsillo" hidden tabindex="0"
-      aria-label="La cajita en la mano: gira su tapa con el dedo o con las flechas del teclado"></canvas></div>
+      aria-label="La cajita en la mano: gira su tapa con el dedo o con las flechas del teclado"></canvas><canvas id="vitrina3d" hidden tabindex="0"
+      aria-label="El objeto en 3D: arrástralo para girarlo por todos los lados, pellizca para acercarlo y toca dos veces para dejarlo como estaba"></canvas></div>
     <h3 id="examinar-nombre"></h3>
     <p id="examinar-texto"></p>
     <small id="examinar-ayuda">Toca para guardarlo</small>
@@ -359,6 +419,57 @@ button { font: inherit; color: inherit; }
       </div>
     </div>
   </div>
+  <div class="capa oculta" id="menu" hidden>
+    <div class="tarjeta menu" role="dialog" aria-labelledby="menu-titulo">
+      <span class="menu-pie" id="menu-nivel">Nivel 1 · El cuerno</span>
+      <h2 id="menu-titulo">Pausa</h2>
+      <div class="menu-lista">
+        <button class="boton-texto" id="menu-seguir" type="button">Seguir jugando</button>
+        <button class="boton-texto secundario" id="menu-reiniciar" type="button">Reiniciar el nivel</button>
+        <button class="boton-texto secundario" id="menu-inicio" type="button">Menú de inicio</button>
+        <button class="boton-texto secundario" id="menu-salir" type="button" hidden>Salir del juego</button>
+      </div>
+      <div class="ajustes">
+        <button class="interruptor" type="button" data-ajuste="sonido" aria-pressed="true">Sonido <b>sí</b></button>
+        <button class="interruptor" type="button" data-ajuste="vibracion" aria-pressed="true">Vibración <b>sí</b></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="capa oculta" id="niveles" hidden>
+    <div class="tarjeta menu" role="dialog" aria-labelledby="niveles-titulo">
+      <h2 id="niveles-titulo">Niveles</h2>
+      <ol class="lista-niveles" id="lista-niveles"></ol>
+      <button class="boton-texto secundario" id="niveles-volver" type="button">Volver</button>
+    </div>
+  </div>
+
+  <div class="capa oculta" id="opciones" hidden>
+    <div class="tarjeta menu" role="dialog" aria-labelledby="opciones-titulo">
+      <h2 id="opciones-titulo">Opciones</h2>
+      <div class="ajustes">
+        <button class="interruptor" type="button" data-ajuste="sonido" aria-pressed="true">Sonido <b>sí</b></button>
+        <button class="interruptor" type="button" data-ajuste="vibracion" aria-pressed="true">Vibración <b>sí</b></button>
+      </div>
+      <button class="boton-texto secundario" id="opciones-volver" type="button">Volver</button>
+    </div>
+  </div>
+
+  <div class="capa oculta" id="confirmar" hidden>
+    <div class="tarjeta menu confirmar" role="alertdialog" aria-labelledby="confirmar-texto">
+      <p id="confirmar-texto">¿Seguro?</p>
+      <small id="confirmar-detalle"></small>
+      <div class="fila-botones">
+        <button class="boton-texto" id="confirmar-si" type="button">Sí</button>
+        <button class="boton-texto secundario" id="confirmar-no" type="button">No</button>
+      </div>
+    </div>
+  </div>
+
+  <button id="boton-mirar" type="button" hidden aria-label="Mirar el objeto de cerca">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 12a8.5 3.6 0 0 0 17 0 8.5 3.6 0 0 0-17 0"/><path d="M12 3.5v17"/><path d="M15.2 4.6l-3.2-1.1-3.2 1.1"/></svg><span>Mirar</span>
+  </button>
+
   <div id="girar-movil" role="alert">
     <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="20" y="6" width="24" height="44" rx="4"/><path d="M29 44h6"/>
       <path d="M52 30a20 20 0 0 1-12 22" opacity="0.6"/><path d="M38 47l2 5 5-2" opacity="0.6"/></svg>
