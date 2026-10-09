@@ -4,8 +4,8 @@ Orden acordado: uno completo primero y después los demás sobre el mismo molde.
 
 | # | Juego | Estado | Esfuerzo estimado* |
 |---|---|---|---|
-| 1 | **Palabrario** — sopa de letras (antes "Palabrario") | 545 sopas, app de pago, APK y AAB exportados. Falta lo de `palabrario/docs/LANZAMIENTO.md` | — |
-| 2 | **Pintazz** (nombre de trabajo) — dibujo libre, colorear y mandalas | Diseño abajo | Medio |
+| 1 | **Palabrario** — sopa de letras | **Casi terminado, en espera**: 545 sopas, app de pago + paquetes de pistas, auditado, APK y AAB exportados. Se sube cuando la cuenta de Play esté lista (`palabrario/docs/LANZAMIENTO.md`) | — |
+| 2 | **Pintazz** (nombre de trabajo) — dibujo libre, colorear y mandalas | **En curso** | Medio |
 | 3 | **Rebotazz** — plataforma, bola y bloques | Diseño abajo | Bajo-medio |
 | 4 | **Zona Zero** — supervivencia zombi 2D | Diseño abajo, alcance recortado | Alto |
 
@@ -112,7 +112,6 @@ y escribir su GDD con `design-system` y `map-systems` antes de producir.
 
 ## Siguiente paso recomendado
 
-1. Cerrar Palabrario: revisión humana de las palabras, prueba en un móvil y subida a
+1. Palabrario: en espera de la cuenta de Play; luego prueba en un móvil y subida a
    prueba interna (`palabrario/docs/LANZAMIENTO.md`).
-2. Siguiente: **Pintazz**, con el mismo modelo de pago. Es el de más potencial comercial,
-   pero necesita arte (láminas para colorear y mandalas).
+2. En curso: **Pintazz**, con el mismo modelo de pago.

@@ -2,6 +2,10 @@
 
 Adaptado de la skill `launch-checklist` a un juego móvil de un jugador, sin servidor y
 sin anuncios. Única compra dentro: paquetes de pistas con Google Play Billing.
+> **Estado (2026-10-09): casi terminado, en espera.** La cuenta de desarrollador de
+> Google Play está en trámite. Cuando esté lista, el dueño sube el juego siguiendo la
+> sección 5. Mientras tanto no se toca, salvo bugs.
+
 Leyenda: ✅ verificado aquí · 🟡 hecho pero sin probar en dispositivo · ⬜ pendiente del
 dueño · ➖ no aplica.
 
