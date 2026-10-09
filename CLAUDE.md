@@ -782,10 +782,13 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
     APK).
   - Las esperas de la prueba van en tiempo real y comprobando el estado: sin tarjeta gráfica, un
     cuadro puede tardar segundos mientras compila sombreadores.
-- **APK de prueba:** el de hoy es `caja-viva-0.7.1-prueba.apk` (La caja viva ilustrada, arriba), en la raíz de Drive ›
-  `Respaldos Claude/puzles/`; de la 0.1 a la 0.7 están en «Versiones anteriores (puzles)». Los documentos de la caja viva
+- **APK de prueba:** el de hoy es `caja-viva-0.8-prueba.apk` (La caja viva ilustrada, arriba), en la raíz de Drive ›
+  `Respaldos Claude/puzles/`; de la 0.1 a la 0.7.1 están en «Versiones anteriores (puzles)». Los documentos de la caja viva
   (niveles, LEEME, LEEME del APK y la hoja de prueba) están en `puzles/Documentos/`; los del 03-10, en su «Versiones
   anteriores (documentos)».
+  - 0.8 (09-10-2026, código 9, 7,3 MB): menús de inicio y de pausa con confirmación, «Mirar» en 3D, el nivel a medias
+    guardado y los arreglos de la revisión con las skills (arriba). Pruebas: los siete niveles, la A, el aviso vertical,
+    la partida guardada y los menús, todas bien; sin red, los menús 23 de 23.
   - 0.7.1 (07-10-2026, código 8): la partida guardada apunta cuántos niveles tiene el juego; una de la 0.6 con el final
     hecho (entonces el 5) sigue en «La cómoda» en vez de saltársela (`prueba/partida_antigua.mjs`). **Si se renumeran
     los niveles, hay que poner al día las partidas viejas.**
