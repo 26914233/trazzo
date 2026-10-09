@@ -393,12 +393,24 @@ comprobar(tecnica === 'A' ? 'en la A, la tarjeta dice que el nivel 2 necesita 3D
   tecnica === 'A' ? await pagina.isHidden('#boton-seguir') : await pagina.isVisible('#boton-seguir'),
   await pagina.evaluate(() => document.getElementById('tarjeta-siguiente').textContent));
 
-await pagina.tap('#boton-otra');
-await hasta(() => window.__prueba.estado().fase === 'jugando' && window.__prueba.ojo().parpadoBase === 0);
-e = await estado();
-const cerrados = await pagina.evaluate(() => Object.keys(window.__prueba.estado().cajones).every(id => window.__prueba.cajon(id).k === 0));
-comprobar('volver a empezar deja la caja como al principio', e.fase === 'jugando' && e.llave === 'cajon' && e.nota === 'cajon' && e.tapa === 'puesta'
-  && e.cuerno === 'brasas' && e.inventario.length === 0 && cerrados);
+if (tecnica === 'A') {
+  // en la A no se puede seguir: la tarjeta ofrece volver a empezar
+  await pagina.tap('#boton-otra');
+  await hasta(() => window.__prueba.estado().fase === 'jugando' && window.__prueba.ojo().parpadoBase === 0);
+  e = await estado();
+  const cerrados = await pagina.evaluate(() => Object.keys(window.__prueba.estado().cajones).every(id => window.__prueba.cajon(id).k === 0));
+  comprobar('volver a empezar deja la caja como al principio', e.fase === 'jugando' && e.llave === 'cajon' && e.nota === 'cajon' && e.tapa === 'puesta'
+    && e.cuerno === 'brasas' && e.inventario.length === 0 && cerrados);
+} else {
+  // en la B, junto a «Seguir» ya no está «Volver a empezar» (un toque de más llevaba al nivel 1); el atrás abre la
+  // pausa, sin «Reiniciar el nivel» (ya está superado), y «Seguir jugando» vuelve a la tarjeta (menus.mjs prueba el resto)
+  comprobar('junto a «Seguir» no está «Volver a empezar»', await pagina.isHidden('#boton-otra'));
+  comprobar('con la tarjeta, atrás abre la pausa sin «Reiniciar el nivel»', await pagina.evaluate(() => window.__atras()) === true
+    && await pagina.isVisible('#menu-seguir') && await pagina.isHidden('#menu-reiniciar'));
+  await pagina.tap('#menu-seguir');
+  await pagina.waitForTimeout(600);
+  comprobar('«Seguir jugando» vuelve a la tarjeta', await pagina.isVisible('#boton-seguir') && await pagina.isHidden('#menu-seguir'));
+}
 
 if (SIN_RED) {
   comprobar('sin internet: nada sale de la página', fuera.length === 0, fuera.slice(0, 3).join(' | '));

@@ -2141,7 +2141,6 @@ function examinar(objeto) {
   el.examinarAyuda.textContent = cajitaSi ? 'Gira la tapa con el dedo · toca fuera para guardarla'
     : fichaSi ? 'Deslízala de lado para darle la vuelta · toca fuera para guardarla' : manoSi ? ayudaMano4()
       : en3d ? 'Arrastra para girarlo · pellizca para acercarlo · toca fuera para guardarlo' : 'Toca para guardarlo';
-  if (en3d) abrirVitrina(objeto);
   el.bolsillo.setAttribute('aria-label', fichaSi ? 'La ficha en la mano: deslízala de lado o usa las flechas para darle la vuelta'
     : 'La cajita en la mano: gira su tapa con el dedo o con las flechas del teclado');
   if (cajitaSi) abrirBolsillo();
@@ -2153,6 +2152,7 @@ function examinar(objeto) {
   el.examinar.hidden = false;
   requestAnimationFrame(() => el.examinar.classList.remove('oculta'));
   sonar('recoger', -16, 1.25);
+  if (en3d) abrirVitrina(objeto);                         // (con el panel ya abierto)
 }
 let toqueEnExaminar = false;
 function cerrarExaminar() {
@@ -2168,11 +2168,14 @@ let vitrina = null, vitrinaRota = false;
 async function abrirVitrina(objeto) {
   try {
     if (!vitrina) vitrina = (await import('./vitrina3d.js')).crearVitrina(el.vitrina3d, { quieto });
-    if (el.examinar.hidden || el.examinar.classList.contains('oculta')) return;
+    // (si se cerró mientras tanto, cerrarExaminar ya cerró la vitrina y mostrar() no sigue; la clase «oculta» aún no
+    // se ha quitado justo al abrir: se quita en el cuadro siguiente)
+    if (el.examinar.hidden) return;
     const n3 = estado.n3;
     el.vitrina3d.hidden = false;                       // (para medirla; el dibujo sigue delante hasta que esté)
     const hecho = await vitrina.mostrar(objeto, { icono: OBJETOS[objeto].icono, completa: !!(n3 && n3.completa) });
-    if (!hecho || el.examinar.hidden || el.examinar.classList.contains('oculta')) { if (hecho) vitrina.cerrar(); return; }
+    if (!hecho) return;
+    if (el.examinar.hidden) { vitrina.cerrar(); return; }
     vitrina.medir();
     el.examinarImg.hidden = true;
   } catch (e) {

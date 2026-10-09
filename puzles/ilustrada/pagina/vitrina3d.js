@@ -258,9 +258,10 @@ async function modeloFicha() {
 // la campanilla de bronce, de mano: cuerpo de campana, el mango y, si ya lo tiene, el badajo dentro
 function modeloCampanilla({ completa = false } = {}) {
   const bronce = textura(256, 256, (g, w, h) => pintarBronce(g, w, h));
-  const mat = new THREE.MeshStandardMaterial({ map: bronce, metalness: 0.92, roughness: 0.34 });
+  const mat = new THREE.MeshStandardMaterial({ map: bronce, metalness: 0.8, roughness: 0.32 });
   const dentro = new THREE.MeshStandardMaterial({ color: new THREE.Color('#3a2510'), metalness: 0.7, roughness: 0.6 });
-  const fuera = [[0, 0.42], [0.14, 0.41], [0.25, 0.34], [0.31, 0.2], [0.34, 0.0], [0.4, -0.2], [0.48, -0.36], [0.5, -0.43]].map(([x, y]) => new THREE.Vector2(x, y));
+  // (los perfiles, de abajo arriba: así las caras miran hacia fuera)
+  const fuera = [[0.5, -0.43], [0.48, -0.36], [0.4, -0.2], [0.34, 0.0], [0.31, 0.2], [0.25, 0.34], [0.14, 0.41], [0, 0.42]].map(([x, y]) => new THREE.Vector2(x, y));
   const interior = [[0.47, -0.43], [0.44, -0.37], [0.37, -0.2], [0.31, 0.0], [0.28, 0.18], [0.22, 0.3], [0.12, 0.36], [0, 0.37]].map(([x, y]) => new THREE.Vector2(x, y));
   const g = new THREE.Group();
   g.add(malla(new THREE.LatheGeometry(fuera, 64), mat));
@@ -281,7 +282,7 @@ function modeloCampanilla({ completa = false } = {}) {
 // el badajo: una varilla con su bola y la anilla para colgarlo; recién sacado del té, todavía mojado
 function modeloBadajo() {
   const bronce = textura(256, 256, (g, w, h) => pintarBronce(g, w, h, 29));
-  const mat = new THREE.MeshStandardMaterial({ map: bronce, color: new THREE.Color('#a87a3e'), metalness: 0.9, roughness: 0.2 });
+  const mat = new THREE.MeshStandardMaterial({ map: bronce, metalness: 0.75, roughness: 0.24 });
   const g = new THREE.Group();
   const vara = malla(new THREE.CylinderGeometry(0.032, 0.04, 0.72, 16), mat); g.add(vara);
   const bola = malla(new THREE.SphereGeometry(0.12, 28, 20), mat); bola.position.y = -0.42; g.add(bola);
@@ -344,7 +345,7 @@ async function modeloOro() {
   const sobre = malla(geo, [papel, papel, papel, papel,
     new THREE.MeshStandardMaterial({ map: frente, roughness: 0.9 }), new THREE.MeshStandardMaterial({ map: dorso, roughness: 0.9 })]);
   const g = new THREE.Group(); g.add(sobre);
-  const oro = new THREE.MeshStandardMaterial({ color: new THREE.Color('#e5b54b'), metalness: 1, roughness: 0.22 });
+  const oro = new THREE.MeshStandardMaterial({ color: new THREE.Color('#e5b54b'), metalness: 0.6, roughness: 0.3, emissive: new THREE.Color('#a8781c'), emissiveIntensity: 0.55 });
   const azar = azarFijo(41);
   for (let i = 0; i < 18; i++) {
     const mota = malla(new THREE.OctahedronGeometry(0.008 + azar() * 0.01), oro);
