@@ -159,6 +159,12 @@ static func miles(n: int) -> String:
 	return ("-" if n < 0 else "") + s + out
 
 
+## Texto de datos dentro de un RichTextLabel con BBCode: el corchete se
+## escapa para que una palabra no pueda abrir etiquetas (SEC-010).
+static func escapar_bbcode(texto: String) -> String:
+	return texto.replace("[", "[lb]")
+
+
 static func ir(desde: Node, escena: String) -> void:
 	desde.get_tree().change_scene_to_file("res://escenas/%s.tscn" % escena)
 

@@ -11,6 +11,9 @@ extends RefCounted
 
 ## Una compra quedo pagada y confirmada. Monetizacion la entrega.
 signal compra_confirmada(producto: String)
+## Respuesta correcta de query_purchases: compras permanentes que Play dice
+## que el usuario tiene. Monetizacion las usa como fuente de verdad.
+signal permanentes_sincronizados(productos: Array)
 
 # Valores de la Play Billing Library (BillingResponseCode.OK = 0;
 # PurchaseState: UNSPECIFIED=0, PURCHASED=1, PENDING=2). Se leen del cliente
@@ -43,7 +46,7 @@ func _init(cliente_billing: Object, ids_productos: PackedStringArray, ids_consum
 		cliente.query_purchases(INAPP))
 	cliente.disconnected.connect(func(): conectado = false)
 	cliente.on_purchase_updated.connect(_al_actualizar)
-	cliente.query_purchases_response.connect(_al_actualizar)
+	cliente.query_purchases_response.connect(_al_consultar)
 	cliente.consume_purchase_response.connect(_al_confirmar)
 	cliente.acknowledge_purchase_response.connect(_al_confirmar)
 	cliente.start_connection()
@@ -71,6 +74,20 @@ func comprar(producto: String, arbol: SceneTree, espera_max_s: float = 300.0) ->
 func pedir_restauracion() -> void:
 	if conectado:
 		cliente.query_purchases(INAPP)
+
+
+func _al_consultar(resultado: Dictionary) -> void:
+	if int(resultado.get("response_code", -1)) != OK:
+		return  # sin respuesta valida no se revoca nada ni se cancela nada en curso
+	var permanentes: Array = []
+	for compra in resultado.get("purchases", []):
+		var productos: Array = compra.get("product_ids", [])
+		if productos.is_empty() or int(compra.get("purchase_state", 0)) != COMPRADO:
+			continue
+		if not (productos[0] in consumibles):
+			permanentes.append(productos[0])
+	permanentes_sincronizados.emit(permanentes)
+	_al_actualizar(resultado)
 
 
 func _al_actualizar(resultado: Dictionary) -> void:

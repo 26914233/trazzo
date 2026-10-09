@@ -90,9 +90,9 @@ func _refrescar() -> void:
 	var partes: PackedStringArray = []
 	for c in _sopa.colocadas:
 		if _encontradas.has(c.palabra):
-			partes.append("[color=#%s][s]%s[/s][/color]" % [_color.darkened(0.35).to_html(false), c.original])
+			partes.append("[color=#%s][s]%s[/s][/color]" % [_color.darkened(0.35).to_html(false), Estilo.escapar_bbcode(c.original)])
 		else:
-			partes.append("[b]%s[/b]" % c.original)
+			partes.append("[b]%s[/b]" % Estilo.escapar_bbcode(c.original))
 	_lista.text = "[center]" + "   ".join(partes) + "[/center]"
 	_contador.text = "%d de %d palabras" % [_encontradas.size(), _sopa.colocadas.size()]
 	if Progreso.pistas_gratis() > 0:

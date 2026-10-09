@@ -5,7 +5,8 @@
 #   2) el contenido en JSON
 # La firma se comprueba sobre el texto exacto de la linea 2 antes de parsearlo.
 # Un archivo editado a mano se rechaza y se vuelve a valores seguros (cero
-# fichas), nunca a valores generosos. Detalle y limites en docs/AUDITORIA.md.
+# fichas), nunca a valores generosos, y el archivo rechazado se aparta en
+# progreso.save.rechazado. Limites conocidos en docs/LANZAMIENTO.md (seccion 5).
 extends Node
 
 signal fichas_cambiadas(total: int)
@@ -13,8 +14,11 @@ signal cambiado
 
 const VERSION := 1
 # La sal vive en el binario, asi que no es un secreto contra quien descompile
-# el APK: solo sube el listón frente a editar el archivo. Ver AUDITORIA.md.
+# el APK: solo sube el liston frente a editar el archivo (auditoria SEC-001).
+# Por eso las compras permanentes se vuelven a pedir a Play en cada arranque.
 const SAL := "sopazz-v1-7f3c91e2"
+const FICHAS_MAX := 10_000_000
+const ESCALAS := [0.85, 1.0, 1.15, 1.3]
 
 var ruta := "user://progreso.save"
 var datos: Dictionary = {}
@@ -34,7 +38,9 @@ static func por_defecto() -> Dictionary:
 		"niveles": {},              # "tema|dificultad" -> siguiente nivel a jugar
 		"estrellas": {},            # "tema|dificultad|nivel" -> mejores estrellas
 		"temas_jugados": [],
-		"temas_comprados": [],
+		"temas_comprados": [],      # comprados en Play (Play manda, ver sincronizar_permanentes)
+		"temas_con_fichas": [],     # desbloqueados con fichas (solo local)
+		"max_dia": "",              # fecha mas alta vista: la del juego nunca retrocede
 		"sin_anuncios": false,
 		"niveles_completados": 0,
 		"racha": 0,
@@ -82,15 +88,50 @@ func cargar() -> void:
 		_rechazar("json")
 		return
 	# Se fusiona sobre los valores por defecto: un guardado de una version
-	# anterior sin una clave nueva sigue funcionando.
+	# anterior sin una clave nueva sigue funcionando. Solo entra lo que tiene
+	# el tipo esperado, y despues se acota (auditoria SEC-004).
 	for k in leido:
-		if datos.has(k):
+		if datos.has(k) and _mismo_tipo(datos[k], leido[k]):
 			datos[k] = leido[k]
+	_sanear()
+
+
+static func _mismo_tipo(esperado, valor) -> bool:
+	var numeros := [TYPE_INT, TYPE_FLOAT]
+	if typeof(esperado) in numeros:
+		return typeof(valor) in numeros
+	return typeof(esperado) == typeof(valor)
+
+
+func _sanear() -> void:
+	datos["fichas"] = clampi(int(datos["fichas"]), 0, FICHAS_MAX)
+	datos["pistas_gratis"] = clampi(int(datos["pistas_gratis"]), 0, Economia.PISTAS_GRATIS_INICIALES)
+	datos["racha"] = maxi(int(datos["racha"]), 0)
+	datos["niveles_completados"] = maxi(int(datos["niveles_completados"]), 0)
+	if not float(datos["escala_texto"]) in ESCALAS:
+		datos["escala_texto"] = 1.0
+	for lista in ["temas_jugados", "temas_comprados", "temas_con_fichas"]:
+		datos[lista] = datos[lista].filter(func(x): return typeof(x) == TYPE_STRING)
+	for mapa in ["niveles", "estrellas"]:
+		var limpio := {}
+		for k in datos[mapa]:
+			var v = datos[mapa][k]
+			if typeof(k) == TYPE_STRING and typeof(v) in [TYPE_INT, TYPE_FLOAT]:
+				limpio[k] = clampi(int(v), 0, 1_000_000)
+		datos[mapa] = limpio
 
 
 func _rechazar(motivo: String) -> void:
 	ultimo_rechazo = motivo
-	push_warning("Progreso descartado (%s); se empieza de cero." % motivo)
+	# El motivo solo en depuracion: en release le diria a quien manipula el
+	# archivo que fallo exactamente (auditoria SEC-009).
+	if OS.is_debug_build():
+		push_warning("Progreso descartado (%s); se empieza de cero." % motivo)
+	else:
+		push_warning("Progreso no valido; se empieza de cero.")
+	# Se aparta el original en vez de perderlo al siguiente guardado: un cambio
+	# de ID del dispositivo o de version no debe borrar el progreso (SEC-006).
+	DirAccess.rename_absolute(ProjectSettings.globalize_path(ruta), ProjectSettings.globalize_path(ruta + ".rechazado"))
 	datos = por_defecto()
 
 
@@ -235,7 +276,7 @@ func registrar_dia(hoy: String) -> int:
 
 func tema_desbloqueado(id: String) -> bool:
 	var t: Dictionary = Temas.tema(id) if is_inside_tree() else {}
-	return t.get("gratis", false) or id in datos["temas_comprados"]
+	return t.get("gratis", false) or id in datos["temas_comprados"] or id in datos["temas_con_fichas"]
 
 
 func desbloquear_tema(id: String) -> void:
@@ -249,7 +290,8 @@ func desbloquear_con_fichas(id: String) -> bool:
 		return true
 	if not gastar_fichas(Economia.COSTE_TEMA):
 		return false
-	desbloquear_tema(id)
+	datos["temas_con_fichas"].append(id)
+	guardar()
 	return true
 
 
@@ -259,6 +301,15 @@ func sin_anuncios() -> bool:
 
 func activar_sin_anuncios() -> void:
 	datos["sin_anuncios"] = true
+	guardar()
+
+
+## Las compras permanentes segun Play (fuente de verdad): lo que no aparece
+## se retira (guardado forjado, reembolso). Solo se llama con una respuesta
+## correcta de Play; sin conexion no se revoca nada.
+func sincronizar_permanentes(sin_anuncios_comprado: bool, temas: Array) -> void:
+	datos["sin_anuncios"] = sin_anuncios_comprado
+	datos["temas_comprados"] = temas.duplicate()
 	guardar()
 
 
@@ -273,5 +324,17 @@ func fijar_ajuste(nombre: String, valor) -> void:
 	guardar()
 
 
-static func hoy() -> String:
-	return Time.get_date_string_from_system()
+## Fecha del juego: la del sistema, pero nunca anterior a la mas alta ya
+## vista. Atrasar el reloj del movil no vuelve a pagar la racha, el diario,
+## la pista de cortesia ni los premiados (auditoria SEC-002). Adelantarlo no
+## se puede detectar sin servidor, pero deja de rendir al volver a la fecha real.
+func fecha_juego(sistema: String = "") -> String:
+	if sistema == "":
+		sistema = Time.get_date_string_from_system()
+	if sistema > str(datos["max_dia"]):
+		datos["max_dia"] = sistema
+	return str(datos["max_dia"])
+
+
+func hoy() -> String:
+	return fecha_juego()

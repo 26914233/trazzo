@@ -24,7 +24,7 @@ func cargar() -> void:
 			continue
 		var texto := FileAccess.get_file_as_string(RUTA + archivo)
 		var datos = JSON.parse_string(texto)
-		if typeof(datos) != TYPE_DICTIONARY or not datos.has("palabras"):
+		if not _tema_valido(datos):
 			push_error("Tema invalido: %s" % archivo)
 			continue
 		lista.append(datos)
@@ -32,6 +32,14 @@ func cargar() -> void:
 	lista.sort_custom(func(a, b): return a.get("orden", 0) < b.get("orden", 0))
 	if lista.is_empty():
 		push_error("No se cargo ningun tema desde %s" % RUTA)
+
+
+static func _tema_valido(d) -> bool:
+	if typeof(d) != TYPE_DICTIONARY:
+		return false
+	if typeof(d.get("id")) != TYPE_STRING or d["id"] == "" or typeof(d.get("palabras")) != TYPE_ARRAY:
+		return false
+	return d["palabras"].all(func(p): return typeof(p) == TYPE_STRING)
 
 
 func tema(id: String) -> Dictionary:

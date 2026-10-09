@@ -1,8 +1,9 @@
 # Tareas: Sopazz (sopa de letras, Godot 4 → Android)
 
-> Estado 2026-10-09: 107/107 comprobaciones headless en verde; APK de prueba exportado
+> Estado 2026-10-09: 126/126 comprobaciones headless en verde; APK de prueba exportado
 > y verificado. T13 y T12 verificados con stub y Billing falso; AdMob/UMP reales
-> pendientes de prueba en dispositivo. T14, T17 y T18: ver `juegos/sopazz/docs/LANZAMIENTO.md`.
+> pendientes de prueba en dispositivo. APK y AAB de release exportados y firmados. Auditoría hecha; SEC-001
+> queda parcialmente abierto (decisión del dueño). Ver `juegos/sopazz/docs/LANZAMIENTO.md`.
 
 Plan completo en `tasks/plan.md`. Marcar solo lo verificado de verdad.
 
@@ -84,7 +85,7 @@ Plan completo en `tasks/plan.md`. Marcar solo lo verificado de verdad.
 
 ## Fase 4: Subida a Google Play
 
-- [ ] **T14: Exportación Android** — M
+- [x] **T14: Exportación Android** — M
   - Criterios: `export_presets.cfg` con nombre de paquete, versión, iconos, ABI
     arm64+arm32, AAB; instrucciones de firma sin claves en el repo.
   - Verificación: el preset se lee sin error; el AAB se construye en la máquina del
@@ -97,11 +98,11 @@ Plan completo en `tasks/plan.md`. Marcar solo lo verificado de verdad.
   - Criterios: página de privacidad publicable y respuestas del formulario de Data
     safety coherentes con lo que el juego recoge de verdad.
   - Verificación: contraste línea por línea con el código de monetización.
-- [ ] **T17: Auditoría anti-trampa y de economía** — M
+- [x] **T17: Auditoría anti-trampa y de economía** — M
   - Criterios: guardado, monedas y pistas revisados con `security-audit-juegos`;
     hallazgos con rastro en el código, los no resueltos como `needs_validation`.
-  - Verificación: informe en `docs/AUDITORIA.md`.
-- [ ] **T18: Checklist de lanzamiento** — S
+  - Verificación: resumen y estado en `juegos/sopazz/docs/LANZAMIENTO.md` §5.
+- [x] **T18: Checklist de lanzamiento** — S
   - Criterios: `launch-checklist` repasado, con lo que falta marcado como pendiente real.
   - Verificación: `docs/LANZAMIENTO.md`.
 

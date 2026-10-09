@@ -53,6 +53,7 @@ func _ready() -> void:
 		# Toda entrega real pasa por aqui: compra normal, pendiente que se paga
 		# mas tarde, compra a medias recuperada al abrir y restauracion.
 		pagos.compra_confirmada.connect(conceder)
+		pagos.permanentes_sincronizados.connect(sincronizar_permanentes)
 
 
 ## Unidades de anuncio. En builds de depuracion SIEMPRE las de prueba: hacer
@@ -143,8 +144,33 @@ func mostrar_premiado() -> bool:
 
 # ---------------------------------------------------------------- compras
 
+## Lista blanca: solo el catalogo y los temas de pago que existen (SEC-005).
+func producto_valido(producto: String) -> bool:
+	if PRODUCTOS.has(producto):
+		return true
+	if producto.begins_with("tema_"):
+		var t := Temas.tema(producto.trim_prefix("tema_"))
+		return not t.is_empty() and not t.get("gratis", false)
+	return false
+
+
+## Compras permanentes que Play dice que existen -> estado local.
+func sincronizar_permanentes(productos: Array) -> void:
+	var temas: Array = []
+	if "todos_los_temas" in productos:
+		for t in Temas.lista:
+			if not t.get("gratis", false):
+				temas.append(t["id"])
+	for p in productos:
+		if str(p).begins_with("tema_") and producto_valido(p):
+			var id := str(p).trim_prefix("tema_")
+			if not id in temas:
+				temas.append(id)
+	Progreso.sincronizar_permanentes("sin_anuncios" in productos, temas)
+
+
 func comprar(producto: String) -> bool:
-	if not (PRODUCTOS.has(producto) or producto.begins_with("tema_")):
+	if not producto_valido(producto):
 		push_error("Producto desconocido: %s" % producto)
 		return false
 	if pagos:
@@ -160,6 +186,9 @@ func comprar(producto: String) -> bool:
 ## Entrega lo comprado. Separado de comprar() para reutilizarlo al restaurar
 ## compras y para probarlo sin pasarela de pago.
 func conceder(producto: String) -> void:
+	if not producto_valido(producto):
+		push_error("Producto fuera del catalogo, no se entrega: %s" % producto)
+		return
 	if producto.begins_with("tema_"):
 		Progreso.desbloquear_tema(producto.trim_prefix("tema_"))
 	elif producto == "todos_los_temas":

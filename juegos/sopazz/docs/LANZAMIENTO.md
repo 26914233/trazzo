@@ -59,7 +59,34 @@ dueño · ➖ no aplica.
 
 ## 5. Seguridad (`security-audit-juegos`)
 
-Auditoría en curso; el informe se añadirá aquí.
+Auditoría completa (6 categorías) hecha por el agente `security-engineer` siguiendo la
+skill, con verificación propia: forjó un guardado válido, analizó el APK y probó las
+fechas. **Resultado: 0 críticos, 1 alto, 2 medios, 9 bajos, 4 por validar.** Cada
+corrección lleva prueba en `tests/pruebas.gd`.
+
+| ID | Sev. | Hallazgo | Estado |
+|---|---|---|---|
+| SEC-001 | ALTO | La clave del guardado se puede reconstruir desde el cliente y ahí viven los derechos de pago | **Mitigado en parte.** "Quitar anuncios" y los temas comprados se sincronizan con Play en cada arranque (Play manda). **Queda abierto:** el saldo de fichas es local; forjarlo exige root y extraer la sal. Arreglo completo = servidor de compras. **Decisión del dueño: aceptar el riesgo o hacer servidor.** |
+| SEC-002 | MEDIO | Cambiar la fecha del móvil regalaba fichas, pistas y premiados | ✅ Corregido: la fecha del juego nunca retrocede |
+| SEC-003 | MEDIO | Compras sin verificar; reembolsos no se retiraban | **Mitigado en parte:** los permanentes reembolsados desaparecen al sincronizar. Sin verificación de firma ni servidor; un billing falso con root sigue pudiendo dar fichas |
+| SEC-004 | BAJO | Guardado fusionado sin validar tipos ni rangos | ✅ Corregido |
+| SEC-005 | BAJO | `conceder()` sin lista blanca | ✅ Corregido |
+| SEC-006 | BAJO | Guardado rechazado se perdía | ✅ Corregido: se aparta en `.rechazado` |
+| SEC-007 | BAJO | Borrar datos devuelve el bonus de 300 fichas de "quitar anuncios" | Riesgo aceptado propuesto (impacto bajo, no se acumula) |
+| SEC-008 | BAJO | El APK de prueba es debuggable y con clave de depuración | Documentado: no repartirlo; a Play solo va el AAB de release |
+| SEC-009 | BAJO | Los logs decían por qué se rechazaba el guardado | ✅ Corregido en release |
+| SEC-010 | BAJO | Temas poco validados; palabras en BBCode sin escapar | ✅ Corregido |
+| SEC-011 | BAJO | Plugins sin versión fijada | Documentado en `INTEGRACION_ANDROID.md` |
+| SEC-012 | BAJO | Recompensa de premiados solo en cliente | Riesgo aceptado propuesto (valor bajo; SSV necesita servidor) |
+| NV-01 | — | Consentimiento: si UMP falla se piden anuncios igual; edad fija | needs_validation: probar en móvil con geografía EEA |
+| NV-02 | — | URL de privacidad | La página ya existe en el repo; falta comprobarla publicada |
+| NV-03 | — | Flags del AAB de release | AAB de release construido y firmado; `debuggable` sin comprobar (no hay bundletool aquí) |
+| NV-04 | — | CVE de plugins | Sin plugins instalados no se puede contrastar |
+
+**Recomendación de la skill:** con SEC-001 abierto, *FIX BEFORE SHIPPING*, salvo que el
+dueño acepte por escrito el riesgo del saldo de fichas local (juego de un jugador, sin
+ranking ni multijugador). El informe completo está pendiente de que el dueño apruebe
+guardarlo en `production/security/security-audit-2026-10-09-full.md`.
 
 ## 6. Orden para subir
 

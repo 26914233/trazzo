@@ -40,6 +40,11 @@ func _ready() -> void:
 	await prueba_pantallas()
 	await prueba_pagos_play()
 	prueba_adaptadores_sin_plugin()
+	prueba_reloj_no_retrocede()
+	prueba_esquema_guardado()
+	prueba_lista_blanca_productos()
+	await prueba_permanentes_desde_play()
+	prueba_escapar_bbcode()
 
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Progreso.ruta))
 	Progreso.ruta = ruta_real
@@ -451,3 +456,93 @@ func prueba_adaptadores_sin_plugin() -> void:
 	comprobar(Monetizacion.ids_anuncios()["premiado"] == Monetizacion.ADMOB_TEST_PREMIADO, "depuracion usa unidades de prueba")
 	comprobar("tema_mitologia" in Monetizacion.ids_productos() and not ("tema_animales" in Monetizacion.ids_productos()), "solo los temas de pago son productos")
 	comprobar(Monetizacion.ids_consumibles().size() == 4, "4 paquetes de fichas consumibles")
+
+
+# ---------------------------------------------------------------- correcciones de la auditoria
+
+func prueba_reloj_no_retrocede() -> void:
+	caso("SEC-002: cambiar la fecha del movil no regala fichas")
+	_reiniciar_progreso()
+	comprobar(Progreso.fecha_juego("2026-10-09") == "2026-10-09", "fecha normal")
+	comprobar(Progreso.fecha_juego("2026-10-05") == "2026-10-09", "atrasar el reloj no hace retroceder la fecha del juego")
+	var total := 0
+	for i in 30:
+		var f := "2026-10-08" if i % 2 == 0 else "2026-10-09"
+		total += Progreso.registrar_dia(Progreso.fecha_juego(f))
+	comprobar(total == 10, "alternar dos fechas solo paga el primer dia (pago %d)" % total)
+	comprobar(Economia.avanzar_racha(4, "2026-10-09", "2026-10-02") == [4, false], "fecha anterior: ni reinicia ni cobra")
+
+
+func _escribir_firmado(datos: Dictionary) -> void:
+	var cuerpo := JSON.stringify(datos)
+	var f := FileAccess.open(Progreso.ruta, FileAccess.WRITE)
+	f.store_string(Progreso._firmar(cuerpo) + "\n" + cuerpo)
+	f.close()
+
+
+func prueba_esquema_guardado() -> void:
+	caso("SEC-004/006: guardado con firma valida pero valores absurdos")
+	var raro := Progreso.por_defecto()
+	raro["temas_comprados"] = "paisescinecienciamitologiamusicaoficios"
+	raro["fichas"] = 1e15
+	raro["escala_texto"] = 50
+	raro["pistas_gratis"] = 999
+	raro["niveles"] = {"animales|1": "muchos"}
+	_escribir_firmado(raro)
+	Progreso.cargar()
+	comprobar(typeof(Progreso.datos["temas_comprados"]) == TYPE_ARRAY, "tipo incorrecto se descarta")
+	comprobar(not Progreso.tema_desbloqueado("cine"), "un String no desbloquea temas por subcadena")
+	comprobar(Progreso.fichas() <= Progreso.FICHAS_MAX, "fichas acotadas (%d)" % Progreso.fichas())
+	comprobar(float(Progreso.datos["escala_texto"]) == 1.0, "escala fuera de las opciones vuelve a 1.0")
+	comprobar(Progreso.pistas_gratis() <= Economia.PISTAS_GRATIS_INICIALES, "pistas gratis acotadas")
+	comprobar(Progreso.nivel_actual("animales", 1) == 1, "nivel con tipo raro se ignora")
+	# Rechazo por firma: el original se aparta en vez de perderse.
+	var rechazado := Progreso.ruta + ".rechazado"
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(rechazado))
+	var f := FileAccess.open(Progreso.ruta, FileAccess.WRITE)
+	f.store_string("firma_falsa\n{\"fichas\": 5}")
+	f.close()
+	Progreso.cargar()
+	Progreso.sumar_fichas(1)
+	comprobar(FileAccess.file_exists(rechazado), "el guardado rechazado se conserva en .rechazado")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(rechazado))
+
+
+func prueba_lista_blanca_productos() -> void:
+	caso("SEC-005: productos fuera del catalogo")
+	_reiniciar_progreso()
+	Monetizacion.conceder("producto_nuevo")
+	Monetizacion.conceder("tema_inventado")
+	Monetizacion.conceder("tema_animales")  # gratis: no es un producto
+	comprobar(Progreso.fichas() == 0 and Progreso.datos["temas_comprados"].is_empty(), "no se entrega nada ni revienta")
+	comprobar(Monetizacion.producto_valido("tema_cine") and Monetizacion.producto_valido("fichas_500"), "los del catalogo si")
+
+
+func prueba_permanentes_desde_play() -> void:
+	caso("SEC-001/003: Play manda sobre las compras permanentes")
+	_reiniciar_progreso()
+	# Un guardado forjado (o un reembolso) dice que tiene esto...
+	Progreso.activar_sin_anuncios()
+	Progreso.desbloquear_tema("cine")
+	Progreso.sumar_fichas(400)
+	Progreso.desbloquear_con_fichas("ciencia")
+	var falso := FalsoBilling.new()
+	falso.compras_previas = [FalsoBilling.compra("tema_mitologia", 1, "tok_m", true)]
+	var pagos := PagosPlay.new(falso, Monetizacion.ids_productos(), Monetizacion.ids_consumibles())
+	pagos.compra_confirmada.connect(Monetizacion.conceder)
+	pagos.permanentes_sincronizados.connect(Monetizacion.sincronizar_permanentes)
+	await _esperar_frames(4)
+	comprobar(not Progreso.sin_anuncios(), "sin_anuncios no comprado en Play se retira")
+	comprobar(not Progreso.tema_desbloqueado("cine"), "tema no comprado en Play se retira")
+	comprobar(Progreso.tema_desbloqueado("mitologia"), "el comprado en Play se mantiene")
+	comprobar(Progreso.tema_desbloqueado("ciencia"), "el desbloqueado con fichas no se toca")
+	# Si Play no responde bien, no se revoca nada.
+	Progreso.activar_sin_anuncios()
+	falso.query_purchases_response.emit({"response_code": 6, "debug_message": "sin red"})
+	await _esperar_frames(2)
+	comprobar(Progreso.sin_anuncios(), "sin respuesta de Play no se quita nada")
+
+
+func prueba_escapar_bbcode() -> void:
+	caso("SEC-010: palabras con corchetes no inyectan BBCode")
+	comprobar(Estilo.escapar_bbcode("A[b]C") == "A[lb]b]C", "se escapa el corchete")

@@ -52,8 +52,8 @@ static func recompensa_racha(dia: int) -> int:
 ## Nueva racha dado el ultimo dia jugado y hoy (fechas "AAAA-MM-DD").
 ## Devuelve [racha_nueva, cobra_recompensa_hoy].
 static func avanzar_racha(racha: int, ultimo_dia: String, hoy: String) -> Array:
-	if ultimo_dia == hoy:
-		return [racha, false]
+	if ultimo_dia == hoy or (ultimo_dia != "" and hoy < ultimo_dia):
+		return [racha, false]  # mismo dia, o fecha anterior: ni reinicia ni cobra
 	if ultimo_dia != "" and _dias_entre(ultimo_dia, hoy) == 1:
 		return [racha + 1, true]
 	return [1, true]

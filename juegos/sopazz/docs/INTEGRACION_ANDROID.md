@@ -42,6 +42,16 @@ El resto del juego no se toca.
 - Descomprimir en `addons/`, activar en *Project Settings → Plugins*.
 - Docs: https://godot-sdk-integrations.github.io/godot-google-play-billing/
 
+**Fijar versiones (auditoría SEC-011):** instalar una release concreta de cada plugin,
+nunca una rama móvil, y anotar aquí versión y fecha:
+
+| Plugin | Versión instalada | Fecha |
+|---|---|---|
+| AdMob (Poing Studios) | _por rellenar_ | |
+| godot-google-play-billing | _por rellenar_ | |
+
+Al actualizar, leer el changelog y volver a pasar §6.
+
 Al detectar las clases `MobileAds` y `BillingClient` en Android, `autoload/monetizacion.gd`
 cambia solo del stub a los proveedores reales. No hay que tocar código.
 
@@ -95,6 +105,11 @@ Activar **Play App Signing** al subir el primer AAB: si se pierde esta clave, Go
 sigue pudiendo firmar las actualizaciones.
 
 ## 6. Prueba en un móvil antes de enviar a revisión
+
+> El preset "Android APK (prueba)" genera un APK **debuggable** firmado con la clave
+> de depuración: con `adb run-as` cualquiera puede leer y editar el guardado. Sirve
+> para tus pruebas; **no lo repartas**. A testers y a Play va el AAB de release.
+
 
 - [ ] Instalar desde una pista de **prueba interna** de Play (Billing solo funciona
       con builds subidas a Play).
