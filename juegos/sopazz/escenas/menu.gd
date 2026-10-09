@@ -1,4 +1,4 @@
-# Menu principal: sopa del dia, continuar, jugar, version completa y ajustes.
+# Menu principal: sopa del dia, continuar, jugar y ajustes.
 extends Control
 
 static var _dia_registrado := ""
@@ -20,7 +20,8 @@ func _ready() -> void:
 	var hueco := Control.new()
 	hueco.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	col.add_child(hueco)
-	col.add_child(Estilo.titulo("Sopazz", 168, true))
+	# El nombre sale de project.godot (application/config/name): un solo sitio.
+	col.add_child(Estilo.titulo(str(ProjectSettings.get_setting("application/config/name")), 150, true))
 	col.add_child(Estilo.etiqueta("%d sopas de letras en español" % Temas.total_sopas(), 42, Estilo.TEXTO_SUAVE))
 	var hueco2 := Control.new()
 	hueco2.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -43,18 +44,10 @@ func _ready() -> void:
 	jugar.pressed.connect(func(): Estilo.ir(self, "categorias"))
 	col.add_child(jugar)
 
-	var fila := HBoxContainer.new()
-	var completo := Estilo.boton("Completo ✓" if Progreso.es_premium() else "Desbloquear todo", "normal", 130)
-	completo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	completo.add_theme_font_size_override("font_size", 40)
-	completo.pressed.connect(func(): Estilo.ir(self, "completo"))
 	var ajustes := Estilo.boton("Ajustes", "normal", 130)
-	ajustes.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	ajustes.add_theme_font_size_override("font_size", 40)
 	ajustes.pressed.connect(func(): Estilo.ir(self, "ajustes"))
-	fila.add_child(completo)
-	fila.add_child(ajustes)
-	col.add_child(fila)
+	col.add_child(ajustes)
 	col.add_child(Estilo.etiqueta("%d de %d sopas resueltas" % [Progreso.resueltas_total(), Temas.total_sopas()], 34, Estilo.TEXTO_SUAVE))
 
 
@@ -73,7 +66,7 @@ func _tarjeta_del_dia(hoy: String) -> Button:
 		var cat := Temas.categoria(d["categoria"])
 		var sub := Temas.subtema(d["categoria"], d["subtema"])
 		v.add_child(Estilo.titulo(sub["nombre"], 56))
-		var estado := "Resuelta. Vuelve mañana" if hecha else "%s · gratis para todos" % cat["nombre"]
+		var estado := "Resuelta. Vuelve mañana" if hecha else "%s · una nueva cada día" % cat["nombre"]
 		v.add_child(Estilo.etiqueta(estado, 36, Estilo.TEXTO_SUAVE, false))
 	for h in v.get_children():
 		h.mouse_filter = Control.MOUSE_FILTER_IGNORE

@@ -49,13 +49,9 @@ func _ready() -> void:
 	var privacidad := Estilo.boton("Política de privacidad", "normal", 124)
 	privacidad.pressed.connect(func(): OS.shell_open(URL_PRIVACIDAD))
 	col.add_child(privacidad)
-	var restaurar := Estilo.boton("Restaurar compra", "normal", 124)
-	restaurar.pressed.connect(func():
-		var n := await Monetizacion.restaurar_compras()
-		Estilo.aviso(self, "Compra restaurada." if n > 0 else "No hay ninguna compra que restaurar."))
-	col.add_child(restaurar)
 	var version := str(ProjectSettings.get_setting("application/config/version", "1.0.0"))
-	col.add_child(Estilo.etiqueta("Sopazz %s · thunderDarkness" % version, 32, Estilo.TEXTO_SUAVE))
+	var nombre := str(ProjectSettings.get_setting("application/config/name"))
+	col.add_child(Estilo.etiqueta("%s %s · thunderDarkness" % [nombre, version], 32, Estilo.TEXTO_SUAVE))
 
 
 func _interruptor(texto: String, clave: String) -> Button:

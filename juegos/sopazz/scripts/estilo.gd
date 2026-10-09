@@ -1,10 +1,21 @@
-# Estilo visual con variantes de diseño ("papel", "noche", "cielo") y
+# Estilo visual con variantes de diseño ("cielo", el principal; "papel" y
+# "noche", elegibles en Ajustes) y
 # utilidades de interfaz: pantallas, botones, tarjetas, dialogos y avisos.
 # Paletas de ui-ux-pro-max; texto con contraste >= 4.5 sobre su fondo.
 class_name Estilo
 extends RefCounted
 
 const VARIANTES := {
+	"cielo": {
+		"nombre": "Cielo",
+		"fondo": "#F0F9FF", "fondo_2": "#DCEFFD", "superficie": "#FFFFFF",
+		"texto": "#0C4A6E", "texto_suave": "#3E6A85",
+		"primario": "#0284C7", "sobre_primario": "#FFFFFF",
+		"acento": "#F59E0B", "sobre_acento": "#3B2300",
+		"borde": "#D3E9F8", "bloqueado": "#EEF4F8", "tablero": "#FFFFFF", "letra": "#0C4A6E",
+		"radio": 30, "grosor": 0, "sombra": "#0C4A6E1F", "sombra_tam": 22, "sombra_y": 8,
+		"titulo": "Fredoka-SemiBold.ttf", "texto_fuente": "Fredoka-Medium.ttf", "negrita": "Fredoka-SemiBold.ttf",
+	},
 	"papel": {
 		"nombre": "Papel",
 		"fondo": "#FAF7F2", "fondo_2": "#F1EBE1", "superficie": "#FFFFFF",
@@ -24,16 +35,6 @@ const VARIANTES := {
 		"borde": "#26324D", "bloqueado": "#111A2C", "tablero": "#131C30", "letra": "#E2E8F0",
 		"radio": 24, "grosor": 1, "sombra": "#00000059", "sombra_tam": 18, "sombra_y": 6,
 		"titulo": "Nunito-ExtraBold.ttf", "texto_fuente": "Nunito-Bold.ttf", "negrita": "Nunito-ExtraBold.ttf",
-	},
-	"cielo": {
-		"nombre": "Cielo",
-		"fondo": "#F0F9FF", "fondo_2": "#DCEFFD", "superficie": "#FFFFFF",
-		"texto": "#0C4A6E", "texto_suave": "#3E6A85",
-		"primario": "#0284C7", "sobre_primario": "#FFFFFF",
-		"acento": "#F59E0B", "sobre_acento": "#3B2300",
-		"borde": "#D3E9F8", "bloqueado": "#EEF4F8", "tablero": "#FFFFFF", "letra": "#0C4A6E",
-		"radio": 30, "grosor": 0, "sombra": "#0C4A6E1F", "sombra_tam": 22, "sombra_y": 8,
-		"titulo": "Fredoka-SemiBold.ttf", "texto_fuente": "Fredoka-Medium.ttf", "negrita": "Fredoka-SemiBold.ttf",
 	},
 }
 
@@ -64,7 +65,7 @@ static var _tema: Theme
 
 static func aplicar(nombre: String) -> void:
 	if not VARIANTES.has(nombre):
-		nombre = "papel"
+		nombre = "cielo"
 	var v: Dictionary = VARIANTES[nombre]
 	actual = nombre
 	FONDO = Color(v["fondo"]); FONDO_2 = Color(v["fondo_2"]); SUPERFICIE = Color(v["superficie"])
@@ -83,7 +84,7 @@ static func aplicar(nombre: String) -> void:
 
 static func _asegurar() -> void:
 	if actual == "":
-		aplicar("papel")
+		aplicar("cielo")
 
 
 static func es_oscuro() -> bool:

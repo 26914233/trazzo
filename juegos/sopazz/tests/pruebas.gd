@@ -6,7 +6,6 @@
 # Sale con codigo 0 si todo pasa y 1 si algo falla.
 extends Node
 
-const FalsoBilling := preload("res://tests/falso_billing.gd")
 const HOY := "2026-10-09"
 
 var _fallos := 0
@@ -18,7 +17,6 @@ func _ready() -> void:
 	# Las pruebas de guardado no deben pisar el progreso real.
 	var ruta_real := Progreso.ruta
 	Progreso.ruta = "user://prueba_progreso.save"
-	Monetizacion.stub_demora_s = 0.01
 
 	prueba_normalizar()
 	prueba_celdas_en_linea()
@@ -33,19 +31,11 @@ func _ready() -> void:
 	prueba_sopa_del_dia_y_siguiente()
 	prueba_economia()
 	prueba_racha()
-	prueba_reglas_anuncios()
 	prueba_guardado_y_firma()
 	prueba_esquema_guardado()
 	prueba_reloj_no_retrocede()
-	prueba_version_gratis()
-	prueba_pistas()
 	prueba_victorias()
-	prueba_premiados_tope()
-	await prueba_compra_stub()
-	prueba_lista_blanca()
-	await prueba_pagos_play()
-	await prueba_timeout_anuncio()
-	prueba_adaptadores_sin_plugin()
+	prueba_app_de_pago()
 	prueba_ajustar_seleccion()
 	prueba_escapar_bbcode()
 	prueba_disenos()
@@ -183,7 +173,6 @@ func prueba_categorias() -> void:
 			if s["palabras"].size() != 12:
 				malas += 1
 	comprobar(malas == 0, "todas las sopas tienen 12 palabras (%d no)" % malas)
-	comprobar(Temas.total_gratis() == Temas.lista.size() * Economia.SOPAS_GRATIS_POR_CATEGORIA, "3 gratis por categoria")
 
 
 func prueba_todas_las_sopas_caben() -> void:
@@ -251,18 +240,6 @@ func prueba_racha() -> void:
 	comprobar(Economia.avanzar_racha(4, HOY, "2026-10-02") == [4, false], "fecha anterior: ni reinicia ni cuenta")
 
 
-func prueba_reglas_anuncios() -> void:
-	caso("reglas del intersticial")
-	var base := {"niveles_completados": 10, "desde_ultimo_s": INF, "completados_desde_ultimo": 3}
-	comprobar(ReglasAnuncios.intersticial_permitido(base), "caso normal permite")
-	comprobar(not ReglasAnuncios.intersticial_permitido(base.merged({"sin_anuncios": true}, true)), "con la compra, nunca")
-	comprobar(not ReglasAnuncios.intersticial_permitido(base.merged({"en_partida": true}, true)), "nunca en partida")
-	comprobar(not ReglasAnuncios.intersticial_permitido(base.merged({"abandono": true}, true)), "nunca tras abandonar")
-	comprobar(not ReglasAnuncios.intersticial_permitido(base.merged({"niveles_completados": 3}, true)), "onboarding limpio")
-	comprobar(not ReglasAnuncios.intersticial_permitido(base.merged({"desde_ultimo_s": 60.0}, true)), "separacion de 90 s")
-	comprobar(not ReglasAnuncios.intersticial_permitido(base.merged({"completados_desde_ultimo": 2}, true)), "1 de cada 3")
-
-
 # ---------------------------------------------------------------- guardado
 
 func _escribir_firmado(datos: Dictionary) -> void:
@@ -278,14 +255,14 @@ func prueba_guardado_y_firma() -> void:
 	Progreso.registrar_victoria("comida", "frutas", 1, 3, false, HOY)
 	Progreso.cargar()
 	comprobar(Progreso.estrellas_de("comida", "frutas", 1) == 3 and Progreso.ultimo_rechazo == "", "guarda y carga")
-	# Manipular el archivo a mano: activar la compra sin rehacer la firma.
+	# Manipular el archivo a mano: cambiar la racha sin rehacer la firma.
 	var texto := FileAccess.get_file_as_string(Progreso.ruta)
 	var f := FileAccess.open(Progreso.ruta, FileAccess.WRITE)
-	f.store_string(texto.replace("\"premium\":false", "\"premium\":true"))
+	f.store_string(texto.replace("\"racha\":0", "\"racha\":999"))
 	f.close()
 	Progreso.cargar()
 	comprobar(Progreso.ultimo_rechazo == "firma", "detecta la manipulacion")
-	comprobar(not Progreso.es_premium(), "y no regala la compra")
+	comprobar(int(Progreso.datos["racha"]) == 0, "y no acepta el valor inventado")
 	comprobar(FileAccess.file_exists(Progreso.ruta + ".rechazado"), "el original se aparta en .rechazado")
 	f = FileAccess.open(Progreso.ruta, FileAccess.WRITE)
 	f.store_string("basura")
@@ -297,21 +274,21 @@ func prueba_guardado_y_firma() -> void:
 func prueba_esquema_guardado() -> void:
 	caso("guardado con firma valida pero valores absurdos")
 	var raro := Progreso.por_defecto()
-	raro["premium"] = "si"
+	raro["racha"] = "infinita"
 	raro["estrellas"] = {"comida/frutas/1": 99, "x": "mucho"}
 	raro["escala_texto"] = 50
-	raro["pistas_hoy"] = -7
+	raro["completadas"] = -7
 	raro["diseno"] = "hackeado"
 	raro["dificultad"] = 42
 	raro["ultima"] = {"categoria": 5}
 	_escribir_firmado(raro)
 	Progreso.cargar()
-	comprobar(not Progreso.es_premium(), "tipo incorrecto se descarta")
+	comprobar(int(Progreso.datos["racha"]) == 0, "tipo incorrecto se descarta")
 	comprobar(Progreso.estrellas_de("comida", "frutas", 1) == 3, "estrellas acotadas a 3")
 	comprobar(not Progreso.datos["estrellas"].has("x"), "valor no numerico fuera")
 	comprobar(float(Progreso.ajuste("escala_texto")) == 1.0, "escala fuera de las opciones vuelve a 1.0")
-	comprobar(int(Progreso.datos["pistas_hoy"]) == 0, "pistas acotadas")
-	comprobar(Progreso.ajuste("diseno") == "papel" and int(Progreso.ajuste("dificultad")) == 3, "diseño y dificultad saneados")
+	comprobar(Progreso.completadas() == 0, "contadores negativos acotados")
+	comprobar(Progreso.ajuste("diseno") == "cielo" and int(Progreso.ajuste("dificultad")) == 3, "diseño y dificultad saneados")
 	comprobar(Progreso.ultima().is_empty(), "ultima sopa con tipos raros se descarta")
 
 
@@ -320,36 +297,8 @@ func prueba_reloj_no_retrocede() -> void:
 	_reiniciar_progreso()
 	comprobar(Progreso.fecha_juego(HOY) == HOY, "fecha normal")
 	comprobar(Progreso.fecha_juego("2026-10-05") == HOY, "atrasar el reloj no retrocede la fecha del juego")
-	for i in 3:
-		Progreso.pagar_pista(Progreso.fecha_juego(HOY))
-	comprobar(Progreso.pagar_pista(Progreso.fecha_juego("2026-10-01")) == "", "atrasar el reloj no devuelve las pistas del dia")
-
-
-# ---------------------------------------------------------------- version gratis y compra
-
-func prueba_version_gratis() -> void:
-	caso("version gratis: 3 sopas por tema")
-	_reiniciar_progreso()
-	var c: Dictionary = Temas.categoria("animales")
-	comprobar(Progreso.desbloqueada("animales", c["subtemas"][0]["id"]), "la 1a es gratis")
-	comprobar(Progreso.desbloqueada("animales", c["subtemas"][2]["id"]), "la 3a es gratis")
-	comprobar(not Progreso.desbloqueada("animales", c["subtemas"][3]["id"]), "la 4a pide la compra")
-	Progreso.activar_premium()
-	comprobar(Progreso.desbloqueada("animales", c["subtemas"][-1]["id"]), "con la compra, todas")
-
-
-func prueba_pistas() -> void:
-	caso("pistas del dia")
-	_reiniciar_progreso()
-	var r := []
-	for i in 3:
-		r.append(Progreso.pagar_pista(HOY))
-	comprobar(r == ["gratis", "gratis", "gratis"], "3 gratis al dia")
-	comprobar(Progreso.pagar_pista(HOY) == "", "la 4a pide anuncio")
-	comprobar(Progreso.pistas_restantes("2026-10-10") == 3, "al dia siguiente vuelven")
-	comprobar(Progreso.usar_cortesia(HOY) and not Progreso.usar_cortesia(HOY), "una de cortesia al dia")
-	Progreso.activar_premium()
-	comprobar(Progreso.pagar_pista(HOY) == "premium", "con la compra son ilimitadas")
+	Progreso.registrar_victoria("comida", "frutas", 1, 3, true, Progreso.fecha_juego(HOY))
+	comprobar(Progreso.diario_hecho(Progreso.fecha_juego("2026-10-01")), "atrasar el reloj no reabre la sopa del dia")
 
 
 func prueba_victorias() -> void:
@@ -364,104 +313,17 @@ func prueba_victorias() -> void:
 	comprobar(Progreso.diario_hecho(HOY), "sopa del dia marcada")
 
 
-func prueba_premiados_tope() -> void:
-	caso("tope de premiados")
-	_reiniciar_progreso()
-	for i in Economia.PREMIADOS_MAX_DIA:
-		Progreso.registrar_premiado(HOY)
-	comprobar(not Progreso.premiado_disponible(HOY), "tope diario")
-	comprobar(Progreso.premiado_disponible("2026-10-10"), "se reinicia al dia siguiente")
-
-
-func prueba_compra_stub() -> void:
-	caso("compra unica (stub)")
-	_reiniciar_progreso()
-	Monetizacion.stub_exito = false
-	var ok: bool = await Monetizacion.comprar(Monetizacion.PRODUCTO)
-	comprobar(not ok and not Progreso.es_premium(), "compra fallida no desbloquea")
-	Monetizacion.stub_exito = true
-	ok = await Monetizacion.comprar(Monetizacion.PRODUCTO)
-	comprobar(ok and Progreso.es_premium(), "la compra desbloquea todo")
-	var shown: bool = await Monetizacion.intentar_intersticial()
-	comprobar(not shown, "con la compra no sale intersticial")
-	ok = await Monetizacion.comprar("hackeo")
-	comprobar(not ok, "producto desconocido se rechaza")
-
-
-func prueba_lista_blanca() -> void:
-	caso("productos fuera del catalogo")
-	_reiniciar_progreso()
-	Monetizacion.conceder("producto_nuevo")
-	Monetizacion.conceder("fichas_500")
-	comprobar(not Progreso.es_premium(), "no se entrega nada ni revienta")
-	comprobar(Monetizacion.ids_productos() == PackedStringArray(["desbloquear_todo"]), "un solo producto")
-
-
-func prueba_pagos_play() -> void:
-	caso("cobro con Google Play Billing (cliente falso)")
-	_reiniciar_progreso()
-	# Un guardado forjado dice que tiene la compra, pero Play no la tiene.
-	Progreso.activar_premium()
-	var falso := FalsoBilling.new()
-	var pagos := PagosPlay.new(falso, Monetizacion.ids_productos(), Monetizacion.ids_consumibles())
-	pagos.compra_confirmada.connect(Monetizacion.conceder)
-	pagos.permanentes_sincronizados.connect(Monetizacion.sincronizar_permanentes)
-	Monetizacion.pagos = pagos
-	await _esperar_frames(4)
-	comprobar(pagos.conectado, "conecta")
-	comprobar(not Progreso.es_premium(), "Play manda: compra que Play no tiene se retira")
-
-	falso.modo = "cancelar"
-	var ok: bool = await Monetizacion.comprar(Monetizacion.PRODUCTO)
-	comprobar(not ok and not Progreso.es_premium(), "cancelada: no desbloquea y no se queda colgada")
-
-	falso.modo = "falla_confirmar"
-	ok = await Monetizacion.comprar(Monetizacion.PRODUCTO)
-	comprobar(not ok and not Progreso.es_premium(), "si Play no confirma, no se entrega (Play la reembolsaria)")
-
-	falso.modo = "pendiente"
-	ok = await Monetizacion.comprar(Monetizacion.PRODUCTO)
-	comprobar(not ok and not Progreso.es_premium(), "pendiente (pago en efectivo): aun no se entrega")
-	falso.on_purchase_updated.emit({"response_code": 0, "purchases": [FalsoBilling.compra(Monetizacion.PRODUCTO, 1, "tok_p")]})
-	await _esperar_frames(3)
-	comprobar("tok_p" in falso.reconocidos and Progreso.es_premium(), "cuando se paga, se reconoce y se entrega sola")
-
-	# Otro movil: Play devuelve la compra ya reconocida.
-	Progreso.fijar_premium(false)
-	falso.compras_previas = [FalsoBilling.compra(Monetizacion.PRODUCTO, 1, "tok_r", true)]
-	var n: int = await Monetizacion.restaurar_compras()
-	comprobar(n == 1 and Progreso.es_premium(), "restaurar devuelve la compra")
-
-	# Reembolso: Play ya no la devuelve.
-	falso.compras_previas = []
-	pagos.pedir_restauracion()
-	await _esperar_frames(3)
-	comprobar(not Progreso.es_premium(), "un reembolso retira la compra")
-
-	# Sin respuesta valida de Play, no se toca nada.
-	Progreso.activar_premium()
-	falso.query_purchases_response.emit({"response_code": 6, "debug_message": "sin red"})
-	await _esperar_frames(2)
-	comprobar(Progreso.es_premium(), "sin conexion no se revoca")
-	Monetizacion.pagos = null
-
-
-signal _nunca(ok: bool)
-
-func prueba_timeout_anuncio() -> void:
-	caso("anuncio que nunca responde")
-	Monetizacion.timeout_anuncio_s = 0.2
-	var t0 := Time.get_ticks_msec()
-	var ok: bool = await Monetizacion._con_timeout(_nunca)
-	comprobar(not ok and Time.get_ticks_msec() - t0 < 2000, "devuelve false y no se cuelga")
-	Monetizacion.timeout_anuncio_s = 180.0
-
-
-func prueba_adaptadores_sin_plugin() -> void:
-	caso("sin plugins: el juego cae al stub")
-	comprobar(not AnunciosAdMob.disponible(), "AdMob no disponible aqui")
-	comprobar(not Monetizacion.anuncios_reales() and not Monetizacion.pagos_reales(), "monetizacion usa el stub")
-	comprobar(Monetizacion.ids_anuncios()["premiado"] == Monetizacion.ADMOB_TEST_PREMIADO, "depuracion usa unidades de prueba")
+func prueba_app_de_pago() -> void:
+	caso("app de pago: todo incluido")
+	comprobar(not ProjectSettings.has_setting("autoload/Monetizacion"), "sin capa de anuncios ni compras")
+	var presets := FileAccess.get_file_as_string("res://export_presets.cfg")
+	comprobar(not ("permissions/internet=true" in presets), "sin permiso de internet")
+	comprobar(presets.contains("permissions/vibrate=true"), "solo vibracion")
+	var abiertas := true
+	for c in Temas.lista:
+		for s2 in c["subtemas"]:
+			abiertas = abiertas and Temas.subtema(c["id"], s2["id"]).has("palabras")
+	comprobar(abiertas, "las %d sopas se pueden abrir" % Temas.total_sopas())
 
 
 # ---------------------------------------------------------------- interfaz
@@ -490,7 +352,7 @@ func prueba_disenos() -> void:
 		comprobar(_contraste(Estilo.TEXTO_SUAVE, Estilo.FONDO) >= 4.5, "%s: texto suave sobre fondo >= 4.5" % id)
 		comprobar(_contraste(Estilo.SOBRE_PRIMARIO, Estilo.PRIMARIO) >= 3.0, "%s: boton principal >= 3 (texto grande)" % id)
 		comprobar(_contraste(Estilo.LETRA, Estilo.TABLERO) >= 7.0, "%s: letras del tablero >= 7" % id)
-	Estilo.aplicar("papel")
+	Estilo.aplicar("cielo")
 
 
 static func _lum(c: Color) -> float:
@@ -516,6 +378,9 @@ func prueba_partida_completa() -> void:
 	comprobar(sopa.colocadas.size() == 9, "Normal: 9 palabras")
 	juego._al_seleccionar([Vector2i(0, 0), Vector2i(1, 1)] as Array[Vector2i])
 	comprobar(juego._encontradas.size() == 0, "seleccion falsa no cuenta")
+	for i in 5:
+		juego._pedir_pista()
+	comprobar(juego._pistas_usadas == 5, "pistas sin limite (cuestan estrellas, no dinero)")
 	for i in sopa.colocadas.size():
 		var celdas: Array[Vector2i] = sopa.colocadas[i].celdas.duplicate()
 		if i % 2 == 1:
@@ -541,13 +406,13 @@ class ContadorErrores extends Logger:
 
 
 func prueba_pantallas() -> void:
-	caso("las 6 pantallas cargan sin errores en los 3 diseños")
+	caso("las 5 pantallas cargan sin errores en los 3 diseños")
 	var log := ContadorErrores.new()
 	OS.add_logger(log)
 	Temas.seleccion = {"categoria": "comida", "subtema": "frutas", "dificultad": 0, "diario": false}
 	for id in Estilo.VARIANTES:
 		Estilo.aplicar(id)
-		for nombre in ["menu", "categorias", "sopas", "juego", "completo", "ajustes"]:
+		for nombre in ["menu", "categorias", "sopas", "juego", "ajustes"]:
 			var escena: Node = load("res://escenas/%s.tscn" % nombre).instantiate()
 			add_child(escena)
 			for f in 4:
@@ -555,5 +420,5 @@ func prueba_pantallas() -> void:
 			escena.queue_free()
 			await get_tree().process_frame
 	OS.remove_logger(log)
-	Estilo.aplicar("papel")
+	Estilo.aplicar("cielo")
 	comprobar(log.errores.is_empty(), "errores: %s" % [log.errores.slice(0, 5)])

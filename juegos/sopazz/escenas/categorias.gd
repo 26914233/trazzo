@@ -22,16 +22,6 @@ func _ready() -> void:
 		difs.add_child(b)
 	col.add_child(difs)
 
-	if not Progreso.es_premium():
-		var t := Estilo.tarjeta(150, Estilo.tinte(Estilo.ACENTO), func(): Estilo.ir(self, "completo"))
-		var v: VBoxContainer = t[1]
-		v.alignment = BoxContainer.ALIGNMENT_CENTER
-		v.add_child(Estilo.etiqueta("Desbloquea las %d sopas · %s" % [Temas.total_sopas(), Monetizacion.PRECIO], 38, Estilo.TEXTO))
-		v.add_child(Estilo.etiqueta("Pago único. Sin anuncios y pistas ilimitadas.", 32, Estilo.TEXTO_SUAVE))
-		for h in v.get_children():
-			h.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		col.add_child(t[0])
-
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED

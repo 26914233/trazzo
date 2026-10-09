@@ -84,12 +84,8 @@ func _refrescar() -> void:
 			partes.append("[b]%s[/b]" % texto)
 	_lista.text = "[center]" + "    ".join(partes) + "[/center]"
 	_contador.text = "%d de %d palabras" % [_encontradas.size(), _sopa.colocadas.size()]
-	if Progreso.es_premium():
-		_boton_pista.text = "Pista"
-	elif Progreso.pistas_restantes(_hoy) > 0:
-		_boton_pista.text = "Pista  ·  %d gratis hoy" % Progreso.pistas_restantes(_hoy)
-	else:
-		_boton_pista.text = "Pista  ·  ver un anuncio"
+	# Pistas sin limite: lo unico que cuestan son estrellas.
+	_boton_pista.text = "Pista" if _pistas_usadas == 0 else "Pista  ·  %d usadas" % _pistas_usadas
 
 
 # ---------------------------------------------------------------- jugar
@@ -119,25 +115,6 @@ func _pedir_pista() -> void:
 			break
 	if falta == null:
 		return
-	if Progreso.pagar_pista(_hoy) == "":
-		var elegido := await Estilo.dialogo(self, "¿Otra pista?",
-			"Ya usaste las %d pistas gratis de hoy. Mira un anuncio corto, o desbloquea el juego completo para tener pistas ilimitadas." % Economia.PISTAS_GRATIS_DIA,
-			["Ver anuncio", "Juego completo", "Ahora no"])
-		if elegido == 1:
-			Estilo.ir(self, "completo")
-			return
-		if elegido != 0:
-			return
-		_boton_pista.disabled = true
-		var visto := await Monetizacion.mostrar_premiado()
-		_boton_pista.disabled = false
-		if not visto:
-			# Que una mala conexion no deje a nadie atascado: una de cortesia al dia.
-			if Progreso.usar_cortesia(_hoy):
-				Estilo.aviso(self, "El anuncio no cargó. Esta pista va por nuestra cuenta.")
-			else:
-				Estilo.aviso(self, "El anuncio no cargó. Inténtalo en un momento.")
-				return
 	_pistas_usadas += 1
 	_tablero.mostrar_pista(falta.celdas[0])
 	_refrescar()
@@ -162,7 +139,6 @@ func _victoria() -> void:
 	Sonido.vibrar(60)
 	var estrellas := Economia.estrellas(_segundos, _sopa.colocadas.size(), _pistas_usadas)
 	Progreso.registrar_victoria(_sel["categoria"], _sel["subtema"], _sel["dificultad"], estrellas, _sel["diario"], _hoy)
-	Monetizacion.nivel_completado()
 	await get_tree().create_timer(0.6).timeout
 	_panel_victoria(estrellas)
 
@@ -178,9 +154,6 @@ func _panel_victoria(estrellas: int) -> void:
 		if not sig.is_empty():
 			var boton_sig := Estilo.boton("Siguiente sopa", "primario", 150)
 			boton_sig.pressed.connect(func():
-				if not Progreso.desbloqueada(sig["categoria"], sig["subtema"]):
-					_ir_tras_sopa("completo")
-					return
 				Temas.seleccion = {"categoria": sig["categoria"], "subtema": sig["subtema"], "dificultad": _sel["dificultad"], "diario": false}
 				_ir_tras_sopa("juego"))
 			col.add_child(boton_sig)
@@ -189,8 +162,5 @@ func _panel_victoria(estrellas: int) -> void:
 	col.add_child(volver)
 
 
-## Entre sopas (nunca durante una) es el unico sitio del intersticial;
-## las reglas deciden si toca.
 func _ir_tras_sopa(destino: String) -> void:
-	await Monetizacion.intentar_intersticial()
 	Estilo.ir(self, destino)

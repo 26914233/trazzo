@@ -1,4 +1,4 @@
-# Las sopas de una categoria, con estrellas y bloqueo de la version gratis.
+# Las sopas de una categoria, con sus estrellas en la dificultad elegida.
 extends Control
 
 var _cat: Dictionary
@@ -27,8 +27,7 @@ func _ready() -> void:
 
 
 func _fila(i: int, s: Dictionary, dif: int) -> Button:
-	var abierta := Progreso.desbloqueada(_cat["id"], s["id"])
-	var t := Estilo.tarjeta(150, Estilo.SUPERFICIE if abierta else Estilo.BLOQUEADO, func(): _abrir(s, abierta, dif))
+	var t := Estilo.tarjeta(150, Estilo.SUPERFICIE, func(): _abrir(s, dif))
 	var v: VBoxContainer = t[1]
 	v.alignment = BoxContainer.ALIGNMENT_CENTER
 	var h := HBoxContainer.new()
@@ -38,31 +37,19 @@ func _fila(i: int, s: Dictionary, dif: int) -> Button:
 	var c_cat := Color(_cat["color"])
 	num.add_theme_color_override("font_color", c_cat.lightened(0.25) if Estilo.es_oscuro() else c_cat.darkened(0.35))
 	h.add_child(num)
-	var nombre := Estilo.etiqueta(s["nombre"], 42, Estilo.TEXTO if abierta else Estilo.TEXTO_SUAVE, false, false)
+	var nombre := Estilo.etiqueta(s["nombre"], 42, Estilo.TEXTO, false, false)
 	nombre.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	nombre.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	nombre.clip_text = true
 	h.add_child(nombre)
-	var derecha: Label
-	if abierta:
-		derecha = Estilo.etiqueta(Estilo.estrellas_texto(Progreso.estrellas_de(_cat["id"], s["id"], dif)), 44, Estilo.ACENTO, false, false)
-	else:
-		derecha = Estilo.etiqueta("Bloqueada", 32, Estilo.TEXTO_SUAVE, false, false)
-	h.add_child(derecha)
+	h.add_child(Estilo.etiqueta(Estilo.estrellas_texto(Progreso.estrellas_de(_cat["id"], s["id"], dif)), 44, Estilo.ACENTO, false, false))
 	for c in h.get_children():
 		c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v.add_child(h)
 	return t[0]
 
 
-func _abrir(s: Dictionary, abierta: bool, dif: int) -> void:
-	if not abierta:
-		var e := await Estilo.dialogo(self, "Sopa del juego completo",
-			"La versión gratis trae %d sopas por tema. Con un pago único de %s tienes las %d, sin anuncios." % [Economia.SOPAS_GRATIS_POR_CATEGORIA, Monetizacion.PRECIO, Temas.total_sopas()],
-			["Ver el juego completo", "Ahora no"])
-		if e == 0:
-			Estilo.ir(self, "completo")
-		return
+func _abrir(s: Dictionary, dif: int) -> void:
 	Temas.seleccion = {"categoria": _cat["id"], "subtema": s["id"], "dificultad": dif, "diario": false}
 	Estilo.ir(self, "juego")
 

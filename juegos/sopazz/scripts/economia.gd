@@ -1,13 +1,8 @@
-# Reglas del juego y del modelo de pago. Valores en docs/MONETIZACION.md.
+# Reglas del juego. Es una app de pago (docs/MONETIZACION.md): todo
+# viene incluido, sin anuncios, compras ni limites de pistas.
 # Clase pura y estatica: se prueba sin escena.
 class_name Economia
 extends RefCounted
-
-## Version gratis: estas primeras sopas de cada categoria, mas la sopa del dia.
-## El pago unico desbloquea las demas, quita los anuncios y da pistas ilimitadas.
-const SOPAS_GRATIS_POR_CATEGORIA := 3
-const PISTAS_GRATIS_DIA := 3
-const PREMIADOS_MAX_DIA := 20
 
 ## Cada sopa tiene 12 palabras; la dificultad decide cuantas entran, el tamaño
 ## minimo de la cuadricula y las direcciones (ver GeneradorSopa).

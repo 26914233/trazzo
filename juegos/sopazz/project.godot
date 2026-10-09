@@ -19,7 +19,6 @@ config/version="1.0.0"
 
 Temas="*res://autoload/temas.gd"
 Progreso="*res://autoload/progreso.gd"
-Monetizacion="*res://autoload/monetizacion.gd"
 Sonido="*res://autoload/sonido.gd"
 
 [display]

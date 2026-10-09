@@ -69,19 +69,6 @@ func total_sopas() -> int:
 	return n
 
 
-## La version gratis incluye las primeras sopas de cada categoria.
-func es_gratis(cat: String, sub: String) -> bool:
-	var i := indice_subtema(cat, sub)
-	return i >= 0 and i < Economia.SOPAS_GRATIS_POR_CATEGORIA
-
-
-func total_gratis() -> int:
-	var n := 0
-	for c in lista:
-		n += mini(c["subtemas"].size(), Economia.SOPAS_GRATIS_POR_CATEGORIA)
-	return n
-
-
 ## Palabras de una sopa segun la dificultad: las mas cortas primero, asi en
 ## Facil caben en una cuadricula pequeña y en Dificil entran todas.
 func palabras_sopa(cat: String, sub: String, dificultad: int) -> PackedStringArray:
@@ -129,8 +116,7 @@ func generar(cat: String, sub: String, dificultad: int) -> GeneradorSopa.Sopa:
 	return sopa
 
 
-## Sopa del dia: la misma para todo el mundo cada fecha, elegida entre todas
-## (tambien las de pago: es un adelanto de lo que trae el juego completo).
+## Sopa del dia: la misma para todo el mundo cada fecha, elegida entre todas.
 func sopa_del_dia(fecha: String) -> Dictionary:
 	var total := total_sopas()
 	if total == 0:
