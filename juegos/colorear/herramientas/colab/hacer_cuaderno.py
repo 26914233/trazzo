@@ -15,20 +15,21 @@ def code(t):
 celdas = [
     md("""# Láminas para colorear con SDXL (gratis en Colab)
 
-**Antes de empezar:** menú *Entorno de ejecución → Cambiar tipo de entorno de ejecución → GPU T4*.
-Luego *Entorno de ejecución → Ejecutar todo*. Pedirá permiso para usar tu Google Drive.
+**Solo dos pasos:** pulsa **Conectar** (arriba a la derecha) y luego
+*Entorno de ejecución → Ejecutar todo*. Acepta el permiso de Google Drive cuando lo pida.
 
-- Guarda cada imagen en `Mi unidad/colorear_lotes/<categoría>/` en cuanto la hace.
-- Si Colab se desconecta, vuelve a *Ejecutar todo*: salta las que ya existen y sigue.
-- Al terminar crea `Mi unidad/colorear_zip/` con un .zip por categoría. Comparte esa carpeta
-  como *Cualquier persona con el enlace* y pásale el enlace a Claude.
+- Ya viene con GPU T4. Si dijera que no hay GPU: *Entorno de ejecución → Cambiar tipo → T4 GPU*.
+- Tarda unas 2–3 horas. Guarda cada imagen en `Mi unidad/colorear_lotes/<categoría>/` al momento.
+- Si Colab se desconecta, vuelve a *Ejecutar todo*: salta las que ya hizo y sigue.
+- Al terminar crea `Mi unidad/colorear_zip/` con un .zip por categoría. Avisa a Claude:
+  las lee directamente de tu Drive, no hace falta compartir nada.
 
 Modelos: SDXL base 1.0 (Stability AI) + SDXL-Lightning 8 pasos (ByteDance), ambos con
 licencia `openrail++`, que permite uso comercial respetando sus restricciones de uso."""),
     code("""# Ajustes
 MODO = "rapido"      # "rapido" (Lightning, ~5 s por imagen) o "calidad" (SDXL normal, ~25 s, usa el prompt negativo)
 SEMILLAS = 2         # imágenes por prompt (855 prompts x 2 = 1710)
-SOLO_PRUEBA = 0      # pon por ejemplo 20 para probar antes de lanzar todo (0 = todas)
+SOLO_PRUEBA = 0      # 0 = todas; un número (p. ej. 20) para hacer solo una prueba
 CARPETA = "/content/drive/MyDrive/colorear_lotes"
 CARPETA_ZIP = "/content/drive/MyDrive/colorear_zip\""""),
     code("!pip -q install diffusers==0.31.0 transformers accelerate safetensors"),
