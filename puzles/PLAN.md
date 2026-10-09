@@ -276,6 +276,48 @@ La 24 se cerró el 03-10-2026 (abajo); la 25 y la 26 siguen abiertas.
     sin avanzar; C) automáticas.
   - Recomendación: **B**.
 
+### Decisiones que deja la revisión con las skills de videojuegos (09-10-2026)
+
+Cuatro revisores aplicaron 14 skills de la carpeta `.claude` de OmniRoute (diseño, UX/UI, niveles y pulido, y QA) a
+los siete niveles. Los fallos claros se arreglaron en la 0.8 (`ilustrada/LEEME.md`). Lo que cambia el diseño se
+propone aquí. Las duraciones y la dificultad siguen siendo **[Hipótesis]**: nadie ha jugado aún los niveles 4 a 7.
+
+**DECISIÓN 32: el final no usa lo que dan los niveles 4, 5 y 6.** El final tiene solo tres anillos (cuerno, ojo y voz):
+金, 秘 y 灯 no intervienen, y es el nivel más corto, justo después de los dos más densos. Además, su mensaje inicial
+explica los tres sentidos.
+- **A)** Una fase por pieza nueva: el oro cura una grieta del corazón (como la mejilla); el secreto, el dibujo de la sala
+  a oscuras, es el mapa de una marca; y la lámpara encendida proyecta la sombra que alinea un anillo. Sin el mensaje
+  que lo explica todo. Unas 4-6 horas, sin imágenes nuevas.
+- **B)** Dejarlo como está.
+- **Recomendación: A.** Es el «puzle grande» que promete el juego; sin ella, tres sellos no sirven para nada.
+
+**DECISIÓN 33: la prisa del nivel 6** (y un poco del 4 y del 5). La biblia prohíbe los reflejos y el contrarreloj
+(§9.1 y §20.9), pero en el 6 la tsukegi arde 25 s, la ráfaga la apaga en la bandeja a los 0,25 s y las brasas solo
+prenden en una ventana de 1,5 s. En el 4, la caja canta 4,8 s mientras hay que llevar el pedazo.
+- **A)** La ráfaga solo apaga la llama mientras se lleva con el dedo (no en la bandeja), la tsukegi arde hasta usarla, y
+  en el 4 la caja sigue cantando mientras el dedo lleva el pedazo. Se mantiene la idea («cierra el shoji antes de
+  llevarla»), sin prisa.
+- **B)** Esperar a la prueba con jugadores para ajustarlo.
+- **Recomendación: A** (es pequeño y cumple la regla de la biblia); la prueba dirá si hace falta más.
+
+**DECISIÓN 34: probar antes de crecer.** El roadmap (`genero/08_ROADMAP.md` §4) ponía la prueba con 3-5 jugadores antes
+de más niveles, y se saltó. Para lanzar faltan los Must Have: textos en una tabla (para el inglés), las pistas (DECISIÓN
+26), música y los ajustes (ya hechos en la 0.8).
+- **A)** Congelar el contenido: la hoja de prueba del usuario y 3-5 personas, con tiempos y pistas por paso; mientras
+  tanto, solo arreglos y los Must Have.
+- **B)** Seguir con más niveles y probar después.
+- **Recomendación: A.**
+
+**DECISIÓN 35: variedad y coherencia** (cambios pequeños, para después de la prueba):
+- la luz fría se maneja de tres formas (el 3, en espejo; el 6, arrastrada al revés y se queda; el 7, donde tocas):
+  unificar con la del 6, y contar la del 7 como un premio («ya no aparta la vista de ti»);
+- «encajar algo en la cara» sale cuatro veces y «mientras suelta el aire», cuatro: que el clímax de cada pieza
+  reaccione distinto (el cuerno con humo, el ojo parpadeando a destiempo, la voz cantando, el oro corriendo);
+- el sueño del nivel 5 se enseña solo en el clímax: enseñarlo antes, sin riesgo;
+- el final necesita un tema propio (hoy suena el mismo canto que el 3 y el 4, y el koto del «final» suena al acabar el
+  nivel 1), y el ambiente, más capas (un solo bucle de 7,5 s para todo el juego).
+- **Recomendación:** hacerlas después de la prueba con jugadores, empezando por la luz fría y el tema del final.
+
 ## 6. Bocetos antes de construir (03-10-2026)
 
 El usuario vio la caja viva profunda: le gusta la idea, pero no el diseño. Pidió bocetos de todo
@@ -542,9 +584,9 @@ entrar al nivel final».
 **El plan** está en `ilustrada/NIVELES.md`:
 - La idea en una frase: **la caja no te deja tocar mientras te mira; devuélvele la cara (el cuerno, el ojo y la
   voz) y te abrirá su corazón.**
-- Cuatro niveles: 1 · El cuerno, 2 · La caja de dentro, 3 · La voz y el final, El corazón. **Los cuatro se juegan
-  desde el 05-10-2026** (APK 0.5).
-- La cara es el puzle grande: cada nivel le devuelve una pieza y el final solo se abre con las tres.
+- Siete niveles desde el 07-10-2026 (DECISIÓN 31; APK 0.7): 1 · El cuerno, 2 · La caja de dentro, 3 · La voz, 4 · El
+  oro, 5 · La cómoda, 6 · La noche y el final, 7 · El corazón. (El 05-10-2026, con la 0.5, eran cuatro.)
+- La cara es el puzle grande: cada nivel le devuelve una pieza y el final solo se abre con todas.
 
 **Hecho [en la página privada]:**
 - **El paso de nivel:**
@@ -644,7 +686,8 @@ el final como nivel 7, van en el 0.7 (fichas en `ilustrada/NIVELES.md` §8 y §9
 rota; tres esquirlas (una cae al cantar, otra se delata por su sombra encima de la lámpara y la tercera está en el cajón
 de la peana, que se abre repitiendo en tres olas de oro la frase que canta la caja); en la mano se montan, se traza la
 laca, se cura con el aliento de la caja (el té ya está tibio) y se espolvorea el oro; y se pone mientras canta con los
-ojos cerrados, porque mientras mira no deja tocarle la cara y ya nada la distrae. El final pasa a ser el nivel 5.
+ojos cerrados, porque mientras mira no deja tocarle la cara y ya nada la distrae. El final pasó entonces a ser el nivel 5
+(hoy, el 7).
 
 **Niveles 5 · La cómoda y 6 · La noche (07-10-2026) [Hechos, para el APK 0.7]** (`ilustrada/NIVELES.md` §8 y §9).
 El final pasa a ser el nivel 7.

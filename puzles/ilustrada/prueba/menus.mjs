@@ -97,10 +97,18 @@ await jugando(2);
 const e2 = await estado();
 comprobar('reiniciar el nivel: el nivel 2 otra vez, desde el principio, sin pausa',
   e2.nivel === 2 && e2.hija && e2.hija.fase === 'dentro' && !(await pagina.evaluate(() => window.__prueba.pausado())) && !(await abierta('menu')));
+await hasta(() => !!window.__prueba.enCurso());
 comprobar('mientras se juega, el nivel a medias queda guardado', await pagina.evaluate(() => { const g = window.__prueba.enCurso(); return !!g && g.estado.nivel === 2; }));
 
-// 4. el atrás de Android: en la sala abre la pausa; otra vez, la cierra
-comprobar('atrás en la sala abre la pausa (no saca de la app)', await pagina.evaluate(() => window.__atras()) === true && await abierta('menu'));
+// 4. el atrás de Android: de cerca vuelve a la sala; en la sala abre la pausa; otra vez, la cierra
+if ((await estado()).vista !== 'sala') {
+  comprobar('de cerca, atrás vuelve a la sala', await pagina.evaluate(() => window.__atras()) === true);
+  await hasta(() => window.__prueba.estado().vista === 'sala');
+  await pausa(600);
+}
+const atrasEnSala = await pagina.evaluate(() => window.__atras());
+await hasta(() => !document.getElementById('menu').classList.contains('oculta'));
+comprobar('atrás en la sala abre la pausa (no saca de la app)', atrasEnSala === true && await abierta('menu'));
 await pausa(400);
 comprobar('atrás otra vez cierra la pausa', await pagina.evaluate(() => window.__atras()) === true && !(await abierta('menu')));
 await pausa(500);
@@ -116,9 +124,10 @@ comprobar(`al elegir un objeto de la bandeja (${objeto}) aparece «Mirar»`, awa
   await pagina.textContent('#boton-mirar'));
 await pagina.tap('#boton-mirar');
 if (objeto === 'nota') {
-  await hasta(() => !document.getElementById('nota').hidden);
+  await hasta(() => !document.getElementById('nota').classList.contains('oculta'));
   comprobar('«Leer» abre la nota', true);
   await pagina.evaluate(() => window.__atras());
+  await hasta(() => document.getElementById('nota').hidden);
 } else {
   await hasta(o => { const v = window.__prueba.vitrina(); return v && v.objeto === o && v.tieneModelo; }, objeto);
   await pausa(2500);

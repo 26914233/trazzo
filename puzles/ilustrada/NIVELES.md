@@ -68,8 +68,8 @@ NIVEL FINAL (7) · El corazón
 - El nivel final solo se abre con los seis sellos. Es el patrón de «árbol que converge» de la serie
   (`ANALISIS_THE_ROOM.md` §5.1), a escala de juego.
 - **Primera versión:** los niveles van en orden.
-- **Más adelante:** tras el nivel 1, que el jugador elija el orden del 2 y el 3, como los sellos de la
-  serie.
+- **Elegir nivel (desde la 0.8, 09-10-2026):** en el menú de inicio, «Niveles» deja volver a jugar los superados y el
+  siguiente. El orden sigue siendo fijo: cada nivel usa lo que dio el anterior (el 3 necesita el ojo del 2).
 
 ## 3. Qué trae cada nivel
 
@@ -223,7 +223,7 @@ lengua, su badajo).
     campanilla **mientras suelta el aire**: con un murmullo, la boca cerrada. Si se toca mientras toma aire, lo
     contiene y no contesta. Al tercer murmullo, **los labios se entreabren**.
 14. **Clímax y recompensa:** la campanilla en la boca: la caja canta, muy bajo. Tarjeta «Nivel 3 superado · La
-    voz», con los tres sellos (角 目 声) y «Nivel final · El corazón».
+    voz», con los tres sellos (角 目 声) y «Nivel 4 · El oro» (desde el 07-10-2026; antes llevaba al final).
 
 **Cómo está hecho:** `pagina/juego.js` (sección «Nivel 3 · La voz») y `pagina/tecnica_3d.js` (el cajón largo de la
 espalda, con la pintura de espaldas proyectada en su frente; la ficha en su hueco; la tetera que se vuelca con su
@@ -461,11 +461,11 @@ base, anillos y brillos, dibujados por código en `nivel3_arte.js`). Prueba: `pr
 | Nivel | Familias | Código: cómo se encuentra | Llave: qué tiene de especial | Sistema nuevo | Sorpresa |
 |---|---|---|---|---|---|
 | 1 [Hecho] | Atención, Manipular, Observar, Montar | Ninguno | La llave no se deja coger mientras el ojo mira | La sala participa | La caja despierta |
-| 2 | Atención, Manipular, Memoria espacial, Bolsillo | Ninguno: flechas de marquetería | No hay llave: el orden de las tablillas | El objeto en la mano; esconder del ojo | El ojo nuevo ve otra cosa |
+| 2 [Hecho] | Atención, Manipular, Memoria espacial, Bolsillo | Ninguno: flechas de marquetería | No hay llave: el orden de las tablillas | El objeto en la mano; esconder del ojo | El ojo nuevo ve otra cosa |
 | 3 [Hecho] | Observar, Guiar, Deducir, Manipular, Tiempo | Tres tintas que solo se ven a la luz del ojo | La ficha coronada (darle la vuelta) | La mirada como linterna; la respiración como ritmo | La caja escribe y, al final, canta |
 | 4 [Hecho] | Observar, Oído, Montar, Manipular, Tiempo | La frase que canta, en tres olas de oro de la peana | No hay llave: un oficio (montar, laca, curar, oro) | La mano como taller; el cuerpo de la caja como herramienta | El centro de la peana es un cajón; el oro corre por la grieta |
-| 5 | Deducir, Manipular, Oído, Atención | La tarjeta del lazo (qué cola) y lo que tiembla (qué bloquea) | Una llave que no gira: empuja; un cordón que es un cerrojo | La caja como mecanismo; el sueño (silencio y paciencia) | El hueco de la ficha era un tirador; la cómoda entera se suelta |
-| 6 | Guiar, Memoria espacial, Tiempo, Sistema | La tinta de la llamita, a la luz fría | No hay llave: el fuego, que se consume | La luz como recurso; el viento que aviva y apaga | Se apaga la lámpara; vuelve la luz cálida |
+| 5 [Hecho] | Deducir, Manipular, Oído, Atención | La tarjeta del lazo (qué cola) y lo que tiembla (qué bloquea) | Una llave que no gira: empuja; un cordón que es un cerrojo | La caja como mecanismo; el sueño (silencio y paciencia) | El hueco de la ficha era un tirador; la cómoda entera se suelta |
+| 6 [Hecho] | Guiar, Memoria espacial, Tiempo, Sistema | La tinta de la llamita, a la luz fría | No hay llave: el fuego, que se consume | La luz como recurso; el viento que aviva y apaga | Se apaga la lámpara; vuelve la luz cálida |
 | Final [Hecho] | Meta, Atención, Oído | Lo señala la propia caja: el ojo, la luz y la voz | La caja hija es la última llave | Memoria entre niveles | Su corazón sube por la trampilla |
 
 ## 12. Control de originalidad (filas nuevas para el anexo B de la biblia)
@@ -490,10 +490,10 @@ base, anillos y brillos, dibujados por código en `nivel3_arte.js`). Prueba: `pr
 
 ## 13. Producción en la B
 
-- **Nivel 2:**
+- **Nivel 2 [Hecho]:**
   - la caja hija y la cajita son 3D, con texturas pintadas (Gemini) y el mismo aire de tinta y acuarela;
   - un retoque de la cara con el ojo nuevo en la cuenca, para animarlo como el viejo;
-  - unas 5 imágenes, unos 0,25 USD **[Estimación]**.
+  - unas 5 imágenes, unos 0,25 USD (la estimación de antes de hacerlo; el coste real no se apuntó).
 - **Nivel 4 [Hecho]:** sin imágenes nuevas: la mejilla curada sale del propio boceto (`herramientas/nivel4_capas.py`) y lo
   demás se dibuja por código (`pagina/nivel4_arte.js`). Coste: 0 USD.
 - **Niveles 5 y 6:** sin imágenes nuevas: el costado sin la borla y la lámpara apagada salen de la pintura

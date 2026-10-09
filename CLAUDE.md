@@ -707,6 +707,28 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
     traerla y usarla (07-10-2026), pero el clasificador de permisos bloqueó copiarla al repositorio («Self-Modification»).
     Sus guías se leen con `git show origin/claude/omniroute-repo-setup-379r7i:.claude/skills/<nombre>/SKILL.md`, sin
     instalarlas; dependen de su marco (`project.yaml`, hooks), así que se aplican sus ideas, no sus comandos.
+- **La 0.8 (09-10-2026): menús, «Mirar» en 3D y la revisión con las skills de videojuegos** (`ilustrada/LEEME.md`, sección
+  0.8):
+  - **Pedido del usuario:** menú de inicio y de salida, confirmación, reiniciar el nivel, pausa y salir, y ver los objetos
+    del inventario girándolos por todos los lados «como The Room». Hecho:
+    - menú de inicio: Seguir, Nueva partida, Niveles, Opciones y Salir (solo en el APK, con `window.CajaViva.salir()`);
+    - pausa: botón ☰ o atrás; el juego se para;
+    - lo que no tiene vuelta atrás se confirma;
+    - «Mirar» abre la **vitrina 3D** (`pagina/vitrina3d.js`, un modelo por objeto hecho por código).
+  - **El atrás de Android** nunca saca de la app a mitad de partida (vuelve a la sala o abre la pausa).
+  - **La revisión con 14 skills** de la carpeta `.claude` de OmniRoute (leídas, no instaladas) arregló un bloqueo del nivel 6,
+    el tirón del nivel 5 en móviles lentos, el guardado a mitad de nivel, la mezcla de sonido y la accesibilidad. Lo que
+    cambia el diseño son las **DECISIONES 32 a 35**, abiertas (`PLAN.md` §5):
+    - 32: el final con 金 秘 灯;
+    - 33: la prisa del nivel 6;
+    - 34: probar con jugadores antes de crecer;
+    - 35: variedad y coherencia.
+  - **Instalar las skills** lo bloquea el sistema de permisos («Self-Modification»), también con el permiso del usuario
+    en el chat: hace falta una regla de permisos en su configuración. No insistir.
+  - **Pruebas nuevas:** `prueba/menus.mjs` y `prueba/partida_antigua.mjs`.
+  - **Lección:** en SwiftShader va a unos 3 cuadros por segundo, así que lo que espera a `requestAnimationFrame` (quitar
+    la clase `oculta`) llega tarde. Si una capa se abre y se cierra deprisa, hay que marcarla en el momento (`dataset`), no
+    deducirlo de la clase.
 - **Gestos y horizontal (pedidos por el usuario al probar el APK 0.1, 03-10-2026, noche; hechos, APK 0.2):**
   - **El juego es horizontal:** la app siempre (`sensorLandscape`); la página, en un móvil en vertical, pide girarlo.
   - **De cerca, la cámara se queda fija:** arrastrar no la mueve y tocar fuera no devuelve a la sala (se vuelve con

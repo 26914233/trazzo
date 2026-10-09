@@ -251,7 +251,7 @@ Aparecen en cualquier línea, como mucho uno nuevo por caja:
 | Sistema | Qué es | Ejemplo |
 |---|---|---|
 | Estado compartido | El resultado depende de la posición final de varias piezas | Tres cajones que, juntos, forman la combinación |
-| Puzle de bolsillo | El objeto examinado tiene su propio mecanismo | Un abanico que se abre y enseña un dibujo |
+| Puzle de bolsillo | El objeto examinado tiene su propio mecanismo | La cajita de laca roja: su tapa gira por topes (la caja viva, nivel 2) |
 | Causa a distancia | Lo que haces aquí cambia algo allí | Atrasar el reloj borra la carta del escritorio |
 | Reversibilidad | Deshacer es una mecánica | Cerrar un cajón libera otro |
 | Memoria entre cajas | Un objeto de una caja anterior | El objeto guardado de la caja 1, en la caja 4 |
@@ -340,7 +340,7 @@ La referencia se puede ordenar por mecanismos (`ANALISIS_THE_ROOM.md` §6). La n
 | **Tiempo** | Horas, orden, ritmo lento (nunca reflejos) | Poner las horas (relojero) [Hecho] | Destreza escondida |
 | **Memoria espacial** | Recordar lo que había en otra cara o en otro sitio | Pistas cruzadas entre muebles (farero) [Hecho] | Cargar demasiado |
 | **Transformación** | El objeto cambia de estado o de forma | La reliquia se despliega [Hecho] | Que no se entienda qué cambió |
-| **Bolsillo** | Un objeto examinado esconde su mecanismo | [Propuesta] Un abanico que se abre en el examen | Que nadie piense en examinar |
+| **Bolsillo** | Un objeto examinado esconde su mecanismo | [Hecho] La cajita de laca roja y la ficha de shōgi (la caja viva, niveles 2 y 3) | Que nadie piense en examinar |
 | **Meta** | Usar lo de cajas anteriores | [Propuesta] Los objetos guardados, en la caja 4 | Olvidar qué se guardó |
 
 **Mezcla por caja [Propuesta]:**
@@ -1601,6 +1601,7 @@ mejorar?** [Opinión del equipo, salvo lo marcado.]
 | No se mueve, suena seco y da una línea de texto | Feedback de error | El principio es de la referencia y del usuario; la expresión es nuestra: cada objeto se resiste a su manera (aliento, «no» del minutero, luz que se retira, racha) | Mantener |
 | Entrada de cámara por la sala | Presentar el espacio | Bajo: la referencia hace barridos al empezar | Mantener: cada sala tiene su puerta |
 | Una lente u ocular | Capa oculta | **Alto:** es la expresión central de la referencia | **No usar.** Nuestras capas ocultas salen de la regla de cada línea |
+| Un abanico (*sensu*) | Puzle de bolsillo | **Alto:** Old Sins usa un abanico en su galería japonesa | **No usar** (añadido el 09-10-2026, tras la revisión con las skills de diseño) |
 | Miniaturas y entrar en lo pequeño | Escala | **Alto:** es la expresión central de The Room Three | **No usar** |
 | Rituales de varillas o máquina de puertas | Ritual que vuelve | **Alto** si se copia | Nuestro ritual es la regla de la línea |
 | Melodía que se compone con los pasos | Feedback musical | No | Mantener |
@@ -1916,7 +1917,11 @@ la línea que elija la DECISIÓN 23.
 17. **Sonido:** un tono por destello y la tormenta.
 18. **Animación:** los destellos y la lluvia en el cristal.
 
-### C.10 El abanico (puzle de bolsillo, cualquier línea)
+### C.10 El abanico (puzle de bolsillo) [Retirado el 09-10-2026]
+
+**No usar:** Old Sins usa un abanico en su galería japonesa (`genero/08_ROADMAP.md` §6 y el anexo B). La ficha se
+conserva solo como ejemplo del formato.
+
 1. **Nombre:** El abanico.
 2. **Concepto:** un abanico plegado del inventario. Al examinarlo se abre varilla a varilla y su
    dibujo es un mapa de la caja.

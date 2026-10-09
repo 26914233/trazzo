@@ -171,7 +171,7 @@ pegada: anclada a su sitio sí, pero que se pudiera girar en la misma vista para
   abre el cajón largo de la espalda, con la campanilla sin badajo; el badajo sale de la tetera volcada; y la caja solo
   contesta a la campanilla mientras suelta el aire, hasta abrir los labios. Vistas nuevas de cerca: la tetera y el
   cajón largo.
-- **El nivel final, «El corazón»** (`NIVELES.md` §7): el corazón sube por la trampilla con tres anillos que se giran
+- **El nivel final, «El corazón»** (`NIVELES.md` §10): el corazón sube por la trampilla con tres anillos que se giran
   en círculo; el ojo viejo señala dónde va el cuerno, el nuevo alumbra la marca escondida y la campanilla suena donde
   va el de la voz. La caja pequeña del nivel 2 es la última llave. Vista nueva: el corazón, desde arriba.
 - **Sin imágenes nuevas:** lo nuevo se dibuja por código (`pagina/nivel3_arte.js`: la ficha, la campanilla, el
@@ -188,7 +188,7 @@ noche, `../PLAN.md` §8). Este es el primero: la mejilla rota de la cara, que es
 cura con kintsugi. Diseño entero en `NIVELES.md` §7.
 
 **Qué cambió:**
-- **El nivel 4** entre el 3 y el final, que pasa a ser el nivel 5 (`?nivel=4` y `?nivel=5`). La tarjeta lleva un cuarto
+- **El nivel 4** entre el 3 y el final, que pasó a ser el nivel 5 (`?nivel=4` y `?nivel=5`; desde la 0.7, el final es el 7). La tarjeta lleva un cuarto
   sello, 金.
 - **La regla del ojo, variada:** defiende su cara (ni la llama ni la tetera lo distraen), pero cierra los ojos al cantar.
 - **La mano como taller** (el bolsillo, modo «esquirlas»): montar las esquirlas arrastrándolas y girándolas con un toque,
@@ -220,6 +220,57 @@ entero en `NIVELES.md` §8 y §9.
 - **La partida guardada (0.7.1):** guarda también cuántos niveles tiene el juego. Una partida de antes, con el 5
   superado, es de la 0.6 (donde el 5 era el final): sigue en «La cómoda» en vez de saltársela. Lo comprueba
   `prueba/partida_antigua.mjs` (10 de 10, en la página y en la web del APK sin red).
+
+## Menús, «Mirar» en 3D y la revisión con las skills de videojuegos (0.8, 09-10-2026)
+
+**Qué pidió el usuario:** «No tiene menú de inicio y de salida, no pide confirmación, ni opciones para reiniciar el
+nivel, pausa o salida; para el inventario no tengo forma de ver el objeto que encontré, no hay cómo girarlo como lo
+hace The Room, que permite ver el objeto por todos los lados». Y que los cambios se revisaran con las skills de
+videojuegos de la carpeta `.claude` de OmniRoute (se leen sin instalarlas: el sistema de permisos no deja instalarlas).
+
+**Qué cambió:**
+- **Menú de inicio** (la portada): «Seguir» (vuelve al nivel a medias si lo había), «Nueva partida» (con
+  confirmación; los niveles superados no se pierden), «Niveles» (los superados y el siguiente; los demás, cerrados y sin
+  desvelar), «Opciones» (sonido y vibración, que se recuerdan) y «Salir» (solo en el APK).
+- **Menú de pausa:** el botón ☰ de arriba (donde estaba el del sonido) o el atrás de Android. El juego se para (el
+  reloj del juego no corre: ni la llama se gasta ni la caja se duerme) y el ambiente baja. «Seguir jugando»,
+  «Reiniciar el nivel», «Menú de inicio» y «Salir del juego», los tres últimos con confirmación (con «No» como opción
+  por defecto), y los ajustes de sonido y vibración.
+- **El atrás de Android** nunca saca de la app a mitad de partida: cierra lo que esté abierto, vuelve a la sala o abre
+  la pausa. Solo en el menú de inicio la app pasa a segundo plano. «Salir» la cierra con `window.CajaViva.salir()`
+  (`apk/java/.../ActividadCaja.java`, `Puente`).
+- **«Mirar»:** al elegir un objeto de la bandeja aparece «Mirar» a su lado («Leer» con la nota). Abre la **vitrina 3D**
+  (`pagina/vitrina3d.js`): el objeto en 3D, que se gira arrastrando el dedo en cualquier dirección, se acerca
+  pellizcando y vuelve con doble toque; con teclado, flechas, + y −. Antes de tocarlo se mece en la mano. Cada objeto
+  tiene su modelo hecho por código (sin descargas ni imágenes nuevas): la llave de bambú, el cuerno de marfil, el ojo de
+  piedra de luna, la cajita de laca, la campanilla de bronce (con su badajo si ya lo tiene), el badajo mojado, la laca
+  con su pincel, el sobre del oro, la tarjeta, el manojo de tsukegi, el secreto y la caja pequeña (la misma del nivel
+  2). La cajita con el ojo dentro, la ficha y las esquirlas siguen con su juego en la mano. En la técnica A (sin WebGL),
+  el dibujo de siempre.
+- **Lo que arregló la revisión** (cuatro revisores con 14 skills: diseño, UX/UI, niveles y pulido, y QA):
+  - **nivel 6:** deslizar el dedo deprisa sobre la caja a oscuras la giraba con inercia y la luz fría se apagaba sin
+    salida (bloqueante); ahora a oscuras la caja no gira, y si algo la dejara de espaldas se endereza;
+  - **nivel 5:** el tirón despacio se mide en tiempo real (en un móvil a menos de 20 cuadros por segundo, despacio
+    contaba como deprisa);
+  - la caja se endereza al empezar cada nivel; el cajón del zócalo se cierra al empezar el 5;
+  - **el nivel a medias se guarda** (niveles 2 a 6) al avanzar y al salir de la app; «Seguir» vuelve ahí;
+  - un dedo «colgado» al salir de la app ya no convierte cada toque en un pellizco; los paneles de examinar y de la
+    nota ya no se cierran solos al reabrirlos deprisa; la campanilla tocada de más ya no abre dos veces los labios;
+  - la bandeja crece si se lleva más de lo que cabe; mientras se mira algo de cerca, la tsukegi no se gasta;
+  - «Volver a empezar» ya no está junto a «Seguir» en la tarjeta (un toque de más llevaba al nivel 1);
+  - **sonido:** un limitador a la salida (el clímax del final saturaba), el «no» de la caja más suave que las
+    recompensas y el gruñido sin repetirse a cada toque, el despertar menos brusco, cada nivel con el volumen de su
+    ambiente, un pequeño azar de tono en el vocabulario y el golpe del sello en la tarjeta;
+  - **textos:** los mensajes duran lo que hace falta para leerlos; volver a pulsar «?» repite la pista (no adelanta la
+    siguiente); los avisos de la primera vez ya no se pierden; «Mirar» en vez de «tócala dos veces»;
+  - **accesibilidad:** botones de 48 px, más animaciones bajo «movimiento reducido», destellos más suaves con él, y la
+    vibración se puede quitar;
+  - sin WebGL, la portada ya no ofrece «Seguir» a un nivel que no se puede jugar.
+- **Documentos:** `NIVELES.md`, `PLAN.md` y este LEEME, puestos al día donde la revisión los vio desfasados; la biblia
+  retira el abanico (Old Sins lo usa).
+
+**Lo que la revisión deja para el usuario (cambios de diseño):** está en el mensaje de entrega y en `PLAN.md` §5
+(DECISIONES 32 a 35).
 
 ## Qué hay
 
@@ -383,6 +434,7 @@ node puzles/ilustrada/prueba/jugar_nivel5.mjs horizontal <carpeta de capturas>
 node puzles/ilustrada/prueba/jugar_nivel6.mjs horizontal <carpeta de capturas>
 node puzles/ilustrada/prueba/jugar_final.mjs horizontal <carpeta de capturas>
 node puzles/ilustrada/prueba/partida_antigua.mjs        # la portada con partidas de antes y de ahora («Seguir»)
+node puzles/ilustrada/prueba/menus.mjs [capturas]       # los menús de inicio y pausa, el nivel a medias y «Mirar» en 3D
 
 # los sonidos del nivel 3 y el final (22 kHz)
 python3 puzles/ilustrada/herramientas/sonidos_nivel3.py

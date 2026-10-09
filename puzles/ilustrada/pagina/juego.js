@@ -2149,14 +2149,15 @@ function examinar(objeto) {
   // lo de detrás no se lee a través del velo
   el.mensaje.classList.remove('visible'); mensajeHasta = 0;
   el.etiqueta.classList.remove('visible'); etiquetaHasta = 0;
-  el.examinar.hidden = false;
-  requestAnimationFrame(() => el.examinar.classList.remove('oculta'));
+  el.examinar.hidden = false; delete el.examinar.dataset.cerrando;
+  requestAnimationFrame(() => { if (!el.examinar.dataset.cerrando) el.examinar.classList.remove('oculta'); });
   sonar('recoger', -16, 1.25);
   if (en3d) abrirVitrina(objeto);                         // (con el panel ya abierto)
 }
 let toqueEnExaminar = false;
 function cerrarExaminar() {
   if (el.examinar.hidden) return;
+  el.examinar.dataset.cerrando = '1';
   el.examinar.classList.add('oculta');
   bolsillo.activo = false;
   if (vitrina) vitrina.cerrar();
@@ -2805,13 +2806,14 @@ function tocarIncensario() {
 }
 function leerNota() {
   sonar('papel', -4);
-  el.nota.hidden = false;
-  requestAnimationFrame(() => el.nota.classList.remove('oculta'));
+  el.nota.hidden = false; delete el.nota.dataset.cerrando;
+  requestAnimationFrame(() => { if (!el.nota.dataset.cerrando) el.nota.classList.remove('oculta'); });
 }
 // La nota se cierra con un toque que empiece en ella (el toque que la abrió no cuenta)
 let toqueEnNota = false;
 function cerrarNota() {
   if (el.nota.hidden) return;
+  el.nota.dataset.cerrando = '1';                       // (si se cierra antes de terminar de abrirse, no se vuelve a abrir)
   el.nota.classList.add('oculta');
   setTimeout(() => { if (el.nota.classList.contains('oculta')) el.nota.hidden = true; }, 600);
   sonar('papel', -8, 1.2);
@@ -5075,7 +5077,7 @@ function pistaNivel6() {
     return mensaje(lista[Math.min(n, lista.length) - 1], 4.5);
   };
   if (!n6) return mensaje('Mira.');
-  if (!luzFria.punto || luzFria.guiadaHasta !== Infinity) return escalon('luz', ['Su ojo nuevo da luz. Arrastra el dedo para moverla.', 'La luz va al revés de tu dedo, como antes.']);
+  if (!luzFria.punto || luzFria.guiadaHasta !== Infinity) return escalon('luz', ['Su ojo nuevo da luz. Arrastra el dedo para moverla.', 'La luz va al revés de tu dedo y se queda donde la dejas.']);
   const llevaTsukegi = estado.inventario.includes('tsukegi');
   if (!llevaTsukegi) return escalon('tsukegi', ['Para encender algo hace falta con qué. Recuerda lo que guardaba la cómoda.',
     'Alumbra los cajones del costado de la caja.', 'Una tinta fría marca el cajón de arriba: dentro están las tsukegi.']);
@@ -5107,7 +5109,7 @@ const anilloEn = r => RADIOS_ANILLOS.findIndex(([a, b]) => r >= a && r < b);
 // de oro del frente; el de la voz, donde suena la campanilla
 function sitioAnillo(f, i) { return i === 0 ? f.ranura * PASO_ANILLO : i === 1 ? -f.marca * PASO_ANILLO : f.voz * PASO_ANILLO; }
 const enSitio = (f, i, a = f.angulos[i]) => Math.abs(angular(a - sitioAnillo(f, i))) < PASO_ANILLO * 0.3;
-// el estado al final del nivel 3, para empezar el final sin jugarlo (seguir una partida guardada, o «?nivel=4»)
+// el estado al final del nivel 6, para empezar el final sin jugarlo (seguir una partida guardada, o «?nivel=7»)
 function estadoTrasNivel3() {
   estado.n3 = { nota: 'mano', tintas: { rollo: true, te: true, suelo: true }, ficha: 'puesta', fichaCara: 'promovida', largo: 'suelto',
     campanilla: 'puesta', badajo: 'puesto', completa: true, toques: 3, labios: 1 };
@@ -5565,7 +5567,7 @@ function leerEnCurso(nivel) {
     return g && g.niveles === ULTIMO_NIVEL && g.estado && g.estado.nivel === nivel && g.estado.fase === 'jugando' ? g : null;
   } catch (e) { return null; }
 }
-function borrarEnCurso() { try { localStorage.removeItem(CLAVE_EN_CURSO); } catch (e) { /* nada */ } }
+function borrarEnCurso() { progreso.guardada = ''; try { localStorage.removeItem(CLAVE_EN_CURSO); } catch (e) { /* nada */ } }   // (y se vuelve a guardar en cuanto se juegue)
 function guardarProgreso(superado) {
   try {
     const antes = leerProgreso();
@@ -6453,13 +6455,16 @@ el.pista.addEventListener('click', () => { desbloquearAudio(); if (estado.fase =
 // ---------------------------------------------------------------------------------------------
 const puente = window.CajaViva || null;              // en el APK: salir de la app (en el navegador no se puede)
 let pausado = false;
-function mostrarCapa(capa) { capa.hidden = false; requestAnimationFrame(() => capa.classList.remove('oculta')); }
+// (abierta en cuanto se pide, aunque el fundido empiece en el cuadro siguiente: en un móvil lento, dos «atrás»
+// seguidos tienen que cerrarla, no volver a abrirla)
+function mostrarCapa(capa) { capa.hidden = false; capa.dataset.abierta = '1'; requestAnimationFrame(() => { if (capa.dataset.abierta) capa.classList.remove('oculta'); }); }
 function ocultarCapa(capa, ms = 350) {
   if (capa.hidden) return;
+  delete capa.dataset.abierta;
   capa.classList.add('oculta');
-  setTimeout(() => { if (capa.classList.contains('oculta')) capa.hidden = true; }, ms);
+  setTimeout(() => { if (!capa.dataset.abierta) capa.hidden = true; }, ms);
 }
-const capaAbierta = capa => !capa.hidden && !capa.classList.contains('oculta');
+const capaAbierta = capa => !capa.hidden && capa.dataset.abierta === '1';
 // confirmar: una promesa que dice sí o no
 let respuesta = null;
 function confirmar(texto, { si = 'Sí', detalle = '' } = {}) {
@@ -6519,7 +6524,7 @@ function abrirMenu() {
   setTimeout(() => el.menuSeguir.focus({ preventScroll: true }), 60);
 }
 function cerrarMenu() {
-  if (el.menu.hidden) return;
+  if (!capaAbierta(el.menu)) return;
   pausado = false; ultimo = performance.now();
   ocultarCapa(el.menu);
   pintarAjustes();
