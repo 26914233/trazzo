@@ -1,0 +1,48 @@
+; Juego de colorear y mandalas para Android (nombre por decidir; de trabajo "Pintazz").
+; Godot 4.7. Vertical, renderizador compatible para moviles de gama baja.
+
+config_version=5
+
+[application]
+
+config/name="Pintazz"
+config/description="Colorea mandalas, vitrales, flores y geometria. Sin anuncios."
+run/main_scene="res://escenas/menu.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+boot_splash/show_image=false
+boot_splash/bg_color=Color(0.98, 0.97, 0.95, 1)
+config/quit_on_go_back=false
+config/version="0.1.0"
+
+[autoload]
+
+Ajustes="*res://autoload/ajustes.gd"
+Laminas="*res://autoload/laminas.gd"
+Obras="*res://autoload/obras.gd"
+Integridad="*res://autoload/integridad.gd"
+Sonido="*res://autoload/sonido.gd"
+
+[display]
+
+window/size/viewport_width=1080
+window/size/viewport_height=1920
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=1
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true
+
+[juego]
+
+; Paquete de Android: se fija con el nombre definitivo (no se puede cambiar tras subirlo).
+paquete="com.thunderdarkness.pintazz"
+; Antipirateria propia (autoload/integridad.gd).
+integridad/exigir_play=true

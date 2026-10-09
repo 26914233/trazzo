@@ -1,0 +1,12 @@
+# Cache del editor de Godot 4 (se regenera al abrir el proyecto)
+.godot/
+# Builds y claves de firma: nunca al repo
+/build/
+*.apk
+*.aab
+*.keystore
+*.jks
+export_credentials.cfg
+
+# Template de build Android (se instala desde Project > Install Android Build Template)
+android/build/
