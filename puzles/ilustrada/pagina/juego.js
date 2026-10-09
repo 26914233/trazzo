@@ -5801,7 +5801,8 @@ function finToque(e) {
   if (!puntero || e.pointerId !== puntero.id) return;
   const q = posicion(e), g = puntero.gesto;
   if (g && g.estado) soltarGesto(g, e.type === 'pointercancel');
-  else if (puntero.movido < 16 && (performance.now() - puntero.inicio < 900 || puntero.movido < 8) && e.type === 'pointerup') tocarEscena(q.x, q.y);
+  // (mantener el dedo no es un toque: en el nivel 3 sirve para guiar la luz fría)
+  else if (puntero.movido < 16 && performance.now() - puntero.inicio < 900 && e.type === 'pointerup') tocarEscena(q.x, q.y);
   else {
     if (puntero.enHija && tec.soltarHija) { tec.soltarHija(); if (puntero.movido >= 16) sentir('tope', { db: -9, tono: 1.6, sinVibrar: true }); }
     const conImpulso = puntero.enCaja && puntero.eje !== 'v' && performance.now() - (puntero.tMov || 0) < 80;
