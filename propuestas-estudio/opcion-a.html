@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>thunderDarkness — Estudio de videojuegos</title>
+<link rel="stylesheet" href="fonts.css">
+<style>
+  :root{
+    --bg:#06080D; --bg-2:#0C111B; --card:#0F1522; --line:rgba(255,255,255,.09);
+    --txt:#EEF2FB; --muted:#9AA6BD;
+    --curtzz:#22D3EE; --ronin:#FF5A4D; --idea:#8B93A7;
+    --maxw:1180px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--txt);font:400 17px/1.6 "Inter",system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  h1,h2,h3,.disp{font-family:"Space Grotesk","Inter",sans-serif;letter-spacing:-.02em}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+  svg{display:block}
+
+  /* ---------- cabecera ---------- */
+  header.top{position:relative;z-index:5}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:84px}
+  .logo{display:flex;align-items:center;gap:12px;font:700 1.25rem "Space Grotesk";letter-spacing:-.02em}
+  .logo img{width:38px;height:38px}
+  .wm{font-style:normal;font-weight:500;color:var(--muted)}
+  .wm b{font-weight:700;color:#fff}
+  .nav ul{display:flex;gap:34px;list-style:none;margin:0;padding:0;font-weight:500;font-size:.98rem;color:var(--muted)}
+  .nav ul a:hover{color:#fff}
+  .pill{white-space:nowrap;display:inline-flex;align-items:center;gap:10px;padding:11px 20px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-weight:600;font-size:.95rem}
+  .pill i{width:8px;height:8px;border-radius:50%;background:#4ADE80;box-shadow:0 0 12px #4ADE80}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;padding:36px 0 96px;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:-10% -20% auto -20%;height:900px;
+    background:radial-gradient(520px 380px at 78% 38%,rgba(255,90,77,.22),transparent 70%),
+               radial-gradient(560px 420px at 62% 60%,rgba(34,211,238,.18),transparent 70%);pointer-events:none}
+  .hero::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:56px 56px;
+    -webkit-mask-image:radial-gradient(ellipse 70% 60% at 60% 40%,#000,transparent 75%);mask-image:radial-gradient(ellipse 70% 60% at 60% 40%,#000,transparent 75%);pointer-events:none}
+  .hero .wrap{position:relative;z-index:2;display:grid;grid-template-columns:1.02fr .98fr;gap:40px;align-items:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;font:600 .8rem "Inter";letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .eyebrow::before{content:"";width:28px;height:2px;background:linear-gradient(90deg,var(--curtzz),var(--ronin))}
+  h1{font-size:clamp(2.8rem,5.6vw,4.9rem);line-height:1.02;margin:22px 0 0;font-weight:700}
+  h1 em{font-style:normal;background:linear-gradient(100deg,var(--curtzz),#fff 45%,var(--ronin));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .hero p.sub{font-size:1.22rem;color:var(--muted);max-width:30em;margin:26px 0 0}
+  .btns{display:flex;gap:14px;margin-top:38px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:10px;padding:16px 26px;border-radius:14px;font:700 1rem "Space Grotesk";letter-spacing:0}
+  .btn.main{background:#fff;color:#07090f}
+  .btn.ghost{border:1px solid rgba(255,255,255,.22);color:#fff}
+  .btn svg{width:18px;height:18px}
+
+  .stage{position:relative;height:600px}
+  .ph{position:absolute;right:20px;top:20px;width:290px;border-radius:40px;padding:9px;background:linear-gradient(160deg,#2a3348,#0d1220);box-shadow:0 40px 90px -20px rgba(34,211,238,.35),0 0 0 1px rgba(255,255,255,.12) inset;transform:rotate(5deg)}
+  .ph img{display:block;width:100%;border-radius:32px}
+  .art{position:absolute;left:-18px;top:96px;width:300px;height:400px;border-radius:26px;overflow:hidden;box-shadow:0 40px 90px -20px rgba(255,90,77,.45),0 0 0 1px rgba(255,255,255,.1) inset;transform:rotate(-6deg)}
+  .art img{width:100%;height:100%;object-fit:cover}
+  .art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.65))}
+  .art span{position:absolute;left:20px;bottom:18px;z-index:2;font:700 1.6rem "Space Grotesk";letter-spacing:.14em}
+  .chip{position:absolute;display:inline-flex;align-items:center;gap:9px;padding:10px 16px;border-radius:999px;background:rgba(10,14,24,.82);border:1px solid var(--line);backdrop-filter:blur(8px);font:600 .88rem "Inter"}
+  .chip i{width:9px;height:9px;border-radius:50%}
+  .chip.c1{right:6px;bottom:48px}.chip.c1 i{background:var(--curtzz);box-shadow:0 0 10px var(--curtzz)}
+  .chip.c2{left:30px;bottom:44px}.chip.c2 i{background:var(--ronin);box-shadow:0 0 10px var(--ronin)}
+
+  /* ---------- cifras ---------- */
+  .stats{border-block:1px solid var(--line);background:rgba(255,255,255,.015)}
+  .stats .wrap{display:grid;grid-template-columns:repeat(4,1fr)}
+  .stat{padding:30px 0 30px 28px;border-left:1px solid var(--line)}
+  .stat:first-child{border-left:0;padding-left:0}
+  .stat b{display:block;font:700 2.4rem/1 "Space Grotesk"}
+  .stat span{display:block;margin-top:10px;color:var(--muted);font-size:.95rem}
+
+  /* ---------- secciones ---------- */
+  section{padding:104px 0 0}
+  .sec-h{display:flex;align-items:end;justify-content:space-between;gap:30px;margin-bottom:44px}
+  .sec-h h2{font-size:clamp(2rem,3.6vw,3rem);margin:0;line-height:1.08;font-weight:700}
+  .sec-h p{margin:0;color:var(--muted);max-width:30em}
+  .tag{font:600 .8rem "Inter";letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:block}
+
+  .bento{display:grid;grid-template-columns:repeat(12,1fr);gap:22px}
+  .game{position:relative;overflow:hidden;border-radius:28px;border:1px solid var(--line);background:var(--card);padding:40px}
+  .game.c{grid-column:span 7;min-height:560px;background:
+      radial-gradient(520px 360px at 85% 70%,rgba(34,211,238,.22),transparent 70%),linear-gradient(160deg,#0E1B2B,#0A1020 70%)}
+  .game.r{grid-column:span 5;min-height:560px;color:#fff;background:#12060b}
+  .game.r .bg{position:absolute;inset:0}
+  .game.r .bg img{width:100%;height:100%;object-fit:cover;opacity:.95}
+  .game.r .bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,2,6,.1) 0%,rgba(6,2,6,.55) 45%,rgba(6,2,6,.94) 100%)}
+  .game .in{position:relative;z-index:2;height:100%;display:flex;flex-direction:column}
+  .status{display:inline-flex;align-items:center;gap:9px;align-self:flex-start;padding:8px 15px;border-radius:999px;font:700 .78rem "Inter";letter-spacing:.1em;text-transform:uppercase}
+  .status i{width:8px;height:8px;border-radius:50%}
+  .st-c{background:rgba(34,211,238,.12);color:#7BE8FA;border:1px solid rgba(34,211,238,.35)}.st-c i{background:var(--curtzz)}
+  .st-r{background:rgba(255,90,77,.14);color:#FFB0A8;border:1px solid rgba(255,90,77,.4)}.st-r i{background:var(--ronin)}
+  .game h3{font-size:3rem;margin:22px 0 6px;line-height:1;font-weight:700}
+  .game.c h3{display:flex;align-items:center;gap:18px}
+  .game.c h3 img{width:62px;height:62px;border-radius:16px}
+  .game .hook{font-size:1.2rem;font-weight:500;margin:0}
+  .game.c .hook{color:#BFEFF8}
+  .game.r .hook{color:#FFD5CF}
+  .facts{list-style:none;margin:26px 0 0;padding:0;display:grid;gap:14px;color:var(--muted);font-size:1rem;max-width:21em}
+  .game.r .facts{color:#E7C9C5}
+  .facts li{display:flex;gap:12px;align-items:flex-start}
+  .facts svg{width:18px;height:18px;flex:0 0 auto;margin-top:5px}
+  .game.c .facts svg{color:var(--curtzz)}.game.r .facts svg{color:var(--ronin)}
+  .game .go{margin-top:auto;padding-top:30px;display:flex;gap:12px;flex-wrap:wrap}
+  .game.c .go{flex-direction:column;align-items:flex-start}
+  .game.c .vis{position:absolute;right:0;top:0;bottom:0;width:310px;overflow:hidden}
+  .game.c .phone{position:absolute;right:36px;top:64px;width:214px;border-radius:34px;padding:8px;background:linear-gradient(160deg,#2a3348,#0d1220);box-shadow:0 30px 70px -18px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.12) inset;transform:rotate(4deg)}
+  .game.c .phone img{width:100%;display:block;border-radius:27px}
+  .game.c .skin{position:absolute;filter:drop-shadow(0 12px 16px rgba(0,0,0,.65))}
+  .btn.cy{background:var(--curtzz);color:#04141A}
+  .btn.rd{background:var(--ronin);color:#1A0503}
+  .btn.out{border:1px solid rgba(255,255,255,.28);color:#fff}
+
+  .ideas{grid-column:span 12;display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .idea{border-radius:24px;border:1.5px dashed rgba(255,255,255,.18);padding:30px;min-height:178px;display:flex;flex-direction:column;justify-content:space-between;background:repeating-linear-gradient(135deg,transparent 0 14px,rgba(255,255,255,.018) 14px 28px)}
+  .idea .n{font:700 .8rem "Inter";letter-spacing:.14em;text-transform:uppercase;color:var(--idea);display:flex;align-items:center;gap:10px}
+  .idea .n svg{width:16px;height:16px}
+  .idea h4{margin:0;font:700 1.45rem "Space Grotesk"}
+  .idea p{margin:6px 0 0;color:var(--muted);font-size:.97rem;min-height:3.1em}
+  .idea.cta{border-style:solid;border-color:rgba(255,255,255,.2);background:linear-gradient(135deg,rgba(34,211,238,.1),rgba(255,90,77,.1))}
+
+  /* ---------- principios ---------- */
+  .pr{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .pr article{padding:34px;border-radius:24px;background:var(--bg-2);border:1px solid var(--line)}
+  .pr .ico{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,.06);margin-bottom:22px}
+  .pr .ico svg{width:24px;height:24px}
+  .pr h3{margin:0 0 10px;font-size:1.4rem}
+  .pr p{margin:0;color:var(--muted)}
+
+  /* ---------- bitácora ---------- */
+  .log{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .post{border-radius:22px;border:1px solid var(--line);background:var(--card);overflow:hidden;display:flex;flex-direction:column}
+  .post .th{height:150px;position:relative}
+  .post .th.a{background:linear-gradient(135deg,#0c2a3a,#0a1626)}
+  .post .th.b{background:linear-gradient(135deg,#0c2a3a,#0a1626)}
+  .post .th.c{background:linear-gradient(135deg,#3b0c1a,#12060b)}
+  .post .th img{position:absolute;height:118%;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-30deg);filter:drop-shadow(0 10px 14px rgba(0,0,0,.6))}
+  .post .th.c img{width:100%;height:100%;object-fit:cover;transform:none;left:0;top:0;filter:none;opacity:.9}
+  .post .b{padding:24px 26px 28px}
+  .post time{font:600 .78rem "Inter";letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .post h4{margin:10px 0 8px;font:700 1.25rem/1.25 "Space Grotesk"}
+  .post p{margin:0;color:var(--muted);font-size:.97rem}
+
+  /* ---------- cierre y pie ---------- */
+  .final{margin-top:104px;border-top:1px solid var(--line);background:radial-gradient(700px 300px at 20% 100%,rgba(34,211,238,.14),transparent 70%),radial-gradient(700px 300px at 80% 100%,rgba(255,90,77,.14),transparent 70%)}
+  .final .wrap{padding-top:84px;padding-bottom:84px;text-align:center}
+  .final h2{font-size:clamp(2.2rem,4.4vw,3.6rem);margin:0 auto;max-width:15em;line-height:1.08}
+  .final p{color:var(--muted);margin:18px auto 0;max-width:34em;font-size:1.1rem}
+  .final .btns{justify-content:center}
+  footer{border-top:1px solid var(--line);padding:34px 0 44px;color:var(--muted);font-size:.93rem}
+  footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+  footer .logo{font-size:1.05rem}footer .logo img{width:30px;height:30px}
+  footer nav{display:flex;gap:26px}
+  footer a:hover{color:#fff}
+
+  /* ---------- móvil ---------- */
+  @media (max-width:900px){
+    .nav ul{display:none}
+    .hero .wrap{grid-template-columns:1fr}
+    .stage{height:460px;margin-top:10px}
+    .ph{width:210px;right:0}.art{width:220px;height:300px;top:80px}
+    .stats .wrap{grid-template-columns:1fr 1fr}.stat:nth-child(3){border-left:0;padding-left:0}
+    .bento{display:block}.game{margin-bottom:20px;padding:28px}
+    .nav{height:72px}.logo{font-size:1.05rem}.logo img{width:32px;height:32px}.pill{padding:9px 14px;font-size:.85rem}
+    .chip{font-size:.78rem;padding:8px 12px}.chip.c1{right:0;bottom:28px}.chip.c2{left:0;bottom:84px}
+    .game.c{min-height:0}.game.c .vis{position:relative;width:100%;height:470px;margin-top:26px}
+    .game.c .phone{top:0;right:50%;margin-right:-107px}
+    .game.r{min-height:520px}
+    .ideas,.pr,.log{grid-template-columns:1fr}
+    .sec-h{display:block}.sec-h p{margin-top:14px}
+    .game h3{font-size:2.4rem}
+  }
+  @media (prefers-reduced-motion:no-preference){.btn,.pill,.post{transition:transform .2s,border-color .2s}.btn:hover,.post:hover{transform:translateY(-3px)}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap nav">
+    <a class="logo" href="#"><img src="mark.svg" alt=""><em class="wm"><b>thunder</b>Darkness</em></a>
+    <ul>
+      <li><a href="#juegos">Juegos</a></li>
+      <li><a href="#estudio">Estudio</a></li>
+      <li><a href="#bitacora">Bitácora</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+    <a class="pill" href="#"><i></i>Tienda Curtzz</a>
+  </div>
+</header>
+
+<main>
+<div class="hero">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">Estudio independiente de videojuegos</span>
+      <h1>Juegos donde <em>una sola decisión</em> lo cambia todo.</h1>
+      <p class="sub">Hacemos juegos de precisión y tensión. Un corte, un golpe, un segundo de más: aquí cada movimiento cuenta y la derrota siempre se entiende.</p>
+      <div class="btns">
+        <a class="btn main" href="#juegos">Ver los juegos
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn ghost" href="#bitacora">Seguir el desarrollo</a>
+      </div>
+    </div>
+    <div class="stage" aria-hidden="true">
+      <div class="art"><img src="ronin-art.svg" alt=""><span>RONIN</span></div>
+      <div class="ph"><img src="img/curtzz-juego.jpg" alt=""></div>
+      <div class="chip c2"><i></i>RONIN · En desarrollo</div>
+      <div class="chip c1"><i></i>Curtzz · En pruebas</div>
+    </div>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="wrap">
+    <div class="stat"><b>2</b><span>juegos en marcha</span></div>
+    <div class="stat"><b>1</b><span>en pruebas cerradas</span></div>
+    <div class="stat"><b>1</b><span>en producción</span></div>
+    <div class="stat"><b>&infin;</b><span>ideas en la libreta</span></div>
+  </div>
+</div>
+
+<section id="juegos">
+  <div class="wrap">
+    <div class="sec-h">
+      <div><span class="tag">Nuestros juegos</span><h2>Dos mundos.<br>Una misma tensión.</h2></div>
+      <p>Cada juego tiene su propia casa, su tienda y su historia. Aquí empiezan todas.</p>
+    </div>
+
+    <div class="bento">
+      <article class="game c">
+        <div class="in">
+          <span class="status st-c"><i></i>En pruebas cerradas · Android</span>
+          <h3><img src="img/curtzz-logo.png" alt="">Curtzz</h3>
+          <p class="hook">Encierra al enemigo sin rozarlo.</p>
+          <ul class="facts">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17 19 7"/></svg>16 tramos y un jefe al final de cada uno</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17 19 7"/></svg>Tanques, espinas móviles y disparos de colores</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17 19 7"/></svg>Lo importante se gana jugando</li>
+          </ul>
+          <div class="go">
+            <a class="btn cy" href="#">Conocer Curtzz</a>
+            <a class="btn out" href="#">Tienda de Prismas</a>
+          </div>
+        </div>
+        <div class="vis" aria-hidden="true">
+          <div class="phone"><img src="img/curtzz-inicio.jpg" alt=""></div>
+          <img class="skin" style="left:6px;top:326px;width:104px;transform:rotate(-30deg)" src="img/skin-arana.png" alt="">
+          <img class="skin" style="right:6px;top:410px;width:118px;transform:rotate(-30deg)" src="img/skin-dragon.png" alt="">
+        </div>
+      </article>
+
+      <article class="game r">
+        <div class="bg"><img src="ronin-art.svg" alt=""></div>
+        <div class="in">
+          <span class="status st-r"><i></i>En desarrollo</span>
+          <h3>RONIN</h3>
+          <p class="hook">Samuráis, yōkai y duelos de un solo golpe.</p>
+          <ul class="facts" style="margin-top:auto">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17 19 7"/></svg>Duelos de precisión: un solo corte decide</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17 19 7"/></svg>Se lanzará por capítulos. Primero: «Una noche en Hoshiyama»</li>
+          </ul>
+          <div class="go"><a class="btn rd" href="#">Seguir el desarrollo</a></div>
+        </div>
+      </article>
+
+      <div class="ideas">
+        <div class="idea">
+          <div class="n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Proyecto 03 · En la libreta</div>
+          <div><h4>???</h4><p>Todavía sin nombre. Cuando tenga prototipo, saldrá aquí.</p></div>
+        </div>
+        <div class="idea">
+          <div class="n"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Proyecto 04 · En la libreta</div>
+          <div><h4>???</h4><p>Una idea que aún se está cociendo.</p></div>
+        </div>
+        <a class="idea cta" href="#contacto">
+          <div class="n">¿Tienes una idea?</div>
+          <div><h4>Cuéntanosla</h4><p>Escríbenos y la ponemos en la libreta.</p></div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="estudio">
+  <div class="wrap">
+    <div class="sec-h">
+      <div><span class="tag">El estudio</span><h2>Cómo hacemos juegos</h2></div>
+      <p>Pocas reglas, siempre las mismas, en todos los juegos del estudio.</p>
+    </div>
+    <div class="pr">
+      <article>
+        <div class="ico" style="color:var(--curtzz)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 5 14h6l-1 7 8-11h-6z"/></svg></div>
+        <h3>Una decisión pesa</h3>
+        <p>Nada de relleno. Cada jugada tiene riesgo y recompensa, y el jugador lo siente.</p>
+      </article>
+      <article>
+        <div class="ico" style="color:#FBBF24"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></div>
+        <h3>Difícil, pero legible</h3>
+        <p>Cuando pierdes, ves exactamente qué pasó. Por eso quieres volver a intentarlo.</p>
+      </article>
+      <article>
+        <div class="ico" style="color:var(--ronin)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 4.5 3.3 8 8 9 4.7-1 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <h3>Compras sin trampa</h3>
+        <p>Lo importante se gana jugando. Si pides un reembolso, se devuelve y lo comprado se retira.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="bitacora">
+  <div class="wrap">
+    <div class="sec-h">
+      <div><span class="tag">Bitácora</span><h2>Lo último del taller</h2></div>
+      <p>Cambios, decisiones y cosas que salieron mal. En público y en español.</p>
+    </div>
+    <div class="log">
+      <a class="post"><div class="th a"><img src="img/skin-dragon.png" alt=""></div>
+        <div class="b"><time>Curtzz · Octubre 2026</time><h4>Versión 1.8: un jefe al final de cada tramo</h4><p>Espinas que se mueven, Tanques desde los primeros niveles y proyectiles de un color para cada tipo.</p></div></a>
+      <a class="post"><div class="th b"><img src="img/skin-arana.png" alt=""></div>
+        <div class="b"><time>Curtzz · Octubre 2026</time><h4>Cómo se diseñó un Tanque con cinco pieles</h4><p>Del cañón de cartón a una araña robot que dispara por los colmillos.</p></div></a>
+      <a class="post"><div class="th c"><img src="ronin-art.svg" alt=""></div>
+        <div class="b"><time>RONIN · Octubre 2026</time><h4>Por qué elegimos el cel&#8209;shading</h4><p>Tinta, bordes y color plano: el estilo que mejor cuenta una noche en Hoshiyama.</p></div></a>
+    </div>
+  </div>
+</section>
+
+<div class="final" id="contacto">
+  <div class="wrap">
+    <h2>¿Hablamos de juegos?</h2>
+    <p>Prensa, creadores, testers o alguien con una idea rara. Escríbenos.</p>
+    <div class="btns"><a class="btn main" href="#">Contactar con el estudio</a></div>
+  </div>
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="logo" href="#"><img src="mark.svg" alt=""><em class="wm"><b>thunder</b>Darkness</em></a>
+    <div>© 2026 thunderDarkness. Todos los derechos reservados.</div>
+    <nav><a href="#">Curtzz</a><a href="#">Tienda</a><a href="#">Privacidad</a></nav>
+  </div>
+</footer>
+</body>
+</html>
