@@ -12,7 +12,7 @@ dueño · ➖ no aplica.
 | ✅ | Las 5 pantallas cargan sin errores de motor | Prueba con `Logger` dentro de la suite |
 | ✅ | APK de prueba exporta y firma | `aapt2`/`apksigner`: firma v2+v3, target SDK 36, arm64 + armv7 |
 | ✅ | AAB para Play compila con Gradle | Construido con el template de Godot 4.7; ver nota de firma abajo |
-| 🟡 | AAB de release firmado con las variables de entorno | Prueba en curso |
+| ✅ | AAB de release firmado con `GODOT_ANDROID_KEYSTORE_RELEASE_*` | 52,4 MB, `jarsigner -verify`: jar verified (probado con una clave desechable; el de depuración sale sin firmar, es normal) |
 | ✅ | Sin pruebas ni docs dentro del paquete | Filtro de exportación comprobado en el APK y el AAB |
 | ⬜ | Versión etiquetada en git | `git tag sopazz-v1.0.0` al subir |
 | ⬜ | Rendimiento en un móvil barato (objetivo 60 fps, carga < 3 s) | No hay dispositivo aquí. El generador de niveles se optimizó para gama baja |
