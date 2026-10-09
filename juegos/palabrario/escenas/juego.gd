@@ -84,8 +84,13 @@ func _refrescar() -> void:
 			partes.append("[b]%s[/b]" % texto)
 	_lista.text = "[center]" + "    ".join(partes) + "[/center]"
 	_contador.text = "%d de %d palabras" % [_encontradas.size(), _sopa.colocadas.size()]
-	# Pistas sin limite: lo unico que cuestan son estrellas.
-	_boton_pista.text = "Pista" if _pistas_usadas == 0 else "Pista  ·  %d usadas" % _pistas_usadas
+	var gratis := Progreso.pistas_gratis_hoy(_hoy)
+	if gratis > 0:
+		_boton_pista.text = "Pista  ·  %d gratis hoy" % gratis
+	elif Progreso.pistas_compradas() > 0:
+		_boton_pista.text = "Pista  ·  te quedan %d" % Progreso.pistas_compradas()
+	else:
+		_boton_pista.text = "Conseguir pistas"
 
 
 # ---------------------------------------------------------------- jugar
@@ -115,9 +120,56 @@ func _pedir_pista() -> void:
 			break
 	if falta == null:
 		return
+	if Progreso.usar_pista(_hoy) == "":
+		# Sin pistas: la tienda se abre aqui mismo, sin salir de la sopa.
+		if not await _tienda_pistas():
+			return
+		if Progreso.usar_pista(_hoy) == "":
+			return
 	_pistas_usadas += 1
 	_tablero.mostrar_pista(falta.celdas[0])
 	_refrescar()
+
+
+## Paquetes de pistas en un panel sobre la partida. Devuelve true si se compro.
+func _tienda_pistas() -> bool:
+	var m := Estilo.modal(self)
+	var velo: ColorRect = m[0]
+	var col: VBoxContainer = m[1]
+	col.add_child(Estilo.titulo("¿Más pistas?", 60, true))
+	col.add_child(Estilo.etiqueta("Mañana tendrás %d gratis otra vez. Si no quieres esperar:" % Economia.PISTAS_GRATIS_DIA, 38, Estilo.TEXTO_SUAVE))
+	var res := {"hecho": false, "ok": false}
+	for id in Tienda.PAQUETES:
+		var p: Dictionary = Tienda.PAQUETES[id]
+		var texto := "%d pistas  ·  %s" % [p["pistas"], p["precio"]]
+		if p.get("destacado", false):
+			texto += "   (mejor precio)"
+		var b := Estilo.boton(texto, "primario" if p.get("destacado", false) else "normal", 130)
+		b.add_theme_font_size_override("font_size", 42)
+		b.pressed.connect(func():
+			for h in col.get_children():
+				if h is Button:
+					h.disabled = true
+			var ok: bool = await Tienda.comprar(id)
+			if not ok:
+				Estilo.aviso(self, "La compra no se completó. No se te ha cobrado.")
+			res["ok"] = ok
+			res["hecho"] = true)
+		col.add_child(b)
+	var no := Estilo.boton("Ahora no", "suave", 120)
+	no.pressed.connect(func(): res["hecho"] = true)
+	col.add_child(no)
+	velo.gui_input.connect(func(e):
+		if e is InputEventScreenTouch and e.pressed:
+			res["hecho"] = true)
+	while not res["hecho"] and is_instance_valid(velo):
+		await get_tree().process_frame
+	if is_instance_valid(velo):
+		velo.queue_free()
+	if res["ok"]:
+		Estilo.aviso(self, "¡Listo! Tienes %d pistas." % Progreso.pistas_compradas())
+	_refrescar()
+	return res["ok"]
 
 
 func _salir() -> void:

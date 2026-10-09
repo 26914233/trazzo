@@ -6,7 +6,7 @@ config_version=5
 [application]
 
 config/name="Palabrario"
-config/description="545 sopas de letras en español. App de pago, sin anuncios."
+config/description="545 sopas de letras en español. Sin anuncios."
 run/main_scene="res://escenas/menu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://arte/icono.png"
@@ -19,6 +19,7 @@ config/version="1.0.0"
 
 Temas="*res://autoload/temas.gd"
 Progreso="*res://autoload/progreso.gd"
+Tienda="*res://autoload/tienda.gd"
 Sonido="*res://autoload/sonido.gd"
 
 [display]

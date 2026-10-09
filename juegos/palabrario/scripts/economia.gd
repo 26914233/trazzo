@@ -1,8 +1,12 @@
-# Reglas del juego. Es una app de pago (docs/MONETIZACION.md): todo
-# viene incluido, sin anuncios, compras ni limites de pistas.
+# Reglas del juego. App de pago sin anuncios (docs/MONETIZACION.md): todo el
+# contenido incluido; las pistas son lo unico que se compra dentro.
 # Clase pura y estatica: se prueba sin escena.
 class_name Economia
 extends RefCounted
+
+## Pistas de regalo cada dia. Las compradas se suman aparte y no caducan.
+const PISTAS_GRATIS_DIA := 3
+const PISTAS_MAX := 100_000   ## tope de saneado del saldo guardado
 
 ## Cada sopa tiene 12 palabras; la dificultad decide cuantas entran, el tamaño
 ## minimo de la cuadricula y las direcciones (ver GeneradorSopa).

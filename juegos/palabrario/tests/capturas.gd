@@ -41,7 +41,7 @@ func _serie(id: String) -> void:
 	var dir := _salida.path_join(id)
 	DirAccess.make_dir_recursive_absolute(dir)
 	Temas.seleccion = {"categoria": "comida", "subtema": "", "dificultad": 1, "diario": false}
-	for nombre in ["menu", "categorias", "sopas", "completo", "ajustes"]:
+	for nombre in ["menu", "categorias", "sopas", "ajustes"]:
 		await _capturar(nombre, dir)
 
 	# Partida a medias: 4 palabras encontradas, una seleccion en curso y una pista.
@@ -59,6 +59,13 @@ func _serie(id: String) -> void:
 	t.mostrar_pista(sopa.colocadas[6].celdas[0])
 	await _esperar(6)
 	await _guardar("juego", dir)
+	# Tienda de pistas abierta sobre la partida.
+	juego._tienda_pistas()
+	await get_tree().create_timer(0.4).timeout
+	await _guardar("tienda_pistas", dir)
+	var velo := juego.get_child(juego.get_child_count() - 1)
+	velo.queue_free()
+	await _esperar(2)
 	t._seleccion.clear()
 	for i in range(4, sopa.colocadas.size()):
 		juego._al_seleccionar(sopa.colocadas[i].celdas.duplicate())

@@ -6,6 +6,7 @@
 # Sale con codigo 0 si todo pasa y 1 si algo falla.
 extends Node
 
+const FalsoBilling := preload("res://tests/falso_billing.gd")
 const HOY := "2026-10-09"
 
 var _fallos := 0
@@ -17,6 +18,7 @@ func _ready() -> void:
 	# Las pruebas de guardado no deben pisar el progreso real.
 	var ruta_real := Progreso.ruta
 	Progreso.ruta = "user://prueba_progreso.save"
+	Tienda.simulada_demora_s = 0.01
 
 	prueba_normalizar()
 	prueba_celdas_en_linea()
@@ -35,6 +37,9 @@ func _ready() -> void:
 	prueba_esquema_guardado()
 	prueba_reloj_no_retrocede()
 	prueba_victorias()
+	prueba_pistas()
+	await prueba_tienda_simulada()
+	await prueba_cobro_play()
 	prueba_app_de_pago()
 	prueba_ajustar_seleccion()
 	prueba_escapar_bbcode()
@@ -278,6 +283,8 @@ func prueba_esquema_guardado() -> void:
 	raro["estrellas"] = {"comida/frutas/1": 99, "x": "mucho"}
 	raro["escala_texto"] = 50
 	raro["completadas"] = -7
+	raro["pistas_compradas"] = 1e12
+	raro["pistas_hoy"] = 99
 	raro["diseno"] = "hackeado"
 	raro["dificultad"] = 42
 	raro["ultima"] = {"categoria": 5}
@@ -288,6 +295,8 @@ func prueba_esquema_guardado() -> void:
 	comprobar(not Progreso.datos["estrellas"].has("x"), "valor no numerico fuera")
 	comprobar(float(Progreso.ajuste("escala_texto")) == 1.0, "escala fuera de las opciones vuelve a 1.0")
 	comprobar(Progreso.completadas() == 0, "contadores negativos acotados")
+	comprobar(Progreso.pistas_compradas() == Economia.PISTAS_MAX, "saldo de pistas acotado")
+	comprobar(int(Progreso.datos["pistas_hoy"]) == Economia.PISTAS_GRATIS_DIA, "pistas del dia acotadas")
 	comprobar(Progreso.ajuste("diseno") == "cielo" and int(Progreso.ajuste("dificultad")) == 3, "diseño y dificultad saneados")
 	comprobar(Progreso.ultima().is_empty(), "ultima sopa con tipos raros se descarta")
 
@@ -299,6 +308,9 @@ func prueba_reloj_no_retrocede() -> void:
 	comprobar(Progreso.fecha_juego("2026-10-05") == HOY, "atrasar el reloj no retrocede la fecha del juego")
 	Progreso.registrar_victoria("comida", "frutas", 1, 3, true, Progreso.fecha_juego(HOY))
 	comprobar(Progreso.diario_hecho(Progreso.fecha_juego("2026-10-01")), "atrasar el reloj no reabre la sopa del dia")
+	for i in 3:
+		Progreso.usar_pista(Progreso.fecha_juego(HOY))
+	comprobar(Progreso.usar_pista(Progreso.fecha_juego("2026-10-01")) == "", "atrasar el reloj no devuelve las pistas gratis")
 
 
 func prueba_victorias() -> void:
@@ -313,9 +325,73 @@ func prueba_victorias() -> void:
 	comprobar(Progreso.diario_hecho(HOY), "sopa del dia marcada")
 
 
+func prueba_pistas() -> void:
+	caso("pistas: 3 gratis al dia, luego las compradas")
+	_reiniciar_progreso()
+	var r := []
+	for i in 3:
+		r.append(Progreso.usar_pista(HOY))
+	comprobar(r == ["gratis", "gratis", "gratis"], "3 gratis")
+	comprobar(Progreso.usar_pista(HOY) == "", "sin saldo, no hay pista")
+	Progreso.sumar_pistas(2)
+	comprobar(Progreso.usar_pista(HOY) == "comprada" and Progreso.pistas_compradas() == 1, "despues gasta las compradas")
+	comprobar(Progreso.pistas_gratis_hoy("2026-10-10") == 3, "al dia siguiente vuelven las gratis")
+	comprobar(Progreso.usar_pista("2026-10-10") == "gratis" and Progreso.pistas_compradas() == 1, "las gratis van antes que las compradas")
+
+
+func prueba_tienda_simulada() -> void:
+	caso("tienda de pistas (sin plugin)")
+	_reiniciar_progreso()
+	Tienda.simulada_exito = false
+	var ok: bool = await Tienda.comprar("pistas_10")
+	comprobar(not ok and Progreso.pistas_compradas() == 0, "compra fallida no da pistas")
+	Tienda.simulada_exito = true
+	ok = await Tienda.comprar("pistas_30")
+	comprobar(ok and Progreso.pistas_compradas() == 30, "compra da su paquete")
+	ok = await Tienda.comprar("pistas_gratis_infinitas")
+	comprobar(not ok and Progreso.pistas_compradas() == 30, "producto desconocido se rechaza")
+	Tienda.conceder("desbloquear_todo")
+	comprobar(Progreso.pistas_compradas() == 30, "conceder fuera del catalogo no da nada")
+	# En release sin plugin de pagos, la compra simulada nunca regala.
+	Tienda.permitir_simulada = false
+	ok = await Tienda.comprar("pistas_100")
+	comprobar(not ok and Progreso.pistas_compradas() == 30, "release sin plugin: no regala pistas")
+	Tienda.permitir_simulada = true
+
+
+func prueba_cobro_play() -> void:
+	caso("cobro de pistas con Google Play Billing (cliente falso)")
+	_reiniciar_progreso()
+	var falso := FalsoBilling.new()
+	# Compra de una sesion anterior: pagada pero sin consumir (la app se cerro).
+	falso.compras_previas = [FalsoBilling.compra("pistas_10", 1, "tok_viejo")]
+	var ids := PackedStringArray(Tienda.PAQUETES.keys())
+	var pagos := PagosPlay.new(falso, ids, ids)
+	pagos.compra_confirmada.connect(Tienda.conceder)
+	Tienda.pagos = pagos
+	await _esperar_frames(4)
+	comprobar("tok_viejo" in falso.consumidos and Progreso.pistas_compradas() == 10, "recupera al abrir la compra sin entregar")
+	var ok: bool = await Tienda.comprar("pistas_30")
+	comprobar(ok and Progreso.pistas_compradas() == 40, "se cobra, se consume y se entrega UNA vez")
+	falso.modo = "cancelar"
+	ok = await Tienda.comprar("pistas_30")
+	comprobar(not ok and Progreso.pistas_compradas() == 40, "cancelada: nada y sin colgarse")
+	falso.modo = "falla_confirmar"
+	ok = await Tienda.comprar("pistas_30")
+	comprobar(not ok and Progreso.pistas_compradas() == 40, "si Play no confirma el consumo, no se entrega")
+	falso.modo = "pendiente"
+	ok = await Tienda.comprar("pistas_100")
+	comprobar(not ok and Progreso.pistas_compradas() == 40, "pendiente (pago en efectivo): aun no")
+	falso.on_purchase_updated.emit({"response_code": 0, "purchases": [FalsoBilling.compra("pistas_100", 1, "tok_p")]})
+	await _esperar_frames(3)
+	comprobar("tok_p" in falso.consumidos and Progreso.pistas_compradas() == 140, "cuando se paga, llega sola")
+	Tienda.pagos = null
+
+
 func prueba_app_de_pago() -> void:
-	caso("app de pago: todo incluido")
-	comprobar(not ProjectSettings.has_setting("autoload/Monetizacion"), "sin capa de anuncios ni compras")
+	caso("app de pago: contenido completo y sin anuncios")
+	comprobar(not ProjectSettings.has_setting("autoload/Monetizacion"), "sin capa de anuncios")
+	comprobar(ProjectSettings.has_setting("autoload/Tienda"), "tienda de pistas presente")
 	var presets := FileAccess.get_file_as_string("res://export_presets.cfg")
 	comprobar(not ("permissions/internet=true" in presets), "sin permiso de internet")
 	comprobar(presets.contains("permissions/vibrate=true"), "solo vibracion")
@@ -378,9 +454,11 @@ func prueba_partida_completa() -> void:
 	comprobar(sopa.colocadas.size() == 9, "Normal: 9 palabras")
 	juego._al_seleccionar([Vector2i(0, 0), Vector2i(1, 1)] as Array[Vector2i])
 	comprobar(juego._encontradas.size() == 0, "seleccion falsa no cuenta")
+	Progreso.sumar_pistas(4)
 	for i in 5:
 		juego._pedir_pista()
-	comprobar(juego._pistas_usadas == 5, "pistas sin limite (cuestan estrellas, no dinero)")
+	await _esperar_frames(2)
+	comprobar(juego._pistas_usadas == 5 and Progreso.pistas_compradas() == 2, "3 gratis + 2 compradas en la partida")
 	for i in sopa.colocadas.size():
 		var celdas: Array[Vector2i] = sopa.colocadas[i].celdas.duplicate()
 		if i % 2 == 1:

@@ -1,4 +1,4 @@
-# Progreso del jugador: estrellas por sopa, racha, sopa del dia y ajustes.
+# Progreso del jugador: estrellas por sopa, pistas, racha, sopa del dia y ajustes.
 #
 # Se guarda en user://progreso.save con dos lineas:
 #   1) HMAC-SHA256 del contenido (hex)
@@ -12,8 +12,9 @@ signal cambiado
 
 const VERSION := 2
 # La sal vive en el binario, asi que no es un secreto contra quien descompile
-# el APK: solo sube el liston frente a editar el archivo. Como el juego es una
-# app de pago sin compras dentro, el guardado no contiene nada que valga dinero.
+# el APK: solo sube el liston frente a editar el archivo. El saldo de pistas
+# compradas vive aqui: quien tenga root y extraiga la sal puede inflarlo
+# (riesgo aceptado: valor bajo, un jugador, sin ranking; docs/LANZAMIENTO.md).
 const SAL := "palabrario-v1-7f3c91e2"
 const ESCALAS := [0.85, 1.0, 1.15, 1.3]
 const DISENOS := ["cielo", "papel", "noche"]
@@ -39,6 +40,9 @@ static func por_defecto() -> Dictionary:
 		"ultimo_dia": "",
 		"max_dia": "",             # fecha mas alta vista: la del juego nunca retrocede
 		"diario_hecho": "",
+		"pistas_dia": "",          # fecha de las pistas gratis usadas
+		"pistas_hoy": 0,           # pistas gratis usadas ese dia
+		"pistas_compradas": 0,     # saldo comprado (no caduca)
 		"sonido": true,
 		"vibracion": true,
 		"escala_texto": 1.0,
@@ -95,6 +99,8 @@ func _sanear() -> void:
 	datos["version"] = VERSION
 	for k in ["completadas", "racha"]:
 		datos[k] = maxi(int(datos[k]), 0)
+	datos["pistas_hoy"] = clampi(int(datos["pistas_hoy"]), 0, Economia.PISTAS_GRATIS_DIA)
+	datos["pistas_compradas"] = clampi(int(datos["pistas_compradas"]), 0, Economia.PISTAS_MAX)
 	if not float(datos["escala_texto"]) in ESCALAS:
 		datos["escala_texto"] = 1.0
 	if not str(datos["diseno"]) in DISENOS:
@@ -194,6 +200,42 @@ func fijar_ultima(cat: String, sub: String) -> void:
 	guardar()
 
 
+# ---------------------------------------------------------------- pistas
+
+func pistas_gratis_hoy(hoy: String) -> int:
+	if datos["pistas_dia"] != hoy:
+		return Economia.PISTAS_GRATIS_DIA
+	return Economia.PISTAS_GRATIS_DIA - int(datos["pistas_hoy"])
+
+
+func pistas_compradas() -> int:
+	return int(datos["pistas_compradas"])
+
+
+## Gasta una pista: primero las gratis del dia, luego las compradas.
+## Devuelve "gratis", "comprada" o "" si no queda ninguna.
+func usar_pista(hoy: String) -> String:
+	if pistas_gratis_hoy(hoy) > 0:
+		if datos["pistas_dia"] != hoy:
+			datos["pistas_dia"] = hoy
+			datos["pistas_hoy"] = 0
+		datos["pistas_hoy"] = int(datos["pistas_hoy"]) + 1
+		guardar()
+		return "gratis"
+	if pistas_compradas() > 0:
+		datos["pistas_compradas"] = pistas_compradas() - 1
+		guardar()
+		return "comprada"
+	return ""
+
+
+func sumar_pistas(n: int) -> void:
+	if n <= 0:
+		return
+	datos["pistas_compradas"] = mini(pistas_compradas() + n, Economia.PISTAS_MAX)
+	guardar()
+
+
 # ---------------------------------------------------------------- racha y fecha
 
 ## Al abrir la app: avanza la racha. Devuelve la racha actual.
@@ -207,7 +249,8 @@ func registrar_dia(hoy: String) -> int:
 
 
 ## Fecha del juego: la del sistema, pero nunca anterior a la mas alta ya vista.
-## Atrasar el reloj no repite la sopa del dia ni rompe la racha (SEC-002).
+## Atrasar el reloj no repite las pistas gratis ni la sopa del dia, ni rompe
+## la racha (SEC-002).
 func fecha_juego(sistema: String = "") -> String:
 	if sistema == "":
 		sistema = Time.get_date_string_from_system()
