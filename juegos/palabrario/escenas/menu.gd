@@ -50,6 +50,12 @@ func _ready() -> void:
 	col.add_child(ajustes)
 	col.add_child(Estilo.etiqueta("%d de %d sopas resueltas" % [Progreso.resueltas_total(), Temas.total_sopas()], 34, Estilo.TEXTO_SUAVE))
 
+	# Si el guardado se descarto al abrir, se dice una vez en vez de borrar
+	# el progreso en silencio (SEC-007).
+	if Progreso.ultimo_rechazo != "":
+		Progreso.ultimo_rechazo = ""
+		Estilo.aviso(self, "No se pudo leer tu progreso guardado. Empiezas de cero.")
+
 
 func _tarjeta_del_dia(hoy: String) -> Button:
 	var d := Temas.sopa_del_dia(hoy)

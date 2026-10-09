@@ -5,7 +5,7 @@
 #   2) el contenido en JSON
 # La firma se comprueba sobre el texto exacto de la linea 2 antes de parsearlo.
 # Un archivo editado a mano se rechaza, se aparta en progreso.save.rechazado y
-# se empieza de cero. Limites conocidos en docs/LANZAMIENTO.md (seccion 5).
+# se empieza de cero. Limites conocidos en docs/LANZAMIENTO.md (seccion 4).
 extends Node
 
 signal cambiado
@@ -18,6 +18,13 @@ const VERSION := 2
 const SAL := "palabrario-v1-7f3c91e2"
 const ESCALAS := [0.85, 1.0, 1.15, 1.3]
 const DISENOS := ["cielo", "papel", "noche"]
+const RACHA_MAX := 3650            # diez años seguidos
+const COMPLETADAS_MAX := 10_000_000
+# Si la fecha mas alta vista queda mas de esto por delante del reloj, el reloj
+# estuvo mal (p. ej. en otro año) y se vuelve a la fecha real para no dejar la
+# sopa del dia congelada. Atrasos cortos siguen sin devolver nada (SEC-002).
+const DIAS_RELOJ_ROTO := 30
+const FECHAS := ["ultimo_dia", "max_dia", "diario_hecho", "pistas_dia"]
 
 var ruta := "user://progreso.save"
 var datos: Dictionary = {}
@@ -97,8 +104,11 @@ static func _mismo_tipo(esperado, valor) -> bool:
 
 func _sanear() -> void:
 	datos["version"] = VERSION
-	for k in ["completadas", "racha"]:
-		datos[k] = maxi(int(datos[k]), 0)
+	datos["completadas"] = clampi(int(datos["completadas"]), 0, COMPLETADAS_MAX)
+	datos["racha"] = clampi(int(datos["racha"]), 0, RACHA_MAX)
+	for k in FECHAS:
+		if not es_fecha(str(datos[k])):
+			datos[k] = ""
 	datos["pistas_hoy"] = clampi(int(datos["pistas_hoy"]), 0, Economia.PISTAS_GRATIS_DIA)
 	datos["pistas_compradas"] = clampi(int(datos["pistas_compradas"]), 0, Economia.PISTAS_MAX)
 	if not float(datos["escala_texto"]) in ESCALAS:
@@ -117,6 +127,18 @@ func _sanear() -> void:
 		datos["ultima"] = {}
 
 
+## "AAAA-MM-DD" valida (lo que escribe Time.get_date_string_from_system).
+static func es_fecha(s: String) -> bool:
+	if s.length() != 10 or s[4] != "-" or s[7] != "-":
+		return false
+	for i in [0, 1, 2, 3, 5, 6, 8, 9]:
+		if not s[i].is_valid_int():
+			return false
+	var mes := s.substr(5, 2).to_int()
+	var dia := s.substr(8, 2).to_int()
+	return mes >= 1 and mes <= 12 and dia >= 1 and dia <= 31
+
+
 func _rechazar(motivo: String) -> void:
 	ultimo_rechazo = motivo
 	# El motivo solo en depuracion: en release le diria a quien manipula el
@@ -125,8 +147,10 @@ func _rechazar(motivo: String) -> void:
 		push_warning("Progreso descartado (%s); se empieza de cero." % motivo)
 	else:
 		push_warning("Progreso no valido; se empieza de cero.")
-	# Se aparta el original en vez de perderlo al siguiente guardado (SEC-006).
-	DirAccess.rename_absolute(ProjectSettings.globalize_path(ruta), ProjectSettings.globalize_path(ruta + ".rechazado"))
+	# Se aparta el original en vez de perderlo al siguiente guardado, con la
+	# hora en el nombre para que un segundo rechazo no pise al primero (SEC-007).
+	var apartado := "%s.rechazado-%d" % [ruta, int(Time.get_unix_time_from_system() * 1000.0)]
+	DirAccess.rename_absolute(ProjectSettings.globalize_path(ruta), ProjectSettings.globalize_path(apartado))
 	datos = por_defecto()
 
 
@@ -254,9 +278,25 @@ func registrar_dia(hoy: String) -> int:
 func fecha_juego(sistema: String = "") -> String:
 	if sistema == "":
 		sistema = Time.get_date_string_from_system()
-	if sistema > str(datos["max_dia"]):
+	var maximo := str(datos["max_dia"])
+	if maximo != "" and Economia.dias_entre(sistema, maximo) > DIAS_RELOJ_ROTO:
+		_volver_a(sistema)
+	elif sistema > maximo:
 		datos["max_dia"] = sistema
 	return str(datos["max_dia"])
+
+
+## El reloj estuvo muy adelantado: se vuelve a la fecha real. Las pistas
+## gratis de ese dia cuentan como usadas y la racha sigue desde hoy (SEC-006).
+func _volver_a(sistema: String) -> void:
+	datos["max_dia"] = sistema
+	if str(datos["ultimo_dia"]) > sistema:
+		datos["ultimo_dia"] = sistema
+	if str(datos["pistas_dia"]) > sistema:
+		datos["pistas_dia"] = sistema
+	if str(datos["diario_hecho"]) > sistema:
+		datos["diario_hecho"] = ""
+	guardar()
 
 
 func hoy() -> String:

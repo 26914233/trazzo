@@ -156,6 +156,7 @@ func _tienda_pistas() -> bool:
 			res["ok"] = ok
 			res["hecho"] = true)
 		col.add_child(b)
+	col.add_child(Estilo.etiqueta("Las pistas se guardan solo en este teléfono.", 30, Estilo.TEXTO_SUAVE))
 	var no := Estilo.boton("Ahora no", "suave", 120)
 	no.pressed.connect(func(): res["hecho"] = true)
 	col.add_child(no)

@@ -95,6 +95,10 @@ Subir `version/code` en `export_presets.cfg` en cada versión nueva.
       Si sale la pantalla "Esta copia no se instaló desde Google Play", apagar
       `exigir_play` y avisar: la llamada a Android no responde como se espera.
 - [ ] **Antipiratería, release instalado con `adb install`:** debe salir esa pantalla.
+- [ ] **Antipiratería, release con `adb install -i com.android.vending`** (Android 11+):
+      también debe salir esa pantalla (NV-01). Si no sale, no es grave: avisar y seguir.
+- [ ] **Reloj adelantado:** poner la fecha un año por delante, abrir, volver a la fecha
+      real y abrir: la sopa del día vuelve a la de hoy y no hay pistas gratis extra.
 - [ ] **Pistas:** gastar las 3 gratis; comprar un paquete con una cuenta de *License
       testing* (sin cobro real); cerrar la app a mitad de una compra y volver: las pistas
       llegan; pago "lento" de prueba: no llegan hasta que se aprueba.

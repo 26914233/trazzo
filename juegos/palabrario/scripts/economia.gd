@@ -36,12 +36,12 @@ static func estrellas(segundos: float, palabras: int, pistas: int) -> int:
 static func avanzar_racha(racha: int, ultimo_dia: String, hoy: String) -> Array:
 	if ultimo_dia == hoy or (ultimo_dia != "" and hoy < ultimo_dia):
 		return [racha, false]  # mismo dia, o fecha anterior: ni reinicia ni cuenta
-	if ultimo_dia != "" and _dias_entre(ultimo_dia, hoy) == 1:
+	if ultimo_dia != "" and dias_entre(ultimo_dia, hoy) == 1:
 		return [racha + 1, true]
 	return [1, true]
 
 
-static func _dias_entre(a: String, b: String) -> int:
+static func dias_entre(a: String, b: String) -> int:
 	var ua := Time.get_unix_time_from_datetime_string(a + "T00:00:00")
 	var ub := Time.get_unix_time_from_datetime_string(b + "T00:00:00")
 	return int(round((ub - ua) / 86400.0))

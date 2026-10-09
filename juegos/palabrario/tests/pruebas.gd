@@ -33,7 +33,7 @@ func _ready() -> void:
 	prueba_sopa_del_dia_y_siguiente()
 	prueba_economia()
 	prueba_racha()
-	prueba_guardado_y_firma()
+	await prueba_guardado_y_firma()
 	prueba_esquema_guardado()
 	prueba_reloj_no_retrocede()
 	prueba_victorias()
@@ -49,7 +49,8 @@ func _ready() -> void:
 	await prueba_pantallas()
 
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Progreso.ruta))
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(Progreso.ruta + ".rechazado"))
+	for r in _rechazados():
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(r))
 	Progreso.ruta = ruta_real
 	print("\n%d/%d comprobaciones correctas" % [_total - _fallos, _total])
 	if _fallos > 0:
@@ -257,6 +258,8 @@ func _escribir_firmado(datos: Dictionary) -> void:
 
 func prueba_guardado_y_firma() -> void:
 	caso("guardado firmado")
+	for r in _rechazados():
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(r))
 	_reiniciar_progreso()
 	Progreso.registrar_victoria("comida", "frutas", 1, 3, false, HOY)
 	Progreso.cargar()
@@ -269,18 +272,31 @@ func prueba_guardado_y_firma() -> void:
 	Progreso.cargar()
 	comprobar(Progreso.ultimo_rechazo == "firma", "detecta la manipulacion")
 	comprobar(int(Progreso.datos["racha"]) == 0, "y no acepta el valor inventado")
-	comprobar(FileAccess.file_exists(Progreso.ruta + ".rechazado"), "el original se aparta en .rechazado")
+	comprobar(_rechazados().size() == 1, "el original se aparta en .rechazado-<hora>")
 	f = FileAccess.open(Progreso.ruta, FileAccess.WRITE)
 	f.store_string("basura")
 	f.close()
+	await get_tree().create_timer(0.01).timeout
 	Progreso.cargar()
 	comprobar(Progreso.ultimo_rechazo == "formato", "archivo roto no revienta")
+	comprobar(_rechazados().size() == 2, "un segundo rechazo no pisa al primero")
+
+
+## Archivos apartados por Progreso._rechazar() junto al guardado de prueba.
+func _rechazados() -> Array:
+	var dir := Progreso.ruta.get_base_dir()
+	var base := Progreso.ruta.get_file() + ".rechazado"
+	var r := []
+	for nombre in DirAccess.get_files_at(dir):
+		if nombre.begins_with(base):
+			r.append(dir.path_join(nombre))
+	return r
 
 
 func prueba_esquema_guardado() -> void:
 	caso("guardado con firma valida pero valores absurdos")
 	var raro := Progreso.por_defecto()
-	raro["racha"] = "infinita"
+	raro["vibracion"] = "infinita"
 	raro["estrellas"] = {"comida/frutas/1": 99, "x": "mucho"}
 	raro["escala_texto"] = 50
 	raro["completadas"] = -7
@@ -289,9 +305,15 @@ func prueba_esquema_guardado() -> void:
 	raro["diseno"] = "hackeado"
 	raro["dificultad"] = 42
 	raro["ultima"] = {"categoria": 5}
+	raro["racha"] = 10_000_000
+	raro["ultimo_dia"] = "mañana"
+	raro["max_dia"] = "9999-99-99"
+	raro["pistas_dia"] = "2026-10-0x"
 	_escribir_firmado(raro)
 	Progreso.cargar()
-	comprobar(int(Progreso.datos["racha"]) == 0, "tipo incorrecto se descarta")
+	comprobar(Progreso.ajuste("vibracion") == true, "tipo incorrecto se descarta")
+	comprobar(int(Progreso.datos["racha"]) == Progreso.RACHA_MAX, "racha acotada")
+	comprobar(Progreso.datos["ultimo_dia"] == "" and Progreso.datos["max_dia"] == "" and Progreso.datos["pistas_dia"] == "", "fechas mal formadas se vacian")
 	comprobar(Progreso.estrellas_de("comida", "frutas", 1) == 3, "estrellas acotadas a 3")
 	comprobar(not Progreso.datos["estrellas"].has("x"), "valor no numerico fuera")
 	comprobar(float(Progreso.ajuste("escala_texto")) == 1.0, "escala fuera de las opciones vuelve a 1.0")
@@ -312,6 +334,17 @@ func prueba_reloj_no_retrocede() -> void:
 	for i in 3:
 		Progreso.usar_pista(Progreso.fecha_juego(HOY))
 	comprobar(Progreso.usar_pista(Progreso.fecha_juego("2026-10-01")) == "", "atrasar el reloj no devuelve las pistas gratis")
+
+	caso("reloj que estuvo muy adelantado")
+	_reiniciar_progreso()
+	var futuro := "2027-03-01"
+	Progreso.registrar_dia(Progreso.fecha_juego(futuro))
+	for i in 3:
+		Progreso.usar_pista(Progreso.fecha_juego(futuro))
+	comprobar(Progreso.fecha_juego(HOY) == HOY, "vuelve a la fecha real en vez de congelar el dia")
+	comprobar(Progreso.pistas_gratis_hoy(HOY) == 0, "y no regala pistas gratis al volver")
+	comprobar(Progreso.registrar_dia(Progreso.fecha_juego("2026-10-10")) == 2, "la racha sigue desde hoy")
+	comprobar(Progreso.es_fecha("2026-10-09") and not Progreso.es_fecha("2026-13-01") and not Progreso.es_fecha("x"), "formato de fecha")
 
 
 func prueba_victorias() -> void:
@@ -353,10 +386,10 @@ func prueba_tienda_simulada() -> void:
 	comprobar(not ok and Progreso.pistas_compradas() == 30, "producto desconocido se rechaza")
 	Tienda.conceder("desbloquear_todo")
 	comprobar(Progreso.pistas_compradas() == 30, "conceder fuera del catalogo no da nada")
-	# En release sin plugin de pagos, la compra simulada nunca regala.
+	# Fuera del editor (APK exportado) sin plugin de pagos, la compra nunca regala.
 	Tienda.permitir_simulada = false
 	ok = await Tienda.comprar("pistas_100")
-	comprobar(not ok and Progreso.pistas_compradas() == 30, "release sin plugin: no regala pistas")
+	comprobar(not ok and Progreso.pistas_compradas() == 30, "fuera del editor sin plugin: no regala pistas")
 	Tienda.permitir_simulada = true
 
 
@@ -411,6 +444,10 @@ func prueba_integridad() -> void:
 	comprobar(Integridad.evaluar(true, true, null) == "desconocido", "no se pudo preguntar: deja jugar")
 	comprobar(Integridad.evaluar(false, true, "") == "ok", "en depuracion/escritorio no aplica")
 	comprobar(Integridad.evaluar(true, false, "") == "ok", "el dueño puede apagarla")
+	comprobar(Integridad.elegir_instalador("com.android.shell", "com.android.vending") == "com.android.shell", "adb install -i com.android.vending no engaña")
+	comprobar(Integridad.elegir_instalador("com.android.vending", "com.android.vending") == "com.android.vending", "instalacion normal desde Play")
+	comprobar(Integridad.elegir_instalador(null, "com.android.vending") == "com.android.vending", "sin iniciador se usa el instalador")
+	comprobar(Integridad.elegir_instalador("com.google.android.gms", "com.android.vending") == "com.android.vending", "iniciador raro (restauracion) no bloquea")
 	comprobar(Integridad.resultado != "copia", "en este entorno no bloquea")
 
 

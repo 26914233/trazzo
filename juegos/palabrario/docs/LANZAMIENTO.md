@@ -53,21 +53,23 @@ dueño · ➖ no aplica.
 
 ## 4. Seguridad
 
-La auditoría completa (`security-audit-juegos`) se hizo sobre el modelo anterior, con
-anuncios y compras. Al pasar a app de pago desapareció casi toda esa superficie:
+Re-auditoría con `security-audit-juegos` tras añadir los paquetes de pistas (juego de un
+jugador, sin red: el APK solo pide `VIBRATE`). Estado de cada hallazgo:
 
-| Hallazgo anterior | Estado ahora |
+| Hallazgo | Estado |
 |---|---|
-| SEC-001 (alto): derechos de pago en un guardado reconstruible | **Ya no aplica**: el guardado no contiene nada que valga dinero |
-| SEC-003, 005, 007, 012: compras, catálogo, bonus, premiados | **Ya no aplican**: no hay compras ni anuncios |
-| SEC-011: versión de plugins sin fijar | **Ya no aplica**: no hay plugins |
-| SEC-002: reloj del móvil | Sigue corregido (la fecha del juego no retrocede); ahora solo afecta a la racha y a la sopa del día |
-| SEC-004, 006, 009, 010 | Siguen corregidos y con prueba |
-| SEC-008: APK de prueba debuggable | Sigue documentado: no repartirlo |
-| Nuevo: piratería del APK de pago | Riesgo aceptado propuesto (sin servidor no hay protección fuerte); revisar *App integrity* en Play Console |
+| SEC-001 (alto): con root y la sal sacada del binario se puede forjar el guardado e inflar el saldo de pistas | **Riesgo aceptado.** Un jugador, sin ranking ni intercambio; el máximo que se gana es lo que vale un paquete. Mitigado: firma HMAC por dispositivo, esquema validado, saldo acotado a 100 000 y racha a 3650 |
+| SEC-002 (medio): adelantar el reloj da 3 pistas gratis por día adelantado | **Riesgo aceptado.** Sin servidor no hay hora fiable. Atrasar el reloj sigue sin devolver nada (con prueba). Quien lo hace queda con la sopa del día por delante hasta 30 días |
+| SEC-003: textos que decían «sin compras» | **Corregido**: política, Data safety, ficha y la pantalla de copia no válida (ya no promete conservar las pistas al reinstalar) |
+| SEC-004: en el APK de depuración la compra se simulaba gratis | **Corregido**: solo se simula al ejecutar desde el editor (`OS.has_feature("editor")`). El APK de prueba sigue siendo debuggable: no repartirlo |
+| SEC-005: PCK sin cifrar | **Aceptado**: cifrarlo solo sube el listón (la clave va en el binario) y exige compilar plantillas propias. Se revisará si hay piratería real |
+| SEC-006: una fecha futura (reloj mal puesto) congelaba lo diario | **Corregido**: fechas con formato validado; si la fecha guardada va más de 30 días por delante del reloj se vuelve a la real, sin regalar pistas |
+| SEC-007: guardado rechazado = progreso y pistas perdidos en silencio | **Corregido en parte**: se avisa al jugador en el menú y cada archivo rechazado se guarda aparte con la hora. Sigue sin arreglo: un restablecimiento de fábrica cambia el ID del dispositivo y las pistas compradas no se recuperan (son consumibles locales, sin cuenta) |
+| NV-01: `adb install -i com.android.vending` engañaría al antipiratería | **Corregido sin validar en móvil**: en Android 11+ si quien inició la instalación es la shell de adb, cuenta como copia. Probar en un dispositivo antes de subir (`docs/PUBLICAR.md`) |
+| NV-02: las compras no se verifican con la firma de Play ni con servidor | **Aceptado**: hay lista blanca del catálogo y deduplicación por token; verificar en servidor cuesta más que lo que protege |
 
-**No se ha vuelto a pasar la skill completa** tras el cambio. Con una superficie tan
-pequeña, basta con un `security-audit-juegos quick` antes de subir.
+Si el juego añade funciones online (rankings, intercambio), SEC-001 pasa a crítico y hay que
+llevar el saldo a un servidor.
 
 ## 5. Orden para subir
 

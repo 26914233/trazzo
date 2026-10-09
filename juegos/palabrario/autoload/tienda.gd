@@ -17,9 +17,10 @@ const PAQUETES := {
 }
 
 var pagos: PagosPlay = null
-## Sin plugin de pagos, la compra se simula SOLO en depuracion (escritorio,
-## pruebas). En una build de release sin plugin, comprar falla: nunca regala.
-var permitir_simulada := OS.is_debug_build()
+## Sin plugin de pagos, la compra se simula SOLO al ejecutar desde el editor
+## (escritorio, pruebas). Un APK exportado, aunque sea de depuracion, no simula:
+## sin plugin, comprar falla y nunca regala pistas.
+var permitir_simulada := OS.has_feature("editor")
 var simulada_exito := true
 var simulada_demora_s := 0.4
 
@@ -50,7 +51,7 @@ func comprar(producto: String) -> bool:
 		# La entrega la hace la señal compra_confirmada, no este retorno.
 		return await pagos.comprar(producto, get_tree())
 	if not permitir_simulada:
-		push_error("Compra sin plugin de pagos en una build de release: no se entrega nada.")
+		push_error("Compra sin plugin de pagos fuera del editor: no se entrega nada.")
 		return false
 	await get_tree().create_timer(simulada_demora_s).timeout
 	if simulada_exito:

@@ -46,6 +46,19 @@ static func evaluar(aplica: bool, exigir: bool, instalador) -> String:
 	return "copia"
 
 
+## En Android 11+ hay dos nombres: quien inicio la instalacion y quien consta
+## como instalador. El segundo se falsea con `adb install -i com.android.vending`;
+## en ese caso el iniciador es la shell de adb y es el que manda (NV-01). En el
+## resto se usa el instalador: el iniciador de una restauracion de Play no esta
+## documentado y no se arriesga a bloquear a quien pago.
+const SHELL_ADB := "com.android.shell"
+
+static func elegir_instalador(iniciador, instalador):
+	if iniciador != null and str(iniciador) == SHELL_ADB:
+		return SHELL_ADB
+	return instalador
+
+
 ## Pregunta a Android quien instalo la app (Godot 4.4+: AndroidRuntime y
 ## JavaClassWrapper). Devuelve null si algo de la cadena no esta disponible.
 ## Sin probar en dispositivo desde el entorno de desarrollo: por eso cualquier
@@ -68,7 +81,7 @@ func _leer_instalador():
 		var info = pm.getInstallSourceInfo(paquete)
 		if info == null:
 			return null
-		quien = info.getInstallingPackageName()
+		quien = elegir_instalador(info.getInitiatingPackageName(), info.getInstallingPackageName())
 	elif sdk > 0:
 		quien = pm.getInstallerPackageName(paquete)
 	else:
