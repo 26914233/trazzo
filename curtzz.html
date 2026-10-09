@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curtzz — Encierra al enemigo sin rozarlo</title>
+<meta name="description" content="Curtzz es un juego de precisión para Android: encierra al enemigo con rectángulos sin llegar a tocarlo. Cada corte cuenta, cada píxel importa.">
+<meta property="og:title" content="Curtzz">
+<meta property="og:description" content="Encierra al enemigo sin rozarlo. Cada corte cuenta, cada píxel importa.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0B0E13">
+<link rel="icon" href="assets/img/curtzz-logo.png" type="image/png">
+<link rel="stylesheet" href="assets/estudio.css">
+<style>
+  /* ---------- hero ---------- */
+  .hero{position:relative;overflow:hidden;padding:72px 0 80px}
+  #board{position:absolute;inset:0;width:100%;height:100%;opacity:.5}
+  .hero::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 75% 45%,rgba(34,211,238,.14),transparent 60%);pointer-events:none}
+  .hero .wrap{position:relative;z-index:2;display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+  .path{font:500 .9rem "JetBrains Mono",monospace;color:var(--curtzz)}
+  .path span{color:var(--dim)}
+  .badge{display:inline-flex;align-items:center;gap:10px;margin-top:22px;border:1px solid var(--line-2);background:rgba(255,255,255,.04);border-radius:8px;padding:8px 14px;font:600 .78rem "JetBrains Mono",monospace;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+  .badge i{width:8px;height:8px;border-radius:50%;background:var(--wip);box-shadow:0 0 10px var(--wip)}
+  .brand{display:flex;align-items:center;gap:20px;margin:26px 0 0}
+  .brand img{width:84px;height:84px;border-radius:22px}
+  .brand h1{font-size:clamp(3.4rem,10vw,7rem);line-height:.95;font-weight:700;letter-spacing:-.04em;background:linear-gradient(120deg,#fff 30%,var(--curtzz));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .tagline{font:600 clamp(1.3rem,3vw,1.8rem) "Space Grotesk",sans-serif;margin:18px 0 0;letter-spacing:-.01em}
+  .sub{color:var(--muted);margin:14px 0 0;max-width:34em;font-size:1.1rem}
+  .phone{justify-self:center;width:min(250px,100%);border-radius:40px;padding:9px;background:linear-gradient(160deg,#2a3348,#0d1220);box-shadow:0 40px 90px -20px rgba(34,211,238,.35),0 0 0 1px rgba(255,255,255,.12) inset;transform:rotate(4deg)}
+  .phone img{display:block;width:100%;height:auto;border-radius:32px}
+
+  /* ---------- tarjetas ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
+  .card{background:var(--panel);border:1px solid var(--line-2);border-radius:16px;padding:26px}
+  .card h3{margin:0 0 .5rem;font-size:1.2rem;display:flex;align-items:center;gap:.7rem}
+  .card p{margin:0;color:var(--muted);font-size:.97rem}
+  .chip{width:11px;height:11px;border-radius:3px;flex:0 0 auto}
+  .c-cyan{background:var(--curtzz)}.c-amber{background:var(--wip)}.c-green{background:var(--ok)}.c-violet{background:#C084FC}
+  .rule{border-left:3px solid var(--curtzz);padding:.2rem 0 .2rem 18px;margin:0 0 28px;font-size:1.15rem;max-width:44em}
+  .rule strong{color:#fff}
+
+  /* ---------- skins ---------- */
+  .skins{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;list-style:none;margin:0;padding:0}
+  .skins li{border:1px solid var(--line-2);border-radius:16px;background:var(--panel);padding:18px 14px 20px;text-align:center}
+  .skins img{width:100%;max-width:130px;height:auto;margin:0 auto;display:block;filter:drop-shadow(0 12px 14px rgba(0,0,0,.55))}
+  .skins b{display:block;margin-top:10px;font:700 1.02rem "Space Grotesk",sans-serif}
+  .skins span{display:block;margin-top:2px;font:500 .74rem "JetBrains Mono",monospace;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
+
+  /* ---------- tienda ---------- */
+  .pack{display:flex;flex-direction:column;gap:.4rem;color:var(--txt);transition:border-color .15s}
+  .pack:hover{border-color:#C084FC}
+  .pack b{color:#C084FC}
+  .pack .price{margin-top:auto;padding-top:.6rem;font:700 1.3rem "Space Grotesk",sans-serif;color:#fff}
+  .pack.best{border-color:#C084FC;box-shadow:0 0 0 1px #C084FC inset}
+  .note{color:var(--muted);max-width:60ch;margin:1.4rem 0 0;font-size:.95rem}
+
+  @media (max-width:980px){
+    .hero{padding:44px 0 56px}
+    .hero .wrap{grid-template-columns:1fr}
+    .phone{width:min(260px,100%);margin-top:10px}
+    .brand img{width:64px;height:64px;border-radius:18px}
+    .skins{grid-template-columns:repeat(2,1fr)}.skins li:last-child{grid-column:1/-1}
+  }
+  @media (prefers-reduced-motion:reduce){#board{display:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#juego">Saltar al contenido</a>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="logo" href="./" aria-label="thunderDarkness, inicio"><img src="assets/mark.svg" alt=""><em class="wm"><b>thunder</b>Darkness</em></a>
+    <nav aria-label="Principal">
+      <a href="./">/estudio</a><a href="curtzz.html" aria-current="page">/curtzz</a><a href="#tienda">/prismas</a><a href="tienda.html">/tienda</a>
+    </nav>
+    <span class="live"><i></i>En pruebas cerradas</span>
+  </div>
+</header>
+
+<main>
+<div class="hero">
+  <canvas id="board" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div>
+      <div class="path">~/thunderDarkness <span>/</span> curtzz</div>
+      <span class="badge"><i></i>Próximamente en Google Play</span>
+      <div class="brand"><img src="assets/img/curtzz-logo.png" alt="" width="84" height="84"><h1>CURTZZ</h1></div>
+      <p class="tagline">Encierra al enemigo sin rozarlo.</p>
+      <p class="sub">Un juego de precisión donde cada rectángulo que trazas reduce el tablero — y cada milímetro de más te cuesta la partida. Cada corte cuenta, cada píxel importa.</p>
+    </div>
+    <div class="phone"><img src="assets/img/curtzz-juego.jpg" alt="Captura de Curtzz: un tablero con muros, espinas móviles y un Tanque" width="720" height="1600"></div>
+  </div>
+</div>
+
+<section id="juego" aria-labelledby="t-dec">
+  <div class="wrap">
+    <div class="sh">
+      <div><div class="l">// la decisión</div><h2 id="t-dec">La decisión que define cada partida</h2></div>
+      <p>No se trata de dónde cortar. Se trata de cuánto arriesgar.</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3><span class="chip c-green"></span>Rectángulo pequeño</h3>
+        <p>Se cierra rápido y casi nunca falla. Pero apenas reduce el tablero, y el objetivo sigue lejos.</p>
+      </div>
+      <div class="card">
+        <h3><span class="chip c-amber"></span>Rectángulo grande</h3>
+        <p>Avanza muchísimo. Pero tarda más en cerrarse, y ese tiempo es la ventana que el enemigo necesita.</p>
+      </div>
+      <div class="card">
+        <h3><span class="chip c-cyan"></span>Corte perfecto</h3>
+        <p>Pasar a menos de ocho píxeles sin tocarlo. El juego se ralentiza, marca la distancia exacta y te la enseña.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="t-dif">
+  <div class="wrap">
+    <div class="sh">
+      <div><div class="l">// dificultad</div><h2 id="t-dif">Fácil de entender. Difícil de dominar.</h2></div>
+      <p>Los primeros minutos son amables. Después, el juego deja de serlo.</p>
+    </div>
+
+    <div class="rule">Cada dos niveles el juego sube un peldaño: <strong>un enemigo más o un poco más de velocidad</strong>. Y al final de cada tramo te espera un jefe.</div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Enemigos que no se parecen</h3>
+        <p>Rebote, Cazador, Errático, Divisor y Tanque: cada uno obliga a cortar de otra manera.</p>
+      </div>
+      <div class="card">
+        <h3>Un jefe al final de cada tramo</h3>
+        <p>Dieciséis tramos, dieciséis jefes, cada uno con su truco. Y espinas que se mueven por el tablero.</p>
+      </div>
+      <div class="card">
+        <h3>La derrota siempre es legible</h3>
+        <p>Al fallar se marca el punto exacto del contacto. Siempre sabes qué hiciste mal. Por eso lo intentas otra vez.</p>
+      </div>
+      <div class="card">
+        <h3>Juega como quieras</h3>
+        <p>La Línea sigue tu dedo; el Rectángulo se estira y se sella. O cruceta y mando para la precisión celda a celda.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="t-tq">
+  <div class="wrap">
+    <div class="sh">
+      <div><div class="l">// el tanque</div><h2 id="t-tq">Un enemigo, cinco pieles</h2></div>
+      <p>El Tanque dispara a lo que dibujas, y cada piel lo hace por donde le toca: colmillos, cola, boca.</p>
+    </div>
+    <ul class="skins">
+      <li><img src="assets/img/skin-guerra.png" alt="" width="130" height="130" loading="lazy"><b>Tanque de guerra</b><span>Con el Pase</span></li>
+      <li><img src="assets/img/skin-escorpion.png" alt="" width="130" height="130" loading="lazy"><b>Escorpión acorazado</b><span>Con el Pase</span></li>
+      <li><img src="assets/img/skin-arana.png" alt="" width="130" height="130" loading="lazy"><b>Araña robot</b><span>De compra</span></li>
+      <li><img src="assets/img/skin-platillo.png" alt="" width="130" height="130" loading="lazy"><b>Platillo volante</b><span>De compra</span></li>
+      <li><img src="assets/img/skin-dragon.png" alt="" width="130" height="130" loading="lazy"><b>Dragón</b><span>De compra</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="tienda" aria-labelledby="t-tie">
+  <div class="wrap">
+    <div class="sh">
+      <div><div class="l">// prismas</div><h2 id="t-tie">Tienda: más Prismas por el mismo precio</h2></div>
+      <p>Comprando aquí, en la web, cada paquete trae un <strong style="color:#C084FC">25 % más de Prismas</strong> que en el juego, al mismo precio.</p>
+    </div>
+    <div class="grid packs">
+      <a class="card pack" href="tienda.html?paquete=web_250"><h3><span class="chip c-violet"></span>250 Prismas</h3><p>200 + <b>50 de bono</b></p><span class="price">1,99 US$</span></a>
+      <a class="card pack" href="tienda.html?paquete=web_690"><h3><span class="chip c-violet"></span>690 Prismas</h3><p>550 + <b>140 de bono</b></p><span class="price">4,99 US$</span></a>
+      <a class="card pack best" href="tienda.html?paquete=web_1500"><h3><span class="chip c-violet"></span>1.500 Prismas</h3><p>1.200 + <b>300 de bono</b></p><span class="price">9,99 US$</span></a>
+      <a class="card pack" href="tienda.html?paquete=web_3125"><h3><span class="chip c-violet"></span>3.125 Prismas</h3><p>2.500 + <b>625 de bono</b></p><span class="price">19,99 US$</span></a>
+    </div>
+    <p class="note">Pagas con tarjeta, PSE o efectivo y recibes un código para canjear en <em>Tienda → Prismas → Canjear código</em>. Los Prismas abren el Xtremo, Cacería, Bisturí, Infinito, Supervivencia, Jefes y el Pase premium. Todo lo demás se gana jugando.</p>
+  </div>
+</section>
+
+<section aria-labelledby="t-pro">
+  <div class="wrap">
+    <div class="sh">
+      <div><div class="l">// próximamente</div><h2 id="t-pro">Llega a Google Play</h2></div>
+      <p>La fecha se anunciará cuando el juego esté listo de verdad.</p>
+    </div>
+    <div class="btns" style="margin-top:0">
+      <a class="btn main" href="mailto:prueba1bysisne@gmail.com?subject=Quiero%20probar%20Curtzz&body=Hola%2C%20quiero%20ser%20tester%20de%20Curtzz.%20Mi%20correo%20de%20Google%20es%3A%20">Quiero ser tester</a>
+      <a class="btn ghost" href="./">Volver al estudio</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <a class="logo" href="./"><img src="assets/mark.svg" alt=""><em class="wm"><b>thunder</b>Darkness</em></a>
+    <span>© <span id="year">2026</span> Curtzz · thunderDarkness</span>
+    <nav aria-label="Pie"><a href="./">estudio</a><a href="tienda.html">tienda</a><a href="mailto:prueba1bysisne@gmail.com">contacto</a><a href="privacidad.html">privacidad</a></nav>
+  </div>
+</footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+/* Fondo animado: rectangulos que se cierran alrededor de un punto en movimiento.
+   Decorativo, sin dependencias, respeta prefers-reduced-motion via CSS. */
+(function(){
+  var cv = document.getElementById('board');
+  if(!cv) return;
+  var ctx = cv.getContext('2d');
+  var W, H, dpr;
+
+  function resize(){
+    dpr = window.devicePixelRatio || 1;
+    W = cv.clientWidth; H = cv.clientHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  var enemy = { x: 0.5, y: 0.5, vx: 0.0016, vy: 0.0011, r: 7 };
+  var rects = [];
+  var t = 0;
+
+  function spawnRect(){
+    // rectangulo aleatorio que no contiene al enemigo
+    for(var i=0;i<24;i++){
+      var x = Math.random()*0.75;
+      var y = Math.random()*0.75;
+      var w = 0.10 + Math.random()*0.22;
+      var h = 0.10 + Math.random()*0.22;
+      var pad = 0.035;
+      var hits = enemy.x > x-pad && enemy.x < x+w+pad && enemy.y > y-pad && enemy.y < y+h+pad;
+      if(!hits){
+        rects.push({x:x,y:y,w:w,h:h,p:0,life:0});
+        return;
+      }
+    }
+  }
+
+  function step(){
+    t++;
+    // mover enemigo
+    enemy.x += enemy.vx; enemy.y += enemy.vy;
+    if(enemy.x < 0.06 || enemy.x > 0.94) enemy.vx *= -1;
+    if(enemy.y < 0.08 || enemy.y > 0.92) enemy.vy *= -1;
+
+    if(t % 70 === 0 && rects.length < 7) spawnRect();
+
+    ctx.clearRect(0,0,W,H);
+
+    // rejilla muy tenue
+    ctx.strokeStyle = 'rgba(255,255,255,0.028)';
+    ctx.lineWidth = 1;
+    var gs = 46;
+    for(var gx=0; gx<W; gx+=gs){
+      ctx.beginPath(); ctx.moveTo(gx+.5,0); ctx.lineTo(gx+.5,H); ctx.stroke();
+    }
+    for(var gy=0; gy<H; gy+=gs){
+      ctx.beginPath(); ctx.moveTo(0,gy+.5); ctx.lineTo(W,gy+.5); ctx.stroke();
+    }
+
+    // rectangulos
+    for(var i=rects.length-1;i>=0;i--){
+      var r = rects[i];
+      r.p = Math.min(1, r.p + 0.012);
+      var px = r.x*W, py = r.y*H, pw = r.w*W, ph = r.h*H;
+      var per = 2*(pw+ph);
+      var drawn = per * r.p;
+
+      ctx.strokeStyle = r.p >= 1 ? 'rgba(74,222,128,0.55)' : 'rgba(34,211,238,0.85)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      // dibujar perimetro parcial
+      var segs = [[pw,0],[0,ph],[-pw,0],[0,-ph]];
+      var cx = px, cy = py, left = drawn;
+      ctx.moveTo(cx,cy);
+      for(var s=0;s<segs.length && left>0;s++){
+        var len = Math.abs(segs[s][0]) + Math.abs(segs[s][1]);
+        var f = Math.min(1, left/len);
+        cx += segs[s][0]*f; cy += segs[s][1]*f;
+        ctx.lineTo(cx,cy);
+        left -= len;
+      }
+      ctx.stroke();
+
+      if(r.p >= 1){
+        ctx.fillStyle = 'rgba(74,222,128,0.07)';
+        ctx.fillRect(px,py,pw,ph);
+        r.life++;
+        if(r.life > 200) rects.splice(i,1);
+      }
+    }
+
+    // enemigo
+    var ex = enemy.x*W, ey = enemy.y*H;
+    var pulse = 1 + Math.sin(t*0.06)*0.12;
+    ctx.beginPath();
+    ctx.arc(ex,ey,enemy.r*pulse*2.6,0,Math.PI*2);
+    ctx.fillStyle = 'rgba(251,191,36,0.10)';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(ex,ey,enemy.r,0,Math.PI*2);
+    ctx.fillStyle = '#FBBF24';
+    ctx.fill();
+
+    requestAnimationFrame(step);
+  }
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduce) step();
+})();
+</script>
+</body>
+</html>

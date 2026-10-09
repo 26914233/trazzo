@@ -5,46 +5,58 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Curtzz — Tienda</title>
 <meta name="description" content="Compra Prismas de Curtzz en la web con un 25 % de bono y canjéalos en el juego con un código.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%230B1020'/><rect x='22' y='22' width='56' height='56' fill='none' stroke='%2322D3EE' stroke-width='8'/><circle cx='50' cy='50' r='9' fill='%23FBBF24'/></svg>">
+<meta name="theme-color" content="#0B0E13">
+<link rel="icon" href="assets/img/curtzz-logo.png" type="image/png">
+<link rel="stylesheet" href="assets/estudio.css">
 <style>
-  :root{--bg:#0B1020;--bg-2:#121a30;--txt:#E8ECF6;--muted:#94A3B8;--cyan:#22D3EE;--violet:#C084FC;--green:#4ADE80;--red:#F87171;--line:rgba(255,255,255,.09)}
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:860px;margin:0 auto;padding:0 20px}
-  header{padding:40px 0 10px}
-  header a{color:var(--muted);text-decoration:none;font-size:.9rem}
-  h1{font-size:clamp(2rem,7vw,3rem);letter-spacing:-.03em;margin:.6rem 0 .2rem}
+  :root{--violet:#C084FC;--green:#4ADE80;--red:#F87171;--bg-2:var(--panel)}
+  .page{max-width:860px;margin:0 auto;padding:0 28px}
+  .top{padding:56px 0 6px}
+  .path{font:500 .9rem "JetBrains Mono",monospace;color:var(--curtzz)}
+  .path span{color:var(--dim)}
+  h1{font-size:clamp(2rem,7vw,3.2rem);letter-spacing:-.03em;margin:.7rem 0 .4rem;font-weight:700}
   h1 span{background:linear-gradient(120deg,#fff 30%,var(--violet));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
   .lead{color:var(--muted);max-width:60ch}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin:28px 0}
-  .pack{background:var(--bg-2);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:.35rem;cursor:pointer;color:var(--txt);font:inherit;text-align:left;transition:transform .15s,border-color .15s}
+  .pack{background:var(--panel);border:1px solid var(--line-2);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:.35rem;cursor:pointer;color:var(--txt);font:inherit;text-align:left;transition:transform .15s,border-color .15s}
   .pack:hover,.pack.sel{transform:translateY(-3px);border-color:var(--violet)}
-  .pack .n{font-size:1.5rem;font-weight:800}
+  .pack.sel{box-shadow:0 0 0 1px var(--violet) inset}
+  .pack .n{font:700 1.6rem "Space Grotesk",sans-serif}
   .pack .b{color:var(--violet);font-size:.9rem}
-  .pack .p{margin-top:.6rem;font-weight:700;font-size:1.15rem}
-  .btn{display:inline-block;background:var(--violet);color:#1a0b2e;border:0;border-radius:12px;padding:14px 22px;font:inherit;font-weight:800;cursor:pointer}
-  .btn[disabled]{opacity:.45;cursor:not-allowed}
-  .box{background:var(--bg-2);border:1px solid var(--line);border-radius:14px;padding:22px;margin:22px 0}
-  .code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:clamp(1.1rem,5vw,1.7rem);letter-spacing:.06em;background:#0a0f1d;border:1px dashed var(--violet);border-radius:10px;padding:14px;text-align:center;margin:12px 0;word-break:break-all}
+  .pack .p{margin-top:.6rem;font:700 1.15rem "Space Grotesk",sans-serif}
+  .btn.main{background:var(--violet);color:#1a0b2e;font-weight:700}
+  .box{background:var(--panel);border:1px solid var(--line-2);border-radius:14px;padding:22px;margin:22px 0}
+  .code{font-family:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;font-size:clamp(1.1rem,5vw,1.7rem);letter-spacing:.06em;background:#0a0f1d;border:1px dashed var(--violet);border-radius:10px;padding:14px;text-align:center;margin:12px 0;word-break:break-all}
   .ok{color:var(--green)} .bad{color:var(--red)} .muted{color:var(--muted)}
   ol{padding-left:1.2rem;color:var(--muted)}
-  footer{border-top:1px solid var(--line);margin-top:50px;padding:30px 0 50px;color:var(--muted);font-size:.85rem}
-  footer a{color:var(--muted)}
+  footer.site{margin-top:56px}
+  footer.site .wrap{font-size:.8rem}
+  footer.site a{text-decoration:underline;text-underline-offset:3px}
+  @media (prefers-reduced-motion:reduce){.pack{transition:none}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <a href="index.html">← Curtzz</a>
+<header class="bar">
+  <div class="wrap">
+    <a class="logo" href="./" aria-label="thunderDarkness, inicio"><img src="assets/mark.svg" alt=""><em class="wm"><b>thunder</b>Darkness</em></a>
+    <nav aria-label="Principal">
+      <a href="./">/estudio</a><a href="curtzz.html">/curtzz</a><a href="tienda.html" aria-current="page">/tienda</a>
+    </nav>
+    <span class="live"><i></i>Tienda de Prismas</span>
+  </div>
+</header>
+<div class="page">
+  <div class="top">
+    <div class="path">~/thunderDarkness <span>/</span> curtzz <span>/</span> tienda</div>
     <h1><span>Tienda de Prismas</span></h1>
     <p class="lead">El mismo precio que en el juego, con un <strong style="color:var(--violet)">25 % más de Prismas</strong>. Al pagar recibes un código para canjear en <em>Tienda → Prismas → Canjear código</em>.</p>
-  </header>
+  </div>
 
   <div id="estado"></div>
 
   <div id="compra">
     <div class="grid" id="packs"></div>
-    <button class="btn" id="pagar" disabled>Elige un paquete</button>
+    <button class="btn main" id="pagar" disabled>Elige un paquete</button>
     <p class="muted" style="font-size:.85rem;margin-top:12px">El pago lo procesa Mercado Pago (tarjeta, PSE, efectivo y más, según tu país). Curtzz nunca ve los datos de tu tarjeta.</p>
   </div>
 
@@ -57,8 +69,10 @@
     </ol>
   </div>
 </div>
-<footer>
-  <div class="wrap">© <span id="year">2026</span> Curtzz · thunderDarkness · <a href="privacidad.html">Privacidad</a> · ¿Problemas con un pago? <a href="mailto:prueba1bysisne@gmail.com">prueba1bysisne@gmail.com</a></div>
+<footer class="site">
+  <div class="wrap">
+    <span>© <span id="year">2026</span> Curtzz · thunderDarkness · <a href="privacidad.html">Privacidad</a> · ¿Problemas con un pago? <a href="mailto:prueba1bysisne@gmail.com">prueba1bysisne@gmail.com</a></span>
+  </div>
 </footer>
 
 <script>
@@ -128,7 +142,7 @@ async function seguir(pid, intentos = 0) {
       // Texto, nunca HTML: lo que llega del servidor no se interpreta.
       est.innerHTML = `<div class="box"><strong class="ok">¡Pago confirmado!</strong> Tu código para <span id="np"></span> Prismas:
         <div class="code" id="codigo"></div>
-        <button class="btn" id="copiar">Copiar código</button>
+        <button class="btn main" id="copiar">Copiar código</button>
         <p class="muted" style="font-size:.85rem">Guárdalo: esta página lo enseña hasta que lo canjees.</p></div>`;
       $("#np").textContent = fmt(Number(d.prismas) || 0);
       $("#codigo").textContent = String(d.codigo);

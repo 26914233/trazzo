@@ -5,52 +5,46 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Política de privacidad — Curtzz</title>
 <meta name="description" content="Política de privacidad del juego para Android Curtzz.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%230B1020'/><rect x='22' y='22' width='56' height='56' fill='none' stroke='%2322D3EE' stroke-width='8'/><circle cx='50' cy='50' r='9' fill='%23FBBF24'/></svg>">
+<meta name="theme-color" content="#0B0E13">
+<link rel="icon" href="assets/img/curtzz-logo.png" type="image/png">
+<link rel="stylesheet" href="assets/estudio.css">
 <style>
-  :root{
-    --bg:#0B1020;--bg-2:#121a30;--txt:#E8ECF6;--muted:#94A3B8;
-    --cyan:#22D3EE;--amber:#FBBF24;--line:rgba(255,255,255,.09);
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0;background:var(--bg);color:var(--txt);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    line-height:1.7;-webkit-font-smoothing:antialiased;
-  }
-  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
-  a{color:var(--cyan)}
-  header{padding:48px 0 28px;border-bottom:1px solid var(--line)}
-  .back{font-size:.9rem;color:var(--muted);text-decoration:none}
-  .back:hover{color:var(--cyan)}
-  h1{font-size:clamp(1.7rem,5vw,2.4rem);letter-spacing:-.02em;margin:1.2rem 0 .4rem}
+  .doc{max-width:780px}
+  header.doc-h{padding:56px 0 24px;border-bottom:1px solid var(--line)}
+  .path{font:500 .9rem "JetBrains Mono",monospace;color:var(--curtzz)}
+  .path a:hover{text-decoration:underline}
+  .path span{color:var(--dim)}
+  h1{font-size:clamp(1.9rem,5vw,2.8rem);margin:1rem 0 .4rem;font-weight:700}
   .updated{color:var(--muted);font-size:.9rem;margin:0}
-  main{padding:8px 0 64px}
-  h2{font-size:1.15rem;margin:2.4rem 0 .6rem;letter-spacing:-.01em}
-  p,li{color:#cfd6e6}
-  ul{padding-left:1.2rem}
-  li{margin:.4rem 0}
-  .box{
-    background:var(--bg-2);border:1px solid var(--line);
-    border-radius:12px;padding:18px 20px;margin:20px 0;
-  }
-  code{
-    background:rgba(255,255,255,.07);padding:.1rem .35rem;
-    border-radius:5px;font-size:.9em;
-  }
-  footer{border-top:1px solid var(--line);padding:28px 0 56px;color:var(--muted);font-size:.9rem}
+  main.doc{padding:8px 28px 40px;line-height:1.75}
+  main.doc h2{font-size:1.2rem;margin:2.4rem 0 .6rem}
+  main.doc p,main.doc li{color:#cfd6e6}
+  main.doc a{color:var(--curtzz);text-decoration:underline;text-underline-offset:3px}
+  main.doc ul{padding-left:1.2rem}
+  main.doc li{margin:.4rem 0}
+  code{background:rgba(255,255,255,.07);padding:.1rem .35rem;border-radius:5px;font-size:.9em}
 </style>
 </head>
 <body>
-
-<header>
+<header class="bar">
   <div class="wrap">
-    <a class="back" href="index.html">&larr; Volver a Curtzz</a>
-    <h1>Política de privacidad</h1>
-    <p class="updated">Última actualización: <span id="fecha">1 de octubre de 2026</span></p>
+    <a class="logo" href="./" aria-label="thunderDarkness, inicio"><img src="assets/mark.svg" alt=""><em class="wm"><b>thunder</b>Darkness</em></a>
+    <nav aria-label="Principal">
+      <a href="./">/estudio</a><a href="curtzz.html">/curtzz</a><a href="tienda.html">/tienda</a><a href="privacidad.html" aria-current="page">/privacidad</a>
+    </nav>
+    <span class="live"><i></i>Política de privacidad</span>
   </div>
 </header>
 
-<main class="wrap">
+<div class="wrap doc">
+  <header class="doc-h">
+    <div class="path"><a href="curtzz.html">&larr; Volver a Curtzz</a></div>
+    <h1>Política de privacidad</h1>
+    <p class="updated">Última actualización: <span id="fecha">1 de octubre de 2026</span></p>
+  </header>
+</div>
+
+<main class="wrap doc">
 
   <p>Esta política explica qué información trata el juego <strong>Curtzz</strong> (en adelante, «el juego»), su tienda web y su servidor de compras, para qué se usa y qué derechos tienes. Responsable: thunderDarkness (Colombia), <a href="mailto:prueba1bysisne@gmail.com">prueba1bysisne@gmail.com</a>.</p>
 
@@ -94,9 +88,11 @@
   <p>Si cambia esta política, actualizaremos la fecha de arriba y, si el cambio es importante, lo avisaremos en el juego.</p>
 </main>
 
-<footer>
+<footer class="site">
   <div class="wrap">
-    <a href="index.html" style="color:var(--muted)">Curtzz</a> — Política de privacidad
+    <a class="logo" href="./"><img src="assets/mark.svg" alt=""><em class="wm"><b>thunder</b>Darkness</em></a>
+    <span>Curtzz — Política de privacidad</span>
+    <nav aria-label="Pie"><a href="./">estudio</a><a href="curtzz.html">curtzz</a><a href="tienda.html">tienda</a></nav>
   </div>
 </footer>
 </body>
