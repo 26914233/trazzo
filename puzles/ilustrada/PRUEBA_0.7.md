@@ -1,11 +1,11 @@
-# Hoja de prueba: La caja viva 0.7 (niveles 5 y 6)
+# Hoja de prueba: La caja viva 0.8 (niveles 5 y 6, menús y «Mirar» en 3D)
 
-Para apuntar lo que pase al jugar el APK 0.7.1 en el móvil. Basta con contestar lo que se recuerde, en el chat o aquí
+Para apuntar lo que pase al jugar el APK 0.8 en el móvil. Basta con contestar lo que se recuerde, en el chat o aquí
 mismo; lo importante es **dónde te atascas y qué no se entiende**. (Adaptada de la guía «playtest-report» de la carpeta
 `.claude` de la rama `claude/omniroute-repo-setup-379r7i`, que se leyó sin instalarla.)
 
 ## La partida
-- **Fecha y versión:** 0.7.1 (código 8)
+- **Fecha y versión:** 0.8 (código 9)
 - **Móvil:**
 - **Desde qué nivel:** (portada → «Seguir», o desde el principio)
 - **Cuánto tiempo:** nivel 5 ___ min · nivel 6 ___ min
@@ -27,6 +27,14 @@ mismo; lo importante es **dónde te atascas y qué no se entiende**. (Adaptada d
 - ¿Se te apagó la llama? ¿Entendiste por qué (el viento)?
 - La puertecilla de la lámpara: ¿la viste? ¿Se desliza bien con el dedo?
 - ¿La oscuridad se ve bien en tu móvil o está demasiado oscura?
+
+## Menús y «Mirar» (nuevo en la 0.8)
+- El menú de pausa (☰ arriba, o el atrás del móvil): ¿lo encontraste? ¿Reiniciar el nivel y volver al inicio piden
+  confirmación como esperabas?
+- ¿«Seguir» te devolvió al nivel a medias después de salir?
+- «Mirar» (al elegir un objeto de la bandeja): ¿se gira bien con el dedo, también por arriba y por debajo? ¿Pellizcar
+  lo acerca? ¿Algún objeto se ve raro?
+- ¿El juego va igual de fluido con la vista 3D abierta?
 
 ## Lo que pasó
 - **Me gustó:**
