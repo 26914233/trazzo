@@ -311,8 +311,9 @@ await mantener('#hueco-llave', 0.8);
 await espera(0.5);
 await foto('10_examinar');
 comprobar('mantener pulsado un objeto lo examina', await pagina.isVisible('#examinar') && /Llave/.test(await pagina.textContent('#examinar-nombre')), await pagina.textContent('#examinar-nombre'));
-await pagina.tap('#examinar');
-await pagina.waitForTimeout(700);
+// (tocar fuera del objeto: en la B se ve en 3D en el centro, y tocarlo lo gira, no lo guarda)
+await pagina.touchscreen.tap(24, alto - 24);
+await pagina.waitForTimeout(900);
 comprobar('y se guarda al tocarlo', !(await pagina.isVisible('#examinar')));
 
 // la espalda de la caja
