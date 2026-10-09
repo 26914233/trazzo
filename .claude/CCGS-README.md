@@ -28,3 +28,10 @@ Ponytail: solo las 6 skills (ponytail, ponytail-audit, -debt, -gain, -help, -rev
 que son los que activan el modo de forma automatica; para eso hay que instalar el plugin completo en Claude Code:
   /plugin marketplace add DietrichGebert/ponytail
   /plugin install ponytail@ponytail   (dos mensajes separados)
+
+## Replica (Jake Schincariol)
+Origen: https://github.com/Jakeschincariol/replica-skill (MIT, ver LICENSE-replica), commit 77c9436.
+Las 11 skills tal cual: replica-recon, -architect, -design, -build, -backend, -test, -diff, -entrepreneur, -brand, -launch, -deploy.
+Rehacen una app o web por sus funciones (no su codigo, logo, textos ni contenido), en orden recon -> ... -> deploy; cada una
+deja su trabajo en una carpeta replica/ del proyecto. Sus herramientas son Python 3.8+ sin dependencias ni red. No se copiaron
+la carpeta tests/ ni .claude-plugin/ del original.

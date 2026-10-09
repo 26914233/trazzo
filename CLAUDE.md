@@ -19,3 +19,5 @@ Seguridad: `security-audit` (de Cloudflare, MIT) es la principal para auditar c�
 Animación y movimiento: `motion-design` (de LottieFiles, MIT) para tiempos, easing, coreografía y principios de animación; sirve para animaciones de la web, menús y transiciones del juego, con CSS, GSAP o cualquier sistema.
 
 Si hay que elegir entre las dos de movimiento: `motion-design` da los principios (tiempos, easing, coreografía); `design-motion-principles` (de Kyle Zantos, MIT) es práctica y opinada, con dos modos: Create para construir componentes con movimiento y Audit para revisar animaciones ya hechas y detectar movimiento genérico. Usa Audit en la web de Curtzz y en los menús. No está instalada en remotion-render-server porque apunta a componentes de interfaz, no a video.
+
+Apps y webs propias a partir de otra (por funciones, nunca su código, marca ni contenido): las skills `replica-*` (de Jake Schincariol, MIT), en orden `replica-recon` → `replica-architect` → `replica-design` → `replica-build` → `replica-backend` → `replica-test` → `replica-diff` → `replica-entrepreneur` → `replica-brand` → `replica-launch` → `replica-deploy`. Se pueden usar sueltas.
