@@ -10,3 +10,4 @@ export_credentials.cfg
 
 # Template de build Android (se instala desde Project > Install Android Build Template)
 android/build/
+__pycache__/

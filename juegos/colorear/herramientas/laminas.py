@@ -46,14 +46,18 @@ class Lienzo:
     def __init__(self):
         self.img = Image.new("L", (LADO * SS, LADO * SS), 255)
         self.d = ImageDraw.Draw(self.img)
+        self.escala = 1.0     # para dibujar en otra caja (p. ej. 0..1000)
 
     def _p(self, pts):
-        return [(x * SS, y * SS) for x, y in pts]
+        k = SS * self.escala
+        return [(x * k, y * k) for x, y in pts]
 
-    def forma(self, pts, grosor=LINEA, relleno=True):
-        """Polígono cerrado: tapa lo de debajo y dibuja su borde."""
+    def forma(self, pts, grosor=LINEA, relleno=True, negro=False):
+        """Polígono cerrado: tapa lo de debajo (o se rellena de negro) y dibuja su borde."""
         q = self._p(pts)
-        if relleno:
+        if negro:
+            self.d.polygon(q, fill=0)
+        elif relleno:
             self.d.polygon(q, fill=255)
         self.d.line(q + [q[0]], fill=0, width=max(1, int(grosor * SS)), joint="curve")
         self._puntas(q[:1], grosor)
@@ -69,8 +73,8 @@ class Lienzo:
         for x, y in q:
             self.d.ellipse((x - r, y - r, x + r, y + r), fill=0)
 
-    def circulo(self, c, r, grosor=LINEA, relleno=True):
-        self.forma(circulo(c, r), grosor, relleno)
+    def circulo(self, c, r, grosor=LINEA, relleno=True, negro=False):
+        self.forma(circulo(c, r), grosor, relleno, negro)
 
 
 def circulo(c, r, n=None):
@@ -533,9 +537,13 @@ CATEGORIAS = [
 
 
 def procesar(lz):
-    """Devuelve (lineas RGBA, regiones RGB, mini, nº de zonas)."""
+    """Devuelve (lineas LA, regiones RGB, mini, nº de zonas)."""
     fino = lz.img.resize((LADO, LADO), Image.LANCZOS)
-    tinta = 255 - np.asarray(fino, dtype=np.int32)          # 0 papel, 255 línea
+    return procesar_tinta(255 - np.asarray(fino, dtype=np.int32))
+
+
+def procesar_tinta(tinta):
+    """Igual que procesar() a partir de la tinta (0 papel, 255 línea) a LADO x LADO."""
     linea = tinta >= UMBRAL_LINEA
     etiquetas, n = ndimage.label(~linea)                     # 4-conexas
     tam = ndimage.sum_labels(np.ones_like(etiquetas), etiquetas, index=np.arange(n + 1))
