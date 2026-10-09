@@ -32,7 +32,7 @@ SEMILLAS = 2         # imágenes por prompt (855 prompts x 2 = 1710)
 SOLO_PRUEBA = 0      # 0 = todas; un número (p. ej. 20) para hacer solo una prueba
 CARPETA = "/content/drive/MyDrive/colorear_lotes"
 CARPETA_ZIP = "/content/drive/MyDrive/colorear_zip\""""),
-    code("!pip -q install diffusers==0.31.0 transformers accelerate safetensors"),
+    code("!pip -q install -U diffusers transformers accelerate safetensors peft"),
     code("""from google.colab import drive
 drive.mount('/content/drive')"""),
     code(prompts_src.replace('if __name__ == "__main__":', 'if False:')),
