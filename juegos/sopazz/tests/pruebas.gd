@@ -38,6 +38,8 @@ func _ready() -> void:
 	prueba_ajustar_seleccion()
 	await prueba_partida_completa()
 	await prueba_pantallas()
+	await prueba_pagos_play()
+	prueba_adaptadores_sin_plugin()
 
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Progreso.ruta))
 	Progreso.ruta = ruta_real
@@ -320,7 +322,7 @@ func prueba_timeout_anuncio() -> void:
 	var ok: bool = await Monetizacion._con_timeout(_nunca)
 	comprobar(not ok, "devuelve false")
 	comprobar(Time.get_ticks_msec() - t0 < 2000, "y no se queda colgado")
-	Monetizacion.timeout_anuncio_s = 8.0
+	Monetizacion.timeout_anuncio_s = 180.0
 
 
 # ---------------------------------------------------------------- tablero y escenas
@@ -388,3 +390,64 @@ func prueba_pantallas() -> void:
 	Progreso.sumar_fichas(1)
 	OS.remove_logger(log)
 	comprobar(log.errores.is_empty(), "errores: %s" % [log.errores])
+
+
+# ---------------------------------------------------------------- pagos reales (con Billing falso)
+
+const FalsoBilling := preload("res://tests/falso_billing.gd")
+
+
+func _esperar_frames(n: int) -> void:
+	for i in n:
+		await get_tree().process_frame
+
+
+func prueba_pagos_play() -> void:
+	caso("cobro con Google Play Billing (cliente falso)")
+	_reiniciar_progreso()
+	var falso := FalsoBilling.new()
+	# Compra que quedo a medias en una sesion anterior: pagada, sin consumir.
+	falso.compras_previas = [FalsoBilling.compra("fichas_1500", 1, "tok_viejo")]
+	var pagos := PagosPlay.new(falso, Monetizacion.ids_productos(), Monetizacion.ids_consumibles())
+	pagos.compra_confirmada.connect(Monetizacion.conceder)
+	Monetizacion.pagos = pagos
+	await _esperar_frames(4)
+	comprobar(pagos.conectado, "conecta")
+	comprobar("tok_viejo" in falso.consumidos and Progreso.fichas() == 1500, "recupera al abrir la compra que quedo sin entregar (%d)" % Progreso.fichas())
+
+	var ok: bool = await Monetizacion.comprar("fichas_500")
+	comprobar(ok and Progreso.fichas() == 2000, "consumible: se cobra, se consume y se entrega UNA vez (%d)" % Progreso.fichas())
+
+	falso.modo = "cancelar"
+	ok = await Monetizacion.comprar("fichas_500")
+	comprobar(not ok and Progreso.fichas() == 2000, "cancelada: no entrega y no se queda colgada")
+
+	falso.modo = "falla_confirmar"
+	ok = await Monetizacion.comprar("fichas_500")
+	comprobar(not ok and Progreso.fichas() == 2000, "si Play no confirma, no se entrega (Play la reembolsara)")
+
+	falso.modo = "pendiente"
+	ok = await Monetizacion.comprar("tema_cine")
+	comprobar(not ok and not Progreso.tema_desbloqueado("cine"), "pendiente (pago en efectivo): aun no se entrega")
+	falso.on_purchase_updated.emit({"response_code": 0, "purchases": [FalsoBilling.compra("tema_cine", 1, "tok_cine")]})
+	await _esperar_frames(3)
+	comprobar("tok_cine" in falso.reconocidos and Progreso.tema_desbloqueado("cine"), "cuando se paga, se reconoce y se entrega sola")
+
+	falso.modo = "ok"
+	ok = await Monetizacion.comprar("sin_anuncios")
+	comprobar(ok and Progreso.sin_anuncios() and falso.reconocidos.size() == 2, "permanente: se reconoce (si no, Play reembolsa en 3 dias)")
+	var fichas_antes := Progreso.fichas()
+	# Restaurar en otro movil: Play devuelve la compra ya reconocida.
+	falso.compras_previas = [FalsoBilling.compra("sin_anuncios", 1, "tok_sa", true)]
+	var n: int = await Monetizacion.restaurar_compras()
+	comprobar(n == 1 and Progreso.fichas() == fichas_antes, "restaurar no regala las 300 fichas otra vez")
+	Monetizacion.pagos = null
+
+
+func prueba_adaptadores_sin_plugin() -> void:
+	caso("sin plugins: el juego cae al stub")
+	comprobar(not AnunciosAdMob.disponible(), "AdMob no disponible aqui")
+	comprobar(not Monetizacion.anuncios_reales() and not Monetizacion.pagos_reales(), "monetizacion usa el stub")
+	comprobar(Monetizacion.ids_anuncios()["premiado"] == Monetizacion.ADMOB_TEST_PREMIADO, "depuracion usa unidades de prueba")
+	comprobar("tema_mitologia" in Monetizacion.ids_productos() and not ("tema_animales" in Monetizacion.ids_productos()), "solo los temas de pago son productos")
+	comprobar(Monetizacion.ids_consumibles().size() == 4, "4 paquetes de fichas consumibles")

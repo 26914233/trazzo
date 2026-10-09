@@ -1,11 +1,11 @@
 # Capa unica de anuncios y compras. El juego solo habla con este archivo.
 #
 # Proveedores:
-#  - "stub": sin plugin (escritorio, pruebas, este entorno). Simula anuncios y
+#  - stub: sin plugins (escritorio, pruebas, este entorno). Simula anuncios y
 #    compras para que el juego entero sea jugable y probable sin SDK.
-#  - "android": AdMob + Google Play Billing via plugins de Godot. Se activa solo
-#    si los singletons existen en el APK. La conexion fina con cada plugin esta
-#    en _android_*; ver docs/INTEGRACION_ANDROID.md antes de publicar.
+#  - reales: AdMob (scripts/proveedores/anuncios_admob.gd) y Google Play
+#    Billing (scripts/proveedores/pagos_play.gd). Se activan solos en Android
+#    cuando los plugins estan instalados. Ver docs/INTEGRACION_ANDROID.md.
 #
 # Regla de oro: nada aqui puede dejar una pantalla esperando para siempre.
 # Todo anuncio tiene timeout y todo fallo devuelve false.
@@ -13,7 +13,9 @@ extends Node
 
 signal compra_completada(producto: String)
 
-var timeout_anuncio_s := 8.0
+# Red de seguridad, no limite de visionado: un premiado dura hasta 30 s y el
+# "no hay anuncio cargado" ya se resuelve al instante en el adaptador.
+var timeout_anuncio_s := 180.0
 
 # IDs de prueba OFICIALES de AdMob (publicos, no son secretos). Sustituir por los
 # reales de la cuenta del dueño solo en export, nunca en el repo.
@@ -32,7 +34,8 @@ const PRODUCTOS := {
 ## Cada tema de pago se vende tambien suelto como "tema_<id>" a 1,99 US$.
 const PRECIO_TEMA := "1,99\u00a0US$"
 
-var proveedor := "stub"
+var anuncios: AnunciosAdMob = null
+var pagos: PagosPlay = null
 ## Solo para el stub: que resultado simula (las pruebas lo cambian).
 var stub_exito := true
 var stub_demora_s := 0.4
@@ -42,9 +45,53 @@ var _completados_desde_ultimo := 0
 
 
 func _ready() -> void:
-	if OS.get_name() == "Android" and Engine.has_singleton("PoingGodotAdMob"):
-		proveedor = "android"
-	_android_iniciar()
+	if AnunciosAdMob.disponible():
+		anuncios = AnunciosAdMob.new()
+		anuncios.iniciar(ids_anuncios())
+	if OS.get_name() == "Android" and ClasesPlugin.existe("BillingClient"):
+		pagos = PagosPlay.new(ClasesPlugin.nueva("BillingClient"), ids_productos(), ids_consumibles())
+		# Toda entrega real pasa por aqui: compra normal, pendiente que se paga
+		# mas tarde, compra a medias recuperada al abrir y restauracion.
+		pagos.compra_confirmada.connect(conceder)
+
+
+## Unidades de anuncio. En builds de depuracion SIEMPRE las de prueba: hacer
+## clic en anuncios reales propios puede suspender la cuenta de AdMob.
+## Las reales se ponen en Ajustes del proyecto > sopazz/admob/* al exportar.
+func ids_anuncios() -> Dictionary:
+	if OS.is_debug_build():
+		return {"intersticial": ADMOB_TEST_INTERSTICIAL, "premiado": ADMOB_TEST_PREMIADO}
+	var ids := {
+		"intersticial": str(ProjectSettings.get_setting("sopazz/admob/intersticial", ADMOB_TEST_INTERSTICIAL)),
+		"premiado": str(ProjectSettings.get_setting("sopazz/admob/premiado", ADMOB_TEST_PREMIADO)),
+	}
+	if ids["premiado"] == ADMOB_TEST_PREMIADO:
+		push_warning("Build de release con unidades de anuncio de PRUEBA: no genera ingresos.")
+	return ids
+
+
+func ids_productos() -> PackedStringArray:
+	var ids := PackedStringArray(PRODUCTOS.keys())
+	for t in Temas.lista:
+		if not t.get("gratis", false):
+			ids.append("tema_" + t["id"])
+	return ids
+
+
+func ids_consumibles() -> PackedStringArray:
+	var ids := PackedStringArray()
+	for id in PRODUCTOS:
+		if PRODUCTOS[id]["tipo"] == "consumible":
+			ids.append(id)
+	return ids
+
+
+func anuncios_reales() -> bool:
+	return anuncios != null
+
+
+func pagos_reales() -> bool:
+	return pagos != null
 
 
 # ---------------------------------------------------------------- intersticial
@@ -100,15 +147,14 @@ func comprar(producto: String) -> bool:
 	if not (PRODUCTOS.has(producto) or producto.begins_with("tema_")):
 		push_error("Producto desconocido: %s" % producto)
 		return false
-	var ok: bool
-	if proveedor == "android":
-		ok = await _android_comprar(producto)
-	else:
-		await get_tree().create_timer(stub_demora_s).timeout
-		ok = stub_exito
-	if ok:
+	if pagos:
+		# La entrega la hace la señal compra_confirmada, no este retorno: asi
+		# no se entrega dos veces ni se pierde una compra pendiente.
+		return await pagos.comprar(producto, get_tree())
+	await get_tree().create_timer(stub_demora_s).timeout
+	if stub_exito:
 		conceder(producto)
-	return ok
+	return stub_exito
 
 
 ## Entrega lo comprado. Separado de comprar() para reutilizarlo al restaurar
@@ -131,21 +177,25 @@ func conceder(producto: String) -> void:
 
 
 ## Restaura las compras permanentes (obligatorio para no perder "quitar
-## anuncios" al cambiar de movil). Con el stub no hay nada que restaurar.
+## anuncios" al cambiar de movil). Al abrir la app ya se restauran solas;
+## esto es el boton manual. Con el stub no hay nada que restaurar.
 func restaurar_compras() -> int:
-	if proveedor != "android":
+	if pagos == null:
 		return 0
-	var permanentes: Array = await _android_compras_permanentes()
-	for p in permanentes:
-		conceder(p)
-	return permanentes.size()
+	var recibidas := []
+	var contar := func(p: String) -> void: recibidas.append(p)
+	pagos.compra_confirmada.connect(contar)
+	pagos.pedir_restauracion()
+	await get_tree().create_timer(4.0).timeout
+	pagos.compra_confirmada.disconnect(contar)
+	return recibidas.size()
 
 
 # ---------------------------------------------------------------- comun
 
 func _mostrar(tipo: String) -> bool:
-	if proveedor == "android":
-		return await _con_timeout(_android_mostrar(tipo))
+	if anuncios:
+		return await _con_timeout(anuncios.mostrar(tipo))
 	await get_tree().create_timer(stub_demora_s).timeout
 	return stub_exito
 
@@ -162,38 +212,3 @@ func _con_timeout(senal: Signal) -> bool:
 	while not estado["listo"] and Time.get_ticks_msec() < limite:
 		await get_tree().process_frame
 	return estado["ok"]
-
-
-# ---------------------------------------------------------------- Android
-# Puntos de enganche con los plugins. Se dejan aislados aqui a proposito:
-# la API concreta de cada plugin cambia entre versiones y tiene que
-# verificarse contra la version instalada (docs/INTEGRACION_ANDROID.md).
-# Mientras no este hecho, en Android sin plugins el juego cae al stub y
-# simplemente no muestra anuncios (no se rompe).
-
-signal _android_resultado(ok: bool)
-
-
-func _android_iniciar() -> void:
-	if proveedor != "android":
-		return
-	# TODO(integracion): inicializar AdMob con consentimiento UMP y cargar
-	# el primer intersticial y el primer premiado.
-	push_warning("Monetizacion: plugin detectado pero integracion pendiente; sin anuncios.")
-
-
-func _android_mostrar(_tipo: String) -> Signal:
-	# TODO(integracion): mostrar el anuncio cargado y emitir _android_resultado.
-	_android_resultado.emit.call_deferred(false)
-	return _android_resultado
-
-
-func _android_comprar(_producto: String) -> bool:
-	# TODO(integracion): lanzar el flujo de Google Play Billing, esperar la
-	# compra, verificarla (acknowledge) y devolver el resultado.
-	return false
-
-
-func _android_compras_permanentes() -> Array:
-	# TODO(integracion): consultar compras de tipo "inapp" no consumibles.
-	return []

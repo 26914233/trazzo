@@ -59,8 +59,12 @@ No se muestra:
 - si han pasado menos de **90 segundos** desde el anterior;
 - si el jugador compró "quitar anuncios".
 
-Se muestra: al volver al menú tras completar un nivel, como máximo **1 de cada 3**
-niveles completados.
+Se muestra: al salir de la pantalla de victoria (a "Siguiente nivel" o al menú),
+como máximo **1 de cada 3** niveles completados. Es una pausa natural entre niveles,
+que es justo donde Google recomienda ponerlos.
+
+"Quitar anuncios" quita intersticiales y deja los **premiados**: son siempre
+voluntarios y el jugador los quiere (son sus pistas gratis). Se dice en la tienda.
 
 ## 5. Precios (COP/USD, revisables por el dueño)
 
