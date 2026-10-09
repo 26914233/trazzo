@@ -41,6 +41,7 @@ func _ready() -> void:
 	await prueba_tienda_simulada()
 	await prueba_cobro_play()
 	prueba_app_de_pago()
+	prueba_integridad()
 	prueba_ajustar_seleccion()
 	prueba_escapar_bbcode()
 	prueba_disenos()
@@ -402,6 +403,17 @@ func prueba_app_de_pago() -> void:
 	comprobar(abiertas, "las %d sopas se pueden abrir" % Temas.total_sopas())
 
 
+func prueba_integridad() -> void:
+	caso("antipirateria: decision ante cada respuesta de Android")
+	comprobar(Integridad.evaluar(true, true, "com.android.vending") == "ok", "instalada desde Play: juega")
+	comprobar(Integridad.evaluar(true, true, "com.google.android.packageinstaller") == "copia", "APK pasado a mano: bloquea")
+	comprobar(Integridad.evaluar(true, true, "") == "copia", "Android dice que nadie la instalo: bloquea")
+	comprobar(Integridad.evaluar(true, true, null) == "desconocido", "no se pudo preguntar: deja jugar")
+	comprobar(Integridad.evaluar(false, true, "") == "ok", "en depuracion/escritorio no aplica")
+	comprobar(Integridad.evaluar(true, false, "") == "ok", "el dueño puede apagarla")
+	comprobar(Integridad.resultado != "copia", "en este entorno no bloquea")
+
+
 # ---------------------------------------------------------------- interfaz
 
 func prueba_ajustar_seleccion() -> void:
@@ -484,13 +496,13 @@ class ContadorErrores extends Logger:
 
 
 func prueba_pantallas() -> void:
-	caso("las 5 pantallas cargan sin errores en los 3 diseños")
+	caso("las 6 pantallas cargan sin errores en los 3 diseños")
 	var log := ContadorErrores.new()
 	OS.add_logger(log)
 	Temas.seleccion = {"categoria": "comida", "subtema": "frutas", "dificultad": 0, "diario": false}
 	for id in Estilo.VARIANTES:
 		Estilo.aplicar(id)
-		for nombre in ["menu", "categorias", "sopas", "juego", "ajustes"]:
+		for nombre in ["menu", "categorias", "sopas", "juego", "ajustes", "copia_no_valida"]:
 			var escena: Node = load("res://escenas/%s.tscn" % nombre).instantiate()
 			add_child(escena)
 			for f in 4:
