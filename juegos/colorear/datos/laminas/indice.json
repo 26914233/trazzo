@@ -1,0 +1,622 @@
+{
+ "version": 1,
+ "lado": 1280,
+ "categorias": [
+  {
+   "id": "mandalas",
+   "nombre": "Mandalas",
+   "laminas": [
+    {
+     "id": "mandalas_001",
+     "zonas": 407
+    },
+    {
+     "id": "mandalas_002",
+     "zonas": 365
+    },
+    {
+     "id": "mandalas_003",
+     "zonas": 391
+    },
+    {
+     "id": "mandalas_004",
+     "zonas": 196
+    },
+    {
+     "id": "mandalas_005",
+     "zonas": 276
+    },
+    {
+     "id": "mandalas_006",
+     "zonas": 243
+    },
+    {
+     "id": "mandalas_007",
+     "zonas": 259
+    },
+    {
+     "id": "mandalas_008",
+     "zonas": 141
+    },
+    {
+     "id": "mandalas_009",
+     "zonas": 204
+    },
+    {
+     "id": "mandalas_010",
+     "zonas": 197
+    },
+    {
+     "id": "mandalas_011",
+     "zonas": 224
+    },
+    {
+     "id": "mandalas_012",
+     "zonas": 309
+    },
+    {
+     "id": "mandalas_013",
+     "zonas": 293
+    },
+    {
+     "id": "mandalas_014",
+     "zonas": 174
+    },
+    {
+     "id": "mandalas_015",
+     "zonas": 156
+    },
+    {
+     "id": "mandalas_016",
+     "zonas": 424
+    },
+    {
+     "id": "mandalas_017",
+     "zonas": 245
+    },
+    {
+     "id": "mandalas_018",
+     "zonas": 225
+    },
+    {
+     "id": "mandalas_019",
+     "zonas": 200
+    },
+    {
+     "id": "mandalas_020",
+     "zonas": 289
+    },
+    {
+     "id": "mandalas_021",
+     "zonas": 223
+    },
+    {
+     "id": "mandalas_022",
+     "zonas": 271
+    },
+    {
+     "id": "mandalas_023",
+     "zonas": 265
+    },
+    {
+     "id": "mandalas_024",
+     "zonas": 325
+    },
+    {
+     "id": "mandalas_025",
+     "zonas": 280
+    },
+    {
+     "id": "mandalas_026",
+     "zonas": 208
+    },
+    {
+     "id": "mandalas_027",
+     "zonas": 277
+    },
+    {
+     "id": "mandalas_028",
+     "zonas": 221
+    },
+    {
+     "id": "mandalas_029",
+     "zonas": 404
+    },
+    {
+     "id": "mandalas_030",
+     "zonas": 215
+    },
+    {
+     "id": "mandalas_031",
+     "zonas": 221
+    },
+    {
+     "id": "mandalas_032",
+     "zonas": 336
+    },
+    {
+     "id": "mandalas_033",
+     "zonas": 219
+    },
+    {
+     "id": "mandalas_034",
+     "zonas": 345
+    },
+    {
+     "id": "mandalas_035",
+     "zonas": 118
+    },
+    {
+     "id": "mandalas_036",
+     "zonas": 248
+    },
+    {
+     "id": "mandalas_037",
+     "zonas": 174
+    },
+    {
+     "id": "mandalas_038",
+     "zonas": 261
+    },
+    {
+     "id": "mandalas_039",
+     "zonas": 155
+    },
+    {
+     "id": "mandalas_040",
+     "zonas": 209
+    },
+    {
+     "id": "mandalas_041",
+     "zonas": 366
+    },
+    {
+     "id": "mandalas_042",
+     "zonas": 346
+    },
+    {
+     "id": "mandalas_043",
+     "zonas": 269
+    },
+    {
+     "id": "mandalas_044",
+     "zonas": 296
+    },
+    {
+     "id": "mandalas_045",
+     "zonas": 254
+    },
+    {
+     "id": "mandalas_046",
+     "zonas": 176
+    },
+    {
+     "id": "mandalas_047",
+     "zonas": 413
+    },
+    {
+     "id": "mandalas_048",
+     "zonas": 357
+    },
+    {
+     "id": "mandalas_049",
+     "zonas": 278
+    },
+    {
+     "id": "mandalas_050",
+     "zonas": 404
+    },
+    {
+     "id": "mandalas_051",
+     "zonas": 293
+    },
+    {
+     "id": "mandalas_052",
+     "zonas": 307
+    },
+    {
+     "id": "mandalas_053",
+     "zonas": 196
+    },
+    {
+     "id": "mandalas_054",
+     "zonas": 254
+    },
+    {
+     "id": "mandalas_055",
+     "zonas": 243
+    },
+    {
+     "id": "mandalas_056",
+     "zonas": 459
+    },
+    {
+     "id": "mandalas_057",
+     "zonas": 219
+    },
+    {
+     "id": "mandalas_058",
+     "zonas": 141
+    },
+    {
+     "id": "mandalas_059",
+     "zonas": 157
+    },
+    {
+     "id": "mandalas_060",
+     "zonas": 102
+    }
+   ]
+  },
+  {
+   "id": "vitrales",
+   "nombre": "Vitrales",
+   "laminas": [
+    {
+     "id": "vitrales_001",
+     "zonas": 121
+    },
+    {
+     "id": "vitrales_002",
+     "zonas": 123
+    },
+    {
+     "id": "vitrales_003",
+     "zonas": 63
+    },
+    {
+     "id": "vitrales_004",
+     "zonas": 106
+    },
+    {
+     "id": "vitrales_005",
+     "zonas": 137
+    },
+    {
+     "id": "vitrales_006",
+     "zonas": 130
+    },
+    {
+     "id": "vitrales_007",
+     "zonas": 81
+    },
+    {
+     "id": "vitrales_008",
+     "zonas": 61
+    },
+    {
+     "id": "vitrales_009",
+     "zonas": 82
+    },
+    {
+     "id": "vitrales_010",
+     "zonas": 70
+    },
+    {
+     "id": "vitrales_011",
+     "zonas": 60
+    },
+    {
+     "id": "vitrales_012",
+     "zonas": 109
+    },
+    {
+     "id": "vitrales_013",
+     "zonas": 152
+    },
+    {
+     "id": "vitrales_014",
+     "zonas": 87
+    },
+    {
+     "id": "vitrales_015",
+     "zonas": 71
+    },
+    {
+     "id": "vitrales_016",
+     "zonas": 95
+    },
+    {
+     "id": "vitrales_017",
+     "zonas": 126
+    },
+    {
+     "id": "vitrales_018",
+     "zonas": 133
+    },
+    {
+     "id": "vitrales_019",
+     "zonas": 140
+    },
+    {
+     "id": "vitrales_020",
+     "zonas": 101
+    },
+    {
+     "id": "vitrales_021",
+     "zonas": 145
+    },
+    {
+     "id": "vitrales_022",
+     "zonas": 75
+    },
+    {
+     "id": "vitrales_023",
+     "zonas": 121
+    },
+    {
+     "id": "vitrales_024",
+     "zonas": 92
+    },
+    {
+     "id": "vitrales_025",
+     "zonas": 83
+    },
+    {
+     "id": "vitrales_026",
+     "zonas": 74
+    },
+    {
+     "id": "vitrales_027",
+     "zonas": 128
+    },
+    {
+     "id": "vitrales_028",
+     "zonas": 64
+    },
+    {
+     "id": "vitrales_029",
+     "zonas": 94
+    },
+    {
+     "id": "vitrales_030",
+     "zonas": 72
+    }
+   ]
+  },
+  {
+   "id": "flores",
+   "nombre": "Flores",
+   "laminas": [
+    {
+     "id": "flores_001",
+     "zonas": 67
+    },
+    {
+     "id": "flores_002",
+     "zonas": 57
+    },
+    {
+     "id": "flores_003",
+     "zonas": 72
+    },
+    {
+     "id": "flores_004",
+     "zonas": 57
+    },
+    {
+     "id": "flores_005",
+     "zonas": 64
+    },
+    {
+     "id": "flores_006",
+     "zonas": 51
+    },
+    {
+     "id": "flores_007",
+     "zonas": 56
+    },
+    {
+     "id": "flores_008",
+     "zonas": 57
+    },
+    {
+     "id": "flores_009",
+     "zonas": 65
+    },
+    {
+     "id": "flores_010",
+     "zonas": 69
+    },
+    {
+     "id": "flores_011",
+     "zonas": 52
+    },
+    {
+     "id": "flores_012",
+     "zonas": 64
+    },
+    {
+     "id": "flores_013",
+     "zonas": 74
+    },
+    {
+     "id": "flores_014",
+     "zonas": 55
+    },
+    {
+     "id": "flores_015",
+     "zonas": 56
+    },
+    {
+     "id": "flores_016",
+     "zonas": 61
+    },
+    {
+     "id": "flores_017",
+     "zonas": 68
+    },
+    {
+     "id": "flores_018",
+     "zonas": 51
+    },
+    {
+     "id": "flores_019",
+     "zonas": 92
+    },
+    {
+     "id": "flores_020",
+     "zonas": 92
+    },
+    {
+     "id": "flores_021",
+     "zonas": 60
+    },
+    {
+     "id": "flores_022",
+     "zonas": 41
+    },
+    {
+     "id": "flores_023",
+     "zonas": 67
+    },
+    {
+     "id": "flores_024",
+     "zonas": 79
+    },
+    {
+     "id": "flores_025",
+     "zonas": 74
+    },
+    {
+     "id": "flores_026",
+     "zonas": 62
+    },
+    {
+     "id": "flores_027",
+     "zonas": 63
+    },
+    {
+     "id": "flores_028",
+     "zonas": 75
+    },
+    {
+     "id": "flores_029",
+     "zonas": 41
+    },
+    {
+     "id": "flores_030",
+     "zonas": 89
+    }
+   ]
+  },
+  {
+   "id": "geometria",
+   "nombre": "Geometría",
+   "laminas": [
+    {
+     "id": "geometria_001",
+     "zonas": 283
+    },
+    {
+     "id": "geometria_002",
+     "zonas": 75
+    },
+    {
+     "id": "geometria_003",
+     "zonas": 74
+    },
+    {
+     "id": "geometria_004",
+     "zonas": 243
+    },
+    {
+     "id": "geometria_005",
+     "zonas": 169
+    },
+    {
+     "id": "geometria_006",
+     "zonas": 226
+    },
+    {
+     "id": "geometria_007",
+     "zonas": 151
+    },
+    {
+     "id": "geometria_008",
+     "zonas": 283
+    },
+    {
+     "id": "geometria_009",
+     "zonas": 55
+    },
+    {
+     "id": "geometria_010",
+     "zonas": 66
+    },
+    {
+     "id": "geometria_011",
+     "zonas": 436
+    },
+    {
+     "id": "geometria_012",
+     "zonas": 61
+    },
+    {
+     "id": "geometria_013",
+     "zonas": 226
+    },
+    {
+     "id": "geometria_014",
+     "zonas": 85
+    },
+    {
+     "id": "geometria_015",
+     "zonas": 169
+    },
+    {
+     "id": "geometria_016",
+     "zonas": 79
+    },
+    {
+     "id": "geometria_017",
+     "zonas": 147
+    },
+    {
+     "id": "geometria_018",
+     "zonas": 436
+    },
+    {
+     "id": "geometria_019",
+     "zonas": 92
+    },
+    {
+     "id": "geometria_020",
+     "zonas": 164
+    },
+    {
+     "id": "geometria_021",
+     "zonas": 60
+    },
+    {
+     "id": "geometria_022",
+     "zonas": 169
+    },
+    {
+     "id": "geometria_023",
+     "zonas": 97
+    },
+    {
+     "id": "geometria_024",
+     "zonas": 38
+    },
+    {
+     "id": "geometria_025",
+     "zonas": 243
+    },
+    {
+     "id": "geometria_026",
+     "zonas": 219
+    },
+    {
+     "id": "geometria_027",
+     "zonas": 226
+    },
+    {
+     "id": "geometria_028",
+     "zonas": 90
+    }
+   ]
+  }
+ ]
+}
