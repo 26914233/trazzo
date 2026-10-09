@@ -22,15 +22,15 @@ const ADMOB_TEST_PREMIADO := "ca-app-pub-3940256099942544/5224354917"
 
 ## Catalogo. Los IDs deben crearse igual en Play Console.
 const PRODUCTOS := {
-	"sin_anuncios": {"tipo": "permanente", "fichas": 300, "precio": "2,99 US$", "nombre": "Quitar anuncios"},
-	"fichas_500": {"tipo": "consumible", "fichas": 500, "precio": "0,99 US$", "nombre": "500 fichas"},
-	"fichas_1500": {"tipo": "consumible", "fichas": 1500, "precio": "2,49 US$", "nombre": "1.500 fichas"},
-	"fichas_4000": {"tipo": "consumible", "fichas": 4000, "precio": "4,99 US$", "nombre": "4.000 fichas", "destacado": true},
-	"fichas_10000": {"tipo": "consumible", "fichas": 10000, "precio": "9,99 US$", "nombre": "10.000 fichas"},
-	"todos_los_temas": {"tipo": "permanente", "fichas": 0, "precio": "7,99 US$", "nombre": "Todos los temas"},
+	"sin_anuncios": {"tipo": "permanente", "fichas": 300, "precio": "2,99\u00a0US$", "nombre": "Quitar anuncios"},
+	"fichas_500": {"tipo": "consumible", "fichas": 500, "precio": "0,99\u00a0US$", "nombre": "500 fichas"},
+	"fichas_1500": {"tipo": "consumible", "fichas": 1500, "precio": "2,49\u00a0US$", "nombre": "1.500 fichas"},
+	"fichas_4000": {"tipo": "consumible", "fichas": 4000, "precio": "4,99\u00a0US$", "nombre": "4.000 fichas", "destacado": true},
+	"fichas_10000": {"tipo": "consumible", "fichas": 10000, "precio": "9,99\u00a0US$", "nombre": "10.000 fichas"},
+	"todos_los_temas": {"tipo": "permanente", "fichas": 0, "precio": "7,99\u00a0US$", "nombre": "Todos los temas"},
 }
 ## Cada tema de pago se vende tambien suelto como "tema_<id>" a 1,99 US$.
-const PRECIO_TEMA := "1,99 US$"
+const PRECIO_TEMA := "1,99\u00a0US$"
 
 var proveedor := "stub"
 ## Solo para el stub: que resultado simula (las pruebas lo cambian).

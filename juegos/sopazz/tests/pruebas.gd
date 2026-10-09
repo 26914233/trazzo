@@ -35,6 +35,9 @@ func _ready() -> void:
 	prueba_premiados_tope()
 	await prueba_compras()
 	await prueba_timeout_anuncio()
+	prueba_ajustar_seleccion()
+	await prueba_partida_completa()
+	await prueba_pantallas()
 
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Progreso.ruta))
 	Progreso.ruta = ruta_real
@@ -318,3 +321,70 @@ func prueba_timeout_anuncio() -> void:
 	comprobar(not ok, "devuelve false")
 	comprobar(Time.get_ticks_msec() - t0 < 2000, "y no se queda colgado")
 	Monetizacion.timeout_anuncio_s = 8.0
+
+
+# ---------------------------------------------------------------- tablero y escenas
+
+func prueba_ajustar_seleccion() -> void:
+	caso("arrastre del dedo -> linea recta")
+	var h := Tablero.ajustar_seleccion(Vector2i(2, 2), Vector2(5.2, 2.3), 10)
+	comprobar(h == [Vector2i(2, 2), Vector2i(3, 2), Vector2i(4, 2), Vector2i(5, 2)], "horizontal aunque el dedo tiemble")
+	var d := Tablero.ajustar_seleccion(Vector2i(2, 2), Vector2(4.8, 4.6), 10)
+	comprobar(d.size() == 4 and d[3] == Vector2i(5, 5), "diagonal imprecisa (%s)" % [d])
+	var b := Tablero.ajustar_seleccion(Vector2i(2, 2), Vector2(-3.0, 2.0), 10)
+	comprobar(b == [Vector2i(2, 2), Vector2i(1, 2), Vector2i(0, 2)], "se recorta en el borde")
+	comprobar(Tablero.ajustar_seleccion(Vector2i(2, 2), Vector2(2.1, 2.2), 10) == [Vector2i(2, 2)], "sin moverse: una celda")
+	var arriba := Tablero.ajustar_seleccion(Vector2i(3, 5), Vector2(3.2, 1.0), 10)
+	comprobar(arriba.size() == 5 and arriba[4] == Vector2i(3, 1), "vertical hacia arriba")
+
+
+class ContadorErrores extends Logger:
+	var errores: Array[String] = []
+	func _log_error(_f: String, file: String, line: int, code: String, rationale: String, _n: bool, tipo: int, _bt: Array[ScriptBacktrace]) -> void:
+		if tipo != ERROR_TYPE_WARNING:
+			errores.append("%s:%d %s %s" % [file, line, code, rationale])
+	func _log_message(_m: String, _e: bool) -> void:
+		pass
+
+
+func prueba_partida_completa() -> void:
+	caso("partida completa sobre la escena real")
+	_reiniciar_progreso()
+	Temas.seleccion = {"tema": "animales", "dificultad": 1, "nivel": 1, "diario": false}
+	var juego: Control = load("res://escenas/juego.tscn").instantiate()
+	add_child(juego)
+	await get_tree().process_frame
+	var sopa: GeneradorSopa.Sopa = juego._sopa
+	comprobar(sopa.colocadas.size() == 8, "Normal: 8 palabras")
+	# Un error (seleccion que no es palabra) no cuenta.
+	juego._al_seleccionar([Vector2i(0, 0), Vector2i(1, 1)] as Array[Vector2i])
+	comprobar(juego._encontradas.size() == 0, "seleccion falsa no cuenta")
+	for i in sopa.colocadas.size():
+		var c: GeneradorSopa.Colocada = sopa.colocadas[i]
+		var celdas: Array[Vector2i] = c.celdas.duplicate()
+		if i % 2 == 1:
+			celdas.reverse()  # la mitad, de atras hacia adelante
+		juego._al_seleccionar(celdas)
+	comprobar(juego._terminado, "al encontrar todas, victoria")
+	comprobar(Progreso.nivel_actual("animales", 1) == 2, "el nivel 2 queda abierto")
+	comprobar(Progreso.fichas() > 0, "da fichas")
+	await get_tree().create_timer(0.8).timeout
+	juego.queue_free()
+	await get_tree().process_frame
+
+
+func prueba_pantallas() -> void:
+	caso("las 5 pantallas cargan sin errores")
+	var log := ContadorErrores.new()
+	OS.add_logger(log)
+	for nombre in ["menu", "selector", "juego", "tienda", "ajustes"]:
+		var escena: Node = load("res://escenas/%s.tscn" % nombre).instantiate()
+		add_child(escena)
+		for f in 5:
+			await get_tree().process_frame
+		escena.queue_free()
+		await get_tree().process_frame
+	# Ganar fichas con las pantallas ya cerradas no debe tocar nodos liberados.
+	Progreso.sumar_fichas(1)
+	OS.remove_logger(log)
+	comprobar(log.errores.is_empty(), "errores: %s" % [log.errores])

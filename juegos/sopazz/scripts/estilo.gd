@@ -103,14 +103,17 @@ static func _margen_muesca(raiz: Control) -> int:
 	return int(seguro.position.y * escala)
 
 
-static func etiqueta(texto: String, tam: int = 46, color: Color = TEXTO, centrar: bool = true) -> Label:
+static func etiqueta(texto: String, tam: int = 46, color: Color = TEXTO, centrar: bool = true, ajustar: bool = true) -> Label:
 	var l := Label.new()
 	l.text = texto
 	l.add_theme_font_size_override("font_size", tam)
 	l.add_theme_color_override("font_color", color)
 	if centrar:
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	# Ojo: con ajuste de linea, dentro de un HBoxContainer sin EXPAND la
+	# etiqueta pide ancho 0 y se parte letra a letra. Ahi usar ajustar=false.
+	if ajustar:
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	return l
 
 
@@ -136,10 +139,13 @@ static func pildora_fichas() -> PanelContainer:
 	s.content_margin_top = 10
 	s.content_margin_bottom = 10
 	p.add_theme_stylebox_override("panel", s)
-	var l := etiqueta("", 44)
+	var l := etiqueta("", 44, TEXTO, true, false)
 	var poner := func(total: int) -> void: l.text = "%s fichas" % miles(total)
 	poner.call(Progreso.fichas())
 	Progreso.fichas_cambiadas.connect(poner)
+	# Progreso vive siempre; la pildora no. Sin esto, la conexion sobrevive a
+	# la pantalla y la siguiente ganancia de fichas escribe en una etiqueta liberada.
+	l.tree_exiting.connect(func(): Progreso.fichas_cambiadas.disconnect(poner))
 	p.add_child(l)
 	return p
 
@@ -159,19 +165,29 @@ static func ir(desde: Node, escena: String) -> void:
 
 ## Aviso breve abajo de la pantalla que se desvanece solo.
 static func aviso(raiz: Control, texto: String) -> void:
+	var capa := MarginContainer.new()
+	capa.set_anchors_preset(Control.PRESET_FULL_RECT)
+	capa.add_theme_constant_override("margin_bottom", 300)
+	capa.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var v := VBoxContainer.new()
+	v.alignment = BoxContainer.ALIGNMENT_END
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var c := CenterContainer.new()
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var p := PanelContainer.new()
 	p.add_theme_stylebox_override("panel", caja(TEXTO, 40, 0, 0))
-	var l := etiqueta(texto, 42, Color.WHITE)
-	p.add_child(l)
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	raiz.add_child(p)
-	p.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM, Control.PRESET_MODE_MINSIZE, 260)
-	p.custom_minimum_size.x = 860
-	p.position.x = (raiz.size.x - 860) / 2.0
-	var tw := p.create_tween()
+	var l := etiqueta(texto, 42, Color.WHITE)
+	l.custom_minimum_size.x = 760
+	p.add_child(l)
+	c.add_child(p)
+	v.add_child(c)
+	capa.add_child(v)
+	raiz.add_child(capa)
+	var tw := capa.create_tween()
 	tw.tween_interval(2.2)
-	tw.tween_property(p, "modulate:a", 0.0, 0.35)
-	tw.tween_callback(p.queue_free)
+	tw.tween_property(capa, "modulate:a", 0.0, 0.35)
+	tw.tween_callback(capa.queue_free)
 
 
 ## Dialogo modal. `await Estilo.dialogo(...)` devuelve el indice elegido,

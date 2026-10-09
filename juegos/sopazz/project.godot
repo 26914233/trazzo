@@ -13,6 +13,7 @@ config/icon="res://arte/icono.svg"
 boot_splash/show_image=false
 boot_splash/bg_color=Color(0.992, 0.949, 0.973, 1)
 config/quit_on_go_back=false
+config/version="1.0.0"
 
 [autoload]
 
@@ -38,4 +39,3 @@ pointing/emulate_touch_from_mouse=true
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 textures/vram_compression/import_etc2_astc=true
-anti_aliasing/quality/msaa_2d=1
