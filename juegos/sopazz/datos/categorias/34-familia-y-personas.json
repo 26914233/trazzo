@@ -1,0 +1,224 @@
+{
+ "id": "familia-y-personas",
+ "nombre": "Familia y personas",
+ "color": "#BE185D",
+ "orden": 33,
+ "subtemas": [
+  {
+   "id": "familia",
+   "nombre": "Familia",
+   "palabras": [
+    "PADRE",
+    "MADRE",
+    "HIJO",
+    "HIJA",
+    "HERMANO",
+    "HERMANA",
+    "ABUELO",
+    "ABUELA",
+    "TÍO",
+    "TÍA",
+    "PRIMO",
+    "PRIMA"
+   ]
+  },
+  {
+   "id": "familia-politica",
+   "nombre": "Familia política",
+   "palabras": [
+    "SUEGRO",
+    "SUEGRA",
+    "CUÑADO",
+    "CUÑADA",
+    "YERNO",
+    "NUERA",
+    "SOBRINO",
+    "SOBRINA",
+    "NIETO",
+    "NIETA",
+    "PADRINO",
+    "MADRINA"
+   ]
+  },
+  {
+   "id": "etapas-de-la-vida",
+   "nombre": "Etapas de la vida",
+   "palabras": [
+    "BEBÉ",
+    "NIÑO",
+    "INFANCIA",
+    "ADOLESCENTE",
+    "JOVEN",
+    "ADULTO",
+    "ANCIANO",
+    "VEJEZ",
+    "JUVENTUD",
+    "NACIMIENTO",
+    "MADUREZ",
+    "NIÑEZ"
+   ]
+  },
+  {
+   "id": "personalidad",
+   "nombre": "Personalidad",
+   "palabras": [
+    "AMABLE",
+    "GENEROSO",
+    "ALEGRE",
+    "TÍMIDO",
+    "VALIENTE",
+    "HONESTO",
+    "PACIENTE",
+    "CURIOSO",
+    "TERCO",
+    "HUMILDE",
+    "CREATIVO",
+    "SINCERO"
+   ]
+  },
+  {
+   "id": "valores",
+   "nombre": "Valores",
+   "palabras": [
+    "RESPETO",
+    "HONESTIDAD",
+    "AMISTAD",
+    "JUSTICIA",
+    "LEALTAD",
+    "BONDAD",
+    "GRATITUD",
+    "PACIENCIA",
+    "HUMILDAD",
+    "SOLIDARIDAD",
+    "TOLERANCIA",
+    "LIBERTAD"
+   ]
+  },
+  {
+   "id": "nombres-comunes",
+   "nombre": "Nombres comunes",
+   "palabras": [
+    "MARÍA",
+    "JOSÉ",
+    "JUAN",
+    "ANA",
+    "CARLOS",
+    "LUIS",
+    "SOFÍA",
+    "VALENTINA",
+    "MATEO",
+    "SANTIAGO",
+    "CAMILA",
+    "DANIELA"
+   ]
+  },
+  {
+   "id": "apellidos-comunes",
+   "nombre": "Apellidos comunes",
+   "palabras": [
+    "GARCÍA",
+    "RODRÍGUEZ",
+    "MARTÍNEZ",
+    "LÓPEZ",
+    "GONZÁLEZ",
+    "PÉREZ",
+    "GÓMEZ",
+    "SÁNCHEZ",
+    "DÍAZ",
+    "TORRES",
+    "RAMÍREZ",
+    "ROJAS"
+   ]
+  },
+  {
+   "id": "amistad",
+   "nombre": "Amistad",
+   "palabras": [
+    "AMIGO",
+    "CONFIANZA",
+    "APOYO",
+    "RISA",
+    "SECRETO",
+    "ABRAZO",
+    "COMPAÑÍA",
+    "LEALTAD",
+    "JUEGO",
+    "CONSEJO",
+    "AVENTURA",
+    "RECUERDO"
+   ]
+  },
+  {
+   "id": "el-bebe",
+   "nombre": "El bebé",
+   "palabras": [
+    "BIBERÓN",
+    "PAÑAL",
+    "CUNA",
+    "SONAJERO",
+    "CHUPO",
+    "COCHE",
+    "BABERO",
+    "PAPILLA",
+    "GATEO",
+    "COBIJA",
+    "JUGUETE",
+    "NANA"
+   ]
+  },
+  {
+   "id": "los-abuelos",
+   "nombre": "Los abuelos",
+   "palabras": [
+    "ABUELO",
+    "ABUELA",
+    "CUENTO",
+    "RECUERDO",
+    "CONSEJO",
+    "BASTÓN",
+    "GAFAS",
+    "TEJIDO",
+    "RECETA",
+    "JARDÍN",
+    "HISTORIA",
+    "CARIÑO"
+   ]
+  },
+  {
+   "id": "el-vecindario",
+   "nombre": "El vecindario",
+   "palabras": [
+    "VECINO",
+    "BARRIO",
+    "CALLE",
+    "ESQUINA",
+    "PARQUE",
+    "TIENDA",
+    "PANADERÍA",
+    "PORTERÍA",
+    "CONJUNTO",
+    "EDIFICIO",
+    "CANCHA",
+    "IGLESIA"
+   ]
+  },
+  {
+   "id": "aspecto-fisico",
+   "nombre": "Aspecto físico",
+   "palabras": [
+    "ALTO",
+    "BAJO",
+    "DELGADO",
+    "RUBIO",
+    "MORENO",
+    "PELIRROJO",
+    "CALVO",
+    "BARBA",
+    "BIGOTE",
+    "PECAS",
+    "OJOS",
+    "SONRISA"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+# Fiestas | #F43F5E
+Navidad: árbol, pesebre, regalo, estrella, villancico, novena, buñuelo, natilla, reno, trineo, Papá Noel, aguinaldo
+Halloween: calabaza, disfraz, bruja, fantasma, dulce, murciélago, araña, esqueleto, vampiro, escoba, caldero, telaraña
+Cumpleaños: torta, vela, regalo, globo, piñata, fiesta, invitado, sorpresa, deseo, canción, sombrero, confeti
+Año nuevo: uvas, brindis, maleta, pólvora, abrazo, reloj, campanada, champaña, propósito, calendario, deseo, celebrar
+Boda: novia, novio, anillo, velo, ramo, altar, pastel, vals, padrino, madrina, brindis, luna de miel
+Carnaval: disfraz, máscara, comparsa, desfile, carroza, confeti, serpentina, reina, música, baile, maicena, marimonda
+Día de muertos: altar, ofrenda, calavera, catrina, cempasúchil, vela, pan, papel picado, panteón, recuerdo, flores, copal
+San Valentín: amor, corazón, rosa, chocolate, cita, beso, carta, regalo, cupido, flecha, pareja, amistad
+Pascua: huevo, conejo, canasta, primavera, chocolate, flor, pollito, resurrección, domingo, ramos, palma, campana
+Graduación: toga, birrete, diploma, título, discurso, ceremonia, promoción, anillo, foto, aplauso, logro, futuro
+Fiesta en casa: música, baile, comida, bebida, invitado, juego, luces, globo, karaoke, pasabocas, amigos, risa
+Picnic: canasta, mantel, sándwich, fruta, jugo, sombra, pasto, parque, hormiga, termo, servilleta, sol

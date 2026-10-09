@@ -1,0 +1,16 @@
+# Cocina del mundo | #EF4444
+Comida colombiana: ajiaco, bandeja paisa, sancocho, arepa, tamal, lechona, empanada, changua, mondongo, patacón, buñuelo, natilla
+Comida mexicana: taco, burrito, enchilada, quesadilla, tamal, pozole, mole, guacamole, nachos, tortilla, chilaquiles, tostada
+Comida italiana: pizza, pasta, lasaña, risotto, ravioli, espagueti, pesto, tiramisú, ñoquis, calzone, focaccia, polenta
+Comida japonesa: sushi, ramen, tempura, sashimi, miso, udon, wasabi, teriyaki, onigiri, gyoza, tofu, matcha
+Comida china: arroz chino, wantán, chop suey, rollito, tallarín, agridulce, pato laqueado, dim sum, tofu, jengibre, soya, wok
+Comida peruana: ceviche, lomo saltado, ají de gallina, causa, anticucho, huancaína, rocoto, chicha morada, picarones, leche de tigre, quinua, suspiro
+Comida española: paella, tortilla, gazpacho, churros, jamón, chorizo, croquetas, tapas, fabada, pulpo, salmorejo, turrón
+Comida francesa: crepe, croissant, baguette, quiche, ratatouille, soufflé, macarón, brioche, camembert, foie gras, escargot, crème brûlée
+Comida india: curry, masala, naan, samosa, tandoori, chutney, biryani, dal, cúrcuma, lassi, paneer, chai
+Comida árabe: falafel, hummus, shawarma, kebab, tabule, kibbe, baklava, cuscús, pita, tahini, dátil, labneh
+Comida argentina: asado, empanada, chimichurri, dulce de leche, alfajor, milanesa, choripán, mate, locro, provoleta, matambre, medialuna
+Comida venezolana: arepa, hallaca, pabellón, cachapa, tequeño, mandoca, quesillo, golfeado, chicha, empanada, asado negro, perico
+Comida coreana: kimchi, bibimbap, bulgogi, tteokbokki, japchae, kimbap, soju, gochujang, ramyeon, mandu, galbi, banchan
+Comida brasileña: feijoada, brigadeiro, picanha, açaí, coxinha, farofa, pão de queijo, moqueca, tapioca, guaraná, churrasco, quindim
+Comida tailandesa: pad thai, tom yum, satay, curry, coco, maní, jengibre, albahaca, tamarindo, fideos, mango, galanga

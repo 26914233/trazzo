@@ -1,0 +1,16 @@
+# Deportes | #0EA5E9
+Fútbol: gol, balón, arquero, delantero, defensa, penalti, córner, árbitro, tarjeta, cancha, estadio, hincha
+Baloncesto: canasta, aro, tablero, triple, rebote, bloqueo, pívot, base, alero, clavada, tiro, falta
+Tenis: raqueta, red, saque, set, juego, punto, revés, volea, drive, dobles, ventaja, cancha
+Béisbol: bate, pelota, guante, lanzador, receptor, jonrón, base, ponche, entrada, carrera, diamante, montículo
+Ciclismo: bicicleta, pedal, cadena, casco, piñón, manillar, etapa, montaña, sprint, pelotón, maillot, ruta
+Natación: piscina, carril, crol, braza, espalda, mariposa, gafas, gorro, clavado, salto, trampolín, nado
+Atletismo: maratón, carrera, salto, vallas, relevo, jabalina, disco, martillo, pértiga, podio, meta, pista
+Artes marciales: karate, judo, taekwondo, boxeo, kungfu, aikido, capoeira, jiujitsu, cinturón, dojo, kimono, patada
+Deportes de invierno: esquí, snowboard, patinaje, trineo, hockey, curling, biatlón, bobsleigh, slalom, nieve, hielo, pista
+Deportes acuáticos: surf, remo, vela, kayak, canotaje, buceo, waterpolo, windsurf, piragüismo, natación, rafting, apnea
+Deportes extremos: escalada, parapente, rafting, paracaidismo, puenting, skate, motocross, rapel, bungee, alpinismo, sandboard, tirolesa
+Gimnasio: pesas, barra, mancuerna, banco, cinta, bicicleta, colchoneta, entrenador, rutina, serie, repetición, músculo
+Olimpiadas: antorcha, medalla, oro, plata, bronce, podio, récord, atleta, anillos, villa, ceremonia, bandera
+Golf: golf, hoyo, palo, green, bandera, caddie, birdie, par, swing, búnker, tee, bola
+Voleibol: red, saque, remate, bloqueo, colocador, líbero, set, punto, rotación, arena, playa, balón

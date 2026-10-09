@@ -1,0 +1,13 @@
+# Familia y personas | #BE185D
+Familia: padre, madre, hijo, hija, hermano, hermana, abuelo, abuela, tío, tía, primo, prima
+Familia política: suegro, suegra, cuñado, cuñada, yerno, nuera, sobrino, sobrina, nieto, nieta, padrino, madrina
+Etapas de la vida: bebé, niño, infancia, adolescente, joven, adulto, anciano, vejez, juventud, nacimiento, madurez, niñez
+Personalidad: amable, generoso, alegre, tímido, valiente, honesto, paciente, curioso, terco, humilde, creativo, sincero
+Valores: respeto, honestidad, amistad, justicia, lealtad, bondad, gratitud, paciencia, humildad, solidaridad, tolerancia, libertad
+Nombres comunes: María, José, Juan, Ana, Carlos, Luis, Sofía, Valentina, Mateo, Santiago, Camila, Daniela
+Apellidos comunes: García, Rodríguez, Martínez, López, González, Pérez, Gómez, Sánchez, Díaz, Torres, Ramírez, Rojas
+Amistad: amigo, confianza, apoyo, risa, secreto, abrazo, compañía, lealtad, juego, consejo, aventura, recuerdo
+El bebé: biberón, pañal, cuna, sonajero, chupo, coche, babero, papilla, gateo, cobija, juguete, nana
+Los abuelos: abuelo, abuela, cuento, recuerdo, consejo, bastón, gafas, tejido, receta, jardín, historia, cariño
+El vecindario: vecino, barrio, calle, esquina, parque, tienda, panadería, portería, conjunto, edificio, cancha, iglesia
+Aspecto físico: alto, bajo, delgado, rubio, moreno, pelirrojo, calvo, barba, bigote, pecas, ojos, sonrisa

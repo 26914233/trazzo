@@ -1,0 +1,16 @@
+# Música | #F97316
+Instrumentos de cuerda: guitarra, violín, viola, violonchelo, contrabajo, arpa, bajo, tiple, ukelele, banjo, mandolina, charango
+Instrumentos de viento: flauta, trompeta, saxofón, clarinete, oboe, fagot, trombón, tuba, corno, gaita, armónica, quena
+Percusión: tambor, bombo, platillo, bongó, conga, timbal, maraca, xilófono, triángulo, pandereta, cajón, guacharaca
+Géneros musicales: rock, pop, jazz, blues, reguetón, salsa, bachata, merengue, tango, metal, clásica, rap
+Teoría musical: nota, escala, acorde, compás, ritmo, melodía, armonía, tempo, clave, pentagrama, silencio, octava
+Figuras musicales: redonda, blanca, negra, corchea, semicorchea, fusa, puntillo, ligadura, sostenido, bemol, becuadro, calderón
+Orquesta: director, batuta, partitura, atril, solista, coro, ensayo, concierto, violín, viola, timbal, sinfonía
+Partes de la guitarra: mástil, traste, cuerda, clavija, puente, boca, diapasón, caja, cejilla, púa, cabeza, tapa
+Bailes: salsa, cumbia, tango, vals, flamenco, merengue, bachata, samba, mambo, polca, joropo, hiphop
+Voces y canto: soprano, contralto, tenor, barítono, bajo, coro, solista, falsete, afinar, cantar, voz, dueto
+Equipo de sonido: micrófono, parlante, audífonos, amplificador, mezcladora, consola, grabadora, vinilo, casete, altavoz, auricular, cable
+Compositores clásicos: Mozart, Bach, Beethoven, Vivaldi, Chopin, Haydn, Handel, Verdi, Wagner, Debussy, Brahms, Schubert
+Conciertos: escenario, público, banda, gira, entrada, aplausos, telonero, luces, sonido, ensayo, guitarrista, baterista
+Rock: guitarra, batería, bajo, amplificador, riff, solo, banda, concierto, rockero, distorsión, balada, metal
+Ritmos latinos: salsa, merengue, bachata, cumbia, reguetón, mambo, chachachá, bolero, tango, son, rumba, vallenato

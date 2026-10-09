@@ -1,0 +1,13 @@
+# Biología | #10B981
+La célula: célula, núcleo, membrana, citoplasma, ribosoma, mitocondria, vacuola, lisosoma, cloroplasto, pared, organelo, centríolo
+Genética: gen, ADN, ARN, cromosoma, herencia, mutación, alelo, genoma, clon, Mendel, dominante, recesivo
+Microorganismos: bacteria, virus, hongo, levadura, ameba, alga, protozoo, moho, bacilo, microbio, germen, paramecio
+Partes de la planta: raíz, tallo, hoja, flor, fruto, semilla, polen, savia, clorofila, estambre, pistilo, pétalo
+Fotosíntesis: luz, sol, agua, oxígeno, glucosa, clorofila, energía, carbono, hoja, almidón, estoma, savia
+Ecosistemas: selva, bosque, desierto, sabana, tundra, arrecife, pradera, manglar, páramo, humedal, taiga, océano
+Cadena alimenticia: productor, consumidor, herbívoro, carnívoro, omnívoro, depredador, presa, carroñero, parásito, huésped, hongo, plancton
+Evolución: Darwin, especie, selección, adaptación, fósil, ancestro, mutación, extinción, variación, linaje, híbrido, evolución
+Clasificación de los seres vivos: animal, vegetal, hongo, bacteria, protista, arquea, especie, género, familia, orden, clase, filo
+Sistema inmune: anticuerpo, antígeno, vacuna, glóbulo, linfocito, fiebre, defensa, virus, infección, alergia, inmunidad, leucocito
+Botánica: helecho, musgo, cactus, orquídea, palmera, pino, roble, bambú, girasol, rosa, trébol, liquen
+Biólogos famosos: Darwin, Mendel, Pasteur, Linneo, Fleming, Goodall, Wallace, Lamarck, Koch, Hooke, Watson, Crick

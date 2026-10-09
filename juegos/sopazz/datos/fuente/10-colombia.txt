@@ -1,0 +1,16 @@
+# Colombia | #FACC15
+Departamentos: Antioquia, Boyacá, Cundinamarca, Santander, Nariño, Cauca, Huila, Tolima, Caldas, Meta, Chocó, Bolívar
+Capitales departamentales: Medellín, Tunja, Bucaramanga, Pasto, Popayán, Neiva, Ibagué, Manizales, Valledupar, Quibdó, Cartagena, Montería
+Ríos de Colombia: Magdalena, Cauca, Atrato, Meta, Guaviare, Caquetá, Putumayo, Amazonas, Sinú, Orinoco, Arauca, Vichada
+Platos típicos: ajiaco, sancocho, bandeja paisa, tamal, lechona, arepa, changua, mondongo, cazuela, viudo, mute, patacón
+Ritmos colombianos: cumbia, vallenato, bambuco, joropo, currulao, champeta, porro, pasillo, guabina, salsa, mapalé, bullerengue
+Frutas colombianas: lulo, curuba, guanábana, maracuyá, uchuva, pitahaya, borojó, feijoa, chontaduro, zapote, granadilla, guama
+Fauna colombiana: cóndor, jaguar, danta, chigüiro, armadillo, perezoso, tucán, colibrí, guacamaya, caimán, manatí, tití
+Flora colombiana: orquídea, frailejón, palma de cera, ceiba, guayacán, yarumo, heliconia, cafeto, guadua, samán, roble, cedro
+Ciudades: Bogotá, Medellín, Cali, Barranquilla, Cartagena, Cúcuta, Pereira, Santa Marta, Leticia, Riohacha, Sincelejo, Armenia
+Palabras colombianas: parcero, chévere, bacano, berraco, tinto, guayabo, camello, rumba, pola, lucas, chino, ñapa
+Fiestas y carnavales: carnaval, feria, festival, desfile, comparsa, silleteros, reinado, marimonda, cumbiamba, tablado, murga, alborada
+Regiones naturales: Andina, Caribe, Pacífica, Orinoquía, Amazonía, Insular, páramo, llano, sabana, sierra, selva, costa
+Símbolos patrios: bandera, escudo, himno, cóndor, orquídea, palma, amarillo, azul, rojo, libertad, orden, patria
+Comida callejera: empanada, arepa, salchipapa, mazorca, chuzo, obleas, raspado, buñuelo, mango biche, salpicón, chontaduro, pandebono
+Bogotá: Monserrate, Candelaria, Usaquén, Chapinero, Transmilenio, Suba, Kennedy, ciclovía, Teusaquillo, Bosa, Fontibón, Engativá

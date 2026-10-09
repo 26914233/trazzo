@@ -1,0 +1,224 @@
+{
+ "id": "matematicas",
+ "nombre": "Matemáticas",
+ "color": "#4F46E5",
+ "orden": 26,
+ "subtemas": [
+  {
+   "id": "numeros",
+   "nombre": "Números",
+   "palabras": [
+    "UNO",
+    "DOS",
+    "TRES",
+    "CUATRO",
+    "CINCO",
+    "SEIS",
+    "SIETE",
+    "OCHO",
+    "NUEVE",
+    "DIEZ",
+    "CIEN",
+    "MIL"
+   ]
+  },
+  {
+   "id": "numeros-ordinales",
+   "nombre": "Números ordinales",
+   "palabras": [
+    "PRIMERO",
+    "SEGUNDO",
+    "TERCERO",
+    "CUARTO",
+    "QUINTO",
+    "SEXTO",
+    "SÉPTIMO",
+    "OCTAVO",
+    "NOVENO",
+    "DÉCIMO",
+    "ÚLTIMO",
+    "CENTÉSIMO"
+   ]
+  },
+  {
+   "id": "operaciones",
+   "nombre": "Operaciones",
+   "palabras": [
+    "SUMA",
+    "RESTA",
+    "DIVISIÓN",
+    "PRODUCTO",
+    "COCIENTE",
+    "FACTOR",
+    "POTENCIA",
+    "RAÍZ",
+    "RESULTADO",
+    "CÁLCULO",
+    "TOTAL",
+    "MULTIPLICAR"
+   ]
+  },
+  {
+   "id": "figuras-planas",
+   "nombre": "Figuras planas",
+   "palabras": [
+    "CÍRCULO",
+    "TRIÁNGULO",
+    "CUADRADO",
+    "RECTÁNGULO",
+    "ROMBO",
+    "TRAPECIO",
+    "PENTÁGONO",
+    "HEXÁGONO",
+    "ÓVALO",
+    "POLÍGONO",
+    "OCTÁGONO",
+    "ELIPSE"
+   ]
+  },
+  {
+   "id": "cuerpos-geometricos",
+   "nombre": "Cuerpos geométricos",
+   "palabras": [
+    "CUBO",
+    "ESFERA",
+    "CILINDRO",
+    "CONO",
+    "PIRÁMIDE",
+    "PRISMA",
+    "TETRAEDRO",
+    "OCTAEDRO",
+    "DODECAEDRO",
+    "ICOSAEDRO",
+    "TOROIDE",
+    "ORTOEDRO"
+   ]
+  },
+  {
+   "id": "geometria",
+   "nombre": "Geometría",
+   "palabras": [
+    "ÁNGULO",
+    "RECTA",
+    "PUNTO",
+    "VÉRTICE",
+    "LADO",
+    "ARISTA",
+    "CARA",
+    "RADIO",
+    "DIÁMETRO",
+    "PERÍMETRO",
+    "ÁREA",
+    "VOLUMEN"
+   ]
+  },
+  {
+   "id": "algebra",
+   "nombre": "Álgebra",
+   "palabras": [
+    "VARIABLE",
+    "ECUACIÓN",
+    "INCÓGNITA",
+    "TÉRMINO",
+    "COEFICIENTE",
+    "EXPONENTE",
+    "POLINOMIO",
+    "FUNCIÓN",
+    "GRÁFICA",
+    "DESPEJAR",
+    "SIGNO",
+    "IGUALDAD"
+   ]
+  },
+  {
+   "id": "medidas",
+   "nombre": "Medidas",
+   "palabras": [
+    "METRO",
+    "CENTÍMETRO",
+    "KILÓMETRO",
+    "LITRO",
+    "GRAMO",
+    "KILO",
+    "LIBRA",
+    "PULGADA",
+    "MILLA",
+    "ONZA",
+    "GALÓN",
+    "HECTÁREA"
+   ]
+  },
+  {
+   "id": "estadistica",
+   "nombre": "Estadística",
+   "palabras": [
+    "PROMEDIO",
+    "MEDIA",
+    "MODA",
+    "MEDIANA",
+    "GRÁFICO",
+    "MUESTRA",
+    "ENCUESTA",
+    "DATO",
+    "PORCENTAJE",
+    "FRECUENCIA",
+    "TABLA",
+    "RANGO"
+   ]
+  },
+  {
+   "id": "fracciones-y-decimales",
+   "nombre": "Fracciones y decimales",
+   "palabras": [
+    "FRACCIÓN",
+    "NUMERADOR",
+    "DENOMINADOR",
+    "DECIMAL",
+    "ENTERO",
+    "MITAD",
+    "TERCIO",
+    "CUARTO",
+    "COMA",
+    "PORCENTAJE",
+    "RAZÓN",
+    "PROPORCIÓN"
+   ]
+  },
+  {
+   "id": "matematicos-famosos",
+   "nombre": "Matemáticos famosos",
+   "palabras": [
+    "PITÁGORAS",
+    "EUCLIDES",
+    "ARQUÍMEDES",
+    "FIBONACCI",
+    "GAUSS",
+    "EULER",
+    "DESCARTES",
+    "NEWTON",
+    "LEIBNIZ",
+    "HIPATIA",
+    "TURING",
+    "FERMAT"
+   ]
+  },
+  {
+   "id": "el-tiempo-y-el-reloj",
+   "nombre": "El tiempo y el reloj",
+   "palabras": [
+    "SEGUNDO",
+    "MINUTO",
+    "HORA",
+    "DÍA",
+    "SEMANA",
+    "MES",
+    "AÑO",
+    "DÉCADA",
+    "SIGLO",
+    "MILENIO",
+    "RELOJ",
+    "CALENDARIO"
+   ]
+  }
+ ]
+}

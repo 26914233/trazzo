@@ -1,0 +1,188 @@
+{
+ "id": "pasatiempos",
+ "nombre": "Pasatiempos",
+ "color": "#C026D3",
+ "orden": 38,
+ "subtemas": [
+  {
+   "id": "jardineria",
+   "nombre": "Jardinería",
+   "palabras": [
+    "MACETA",
+    "TIERRA",
+    "SEMILLA",
+    "REGAR",
+    "PODAR",
+    "ABONO",
+    "FLOR",
+    "CACTUS",
+    "SUCULENTA",
+    "TRASPLANTAR",
+    "HOJA",
+    "RAÍZ"
+   ]
+  },
+  {
+   "id": "pesca",
+   "nombre": "Pesca",
+   "palabras": [
+    "CAÑA",
+    "ANZUELO",
+    "CARNADA",
+    "SEDAL",
+    "RED",
+    "RÍO",
+    "BOTE",
+    "PEZ",
+    "LOMBRIZ",
+    "CARRETE",
+    "FLOTADOR",
+    "PACIENCIA"
+   ]
+  },
+  {
+   "id": "cocinar",
+   "nombre": "Cocinar",
+   "palabras": [
+    "RECETA",
+    "HORNO",
+    "SARTÉN",
+    "SAL",
+    "SAZÓN",
+    "PICAR",
+    "FREÍR",
+    "HERVIR",
+    "HORNEAR",
+    "MEZCLAR",
+    "BATIR",
+    "DELANTAL"
+   ]
+  },
+  {
+   "id": "lectura",
+   "nombre": "Lectura",
+   "palabras": [
+    "LIBRO",
+    "NOVELA",
+    "PÁGINA",
+    "LECTOR",
+    "SEPARADOR",
+    "BIBLIOTECA",
+    "AUTOR",
+    "CAPÍTULO",
+    "HISTORIA",
+    "CÓMIC",
+    "REVISTA",
+    "CUENTO"
+   ]
+  },
+  {
+   "id": "manualidades",
+   "nombre": "Manualidades",
+   "palabras": [
+    "PAPEL",
+    "TIJERAS",
+    "PEGANTE",
+    "CARTÓN",
+    "ORIGAMI",
+    "PINTURA",
+    "PINCEL",
+    "BRILLANTINA",
+    "CINTA",
+    "BOTONES",
+    "LANA",
+    "COLLAGE"
+   ]
+  },
+  {
+   "id": "coleccionismo",
+   "nombre": "Coleccionismo",
+   "palabras": [
+    "SELLOS",
+    "MONEDAS",
+    "CROMOS",
+    "ÁLBUM",
+    "POSTALES",
+    "FIGURAS",
+    "COLECCIÓN",
+    "RAREZA",
+    "BILLETES",
+    "INSIGNIAS",
+    "LLAVEROS",
+    "DISCOS"
+   ]
+  },
+  {
+   "id": "tejido",
+   "nombre": "Tejido",
+   "palabras": [
+    "LANA",
+    "AGUJA",
+    "CROCHET",
+    "PUNTO",
+    "OVILLO",
+    "BUFANDA",
+    "GORRO",
+    "PATRÓN",
+    "HILO",
+    "TELAR",
+    "MACRAMÉ",
+    "PUNTADA"
+   ]
+  },
+  {
+   "id": "senderismo",
+   "nombre": "Senderismo",
+   "palabras": [
+    "SENDERO",
+    "MOCHILA",
+    "BOTAS",
+    "BASTÓN",
+    "MAPA",
+    "CUMBRE",
+    "CAMINO",
+    "MIRADOR",
+    "CANTIMPLORA",
+    "MONTAÑA",
+    "PAISAJE",
+    "NATURALEZA"
+   ]
+  },
+  {
+   "id": "origami",
+   "nombre": "Origami",
+   "palabras": [
+    "PAPEL",
+    "PLIEGUE",
+    "GRULLA",
+    "RANA",
+    "BARCO",
+    "AVIÓN",
+    "FLOR",
+    "CAJA",
+    "ESTRELLA",
+    "DOBLAR",
+    "CUADRADO",
+    "FIGURA"
+   ]
+  },
+  {
+   "id": "musica-en-casa",
+   "nombre": "Música en casa",
+   "palabras": [
+    "CANTAR",
+    "TOCAR",
+    "GUITARRA",
+    "PIANO",
+    "UKELELE",
+    "PARTITURA",
+    "KARAOKE",
+    "ENSAYO",
+    "CANCIÓN",
+    "RITMO",
+    "AFINAR",
+    "MELODÍA"
+   ]
+  }
+ ]
+}

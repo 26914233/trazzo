@@ -1,0 +1,13 @@
+# Mitología | #7C3AED
+Dioses griegos: Zeus, Hera, Poseidón, Atenea, Apolo, Artemisa, Ares, Afrodita, Hermes, Hades, Dionisio, Hefesto
+Dioses romanos: Júpiter, Juno, Neptuno, Minerva, Marte, Venus, Mercurio, Diana, Vulcano, Baco, Plutón, Ceres
+Mitología nórdica: Odín, Thor, Loki, Freya, Frigg, Balder, Heimdall, Tyr, Asgard, Midgard, Valquiria, Ragnarok
+Dioses egipcios: Osiris, Isis, Horus, Anubis, Set, Thot, Bastet, Sekhmet, Ptah, Hathor, Amón, Atón
+Criaturas mitológicas: dragón, fénix, unicornio, grifo, centauro, minotauro, sirena, quimera, hidra, pegaso, cíclope, kraken
+Leyendas latinoamericanas: Llorona, Patasola, Mohán, Madremonte, Tunda, Silbón, Cadejo, Sayona, Chupacabras, Duende, Bola de fuego, Pombero
+Mitología azteca y maya: Quetzalcóatl, Tláloc, Tezcatlipoca, Coatlicue, Xipe, Kukulkán, Itzamná, Chaac, Ixchel, Mictlán, Xibalbá, Hunahpú
+Mitología muisca y andina: Bachué, Bochica, Chía, Sué, Guatavita, Chiminigagua, Inti, Pachamama, Viracocha, Mamaquilla, Supay, Illapa
+Héroes griegos: Hércules, Aquiles, Ulises, Perseo, Teseo, Jasón, Orfeo, Héctor, Eneas, Áyax, Belerofonte, Atalanta
+Monstruos legendarios: Medusa, Cerbero, Hidra, Escila, Caribdis, Tifón, Gorgona, Harpía, Esfinge, Kraken, Leviatán, Basilisco
+Seres fantásticos: hada, elfo, gnomo, duende, enano, trol, ogro, ninfa, sátiro, gigante, sílfide, fauno
+Mitología japonesa: Amaterasu, Susanoo, Izanagi, Izanami, kami, kitsune, oni, tengu, kappa, yokai, Raijin, Fujin

@@ -1,0 +1,242 @@
+{
+ "id": "profesiones",
+ "nombre": "Profesiones",
+ "color": "#14B8A6",
+ "orden": 21,
+ "subtemas": [
+  {
+   "id": "salud",
+   "nombre": "Salud",
+   "palabras": [
+    "MÉDICO",
+    "ENFERMERO",
+    "DENTISTA",
+    "CIRUJANO",
+    "PEDIATRA",
+    "FARMACÉUTICO",
+    "PSICÓLOGO",
+    "VETERINARIO",
+    "TERAPEUTA",
+    "PARAMÉDICO",
+    "PARTERA",
+    "OPTÓMETRA"
+   ]
+  },
+  {
+   "id": "construccion",
+   "nombre": "Construcción",
+   "palabras": [
+    "ALBAÑIL",
+    "ARQUITECTO",
+    "INGENIERO",
+    "CARPINTERO",
+    "PLOMERO",
+    "ELECTRICISTA",
+    "PINTOR",
+    "SOLDADOR",
+    "OBRERO",
+    "CAPATAZ",
+    "TOPÓGRAFO",
+    "MAESTRO"
+   ]
+  },
+  {
+   "id": "educacion",
+   "nombre": "Educación",
+   "palabras": [
+    "PROFESOR",
+    "MAESTRO",
+    "RECTOR",
+    "TUTOR",
+    "PEDAGOGO",
+    "INVESTIGADOR",
+    "COORDINADOR",
+    "ORIENTADOR",
+    "CATEDRÁTICO",
+    "DOCENTE",
+    "DECANO",
+    "MONITOR"
+   ]
+  },
+  {
+   "id": "arte-y-espectaculo",
+   "nombre": "Arte y espectáculo",
+   "palabras": [
+    "ACTOR",
+    "CANTANTE",
+    "MÚSICO",
+    "PINTOR",
+    "BAILARÍN",
+    "ESCULTOR",
+    "FOTÓGRAFO",
+    "PAYASO",
+    "MAGO",
+    "ESCRITOR",
+    "POETA",
+    "DIRECTOR"
+   ]
+  },
+  {
+   "id": "oficios-manuales",
+   "nombre": "Oficios manuales",
+   "palabras": [
+    "SASTRE",
+    "ZAPATERO",
+    "HERRERO",
+    "JOYERO",
+    "RELOJERO",
+    "TAPICERO",
+    "EBANISTA",
+    "ALFARERO",
+    "PANADERO",
+    "CARNICERO",
+    "PELUQUERO",
+    "BARBERO"
+   ]
+  },
+  {
+   "id": "transporte",
+   "nombre": "Transporte",
+   "palabras": [
+    "PILOTO",
+    "CONDUCTOR",
+    "CHOFER",
+    "TAXISTA",
+    "CAMIONERO",
+    "MAQUINISTA",
+    "CAPITÁN",
+    "MARINERO",
+    "AZAFATA",
+    "MENSAJERO",
+    "CONTROLADOR",
+    "MECÁNICO"
+   ]
+  },
+  {
+   "id": "seguridad-y-emergencias",
+   "nombre": "Seguridad y emergencias",
+   "palabras": [
+    "POLICÍA",
+    "BOMBERO",
+    "SOLDADO",
+    "GUARDIA",
+    "VIGILANTE",
+    "RESCATISTA",
+    "SALVAVIDAS",
+    "DETECTIVE",
+    "ESCOLTA",
+    "AGENTE",
+    "MILITAR",
+    "SOCORRISTA"
+   ]
+  },
+  {
+   "id": "el-campo",
+   "nombre": "El campo",
+   "palabras": [
+    "AGRICULTOR",
+    "GANADERO",
+    "CAMPESINO",
+    "JORNALERO",
+    "PESCADOR",
+    "APICULTOR",
+    "CAFICULTOR",
+    "VAQUERO",
+    "GRANJERO",
+    "PASTOR",
+    "RECOLECTOR",
+    "FLORICULTOR"
+   ]
+  },
+  {
+   "id": "oficina",
+   "nombre": "Oficina",
+   "palabras": [
+    "SECRETARIO",
+    "CONTADOR",
+    "ABOGADO",
+    "GERENTE",
+    "ASISTENTE",
+    "AUXILIAR",
+    "ANALISTA",
+    "ECONOMISTA",
+    "CONSULTOR",
+    "ARCHIVISTA",
+    "CAJERO",
+    "JEFE"
+   ]
+  },
+  {
+   "id": "gastronomia",
+   "nombre": "Gastronomía",
+   "palabras": [
+    "CHEF",
+    "COCINERO",
+    "MESERO",
+    "PANADERO",
+    "PASTELERO",
+    "BARISTA",
+    "CANTINERO",
+    "SUMILLER",
+    "CARNICERO",
+    "REPOSTERO",
+    "AYUDANTE",
+    "PIZZERO"
+   ]
+  },
+  {
+   "id": "tecnologia",
+   "nombre": "Tecnología",
+   "palabras": [
+    "PROGRAMADOR",
+    "DISEÑADOR",
+    "INGENIERO",
+    "ANALISTA",
+    "TÉCNICO",
+    "TESTER",
+    "CIENTÍFICO",
+    "SOPORTE",
+    "EDITOR",
+    "ANIMADOR",
+    "REDACTOR",
+    "STREAMER"
+   ]
+  },
+  {
+   "id": "comercio",
+   "nombre": "Comercio",
+   "palabras": [
+    "VENDEDOR",
+    "COMERCIANTE",
+    "CAJERO",
+    "TENDERO",
+    "BODEGUERO",
+    "REPARTIDOR",
+    "MENSAJERO",
+    "DISTRIBUIDOR",
+    "ASESOR",
+    "PROMOTOR",
+    "COMPRADOR",
+    "LIBRERO"
+   ]
+  },
+  {
+   "id": "ciencia",
+   "nombre": "Ciencia",
+   "palabras": [
+    "CIENTÍFICO",
+    "BIÓLOGO",
+    "QUÍMICO",
+    "FÍSICO",
+    "ASTRÓNOMO",
+    "GEÓLOGO",
+    "MATEMÁTICO",
+    "INVESTIGADOR",
+    "BOTÁNICO",
+    "ZOÓLOGO",
+    "ARQUEÓLOGO",
+    "INGENIERO"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,14 @@
+# Física | #6366F1
+Mecánica: fuerza, masa, velocidad, aceleración, inercia, peso, fricción, impulso, palanca, polea, trabajo, potencia
+Energía: cinética, potencial, térmica, eléctrica, nuclear, química, solar, eólica, mecánica, joule, caloría, vatio
+Ondas y sonido: onda, frecuencia, amplitud, eco, sonido, decibel, vibración, tono, resonancia, longitud, periodo, hercio
+Óptica: luz, lente, espejo, prisma, reflexión, refracción, láser, fotón, color, rayo, sombra, lupa
+Calor y temperatura: calor, temperatura, grado, termómetro, kelvin, celsius, caloría, dilatación, conducción, convección, radiación, entropía
+Unidades de medida: metro, kilogramo, segundo, amperio, kelvin, mol, candela, newton, julio, pascal, voltio, ohmio
+Física moderna: cuántica, relatividad, quark, fotón, átomo, partícula, neutrino, bosón, fisión, fusión, plasma, antimateria
+Físicos famosos: Newton, Einstein, Galileo, Tesla, Planck, Curie, Bohr, Hawking, Maxwell, Faraday, Feynman, Kepler
+Movimiento: trayectoria, distancia, rapidez, caída, órbita, péndulo, rotación, giro, salto, rebote, inercia, momento
+Gravedad: gravedad, peso, masa, atracción, órbita, satélite, caída, Newton, manzana, planeta, marea, ingravidez
+Fluidos: presión, densidad, flotar, empuje, caudal, viscosidad, líquido, gas, burbuja, hidráulica, Arquímedes, Pascal
+Magnetismo: imán, polo, norte, sur, brújula, campo, atracción, repulsión, hierro, bobina, inducción, magnetita
+Instrumentos de medición: regla, balanza, cronómetro, termómetro, voltímetro, dinamómetro, barómetro, calibrador, manómetro, probeta, metro, reloj

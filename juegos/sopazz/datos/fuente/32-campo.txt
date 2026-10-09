@@ -1,0 +1,13 @@
+# Campo | #65A30D
+Granja: granja, establo, corral, granero, tractor, cerca, gallinero, pasto, heno, molino, pozo, huerta
+Cultivos: maíz, trigo, arroz, papa, café, caña, cacao, plátano, yuca, algodón, soya, cebada
+El café: cafeto, grano, cereza, recolector, tostado, molido, secado, beneficio, taza, aroma, pergamino, tinto
+Herramientas del campo: azadón, pala, machete, rastrillo, hoz, arado, carretilla, regadera, tijeras, guadaña, pica, bieldo
+Ganadería: vaca, toro, ternero, ordeño, leche, potrero, establo, corral, rodeo, vaquero, lazo, ganado
+Huerta: tomate, lechuga, cilantro, cebolla, zanahoria, pepino, fríjol, ahuyama, rábano, acelga, espinaca, perejil
+Cosecha: cosecha, siembra, semilla, riego, abono, surco, plántula, cultivo, fruto, recoger, temporada, lluvia
+Maquinaria agrícola: tractor, cosechadora, sembradora, arado, fumigadora, remolque, trilladora, empacadora, motobomba, rastra, aspersor, motocultor
+Apicultura: abeja, colmena, miel, panal, reina, zángano, obrera, polen, cera, néctar, apicultor, enjambre
+Aves de corral: gallina, gallo, pollito, huevo, pato, pavo, codorniz, ganso, incubadora, nido, plumas, maíz
+Árboles frutales: naranjo, limonero, manzano, peral, mango, aguacate, guayabo, cerezo, durazno, ciruelo, papayo, olivo
+Mercado campesino: plaza, puesto, bulto, canasto, balanza, verdura, fruta, queso, panela, yapa, vendedor, cliente

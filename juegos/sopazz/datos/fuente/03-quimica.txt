@@ -1,0 +1,15 @@
+# Química | #8B5CF6
+Laboratorio: probeta, matraz, pipeta, embudo, mechero, balanza, tubo, gradilla, bureta, mortero, crisol, pinza
+Metales alcalinos: litio, sodio, potasio, rubidio, cesio, francio, berilio, magnesio, calcio, estroncio, bario, radio
+Gases nobles y halógenos: helio, neón, argón, kriptón, xenón, radón, flúor, cloro, bromo, yodo, astato, oganesón
+Metales de transición: hierro, cobre, zinc, níquel, cobalto, cromo, titanio, plata, oro, platino, mercurio, manganeso
+No metales y metaloides: hidrógeno, carbono, nitrógeno, oxígeno, fósforo, azufre, selenio, boro, silicio, arsénico, telurio, germanio
+Conceptos químicos: átomo, molécula, ion, enlace, valencia, isótopo, electrón, protón, neutrón, núcleo, orbital, compuesto
+Reacciones: reacción, reactivo, producto, catalizador, oxidación, reducción, combustión, ácido, base, sal, neutralizar, enzima
+Estados de la materia: sólido, líquido, gas, plasma, fusión, ebullición, evaporar, condensar, sublimar, congelar, vapor, presión
+Química orgánica: carbono, metano, etanol, benceno, polímero, alcohol, ácido, éster, éter, glucosa, proteína, lípido
+Química en casa: jabón, vinagre, bicarbonato, cloro, detergente, sal, azúcar, alcohol, amoníaco, limón, levadura, aceite
+Tabla periódica: periodo, grupo, elemento, símbolo, masa, número, metal, metaloide, lantánido, actínido, familia, columna
+Químicos famosos: Curie, Lavoisier, Mendeléiev, Dalton, Boyle, Avogadro, Nobel, Pauling, Bohr, Rutherford, Faraday, Pasteur
+Soluciones y mezclas: solución, soluto, solvente, mezcla, disolver, diluir, saturada, filtrar, decantar, destilar, emulsión, coloide
+Elementos raros: uranio, plutonio, torio, polonio, neodimio, itrio, cerio, lantano, europio, gadolinio, tungsteno, iridio

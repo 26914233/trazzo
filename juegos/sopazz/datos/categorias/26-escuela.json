@@ -1,0 +1,224 @@
+{
+ "id": "escuela",
+ "nombre": "Escuela",
+ "color": "#2563EB",
+ "orden": 25,
+ "subtemas": [
+  {
+   "id": "utiles-escolares",
+   "nombre": "Útiles escolares",
+   "palabras": [
+    "CUADERNO",
+    "LÁPIZ",
+    "BORRADOR",
+    "REGLA",
+    "TIJERAS",
+    "PEGANTE",
+    "COLORES",
+    "MORRAL",
+    "SACAPUNTAS",
+    "COMPÁS",
+    "MARCADOR",
+    "CARPETA"
+   ]
+  },
+  {
+   "id": "materias",
+   "nombre": "Materias",
+   "palabras": [
+    "MATEMÁTICAS",
+    "ESPAÑOL",
+    "CIENCIAS",
+    "HISTORIA",
+    "GEOGRAFÍA",
+    "INGLÉS",
+    "MÚSICA",
+    "ARTE",
+    "QUÍMICA",
+    "FÍSICA",
+    "BIOLOGÍA",
+    "ÉTICA"
+   ]
+  },
+  {
+   "id": "el-salon-de-clase",
+   "nombre": "El salón de clase",
+   "palabras": [
+    "TABLERO",
+    "PUPITRE",
+    "SILLA",
+    "PROFESOR",
+    "ALUMNO",
+    "TIZA",
+    "BORRADOR",
+    "MAPA",
+    "RELOJ",
+    "VENTANA",
+    "PUERTA",
+    "LISTA"
+   ]
+  },
+  {
+   "id": "la-universidad",
+   "nombre": "La universidad",
+   "palabras": [
+    "FACULTAD",
+    "CARRERA",
+    "SEMESTRE",
+    "CAMPUS",
+    "RECTOR",
+    "DECANO",
+    "MATRÍCULA",
+    "TESIS",
+    "CRÉDITO",
+    "PROFESOR",
+    "EXAMEN",
+    "GRADO"
+   ]
+  },
+  {
+   "id": "carreras-universitarias",
+   "nombre": "Carreras universitarias",
+   "palabras": [
+    "MEDICINA",
+    "DERECHO",
+    "INGENIERÍA",
+    "PSICOLOGÍA",
+    "ECONOMÍA",
+    "ARQUITECTURA",
+    "ENFERMERÍA",
+    "CONTADURÍA",
+    "FILOSOFÍA",
+    "PERIODISMO",
+    "DISEÑO",
+    "BIOLOGÍA"
+   ]
+  },
+  {
+   "id": "examenes-y-notas",
+   "nombre": "Exámenes y notas",
+   "palabras": [
+    "EXAMEN",
+    "PRUEBA",
+    "NOTA",
+    "QUIZ",
+    "TAREA",
+    "PREGUNTA",
+    "RESPUESTA",
+    "APROBAR",
+    "REPASAR",
+    "ESTUDIAR",
+    "CALIFICACIÓN",
+    "BOLETÍN"
+   ]
+  },
+  {
+   "id": "biblioteca",
+   "nombre": "Biblioteca",
+   "palabras": [
+    "LIBRO",
+    "ESTANTE",
+    "PRÉSTAMO",
+    "LECTOR",
+    "SILENCIO",
+    "REVISTA",
+    "DICCIONARIO",
+    "ENCICLOPEDIA",
+    "MESA",
+    "FICHA",
+    "AUTOR",
+    "LECTURA"
+   ]
+  },
+  {
+   "id": "gramatica",
+   "nombre": "Gramática",
+   "palabras": [
+    "SUSTANTIVO",
+    "VERBO",
+    "ADJETIVO",
+    "ADVERBIO",
+    "ARTÍCULO",
+    "PRONOMBRE",
+    "SUJETO",
+    "PREDICADO",
+    "ORACIÓN",
+    "SÍLABA",
+    "ACENTO",
+    "PALABRA"
+   ]
+  },
+  {
+   "id": "recreo",
+   "nombre": "Recreo",
+   "palabras": [
+    "RECREO",
+    "PATIO",
+    "MERIENDA",
+    "LONCHERA",
+    "BALÓN",
+    "JUEGO",
+    "AMIGO",
+    "TIMBRE",
+    "CANCHA",
+    "COLUMPIO",
+    "RISA",
+    "DESCANSO"
+   ]
+  },
+  {
+   "id": "lectura-y-escritura",
+   "nombre": "Lectura y escritura",
+   "palabras": [
+    "LECTURA",
+    "ESCRITURA",
+    "CUENTO",
+    "POEMA",
+    "LETRA",
+    "RENGLÓN",
+    "PÁRRAFO",
+    "TÍTULO",
+    "RESUMEN",
+    "ENSAYO",
+    "DICTADO",
+    "CALIGRAFÍA"
+   ]
+  },
+  {
+   "id": "ciencias-en-el-colegio",
+   "nombre": "Ciencias en el colegio",
+   "palabras": [
+    "EXPERIMENTO",
+    "MICROSCOPIO",
+    "HIPÓTESIS",
+    "MAQUETA",
+    "LABORATORIO",
+    "PLANTA",
+    "SEMILLA",
+    "IMÁN",
+    "LUPA",
+    "VOLCÁN",
+    "FERIA",
+    "INFORME"
+   ]
+  },
+  {
+   "id": "personas-del-colegio",
+   "nombre": "Personas del colegio",
+   "palabras": [
+    "RECTOR",
+    "PROFESOR",
+    "ALUMNO",
+    "COMPAÑERO",
+    "COORDINADOR",
+    "ORIENTADOR",
+    "CELADOR",
+    "SECRETARIA",
+    "PADRES",
+    "ACUDIENTE",
+    "MONITOR",
+    "DIRECTOR"
+   ]
+  }
+ ]
+}

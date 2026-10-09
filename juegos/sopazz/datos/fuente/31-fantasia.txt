@@ -1,0 +1,13 @@
+# Fantasía | #9333EA
+Magia y hechizos: mago, varita, hechizo, conjuro, poción, caldero, grimorio, capa, sombrero, runa, magia, cristal
+Dragones: dragón, fuego, escama, ala, garra, cueva, tesoro, huevo, cola, colmillo, guarida, jinete
+Castillo: castillo, torre, muralla, foso, puente, almena, mazmorra, trono, salón, bandera, rey, guardia
+Caballeros: caballero, espada, escudo, armadura, yelmo, lanza, caballo, torneo, honor, escudero, cruzada, estandarte
+Piratas: pirata, barco, tesoro, mapa, isla, loro, parche, cofre, ancla, bandera, cañón, capitán
+Hadas y duendes: hada, duende, varita, alas, polvo, bosque, hongo, flor, brillo, deseo, gnomo, luciérnaga
+Cuentos clásicos: Caperucita, Cenicienta, Blancanieves, Pinocho, Rapunzel, Aladino, Peter Pan, Hansel, Gretel, Bella, Bestia, Sirenita
+El reino: rey, reina, príncipe, princesa, corona, trono, palacio, reino, súbdito, bufón, consejero, heraldo
+Monstruos de fantasía: ogro, trol, orco, goblin, gárgola, quimera, basilisco, grifo, gigante, espectro, gólem, kraken
+Tesoros: oro, plata, joya, corona, cofre, moneda, rubí, diamante, esmeralda, collar, cáliz, tesoro
+Armas medievales: espada, arco, flecha, lanza, hacha, maza, ballesta, daga, escudo, catapulta, alabarda, mangual
+Bosque encantado: árbol, niebla, sendero, luciérnaga, hongo, búho, lobo, cabaña, río, hechizo, sombra, eco

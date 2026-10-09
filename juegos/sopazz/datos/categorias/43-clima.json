@@ -1,0 +1,134 @@
+{
+ "id": "clima",
+ "nombre": "Clima",
+ "color": "#38BDF8",
+ "orden": 42,
+ "subtemas": [
+  {
+   "id": "nubes",
+   "nombre": "Nubes",
+   "palabras": [
+    "CÚMULO",
+    "ESTRATO",
+    "CIRRO",
+    "NIMBO",
+    "CUMULONIMBO",
+    "ALTOCÚMULO",
+    "NUBE",
+    "NIEBLA",
+    "BRUMA",
+    "NEBLINA",
+    "VAPOR",
+    "GOTA"
+   ]
+  },
+  {
+   "id": "instrumentos-del-clima",
+   "nombre": "Instrumentos del clima",
+   "palabras": [
+    "TERMÓMETRO",
+    "BARÓMETRO",
+    "HIGRÓMETRO",
+    "ANEMÓMETRO",
+    "PLUVIÓMETRO",
+    "VELETA",
+    "RADAR",
+    "SATÉLITE",
+    "GLOBO",
+    "ESTACIÓN",
+    "SENSOR",
+    "PRONÓSTICO"
+   ]
+  },
+  {
+   "id": "estaciones-del-ano",
+   "nombre": "Estaciones del año",
+   "palabras": [
+    "PRIMAVERA",
+    "VERANO",
+    "OTOÑO",
+    "INVIERNO",
+    "SOLSTICIO",
+    "EQUINOCCIO",
+    "CALOR",
+    "FRÍO",
+    "HOJAS",
+    "FLORES",
+    "NIEVE",
+    "SOL"
+   ]
+  },
+  {
+   "id": "la-lluvia",
+   "nombre": "La lluvia",
+   "palabras": [
+    "LLUVIA",
+    "AGUACERO",
+    "LLOVIZNA",
+    "CHUBASCO",
+    "GOTA",
+    "CHARCO",
+    "PARAGUAS",
+    "IMPERMEABLE",
+    "BOTAS",
+    "TRUENO",
+    "RELÁMPAGO",
+    "DILUVIO"
+   ]
+  },
+  {
+   "id": "tormentas",
+   "nombre": "Tormentas",
+   "palabras": [
+    "TORMENTA",
+    "HURACÁN",
+    "TORNADO",
+    "CICLÓN",
+    "TIFÓN",
+    "RAYO",
+    "TRUENO",
+    "GRANIZO",
+    "VENTISCA",
+    "RÁFAGA",
+    "VENDAVAL",
+    "TEMPESTAD"
+   ]
+  },
+  {
+   "id": "el-viento",
+   "nombre": "El viento",
+   "palabras": [
+    "BRISA",
+    "RÁFAGA",
+    "VENDAVAL",
+    "HURACÁN",
+    "ALISIO",
+    "MONZÓN",
+    "VELETA",
+    "COMETA",
+    "MOLINO",
+    "REMOLINO",
+    "CORRIENTE",
+    "VENTARRÓN"
+   ]
+  },
+  {
+   "id": "frio-y-calor",
+   "nombre": "Frío y calor",
+   "palabras": [
+    "HELADA",
+    "ESCARCHA",
+    "NIEVE",
+    "HIELO",
+    "OLA DE CALOR",
+    "SEQUÍA",
+    "BOCHORNO",
+    "SOFOCO",
+    "SUDOR",
+    "ABRIGO",
+    "SOMBRA",
+    "TERMÓMETRO"
+   ]
+  }
+ ]
+}

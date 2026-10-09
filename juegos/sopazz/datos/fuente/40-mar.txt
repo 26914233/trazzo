@@ -1,0 +1,11 @@
+# Mar y océano | #0E7490
+Vida marina: coral, alga, plancton, anémona, esponja, erizo, caballito, estrella, langosta, medusa, tortuga, pulpo
+Ballenas y delfines: ballena, delfín, orca, cachalote, beluga, narval, jorobada, azul, aleta, chorro, canto, manada
+La playa: arena, ola, marea, orilla, concha, caracol, gaviota, palmera, cangrejo, faro, muelle, duna
+Buceo: buceo, tanque, aletas, máscara, snorkel, regulador, traje, profundidad, arrecife, burbuja, presión, boya
+El puerto: puerto, muelle, grúa, contenedor, barco, ancla, faro, carga, pescador, red, lancha, aduana
+Partes del barco: proa, popa, babor, estribor, mástil, vela, timón, cubierta, quilla, casco, ancla, bodega
+Tiburones: tiburón, martillo, blanco, tigre, ballena, aleta, dientes, mandíbula, branquias, depredador, escualo, nodriza
+Surf: tabla, ola, surfista, tubo, quilla, parafina, cresta, marea, playa, traje, remar, equilibrio
+Navegación: navegante, brújula, carta, astrolabio, sextante, faro, rumbo, nudo, milla, travesía, capitán, tripulación
+Las profundidades: abismo, fosa, oscuridad, presión, calamar, rape, batiscafo, submarino, sonar, coral, volcán, misterio

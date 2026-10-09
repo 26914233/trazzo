@@ -1,0 +1,224 @@
+{
+ "id": "palabras",
+ "nombre": "Palabras",
+ "color": "#0D9488",
+ "orden": 27,
+ "subtemas": [
+  {
+   "id": "palindromos",
+   "nombre": "Palíndromos",
+   "palabras": [
+    "OSO",
+    "OJO",
+    "ANA",
+    "RADAR",
+    "RECONOCER",
+    "SOMOS",
+    "SALAS",
+    "SOLOS",
+    "ROTOR",
+    "SERES",
+    "SOMETEMOS",
+    "ANILINA"
+   ]
+  },
+  {
+   "id": "palabras-con-ene",
+   "nombre": "Palabras con eñe",
+   "palabras": [
+    "NIÑO",
+    "AÑO",
+    "SEÑAL",
+    "MONTAÑA",
+    "SUEÑO",
+    "BAÑO",
+    "ARAÑA",
+    "MAÑANA",
+    "PIÑA",
+    "UÑA",
+    "CAÑA",
+    "PAÑUELO"
+   ]
+  },
+  {
+   "id": "onomatopeyas",
+   "nombre": "Onomatopeyas",
+   "palabras": [
+    "MIAU",
+    "GUAU",
+    "PÍO",
+    "MUU",
+    "CUAC",
+    "TICTAC",
+    "BUM",
+    "ACHÍS",
+    "ZAS",
+    "CRAC",
+    "RING",
+    "PLAF"
+   ]
+  },
+  {
+   "id": "verbos-de-accion",
+   "nombre": "Verbos de acción",
+   "palabras": [
+    "CORRER",
+    "SALTAR",
+    "NADAR",
+    "COMER",
+    "DORMIR",
+    "CANTAR",
+    "BAILAR",
+    "LEER",
+    "ESCRIBIR",
+    "PENSAR",
+    "JUGAR",
+    "REÍR"
+   ]
+  },
+  {
+   "id": "adjetivos",
+   "nombre": "Adjetivos",
+   "palabras": [
+    "GRANDE",
+    "PEQUEÑO",
+    "ALTO",
+    "BAJO",
+    "FELIZ",
+    "TRISTE",
+    "RÁPIDO",
+    "LENTO",
+    "FUERTE",
+    "SUAVE",
+    "BONITO",
+    "NUEVO"
+   ]
+  },
+  {
+   "id": "sentimientos",
+   "nombre": "Sentimientos",
+   "palabras": [
+    "AMOR",
+    "ALEGRÍA",
+    "MIEDO",
+    "TRISTEZA",
+    "ENOJO",
+    "CALMA",
+    "CELOS",
+    "ORGULLO",
+    "CARIÑO",
+    "TERNURA",
+    "GRATITUD",
+    "EMPATÍA"
+   ]
+  },
+  {
+   "id": "saludos-y-cortesia",
+   "nombre": "Saludos y cortesía",
+   "palabras": [
+    "HOLA",
+    "ADIÓS",
+    "GRACIAS",
+    "POR FAVOR",
+    "PERDÓN",
+    "DISCULPA",
+    "BIENVENIDO",
+    "CHAO",
+    "SALUDO",
+    "PERMISO",
+    "BUENAS NOCHES",
+    "DE NADA"
+   ]
+  },
+  {
+   "id": "contrarios",
+   "nombre": "Contrarios",
+   "palabras": [
+    "DÍA",
+    "NOCHE",
+    "FRÍO",
+    "CALOR",
+    "ALTO",
+    "BAJO",
+    "LLENO",
+    "VACÍO",
+    "RÁPIDO",
+    "LENTO",
+    "ABRIR",
+    "CERRAR"
+   ]
+  },
+  {
+   "id": "dias-de-la-semana",
+   "nombre": "Días de la semana",
+   "palabras": [
+    "LUNES",
+    "MARTES",
+    "MIÉRCOLES",
+    "JUEVES",
+    "VIERNES",
+    "SÁBADO",
+    "DOMINGO",
+    "SEMANA",
+    "HOY",
+    "AYER",
+    "MAÑANA",
+    "FERIADO"
+   ]
+  },
+  {
+   "id": "meses-del-ano",
+   "nombre": "Meses del año",
+   "palabras": [
+    "ENERO",
+    "FEBRERO",
+    "MARZO",
+    "ABRIL",
+    "MAYO",
+    "JUNIO",
+    "JULIO",
+    "AGOSTO",
+    "SEPTIEMBRE",
+    "OCTUBRE",
+    "NOVIEMBRE",
+    "DICIEMBRE"
+   ]
+  },
+  {
+   "id": "signos-de-puntuacion",
+   "nombre": "Signos de puntuación",
+   "palabras": [
+    "PUNTO",
+    "COMA",
+    "GUION",
+    "COMILLAS",
+    "PARÉNTESIS",
+    "CORCHETE",
+    "LLAVE",
+    "ASTERISCO",
+    "APÓSTROFO",
+    "EXCLAMACIÓN",
+    "DIÉRESIS",
+    "TILDE"
+   ]
+  },
+  {
+   "id": "el-abecedario",
+   "nombre": "El abecedario",
+   "palabras": [
+    "VOCAL",
+    "CONSONANTE",
+    "LETRA",
+    "ALFABETO",
+    "MAYÚSCULA",
+    "MINÚSCULA",
+    "SÍLABA",
+    "ACENTO",
+    "EÑE",
+    "HACHE",
+    "EQUIS",
+    "ZETA"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+# Viajes | #0891B2
+Equipaje: maleta, mochila, pasaporte, boleto, cámara, cargador, toalla, bloqueador, gafas, mapa, candado, etiqueta
+Hotel: hotel, habitación, recepción, llave, cama, piscina, desayuno, reserva, huésped, botones, servicio, maletero
+Playa: arena, ola, mar, sol, sombrilla, toalla, concha, castillo, gaviota, palmera, bronceador, arrecife
+Camping: carpa, fogata, linterna, saco, brújula, mochila, leña, cantimplora, sendero, mapa, navaja, montaña
+Maravillas del mundo: Petra, Chichén Itzá, Coliseo, Taj Mahal, Cristo, Machu Picchu, Gran Muralla, pirámides, Stonehenge, Acrópolis, Alhambra, Angkor
+Monumentos: Eiffel, estatua, Big Ben, Partenón, Kremlin, obelisco, Louvre, Pisa, Sagrada, arco, ópera, Capitolio
+Ciudades del mundo: París, Londres, Roma, Tokio, Nueva York, Madrid, Dubái, Sídney, Moscú, Berlín, Cartagena, Cancún
+Aeropuerto: registro, puerta, embarque, aduana, migración, equipaje, pasaporte, sala, vuelo, retraso, escala, cinta
+Crucero: barco, camarote, cubierta, capitán, puerto, isla, piscina, ancla, bufé, marinero, océano, excursión
+Mochilero: mochila, albergue, hostal, aventura, mapa, ruta, autostop, viajero, frontera, tren, bus, caminata
+Turismo en Colombia: Cartagena, Guatapé, Villa de Leyva, Salento, Tayrona, Leticia, San Andrés, Barichara, Mompox, Tatacoa, Popayán, Minca
+Documentos de viaje: pasaporte, visa, cédula, boleto, reserva, seguro, permiso, vacuna, certificado, itinerario, tarjeta, sello

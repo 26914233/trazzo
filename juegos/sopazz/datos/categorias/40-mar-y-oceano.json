@@ -1,0 +1,188 @@
+{
+ "id": "mar-y-oceano",
+ "nombre": "Mar y océano",
+ "color": "#0E7490",
+ "orden": 39,
+ "subtemas": [
+  {
+   "id": "vida-marina",
+   "nombre": "Vida marina",
+   "palabras": [
+    "CORAL",
+    "ALGA",
+    "PLANCTON",
+    "ANÉMONA",
+    "ESPONJA",
+    "ERIZO",
+    "CABALLITO",
+    "ESTRELLA",
+    "LANGOSTA",
+    "MEDUSA",
+    "TORTUGA",
+    "PULPO"
+   ]
+  },
+  {
+   "id": "ballenas-y-delfines",
+   "nombre": "Ballenas y delfines",
+   "palabras": [
+    "BALLENA",
+    "DELFÍN",
+    "ORCA",
+    "CACHALOTE",
+    "BELUGA",
+    "NARVAL",
+    "JOROBADA",
+    "AZUL",
+    "ALETA",
+    "CHORRO",
+    "CANTO",
+    "MANADA"
+   ]
+  },
+  {
+   "id": "la-playa",
+   "nombre": "La playa",
+   "palabras": [
+    "ARENA",
+    "OLA",
+    "MAREA",
+    "ORILLA",
+    "CONCHA",
+    "CARACOL",
+    "GAVIOTA",
+    "PALMERA",
+    "CANGREJO",
+    "FARO",
+    "MUELLE",
+    "DUNA"
+   ]
+  },
+  {
+   "id": "buceo",
+   "nombre": "Buceo",
+   "palabras": [
+    "BUCEO",
+    "TANQUE",
+    "ALETAS",
+    "MÁSCARA",
+    "SNORKEL",
+    "REGULADOR",
+    "TRAJE",
+    "PROFUNDIDAD",
+    "ARRECIFE",
+    "BURBUJA",
+    "PRESIÓN",
+    "BOYA"
+   ]
+  },
+  {
+   "id": "el-puerto",
+   "nombre": "El puerto",
+   "palabras": [
+    "PUERTO",
+    "MUELLE",
+    "GRÚA",
+    "CONTENEDOR",
+    "BARCO",
+    "ANCLA",
+    "FARO",
+    "CARGA",
+    "PESCADOR",
+    "RED",
+    "LANCHA",
+    "ADUANA"
+   ]
+  },
+  {
+   "id": "partes-del-barco",
+   "nombre": "Partes del barco",
+   "palabras": [
+    "PROA",
+    "POPA",
+    "BABOR",
+    "ESTRIBOR",
+    "MÁSTIL",
+    "VELA",
+    "TIMÓN",
+    "CUBIERTA",
+    "QUILLA",
+    "CASCO",
+    "ANCLA",
+    "BODEGA"
+   ]
+  },
+  {
+   "id": "tiburones",
+   "nombre": "Tiburones",
+   "palabras": [
+    "TIBURÓN",
+    "MARTILLO",
+    "BLANCO",
+    "TIGRE",
+    "BALLENA",
+    "ALETA",
+    "DIENTES",
+    "MANDÍBULA",
+    "BRANQUIAS",
+    "DEPREDADOR",
+    "ESCUALO",
+    "NODRIZA"
+   ]
+  },
+  {
+   "id": "surf",
+   "nombre": "Surf",
+   "palabras": [
+    "TABLA",
+    "OLA",
+    "SURFISTA",
+    "TUBO",
+    "QUILLA",
+    "PARAFINA",
+    "CRESTA",
+    "MAREA",
+    "PLAYA",
+    "TRAJE",
+    "REMAR",
+    "EQUILIBRIO"
+   ]
+  },
+  {
+   "id": "navegacion",
+   "nombre": "Navegación",
+   "palabras": [
+    "NAVEGANTE",
+    "BRÚJULA",
+    "CARTA",
+    "ASTROLABIO",
+    "SEXTANTE",
+    "FARO",
+    "RUMBO",
+    "NUDO",
+    "MILLA",
+    "TRAVESÍA",
+    "CAPITÁN",
+    "TRIPULACIÓN"
+   ]
+  },
+  {
+   "id": "las-profundidades",
+   "nombre": "Las profundidades",
+   "palabras": [
+    "ABISMO",
+    "FOSA",
+    "OSCURIDAD",
+    "PRESIÓN",
+    "CALAMAR",
+    "RAPE",
+    "BATISCAFO",
+    "SUBMARINO",
+    "SONAR",
+    "CORAL",
+    "VOLCÁN",
+    "MISTERIO"
+   ]
+  }
+ ]
+}

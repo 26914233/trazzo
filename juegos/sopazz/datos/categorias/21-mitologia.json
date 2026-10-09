@@ -1,0 +1,224 @@
+{
+ "id": "mitologia",
+ "nombre": "Mitología",
+ "color": "#7C3AED",
+ "orden": 20,
+ "subtemas": [
+  {
+   "id": "dioses-griegos",
+   "nombre": "Dioses griegos",
+   "palabras": [
+    "ZEUS",
+    "HERA",
+    "POSEIDÓN",
+    "ATENEA",
+    "APOLO",
+    "ARTEMISA",
+    "ARES",
+    "AFRODITA",
+    "HERMES",
+    "HADES",
+    "DIONISIO",
+    "HEFESTO"
+   ]
+  },
+  {
+   "id": "dioses-romanos",
+   "nombre": "Dioses romanos",
+   "palabras": [
+    "JÚPITER",
+    "JUNO",
+    "NEPTUNO",
+    "MINERVA",
+    "MARTE",
+    "VENUS",
+    "MERCURIO",
+    "DIANA",
+    "VULCANO",
+    "BACO",
+    "PLUTÓN",
+    "CERES"
+   ]
+  },
+  {
+   "id": "mitologia-nordica",
+   "nombre": "Mitología nórdica",
+   "palabras": [
+    "ODÍN",
+    "THOR",
+    "LOKI",
+    "FREYA",
+    "FRIGG",
+    "BALDER",
+    "HEIMDALL",
+    "TYR",
+    "ASGARD",
+    "MIDGARD",
+    "VALQUIRIA",
+    "RAGNAROK"
+   ]
+  },
+  {
+   "id": "dioses-egipcios",
+   "nombre": "Dioses egipcios",
+   "palabras": [
+    "OSIRIS",
+    "ISIS",
+    "HORUS",
+    "ANUBIS",
+    "SET",
+    "THOT",
+    "BASTET",
+    "SEKHMET",
+    "PTAH",
+    "HATHOR",
+    "AMÓN",
+    "ATÓN"
+   ]
+  },
+  {
+   "id": "criaturas-mitologicas",
+   "nombre": "Criaturas mitológicas",
+   "palabras": [
+    "DRAGÓN",
+    "FÉNIX",
+    "UNICORNIO",
+    "GRIFO",
+    "CENTAURO",
+    "MINOTAURO",
+    "SIRENA",
+    "QUIMERA",
+    "HIDRA",
+    "PEGASO",
+    "CÍCLOPE",
+    "KRAKEN"
+   ]
+  },
+  {
+   "id": "leyendas-latinoamericanas",
+   "nombre": "Leyendas latinoamericanas",
+   "palabras": [
+    "LLORONA",
+    "PATASOLA",
+    "MOHÁN",
+    "MADREMONTE",
+    "TUNDA",
+    "SILBÓN",
+    "CADEJO",
+    "SAYONA",
+    "CHUPACABRAS",
+    "DUENDE",
+    "BOLA DE FUEGO",
+    "POMBERO"
+   ]
+  },
+  {
+   "id": "mitologia-azteca-y-maya",
+   "nombre": "Mitología azteca y maya",
+   "palabras": [
+    "QUETZALCÓATL",
+    "TLÁLOC",
+    "TEZCATLIPOCA",
+    "COATLICUE",
+    "XIPE",
+    "KUKULKÁN",
+    "ITZAMNÁ",
+    "CHAAC",
+    "IXCHEL",
+    "MICTLÁN",
+    "XIBALBÁ",
+    "HUNAHPÚ"
+   ]
+  },
+  {
+   "id": "mitologia-muisca-y-andina",
+   "nombre": "Mitología muisca y andina",
+   "palabras": [
+    "BACHUÉ",
+    "BOCHICA",
+    "CHÍA",
+    "SUÉ",
+    "GUATAVITA",
+    "CHIMINIGAGUA",
+    "INTI",
+    "PACHAMAMA",
+    "VIRACOCHA",
+    "MAMAQUILLA",
+    "SUPAY",
+    "ILLAPA"
+   ]
+  },
+  {
+   "id": "heroes-griegos",
+   "nombre": "Héroes griegos",
+   "palabras": [
+    "HÉRCULES",
+    "AQUILES",
+    "ULISES",
+    "PERSEO",
+    "TESEO",
+    "JASÓN",
+    "ORFEO",
+    "HÉCTOR",
+    "ENEAS",
+    "ÁYAX",
+    "BELEROFONTE",
+    "ATALANTA"
+   ]
+  },
+  {
+   "id": "monstruos-legendarios",
+   "nombre": "Monstruos legendarios",
+   "palabras": [
+    "MEDUSA",
+    "CERBERO",
+    "HIDRA",
+    "ESCILA",
+    "CARIBDIS",
+    "TIFÓN",
+    "GORGONA",
+    "HARPÍA",
+    "ESFINGE",
+    "KRAKEN",
+    "LEVIATÁN",
+    "BASILISCO"
+   ]
+  },
+  {
+   "id": "seres-fantasticos",
+   "nombre": "Seres fantásticos",
+   "palabras": [
+    "HADA",
+    "ELFO",
+    "GNOMO",
+    "DUENDE",
+    "ENANO",
+    "TROL",
+    "OGRO",
+    "NINFA",
+    "SÁTIRO",
+    "GIGANTE",
+    "SÍLFIDE",
+    "FAUNO"
+   ]
+  },
+  {
+   "id": "mitologia-japonesa",
+   "nombre": "Mitología japonesa",
+   "palabras": [
+    "AMATERASU",
+    "SUSANOO",
+    "IZANAGI",
+    "IZANAMI",
+    "KAMI",
+    "KITSUNE",
+    "ONI",
+    "TENGU",
+    "KAPPA",
+    "YOKAI",
+    "RAIJIN",
+    "FUJIN"
+   ]
+  }
+ ]
+}

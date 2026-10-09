@@ -1,0 +1,224 @@
+{
+ "id": "espacio",
+ "nombre": "Espacio",
+ "color": "#1E40AF",
+ "orden": 5,
+ "subtemas": [
+  {
+   "id": "planetas",
+   "nombre": "Planetas",
+   "palabras": [
+    "MERCURIO",
+    "VENUS",
+    "TIERRA",
+    "MARTE",
+    "JÚPITER",
+    "SATURNO",
+    "URANO",
+    "NEPTUNO",
+    "PLUTÓN",
+    "CERES",
+    "ERIS",
+    "HAUMEA"
+   ]
+  },
+  {
+   "id": "lunas",
+   "nombre": "Lunas",
+   "palabras": [
+    "LUNA",
+    "FOBOS",
+    "DEIMOS",
+    "EUROPA",
+    "GANÍMEDES",
+    "CALISTO",
+    "TITÁN",
+    "ENCÉLADO",
+    "TRITÓN",
+    "CARONTE",
+    "MIMAS",
+    "OBERÓN"
+   ]
+  },
+  {
+   "id": "constelaciones",
+   "nombre": "Constelaciones",
+   "palabras": [
+    "ORIÓN",
+    "ANDRÓMEDA",
+    "PEGASO",
+    "CASIOPEA",
+    "CISNE",
+    "LIRA",
+    "ESCORPIO",
+    "PERSEO",
+    "HÉRCULES",
+    "DRAGÓN",
+    "OSA MAYOR",
+    "CRUZ DEL SUR"
+   ]
+  },
+  {
+   "id": "estrellas",
+   "nombre": "Estrellas",
+   "palabras": [
+    "SOL",
+    "SIRIO",
+    "VEGA",
+    "POLARIS",
+    "RIGEL",
+    "ANTARES",
+    "ALTAIR",
+    "DENEB",
+    "ALDEBARÁN",
+    "BETELGEUSE",
+    "ARTURO",
+    "CANOPUS"
+   ]
+  },
+  {
+   "id": "cuerpos-celestes",
+   "nombre": "Cuerpos celestes",
+   "palabras": [
+    "PLANETA",
+    "ESTRELLA",
+    "COMETA",
+    "ASTEROIDE",
+    "METEORO",
+    "GALAXIA",
+    "NEBULOSA",
+    "SATÉLITE",
+    "PÚLSAR",
+    "CUÁSAR",
+    "ENANA",
+    "AGUJERO"
+   ]
+  },
+  {
+   "id": "exploracion-espacial",
+   "nombre": "Exploración espacial",
+   "palabras": [
+    "COHETE",
+    "ASTRONAUTA",
+    "NAVE",
+    "SATÉLITE",
+    "SONDA",
+    "MÓDULO",
+    "ÓRBITA",
+    "LANZAMIENTO",
+    "CÁPSULA",
+    "ESTACIÓN",
+    "TRAJE",
+    "DESPEGUE"
+   ]
+  },
+  {
+   "id": "pioneros-del-espacio",
+   "nombre": "Pioneros del espacio",
+   "palabras": [
+    "GAGARIN",
+    "ARMSTRONG",
+    "ALDRIN",
+    "COLLINS",
+    "TERESHKOVA",
+    "GLENN",
+    "RIDE",
+    "LEONOV",
+    "GALILEO",
+    "COPÉRNICO",
+    "KEPLER",
+    "HUBBLE"
+   ]
+  },
+  {
+   "id": "signos-del-zodiaco",
+   "nombre": "Signos del zodiaco",
+   "palabras": [
+    "ARIES",
+    "TAURO",
+    "GÉMINIS",
+    "CÁNCER",
+    "LEO",
+    "VIRGO",
+    "LIBRA",
+    "ESCORPIO",
+    "SAGITARIO",
+    "CAPRICORNIO",
+    "ACUARIO",
+    "PISCIS"
+   ]
+  },
+  {
+   "id": "sistema-solar",
+   "nombre": "Sistema solar",
+   "palabras": [
+    "SOL",
+    "ÓRBITA",
+    "PLANETA",
+    "CINTURÓN",
+    "ASTEROIDE",
+    "COMETA",
+    "LUNA",
+    "ECLIPSE",
+    "EQUINOCCIO",
+    "SOLSTICIO",
+    "ROTACIÓN",
+    "TRASLACIÓN"
+   ]
+  },
+  {
+   "id": "galaxias",
+   "nombre": "Galaxias",
+   "palabras": [
+    "VÍA LÁCTEA",
+    "ANDRÓMEDA",
+    "TRIÁNGULO",
+    "ESPIRAL",
+    "ELÍPTICA",
+    "IRREGULAR",
+    "CÚMULO",
+    "HALO",
+    "BRAZO",
+    "NÚCLEO",
+    "SOMBRERO",
+    "REMOLINO"
+   ]
+  },
+  {
+   "id": "telescopios",
+   "nombre": "Telescopios",
+   "palabras": [
+    "LENTE",
+    "ESPEJO",
+    "OCULAR",
+    "TRÍPODE",
+    "AUMENTO",
+    "ENFOQUE",
+    "MONTURA",
+    "OBSERVATORIO",
+    "HUBBLE",
+    "WEBB",
+    "REFRACTOR",
+    "REFLECTOR"
+   ]
+  },
+  {
+   "id": "fenomenos-del-cielo",
+   "nombre": "Fenómenos del cielo",
+   "palabras": [
+    "ECLIPSE",
+    "AURORA",
+    "SUPERNOVA",
+    "FASE",
+    "MAREA",
+    "LUNA LLENA",
+    "CUARTO",
+    "MENGUANTE",
+    "CRECIENTE",
+    "CONJUNCIÓN",
+    "TRÁNSITO",
+    "METEORITO"
+   ]
+  }
+ ]
+}

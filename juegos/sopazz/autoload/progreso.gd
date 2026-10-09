@@ -1,24 +1,22 @@
-# Progreso del jugador: niveles, fichas, compras y ajustes.
+# Progreso del jugador: estrellas por sopa, compra, pistas del dia y ajustes.
 #
 # Se guarda en user://progreso.save con dos lineas:
 #   1) HMAC-SHA256 del contenido (hex)
 #   2) el contenido en JSON
 # La firma se comprueba sobre el texto exacto de la linea 2 antes de parsearlo.
-# Un archivo editado a mano se rechaza y se vuelve a valores seguros (cero
-# fichas), nunca a valores generosos, y el archivo rechazado se aparta en
-# progreso.save.rechazado. Limites conocidos en docs/LANZAMIENTO.md (seccion 5).
+# Un archivo editado a mano se rechaza, se aparta en progreso.save.rechazado y
+# se empieza de cero. Limites conocidos en docs/LANZAMIENTO.md (seccion 5).
 extends Node
 
-signal fichas_cambiadas(total: int)
 signal cambiado
 
-const VERSION := 1
+const VERSION := 2
 # La sal vive en el binario, asi que no es un secreto contra quien descompile
 # el APK: solo sube el liston frente a editar el archivo (auditoria SEC-001).
-# Por eso las compras permanentes se vuelven a pedir a Play en cada arranque.
+# Por eso la compra se vuelve a pedir a Play en cada arranque.
 const SAL := "sopazz-v1-7f3c91e2"
-const FICHAS_MAX := 10_000_000
 const ESCALAS := [0.85, 1.0, 1.15, 1.3]
+const DISENOS := ["papel", "noche", "cielo"]
 
 var ruta := "user://progreso.save"
 var datos: Dictionary = {}
@@ -28,32 +26,30 @@ var ultimo_rechazo := ""
 
 func _ready() -> void:
 	cargar()
+	Estilo.aplicar(str(datos["diseno"]))
 
 
 static func por_defecto() -> Dictionary:
 	return {
 		"version": VERSION,
-		"fichas": 0,
-		"pistas_gratis": Economia.PISTAS_GRATIS_INICIALES,
-		"niveles": {},              # "tema|dificultad" -> siguiente nivel a jugar
-		"estrellas": {},            # "tema|dificultad|nivel" -> mejores estrellas
-		"temas_jugados": [],
-		"temas_comprados": [],      # comprados en Play (Play manda, ver sincronizar_permanentes)
-		"temas_con_fichas": [],     # desbloqueados con fichas (solo local)
-		"max_dia": "",              # fecha mas alta vista: la del juego nunca retrocede
-		"sin_anuncios": false,
-		"niveles_completados": 0,
+		"premium": false,          # pago unico (Play manda, ver fijar_premium)
+		"estrellas": {},           # "categoria/subtema/dificultad" -> mejores estrellas
+		"completadas": 0,          # victorias totales (reglas del intersticial)
+		"ultima": {},              # ultima sopa jugada, para "Continuar"
 		"racha": 0,
 		"ultimo_dia": "",
+		"max_dia": "",             # fecha mas alta vista: la del juego nunca retrocede
 		"diario_hecho": "",
+		"pistas_dia": "",
+		"pistas_hoy": 0,
+		"cortesia_dia": "",
 		"premiados_dia": "",
 		"premiados_hoy": 0,
-		"cortesia_dia": "",
 		"sonido": true,
-		"musica": false,
 		"vibracion": true,
 		"escala_texto": 1.0,
-		"consentimiento": "desconocido",
+		"diseno": "papel",
+		"dificultad": 0,
 	}
 
 
@@ -87,9 +83,7 @@ func cargar() -> void:
 	if typeof(leido) != TYPE_DICTIONARY:
 		_rechazar("json")
 		return
-	# Se fusiona sobre los valores por defecto: un guardado de una version
-	# anterior sin una clave nueva sigue funcionando. Solo entra lo que tiene
-	# el tipo esperado, y despues se acota (auditoria SEC-004).
+	# Solo entra lo que tiene el tipo esperado, y despues se acota (SEC-004).
 	for k in leido:
 		if datos.has(k) and _mismo_tipo(datos[k], leido[k]):
 			datos[k] = leido[k]
@@ -104,33 +98,36 @@ static func _mismo_tipo(esperado, valor) -> bool:
 
 
 func _sanear() -> void:
-	datos["fichas"] = clampi(int(datos["fichas"]), 0, FICHAS_MAX)
-	datos["pistas_gratis"] = clampi(int(datos["pistas_gratis"]), 0, Economia.PISTAS_GRATIS_INICIALES)
-	datos["racha"] = maxi(int(datos["racha"]), 0)
-	datos["niveles_completados"] = maxi(int(datos["niveles_completados"]), 0)
+	datos["version"] = VERSION
+	for k in ["completadas", "racha"]:
+		datos[k] = maxi(int(datos[k]), 0)
+	datos["pistas_hoy"] = clampi(int(datos["pistas_hoy"]), 0, Economia.PISTAS_GRATIS_DIA)
+	datos["premiados_hoy"] = clampi(int(datos["premiados_hoy"]), 0, Economia.PREMIADOS_MAX_DIA)
 	if not float(datos["escala_texto"]) in ESCALAS:
 		datos["escala_texto"] = 1.0
-	for lista in ["temas_jugados", "temas_comprados", "temas_con_fichas"]:
-		datos[lista] = datos[lista].filter(func(x): return typeof(x) == TYPE_STRING)
-	for mapa in ["niveles", "estrellas"]:
-		var limpio := {}
-		for k in datos[mapa]:
-			var v = datos[mapa][k]
-			if typeof(k) == TYPE_STRING and typeof(v) in [TYPE_INT, TYPE_FLOAT]:
-				limpio[k] = clampi(int(v), 0, 1_000_000)
-		datos[mapa] = limpio
+	if not str(datos["diseno"]) in DISENOS:
+		datos["diseno"] = "papel"
+	datos["dificultad"] = clampi(int(datos["dificultad"]), 0, Economia.DIFICULTADES.size() - 1)
+	var estrellas := {}
+	for k in datos["estrellas"]:
+		var v = datos["estrellas"][k]
+		if typeof(k) == TYPE_STRING and typeof(v) in [TYPE_INT, TYPE_FLOAT]:
+			estrellas[k] = clampi(int(v), 0, 3)
+	datos["estrellas"] = estrellas
+	var u: Dictionary = datos["ultima"]
+	if typeof(u.get("categoria")) != TYPE_STRING or typeof(u.get("subtema")) != TYPE_STRING:
+		datos["ultima"] = {}
 
 
 func _rechazar(motivo: String) -> void:
 	ultimo_rechazo = motivo
 	# El motivo solo en depuracion: en release le diria a quien manipula el
-	# archivo que fallo exactamente (auditoria SEC-009).
+	# archivo que fallo exactamente (SEC-009).
 	if OS.is_debug_build():
 		push_warning("Progreso descartado (%s); se empieza de cero." % motivo)
 	else:
 		push_warning("Progreso no valido; se empieza de cero.")
-	# Se aparta el original en vez de perderlo al siguiente guardado: un cambio
-	# de ID del dispositivo o de version no debe borrar el progreso (SEC-006).
+	# Se aparta el original en vez de perderlo al siguiente guardado (SEC-006).
 	DirAccess.rename_absolute(ProjectSettings.globalize_path(ruta), ProjectSettings.globalize_path(ruta + ".rechazado"))
 	datos = por_defecto()
 
@@ -151,45 +148,106 @@ func guardar() -> void:
 	cambiado.emit()
 
 
-# ---------------------------------------------------------------- fichas
+# ---------------------------------------------------------------- compra
 
-func fichas() -> int:
-	return int(datos["fichas"])
+func es_premium() -> bool:
+	return bool(datos["premium"])
 
 
-func sumar_fichas(n: int) -> void:
-	if n <= 0:
+func activar_premium() -> void:
+	fijar_premium(true)
+
+
+## Estado de la compra segun Play (fuente de verdad): si Play dice que no la
+## tiene (guardado forjado, reembolso), se retira. Solo se llama con una
+## respuesta correcta de Play; sin conexion no se toca.
+func fijar_premium(valor: bool) -> void:
+	if bool(datos["premium"]) == valor:
 		return
-	datos["fichas"] = fichas() + n
+	datos["premium"] = valor
 	guardar()
-	fichas_cambiadas.emit(fichas())
 
 
-func gastar_fichas(n: int) -> bool:
-	if n <= 0 or fichas() < n:
-		return false
-	datos["fichas"] = fichas() - n
+## La sopa se puede jugar: version completa, o una de las gratis.
+func desbloqueada(cat: String, sub: String) -> bool:
+	return es_premium() or Temas.es_gratis(cat, sub)
+
+
+# ---------------------------------------------------------------- sopas
+
+static func _clave_sopa(cat: String, sub: String, dificultad: int) -> String:
+	return "%s/%s/%d" % [cat, sub, dificultad]
+
+
+func estrellas_de(cat: String, sub: String, dificultad: int) -> int:
+	return int(datos["estrellas"].get(_clave_sopa(cat, sub, dificultad), 0))
+
+
+func completadas() -> int:
+	return int(datos["completadas"])
+
+
+## Sopas de una categoria resueltas en esa dificultad.
+func resueltas_en(cat: String, dificultad: int) -> int:
+	var n := 0
+	for s in Temas.categoria(cat).get("subtemas", []):
+		if estrellas_de(cat, s["id"], dificultad) > 0:
+			n += 1
+	return n
+
+
+func resueltas_total() -> int:
+	var sopas := {}
+	for k in datos["estrellas"]:
+		var partes: PackedStringArray = str(k).split("/")
+		if partes.size() == 3:
+			sopas[partes[0] + "/" + partes[1]] = true
+	return sopas.size()
+
+
+func registrar_victoria(cat: String, sub: String, dificultad: int, estrellas: int, diario: bool, hoy: String) -> void:
+	var k := _clave_sopa(cat, sub, dificultad)
+	datos["estrellas"][k] = maxi(int(datos["estrellas"].get(k, 0)), clampi(estrellas, 1, 3))
+	datos["completadas"] = completadas() + 1
+	if diario:
+		datos["diario_hecho"] = hoy
 	guardar()
-	fichas_cambiadas.emit(fichas())
-	return true
+
+
+func diario_hecho(hoy: String) -> bool:
+	return datos["diario_hecho"] == hoy
+
+
+func ultima() -> Dictionary:
+	return datos["ultima"]
+
+
+func fijar_ultima(cat: String, sub: String) -> void:
+	datos["ultima"] = {"categoria": cat, "subtema": sub}
+	guardar()
 
 
 # ---------------------------------------------------------------- pistas
 
-func pistas_gratis() -> int:
-	return int(datos["pistas_gratis"])
+func pistas_restantes(hoy: String) -> int:
+	if datos["pistas_dia"] != hoy:
+		return Economia.PISTAS_GRATIS_DIA
+	return Economia.PISTAS_GRATIS_DIA - int(datos["pistas_hoy"])
 
 
-## Intenta pagar una pista. Devuelve "gratis", "fichas" o "" si hace falta
-## un anuncio premiado (o comprar fichas).
-func pagar_pista(coste: int = Economia.COSTE_PISTA) -> String:
-	if pistas_gratis() > 0:
-		datos["pistas_gratis"] = pistas_gratis() - 1
-		guardar()
-		return "gratis"
-	if gastar_fichas(coste):
-		return "fichas"
-	return ""
+## Intenta usar una pista. "premium" (ilimitadas), "gratis" (de las del dia)
+## o "" si hace falta un anuncio premiado.
+func pagar_pista(hoy: String) -> String:
+	if es_premium():
+		return "premium"
+	if pistas_restantes(hoy) <= 0:
+		return ""
+	if datos["pistas_dia"] != hoy:
+		datos["pistas_dia"] = hoy
+		datos["pistas_hoy"] = 0
+	datos["pistas_hoy"] = int(datos["pistas_hoy"]) + 1
+	guardar()
+	return "gratis"
 
 
 ## Una pista de cortesia al dia cuando el anuncio no carga: que una mala
@@ -214,103 +272,31 @@ func registrar_premiado(hoy: String) -> void:
 	guardar()
 
 
-# ---------------------------------------------------------------- niveles
+# ---------------------------------------------------------------- racha y fecha
 
-func _clave_nivel(tema: String, dificultad: int) -> String:
-	return "%s|%d" % [tema, dificultad]
-
-
-func nivel_actual(tema: String, dificultad: int) -> int:
-	return int(datos["niveles"].get(_clave_nivel(tema, dificultad), 1))
-
-
-func estrellas_de(tema: String, dificultad: int, nivel: int) -> int:
-	return int(datos["estrellas"].get("%s|%d|%d" % [tema, dificultad, nivel], 0))
-
-
-func niveles_completados() -> int:
-	return int(datos["niveles_completados"])
-
-
-## Registra un nivel ganado y devuelve las fichas que da.
-func completar_nivel(tema: String, dificultad: int, nivel: int, estrellas: int, diario: bool, hoy: String) -> int:
-	var primera_vez: bool = not (tema in datos["temas_jugados"])
-	if primera_vez:
-		datos["temas_jugados"].append(tema)
-	if diario:
-		if datos["diario_hecho"] == hoy:
-			diario = false  # el doble solo se cobra una vez al dia
-		else:
-			datos["diario_hecho"] = hoy
-	else:
-		var k := _clave_nivel(tema, dificultad)
-		datos["niveles"][k] = maxi(nivel_actual(tema, dificultad), nivel + 1)
-		var ke := "%s|%d|%d" % [tema, dificultad, nivel]
-		datos["estrellas"][ke] = maxi(estrellas_de(tema, dificultad, nivel), estrellas)
-	datos["niveles_completados"] = niveles_completados() + 1
-	var ganadas := Economia.recompensa_nivel(estrellas, primera_vez, diario)
-	datos["fichas"] = fichas() + ganadas
-	guardar()
-	fichas_cambiadas.emit(fichas())
-	return ganadas
-
-
-func diario_hecho(hoy: String) -> bool:
-	return datos["diario_hecho"] == hoy
-
-
-## Al abrir la app: avanza la racha y paga la recompensa del dia si toca.
+## Al abrir la app: avanza la racha. Devuelve la racha actual.
 func registrar_dia(hoy: String) -> int:
 	var r := Economia.avanzar_racha(int(datos["racha"]), datos["ultimo_dia"], hoy)
-	datos["racha"] = r[0]
-	datos["ultimo_dia"] = hoy
-	var premio := Economia.recompensa_racha(r[0]) if r[1] else 0
-	datos["fichas"] = fichas() + premio
-	guardar()
-	if premio > 0:
-		fichas_cambiadas.emit(fichas())
-	return premio
-
-
-# ---------------------------------------------------------------- temas y compras
-
-func tema_desbloqueado(id: String) -> bool:
-	var t: Dictionary = Temas.tema(id) if is_inside_tree() else {}
-	return t.get("gratis", false) or id in datos["temas_comprados"] or id in datos["temas_con_fichas"]
-
-
-func desbloquear_tema(id: String) -> void:
-	if not (id in datos["temas_comprados"]):
-		datos["temas_comprados"].append(id)
+	if r[1]:
+		datos["racha"] = r[0]
+		datos["ultimo_dia"] = hoy
 		guardar()
+	return int(datos["racha"])
 
 
-func desbloquear_con_fichas(id: String) -> bool:
-	if tema_desbloqueado(id):
-		return true
-	if not gastar_fichas(Economia.COSTE_TEMA):
-		return false
-	datos["temas_con_fichas"].append(id)
-	guardar()
-	return true
+## Fecha del juego: la del sistema, pero nunca anterior a la mas alta ya vista.
+## Atrasar el reloj no repite las pistas del dia, la sopa del dia ni los
+## premiados (SEC-002).
+func fecha_juego(sistema: String = "") -> String:
+	if sistema == "":
+		sistema = Time.get_date_string_from_system()
+	if sistema > str(datos["max_dia"]):
+		datos["max_dia"] = sistema
+	return str(datos["max_dia"])
 
 
-func sin_anuncios() -> bool:
-	return bool(datos["sin_anuncios"])
-
-
-func activar_sin_anuncios() -> void:
-	datos["sin_anuncios"] = true
-	guardar()
-
-
-## Las compras permanentes segun Play (fuente de verdad): lo que no aparece
-## se retira (guardado forjado, reembolso). Solo se llama con una respuesta
-## correcta de Play; sin conexion no se revoca nada.
-func sincronizar_permanentes(sin_anuncios_comprado: bool, temas: Array) -> void:
-	datos["sin_anuncios"] = sin_anuncios_comprado
-	datos["temas_comprados"] = temas.duplicate()
-	guardar()
+func hoy() -> String:
+	return fecha_juego()
 
 
 # ---------------------------------------------------------------- ajustes
@@ -322,19 +308,3 @@ func ajuste(nombre: String):
 func fijar_ajuste(nombre: String, valor) -> void:
 	datos[nombre] = valor
 	guardar()
-
-
-## Fecha del juego: la del sistema, pero nunca anterior a la mas alta ya
-## vista. Atrasar el reloj del movil no vuelve a pagar la racha, el diario,
-## la pista de cortesia ni los premiados (auditoria SEC-002). Adelantarlo no
-## se puede detectar sin servidor, pero deja de rendir al volver a la fecha real.
-func fecha_juego(sistema: String = "") -> String:
-	if sistema == "":
-		sistema = Time.get_date_string_from_system()
-	if sistema > str(datos["max_dia"]):
-		datos["max_dia"] = sistema
-	return str(datos["max_dia"])
-
-
-func hoy() -> String:
-	return fecha_juego()

@@ -22,17 +22,12 @@ var timeout_anuncio_s := 180.0
 const ADMOB_TEST_INTERSTICIAL := "ca-app-pub-3940256099942544/1033173712"
 const ADMOB_TEST_PREMIADO := "ca-app-pub-3940256099942544/5224354917"
 
-## Catalogo. Los IDs deben crearse igual en Play Console.
+## Catalogo: un solo producto, permanente. Debe crearse igual en Play Console.
+const PRODUCTO := "desbloquear_todo"
+const PRECIO := "4,99\u00a0US$"
 const PRODUCTOS := {
-	"sin_anuncios": {"tipo": "permanente", "fichas": 300, "precio": "2,99\u00a0US$", "nombre": "Quitar anuncios"},
-	"fichas_500": {"tipo": "consumible", "fichas": 500, "precio": "0,99\u00a0US$", "nombre": "500 fichas"},
-	"fichas_1500": {"tipo": "consumible", "fichas": 1500, "precio": "2,49\u00a0US$", "nombre": "1.500 fichas"},
-	"fichas_4000": {"tipo": "consumible", "fichas": 4000, "precio": "4,99\u00a0US$", "nombre": "4.000 fichas", "destacado": true},
-	"fichas_10000": {"tipo": "consumible", "fichas": 10000, "precio": "9,99\u00a0US$", "nombre": "10.000 fichas"},
-	"todos_los_temas": {"tipo": "permanente", "fichas": 0, "precio": "7,99\u00a0US$", "nombre": "Todos los temas"},
+	PRODUCTO: {"tipo": "permanente", "precio": PRECIO, "nombre": "Sopazz completo"},
 }
-## Cada tema de pago se vende tambien suelto como "tema_<id>" a 1,99 US$.
-const PRECIO_TEMA := "1,99\u00a0US$"
 
 var anuncios: AnunciosAdMob = null
 var pagos: PagosPlay = null
@@ -72,19 +67,11 @@ func ids_anuncios() -> Dictionary:
 
 
 func ids_productos() -> PackedStringArray:
-	var ids := PackedStringArray(PRODUCTOS.keys())
-	for t in Temas.lista:
-		if not t.get("gratis", false):
-			ids.append("tema_" + t["id"])
-	return ids
+	return PackedStringArray(PRODUCTOS.keys())
 
 
 func ids_consumibles() -> PackedStringArray:
-	var ids := PackedStringArray()
-	for id in PRODUCTOS:
-		if PRODUCTOS[id]["tipo"] == "consumible":
-			ids.append(id)
-	return ids
+	return PackedStringArray()
 
 
 func anuncios_reales() -> bool:
@@ -107,10 +94,10 @@ func contexto_intersticial(abandono: bool = false) -> Dictionary:
 	if _ultimo_intersticial_ms >= 0:
 		desde = (Time.get_ticks_msec() - _ultimo_intersticial_ms) / 1000.0
 	return {
-		"sin_anuncios": Progreso.sin_anuncios(),
+		"sin_anuncios": Progreso.es_premium(),
 		"en_partida": false,
 		"abandono": abandono,
-		"niveles_completados": Progreso.niveles_completados(),
+		"niveles_completados": Progreso.completadas(),
 		"desde_ultimo_s": desde,
 		"completados_desde_ultimo": _completados_desde_ultimo,
 	}
@@ -130,8 +117,8 @@ func intentar_intersticial(abandono: bool = false) -> bool:
 # ---------------------------------------------------------------- premiado
 
 ## Muestra un anuncio premiado. Devuelve true solo si el jugador lo vio entero.
-## Comprar "quitar anuncios" NO quita los premiados: son voluntarios y el
-## jugador los quiere (pistas). Es la practica habitual y la que espera Play.
+## Solo los usa la version gratis (para pistas extra): con la compra las
+## pistas son ilimitadas y no se pide ningun anuncio.
 func mostrar_premiado() -> bool:
 	var hoy := Progreso.hoy()
 	if not Progreso.premiado_disponible(hoy):
@@ -144,29 +131,14 @@ func mostrar_premiado() -> bool:
 
 # ---------------------------------------------------------------- compras
 
-## Lista blanca: solo el catalogo y los temas de pago que existen (SEC-005).
+## Lista blanca: solo el catalogo (SEC-005).
 func producto_valido(producto: String) -> bool:
-	if PRODUCTOS.has(producto):
-		return true
-	if producto.begins_with("tema_"):
-		var t := Temas.tema(producto.trim_prefix("tema_"))
-		return not t.is_empty() and not t.get("gratis", false)
-	return false
+	return PRODUCTOS.has(producto)
 
 
 ## Compras permanentes que Play dice que existen -> estado local.
 func sincronizar_permanentes(productos: Array) -> void:
-	var temas: Array = []
-	if "todos_los_temas" in productos:
-		for t in Temas.lista:
-			if not t.get("gratis", false):
-				temas.append(t["id"])
-	for p in productos:
-		if str(p).begins_with("tema_") and producto_valido(p):
-			var id := str(p).trim_prefix("tema_")
-			if not id in temas:
-				temas.append(id)
-	Progreso.sincronizar_permanentes("sin_anuncios" in productos, temas)
+	Progreso.fijar_premium(PRODUCTO in productos)
 
 
 func comprar(producto: String) -> bool:
@@ -184,29 +156,16 @@ func comprar(producto: String) -> bool:
 
 
 ## Entrega lo comprado. Separado de comprar() para reutilizarlo al restaurar
-## compras y para probarlo sin pasarela de pago.
+## y para probarlo sin pasarela de pago.
 func conceder(producto: String) -> void:
 	if not producto_valido(producto):
 		push_error("Producto fuera del catalogo, no se entrega: %s" % producto)
 		return
-	if producto.begins_with("tema_"):
-		Progreso.desbloquear_tema(producto.trim_prefix("tema_"))
-	elif producto == "todos_los_temas":
-		for t in Temas.lista:
-			if not t.get("gratis", false):
-				Progreso.desbloquear_tema(t["id"])
-	elif producto == "sin_anuncios":
-		var ya := Progreso.sin_anuncios()
-		Progreso.activar_sin_anuncios()
-		if not ya:
-			Progreso.sumar_fichas(PRODUCTOS[producto]["fichas"])
-	else:
-		Progreso.sumar_fichas(PRODUCTOS[producto]["fichas"])
+	Progreso.activar_premium()
 	compra_completada.emit(producto)
 
 
-## Restaura las compras permanentes (obligatorio para no perder "quitar
-## anuncios" al cambiar de movil). Al abrir la app ya se restauran solas;
+## Restaura la compra (obligatorio para no perderla al cambiar de movil). Al abrir la app ya se restauran solas;
 ## esto es el boton manual. Con el stub no hay nada que restaurar.
 func restaurar_compras() -> int:
 	if pagos == null:

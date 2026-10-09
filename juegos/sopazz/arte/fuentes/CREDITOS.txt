@@ -1,0 +1,17 @@
+Fuentes incluidas en Sopazz. Todas bajo SIL Open Font License 1.1 (ver OFL.txt).
+Descargadas de Google Fonts.
+
+DMSans-Bold.ttf: DM Sans Bold
+  Copyright 2014 The DM Sans Project Authors (https://github.com/googlefonts/dm-fonts)
+DMSans-Medium.ttf: DM Sans Medium Regular
+  Copyright 2014 The DM Sans Project Authors (https://github.com/googlefonts/dm-fonts)
+Fraunces-Bold.ttf: Fraunces 72pt Bold
+  Copyright 2020 The Fraunces Project Authors (github.com/undercasetype/Fraunces)
+Fredoka-Medium.ttf: Fredoka Medium Regular
+  Copyright 2016 The Fredoka Project Authors (https://github.com/hafontia/Fredoka-One)
+Fredoka-SemiBold.ttf: Fredoka SemiBold Regular
+  Copyright 2016 The Fredoka Project Authors (https://github.com/hafontia/Fredoka-One)
+Nunito-Bold.ttf: Nunito Bold
+  Copyright 2014 The Nunito Project Authors (https://github.com/googlefonts/nunito)
+Nunito-ExtraBold.ttf: Nunito ExtraBold Regular
+  Copyright 2014 The Nunito Project Authors (https://github.com/googlefonts/nunito)

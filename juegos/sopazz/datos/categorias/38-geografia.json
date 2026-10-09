@@ -1,0 +1,206 @@
+{
+ "id": "geografia",
+ "nombre": "Geografía",
+ "color": "#0369A1",
+ "orden": 37,
+ "subtemas": [
+  {
+   "id": "continentes-y-globo",
+   "nombre": "Continentes y globo",
+   "palabras": [
+    "AMÉRICA",
+    "EUROPA",
+    "ASIA",
+    "ÁFRICA",
+    "OCEANÍA",
+    "ANTÁRTIDA",
+    "CONTINENTE",
+    "HEMISFERIO",
+    "ECUADOR",
+    "TRÓPICO",
+    "POLO",
+    "MERIDIANO"
+   ]
+  },
+  {
+   "id": "accidentes-geograficos",
+   "nombre": "Accidentes geográficos",
+   "palabras": [
+    "MONTAÑA",
+    "VALLE",
+    "MESETA",
+    "LLANURA",
+    "CORDILLERA",
+    "PENÍNSULA",
+    "ISTMO",
+    "GOLFO",
+    "BAHÍA",
+    "CABO",
+    "DELTA",
+    "ESTRECHO"
+   ]
+  },
+  {
+   "id": "rios-del-mundo",
+   "nombre": "Ríos del mundo",
+   "palabras": [
+    "AMAZONAS",
+    "NILO",
+    "MISISIPI",
+    "DANUBIO",
+    "RIN",
+    "VOLGA",
+    "GANGES",
+    "YANGTSÉ",
+    "ORINOCO",
+    "PARANÁ",
+    "TÁMESIS",
+    "SENA"
+   ]
+  },
+  {
+   "id": "lagos",
+   "nombre": "Lagos",
+   "palabras": [
+    "TITICACA",
+    "VICTORIA",
+    "SUPERIOR",
+    "BAIKAL",
+    "TOTA",
+    "MARACAIBO",
+    "NESS",
+    "GINEBRA",
+    "MALAUI",
+    "ERIE",
+    "HURÓN",
+    "CHAD"
+   ]
+  },
+  {
+   "id": "desiertos",
+   "nombre": "Desiertos",
+   "palabras": [
+    "SAHARA",
+    "ATACAMA",
+    "GOBI",
+    "KALAHARI",
+    "MOJAVE",
+    "SONORA",
+    "NAMIB",
+    "TATACOA",
+    "ARÁBIGO",
+    "PATAGONIA",
+    "THAR",
+    "GUAJIRA"
+   ]
+  },
+  {
+   "id": "islas",
+   "nombre": "Islas",
+   "palabras": [
+    "CUBA",
+    "GROENLANDIA",
+    "MADAGASCAR",
+    "ISLANDIA",
+    "SICILIA",
+    "CERDEÑA",
+    "HAWÁI",
+    "GALÁPAGOS",
+    "BALI",
+    "JAVA",
+    "BORNEO",
+    "TAHITÍ"
+   ]
+  },
+  {
+   "id": "mapas-y-orientacion",
+   "nombre": "Mapas y orientación",
+   "palabras": [
+    "MAPA",
+    "BRÚJULA",
+    "NORTE",
+    "SUR",
+    "ESTE",
+    "OESTE",
+    "LATITUD",
+    "LONGITUD",
+    "ESCALA",
+    "LEYENDA",
+    "GLOBO",
+    "COORDENADA"
+   ]
+  },
+  {
+   "id": "climas-del-mundo",
+   "nombre": "Climas del mundo",
+   "palabras": [
+    "TROPICAL",
+    "DESÉRTICO",
+    "POLAR",
+    "TEMPLADO",
+    "ÁRIDO",
+    "HÚMEDO",
+    "MONZÓN",
+    "TUNDRA",
+    "ECUATORIAL",
+    "CONTINENTAL",
+    "ALPINO",
+    "OCEÁNICO"
+   ]
+  },
+  {
+   "id": "cordilleras",
+   "nombre": "Cordilleras",
+   "palabras": [
+    "ANDES",
+    "HIMALAYA",
+    "ALPES",
+    "ROCOSAS",
+    "URALES",
+    "PIRINEOS",
+    "APALACHES",
+    "ATLAS",
+    "CÁRPATOS",
+    "SIERRA NEVADA",
+    "CÁUCASO",
+    "BALCANES"
+   ]
+  },
+  {
+   "id": "cataratas",
+   "nombre": "Cataratas",
+   "palabras": [
+    "IGUAZÚ",
+    "NIÁGARA",
+    "VICTORIA",
+    "ÁNGEL",
+    "TEQUENDAMA",
+    "GOCTA",
+    "KAIETEUR",
+    "YOSEMITE",
+    "SUTHERLAND",
+    "TUGELA",
+    "SALTO",
+    "CASCADA"
+   ]
+  },
+  {
+   "id": "poblacion-y-ciudades",
+   "nombre": "Población y ciudades",
+   "palabras": [
+    "CIUDAD",
+    "PUEBLO",
+    "ALDEA",
+    "CAPITAL",
+    "METRÓPOLI",
+    "HABITANTE",
+    "CENSO",
+    "BARRIO",
+    "MUNICIPIO",
+    "FRONTERA",
+    "REGIÓN",
+    "PROVINCIA"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+# Espacio | #1E40AF
+Planetas: Mercurio, Venus, Tierra, Marte, Júpiter, Saturno, Urano, Neptuno, Plutón, Ceres, Eris, Haumea
+Lunas: luna, Fobos, Deimos, Europa, Ganímedes, Calisto, Titán, Encélado, Tritón, Caronte, Mimas, Oberón
+Constelaciones: Orión, Andrómeda, Pegaso, Casiopea, Cisne, Lira, Escorpio, Perseo, Hércules, Dragón, Osa Mayor, Cruz del Sur
+Estrellas: Sol, Sirio, Vega, Polaris, Rigel, Antares, Altair, Deneb, Aldebarán, Betelgeuse, Arturo, Canopus
+Cuerpos celestes: planeta, estrella, cometa, asteroide, meteoro, galaxia, nebulosa, satélite, púlsar, cuásar, enana, agujero
+Exploración espacial: cohete, astronauta, nave, satélite, sonda, módulo, órbita, lanzamiento, cápsula, estación, traje, despegue
+Pioneros del espacio: Gagarin, Armstrong, Aldrin, Collins, Tereshkova, Glenn, Ride, Leonov, Galileo, Copérnico, Kepler, Hubble
+Signos del zodiaco: Aries, Tauro, Géminis, Cáncer, Leo, Virgo, Libra, Escorpio, Sagitario, Capricornio, Acuario, Piscis
+Sistema solar: Sol, órbita, planeta, cinturón, asteroide, cometa, luna, eclipse, equinoccio, solsticio, rotación, traslación
+Galaxias: Vía Láctea, Andrómeda, Triángulo, espiral, elíptica, irregular, cúmulo, halo, brazo, núcleo, Sombrero, Remolino
+Telescopios: lente, espejo, ocular, trípode, aumento, enfoque, montura, observatorio, Hubble, Webb, refractor, reflector
+Fenómenos del cielo: eclipse, aurora, supernova, fase, marea, luna llena, cuarto, menguante, creciente, conjunción, tránsito, meteorito

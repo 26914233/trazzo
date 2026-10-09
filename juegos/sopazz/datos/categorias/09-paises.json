@@ -1,0 +1,278 @@
+{
+ "id": "paises",
+ "nombre": "Países",
+ "color": "#3B82F6",
+ "orden": 8,
+ "subtemas": [
+  {
+   "id": "america-del-sur",
+   "nombre": "América del Sur",
+   "palabras": [
+    "COLOMBIA",
+    "VENEZUELA",
+    "ECUADOR",
+    "PERÚ",
+    "BOLIVIA",
+    "CHILE",
+    "ARGENTINA",
+    "URUGUAY",
+    "PARAGUAY",
+    "BRASIL",
+    "GUYANA",
+    "SURINAM"
+   ]
+  },
+  {
+   "id": "centroamerica-y-caribe",
+   "nombre": "Centroamérica y Caribe",
+   "palabras": [
+    "MÉXICO",
+    "GUATEMALA",
+    "HONDURAS",
+    "BELICE",
+    "NICARAGUA",
+    "PANAMÁ",
+    "CUBA",
+    "HAITÍ",
+    "JAMAICA",
+    "BAHAMAS",
+    "DOMINICANA",
+    "BARBADOS"
+   ]
+  },
+  {
+   "id": "europa-occidental",
+   "nombre": "Europa occidental",
+   "palabras": [
+    "ESPAÑA",
+    "FRANCIA",
+    "PORTUGAL",
+    "ITALIA",
+    "ALEMANIA",
+    "BÉLGICA",
+    "HOLANDA",
+    "SUIZA",
+    "AUSTRIA",
+    "IRLANDA",
+    "INGLATERRA",
+    "LUXEMBURGO"
+   ]
+  },
+  {
+   "id": "europa-del-norte-y-del-este",
+   "nombre": "Europa del norte y del este",
+   "palabras": [
+    "NORUEGA",
+    "SUECIA",
+    "FINLANDIA",
+    "DINAMARCA",
+    "ISLANDIA",
+    "POLONIA",
+    "RUSIA",
+    "UCRANIA",
+    "HUNGRÍA",
+    "RUMANIA",
+    "GRECIA",
+    "CROACIA"
+   ]
+  },
+  {
+   "id": "asia",
+   "nombre": "Asia",
+   "palabras": [
+    "CHINA",
+    "JAPÓN",
+    "COREA",
+    "INDIA",
+    "TAILANDIA",
+    "VIETNAM",
+    "INDONESIA",
+    "FILIPINAS",
+    "MALASIA",
+    "MONGOLIA",
+    "NEPAL",
+    "CAMBOYA"
+   ]
+  },
+  {
+   "id": "medio-oriente",
+   "nombre": "Medio Oriente",
+   "palabras": [
+    "TURQUÍA",
+    "ISRAEL",
+    "IRÁN",
+    "IRAK",
+    "JORDANIA",
+    "LÍBANO",
+    "SIRIA",
+    "ARABIA",
+    "CATAR",
+    "KUWAIT",
+    "YEMEN",
+    "OMÁN"
+   ]
+  },
+  {
+   "id": "africa",
+   "nombre": "África",
+   "palabras": [
+    "EGIPTO",
+    "MARRUECOS",
+    "NIGERIA",
+    "KENIA",
+    "ETIOPÍA",
+    "SUDÁFRICA",
+    "GHANA",
+    "SENEGAL",
+    "ARGELIA",
+    "TÚNEZ",
+    "ANGOLA",
+    "CAMERÚN"
+   ]
+  },
+  {
+   "id": "oceania-e-islas",
+   "nombre": "Oceanía e islas",
+   "palabras": [
+    "AUSTRALIA",
+    "FIYI",
+    "SAMOA",
+    "TONGA",
+    "PALAOS",
+    "TUVALU",
+    "KIRIBATI",
+    "NAURU",
+    "VANUATU",
+    "MADAGASCAR",
+    "MALDIVAS",
+    "MAURICIO"
+   ]
+  },
+  {
+   "id": "capitales-de-america",
+   "nombre": "Capitales de América",
+   "palabras": [
+    "BOGOTÁ",
+    "LIMA",
+    "QUITO",
+    "CARACAS",
+    "SANTIAGO",
+    "ASUNCIÓN",
+    "MONTEVIDEO",
+    "BRASILIA",
+    "PANAMÁ",
+    "MANAGUA",
+    "HABANA",
+    "OTTAWA"
+   ]
+  },
+  {
+   "id": "capitales-de-europa",
+   "nombre": "Capitales de Europa",
+   "palabras": [
+    "MADRID",
+    "PARÍS",
+    "ROMA",
+    "BERLÍN",
+    "LISBOA",
+    "LONDRES",
+    "VIENA",
+    "ATENAS",
+    "OSLO",
+    "PRAGA",
+    "VARSOVIA",
+    "DUBLÍN"
+   ]
+  },
+  {
+   "id": "capitales-de-asia",
+   "nombre": "Capitales de Asia",
+   "palabras": [
+    "TOKIO",
+    "PEKÍN",
+    "SEÚL",
+    "BANGKOK",
+    "HANÓI",
+    "MANILA",
+    "YAKARTA",
+    "TEHERÁN",
+    "BAGDAD",
+    "KABUL",
+    "KATMANDÚ",
+    "DOHA"
+   ]
+  },
+  {
+   "id": "capitales-de-africa-y-oceania",
+   "nombre": "Capitales de África y Oceanía",
+   "palabras": [
+    "CAIRO",
+    "NAIROBI",
+    "DAKAR",
+    "RABAT",
+    "ACRA",
+    "ABUJA",
+    "LUANDA",
+    "ARGEL",
+    "TÚNEZ",
+    "CANBERRA",
+    "WELLINGTON",
+    "SUVA"
+   ]
+  },
+  {
+   "id": "gentilicios",
+   "nombre": "Gentilicios",
+   "palabras": [
+    "COLOMBIANO",
+    "MEXICANO",
+    "PERUANO",
+    "CHILENO",
+    "ARGENTINO",
+    "ESPAÑOL",
+    "FRANCÉS",
+    "ALEMÁN",
+    "JAPONÉS",
+    "CHINO",
+    "RUSO",
+    "BRASILEÑO"
+   ]
+  },
+  {
+   "id": "idiomas",
+   "nombre": "Idiomas",
+   "palabras": [
+    "ESPAÑOL",
+    "INGLÉS",
+    "FRANCÉS",
+    "ALEMÁN",
+    "ITALIANO",
+    "PORTUGUÉS",
+    "CHINO",
+    "JAPONÉS",
+    "ÁRABE",
+    "RUSO",
+    "HINDI",
+    "COREANO"
+   ]
+  },
+  {
+   "id": "monedas-del-mundo",
+   "nombre": "Monedas del mundo",
+   "palabras": [
+    "PESO",
+    "DÓLAR",
+    "EURO",
+    "LIBRA",
+    "YEN",
+    "YUAN",
+    "RUBLO",
+    "REAL",
+    "SOL",
+    "BOLÍVAR",
+    "FRANCO",
+    "RUPIA"
+   ]
+  }
+ ]
+}

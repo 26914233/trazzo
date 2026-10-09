@@ -1,0 +1,188 @@
+{
+ "id": "mascotas",
+ "nombre": "Mascotas",
+ "color": "#FB7185",
+ "orden": 34,
+ "subtemas": [
+  {
+   "id": "cuidado-de-mascotas",
+   "nombre": "Cuidado de mascotas",
+   "palabras": [
+    "COMIDA",
+    "AGUA",
+    "PLATO",
+    "COLLAR",
+    "CORREA",
+    "CAMA",
+    "JUGUETE",
+    "BAÑO",
+    "CEPILLO",
+    "VACUNA",
+    "PASEO",
+    "PREMIO"
+   ]
+  },
+  {
+   "id": "veterinaria",
+   "nombre": "Veterinaria",
+   "palabras": [
+    "VETERINARIO",
+    "VACUNA",
+    "CHEQUEO",
+    "PESO",
+    "JERINGA",
+    "VENDAJE",
+    "RECETA",
+    "CONSULTA",
+    "CIRUGÍA",
+    "COLLAR",
+    "PULGA",
+    "GARRAPATA"
+   ]
+  },
+  {
+   "id": "perros",
+   "nombre": "Perros",
+   "palabras": [
+    "LADRAR",
+    "MORDER",
+    "OLFATEAR",
+    "CORRER",
+    "JUGAR",
+    "COLA",
+    "HUESO",
+    "PELOTA",
+    "PATITA",
+    "OLFATO",
+    "CACHORRO",
+    "GUARDIÁN"
+   ]
+  },
+  {
+   "id": "gatos",
+   "nombre": "Gatos",
+   "palabras": [
+    "MAULLAR",
+    "RONRONEAR",
+    "ARAÑAR",
+    "BIGOTES",
+    "GARRAS",
+    "OVILLO",
+    "CAJA",
+    "ARENA",
+    "SIESTA",
+    "SALTAR",
+    "CAZAR",
+    "RATÓN"
+   ]
+  },
+  {
+   "id": "aves-de-casa",
+   "nombre": "Aves de casa",
+   "palabras": [
+    "CANARIO",
+    "PERIQUITO",
+    "LORO",
+    "CACATÚA",
+    "AGAPORNIS",
+    "JAULA",
+    "ALPISTE",
+    "PLUMAS",
+    "PICO",
+    "TRINO",
+    "NIDO",
+    "COLUMPIO"
+   ]
+  },
+  {
+   "id": "acuario",
+   "nombre": "Acuario",
+   "palabras": [
+    "PEZ",
+    "PECERA",
+    "ACUARIO",
+    "FILTRO",
+    "BOMBA",
+    "GRAVA",
+    "ALGA",
+    "BETTA",
+    "GUPPY",
+    "NEÓN",
+    "ESCALAR",
+    "TETRA"
+   ]
+  },
+  {
+   "id": "roedores-y-pequenos",
+   "nombre": "Roedores y pequeños",
+   "palabras": [
+    "HÁMSTER",
+    "COBAYO",
+    "CONEJO",
+    "CHINCHILLA",
+    "HURÓN",
+    "RATÓN",
+    "RUEDA",
+    "JAULA",
+    "VIRUTA",
+    "HENO",
+    "ZANAHORIA",
+    "TÚNEL"
+   ]
+  },
+  {
+   "id": "reptiles-como-mascota",
+   "nombre": "Reptiles como mascota",
+   "palabras": [
+    "TORTUGA",
+    "IGUANA",
+    "GECKO",
+    "CAMALEÓN",
+    "SERPIENTE",
+    "TERRARIO",
+    "LÁMPARA",
+    "CALOR",
+    "GRILLO",
+    "MUDA",
+    "ESCAMA",
+    "CUEVA"
+   ]
+  },
+  {
+   "id": "entrenamiento",
+   "nombre": "Entrenamiento",
+   "palabras": [
+    "SENTADO",
+    "QUIETO",
+    "VEN",
+    "ECHADO",
+    "PATA",
+    "PREMIO",
+    "CLICKER",
+    "OBEDIENCIA",
+    "CORREA",
+    "PACIENCIA",
+    "ORDEN",
+    "TRUCO"
+   ]
+  },
+  {
+   "id": "accesorios-para-mascotas",
+   "nombre": "Accesorios para mascotas",
+   "palabras": [
+    "COLLAR",
+    "CORREA",
+    "ARNÉS",
+    "PLACA",
+    "CAMA",
+    "GUACAL",
+    "RASCADOR",
+    "COMEDERO",
+    "BEBEDERO",
+    "JUGUETE",
+    "SUÉTER",
+    "BOZAL"
+   ]
+  }
+ ]
+}

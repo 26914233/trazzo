@@ -1,0 +1,188 @@
+{
+ "id": "ciudad",
+ "nombre": "Ciudad",
+ "color": "#475569",
+ "orden": 40,
+ "subtemas": [
+  {
+   "id": "en-la-ciudad",
+   "nombre": "En la ciudad",
+   "palabras": [
+    "CALLE",
+    "AVENIDA",
+    "SEMÁFORO",
+    "EDIFICIO",
+    "PARQUE",
+    "PLAZA",
+    "PUENTE",
+    "ESQUINA",
+    "ANDÉN",
+    "TRÁFICO",
+    "ALCALDÍA",
+    "BARRIO"
+   ]
+  },
+  {
+   "id": "lugares-de-la-ciudad",
+   "nombre": "Lugares de la ciudad",
+   "palabras": [
+    "HOSPITAL",
+    "COLEGIO",
+    "BANCO",
+    "IGLESIA",
+    "MUSEO",
+    "TEATRO",
+    "ESTADIO",
+    "MERCADO",
+    "BIBLIOTECA",
+    "CINE",
+    "HOTEL",
+    "RESTAURANTE"
+   ]
+  },
+  {
+   "id": "la-tienda-de-barrio",
+   "nombre": "La tienda de barrio",
+   "palabras": [
+    "TENDERO",
+    "MOSTRADOR",
+    "PAN",
+    "LECHE",
+    "HUEVOS",
+    "GASEOSA",
+    "DULCES",
+    "FIADO",
+    "BOLSA",
+    "VUELTO",
+    "NEVERA",
+    "CLIENTE"
+   ]
+  },
+  {
+   "id": "restaurante",
+   "nombre": "Restaurante",
+   "palabras": [
+    "MESA",
+    "MESERO",
+    "MENÚ",
+    "CARTA",
+    "PLATO",
+    "CUENTA",
+    "PROPINA",
+    "COCINA",
+    "CHEF",
+    "RESERVA",
+    "POSTRE",
+    "ENTRADA"
+   ]
+  },
+  {
+   "id": "el-parque",
+   "nombre": "El parque",
+   "palabras": [
+    "COLUMPIO",
+    "RODADERO",
+    "BANCA",
+    "ÁRBOL",
+    "FUENTE",
+    "SENDERO",
+    "PASTO",
+    "KIOSCO",
+    "PERRO",
+    "BICICLETA",
+    "PATINETA",
+    "PICNIC"
+   ]
+  },
+  {
+   "id": "panaderia",
+   "nombre": "Panadería",
+   "palabras": [
+    "PAN",
+    "HORNO",
+    "MASA",
+    "HARINA",
+    "LEVADURA",
+    "PANADERO",
+    "CROISSANT",
+    "GALLETA",
+    "TORTA",
+    "ALMOJÁBANA",
+    "PANDEBONO",
+    "MOGOLLA"
+   ]
+  },
+  {
+   "id": "farmacia",
+   "nombre": "Farmacia",
+   "palabras": [
+    "FARMACIA",
+    "DROGUERÍA",
+    "RECETA",
+    "PASTILLA",
+    "JARABE",
+    "VENDA",
+    "TERMÓMETRO",
+    "CURITA",
+    "ALCOHOL",
+    "CREMA",
+    "VITAMINA",
+    "FARMACEUTA"
+   ]
+  },
+  {
+   "id": "correo",
+   "nombre": "Correo",
+   "palabras": [
+    "CARTA",
+    "SOBRE",
+    "SELLO",
+    "PAQUETE",
+    "CARTERO",
+    "BUZÓN",
+    "ENVÍO",
+    "REMITENTE",
+    "DESTINATARIO",
+    "DIRECCIÓN",
+    "CÓDIGO",
+    "ENTREGA"
+   ]
+  },
+  {
+   "id": "policia-y-bomberos",
+   "nombre": "Policía y bomberos",
+   "palabras": [
+    "PATRULLA",
+    "SIRENA",
+    "POLICÍA",
+    "BOMBERO",
+    "MANGUERA",
+    "ESCALERA",
+    "ALARMA",
+    "EXTINTOR",
+    "RESCATE",
+    "UNIFORME",
+    "ESTACIÓN",
+    "EMERGENCIA"
+   ]
+  },
+  {
+   "id": "centro-comercial",
+   "nombre": "Centro comercial",
+   "palabras": [
+    "TIENDA",
+    "VITRINA",
+    "ESCALERA",
+    "ASCENSOR",
+    "CINE",
+    "COMIDA",
+    "PARQUEADERO",
+    "OFERTA",
+    "BOLSA",
+    "PROBADOR",
+    "CAJERO",
+    "JUEGOS"
+   ]
+  }
+ ]
+}

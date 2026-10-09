@@ -1,0 +1,224 @@
+{
+ "id": "campo",
+ "nombre": "Campo",
+ "color": "#65A30D",
+ "orden": 31,
+ "subtemas": [
+  {
+   "id": "granja",
+   "nombre": "Granja",
+   "palabras": [
+    "GRANJA",
+    "ESTABLO",
+    "CORRAL",
+    "GRANERO",
+    "TRACTOR",
+    "CERCA",
+    "GALLINERO",
+    "PASTO",
+    "HENO",
+    "MOLINO",
+    "POZO",
+    "HUERTA"
+   ]
+  },
+  {
+   "id": "cultivos",
+   "nombre": "Cultivos",
+   "palabras": [
+    "MAÍZ",
+    "TRIGO",
+    "ARROZ",
+    "PAPA",
+    "CAFÉ",
+    "CAÑA",
+    "CACAO",
+    "PLÁTANO",
+    "YUCA",
+    "ALGODÓN",
+    "SOYA",
+    "CEBADA"
+   ]
+  },
+  {
+   "id": "el-cafe",
+   "nombre": "El café",
+   "palabras": [
+    "CAFETO",
+    "GRANO",
+    "CEREZA",
+    "RECOLECTOR",
+    "TOSTADO",
+    "MOLIDO",
+    "SECADO",
+    "BENEFICIO",
+    "TAZA",
+    "AROMA",
+    "PERGAMINO",
+    "TINTO"
+   ]
+  },
+  {
+   "id": "herramientas-del-campo",
+   "nombre": "Herramientas del campo",
+   "palabras": [
+    "AZADÓN",
+    "PALA",
+    "MACHETE",
+    "RASTRILLO",
+    "HOZ",
+    "ARADO",
+    "CARRETILLA",
+    "REGADERA",
+    "TIJERAS",
+    "GUADAÑA",
+    "PICA",
+    "BIELDO"
+   ]
+  },
+  {
+   "id": "ganaderia",
+   "nombre": "Ganadería",
+   "palabras": [
+    "VACA",
+    "TORO",
+    "TERNERO",
+    "ORDEÑO",
+    "LECHE",
+    "POTRERO",
+    "ESTABLO",
+    "CORRAL",
+    "RODEO",
+    "VAQUERO",
+    "LAZO",
+    "GANADO"
+   ]
+  },
+  {
+   "id": "huerta",
+   "nombre": "Huerta",
+   "palabras": [
+    "TOMATE",
+    "LECHUGA",
+    "CILANTRO",
+    "CEBOLLA",
+    "ZANAHORIA",
+    "PEPINO",
+    "FRÍJOL",
+    "AHUYAMA",
+    "RÁBANO",
+    "ACELGA",
+    "ESPINACA",
+    "PEREJIL"
+   ]
+  },
+  {
+   "id": "cosecha",
+   "nombre": "Cosecha",
+   "palabras": [
+    "COSECHA",
+    "SIEMBRA",
+    "SEMILLA",
+    "RIEGO",
+    "ABONO",
+    "SURCO",
+    "PLÁNTULA",
+    "CULTIVO",
+    "FRUTO",
+    "RECOGER",
+    "TEMPORADA",
+    "LLUVIA"
+   ]
+  },
+  {
+   "id": "maquinaria-agricola",
+   "nombre": "Maquinaria agrícola",
+   "palabras": [
+    "TRACTOR",
+    "COSECHADORA",
+    "SEMBRADORA",
+    "ARADO",
+    "FUMIGADORA",
+    "REMOLQUE",
+    "TRILLADORA",
+    "EMPACADORA",
+    "MOTOBOMBA",
+    "RASTRA",
+    "ASPERSOR",
+    "MOTOCULTOR"
+   ]
+  },
+  {
+   "id": "apicultura",
+   "nombre": "Apicultura",
+   "palabras": [
+    "ABEJA",
+    "COLMENA",
+    "MIEL",
+    "PANAL",
+    "REINA",
+    "ZÁNGANO",
+    "OBRERA",
+    "POLEN",
+    "CERA",
+    "NÉCTAR",
+    "APICULTOR",
+    "ENJAMBRE"
+   ]
+  },
+  {
+   "id": "aves-de-corral",
+   "nombre": "Aves de corral",
+   "palabras": [
+    "GALLINA",
+    "GALLO",
+    "POLLITO",
+    "HUEVO",
+    "PATO",
+    "PAVO",
+    "CODORNIZ",
+    "GANSO",
+    "INCUBADORA",
+    "NIDO",
+    "PLUMAS",
+    "MAÍZ"
+   ]
+  },
+  {
+   "id": "arboles-frutales",
+   "nombre": "Árboles frutales",
+   "palabras": [
+    "NARANJO",
+    "LIMONERO",
+    "MANZANO",
+    "PERAL",
+    "MANGO",
+    "AGUACATE",
+    "GUAYABO",
+    "CEREZO",
+    "DURAZNO",
+    "CIRUELO",
+    "PAPAYO",
+    "OLIVO"
+   ]
+  },
+  {
+   "id": "mercado-campesino",
+   "nombre": "Mercado campesino",
+   "palabras": [
+    "PLAZA",
+    "PUESTO",
+    "BULTO",
+    "CANASTO",
+    "BALANZA",
+    "VERDURA",
+    "FRUTA",
+    "QUESO",
+    "PANELA",
+    "YAPA",
+    "VENDEDOR",
+    "CLIENTE"
+   ]
+  }
+ ]
+}

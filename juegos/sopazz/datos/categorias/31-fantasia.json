@@ -1,0 +1,224 @@
+{
+ "id": "fantasia",
+ "nombre": "Fantasía",
+ "color": "#9333EA",
+ "orden": 30,
+ "subtemas": [
+  {
+   "id": "magia-y-hechizos",
+   "nombre": "Magia y hechizos",
+   "palabras": [
+    "MAGO",
+    "VARITA",
+    "HECHIZO",
+    "CONJURO",
+    "POCIÓN",
+    "CALDERO",
+    "GRIMORIO",
+    "CAPA",
+    "SOMBRERO",
+    "RUNA",
+    "MAGIA",
+    "CRISTAL"
+   ]
+  },
+  {
+   "id": "dragones",
+   "nombre": "Dragones",
+   "palabras": [
+    "DRAGÓN",
+    "FUEGO",
+    "ESCAMA",
+    "ALA",
+    "GARRA",
+    "CUEVA",
+    "TESORO",
+    "HUEVO",
+    "COLA",
+    "COLMILLO",
+    "GUARIDA",
+    "JINETE"
+   ]
+  },
+  {
+   "id": "castillo",
+   "nombre": "Castillo",
+   "palabras": [
+    "CASTILLO",
+    "TORRE",
+    "MURALLA",
+    "FOSO",
+    "PUENTE",
+    "ALMENA",
+    "MAZMORRA",
+    "TRONO",
+    "SALÓN",
+    "BANDERA",
+    "REY",
+    "GUARDIA"
+   ]
+  },
+  {
+   "id": "caballeros",
+   "nombre": "Caballeros",
+   "palabras": [
+    "CABALLERO",
+    "ESPADA",
+    "ESCUDO",
+    "ARMADURA",
+    "YELMO",
+    "LANZA",
+    "CABALLO",
+    "TORNEO",
+    "HONOR",
+    "ESCUDERO",
+    "CRUZADA",
+    "ESTANDARTE"
+   ]
+  },
+  {
+   "id": "piratas",
+   "nombre": "Piratas",
+   "palabras": [
+    "PIRATA",
+    "BARCO",
+    "TESORO",
+    "MAPA",
+    "ISLA",
+    "LORO",
+    "PARCHE",
+    "COFRE",
+    "ANCLA",
+    "BANDERA",
+    "CAÑÓN",
+    "CAPITÁN"
+   ]
+  },
+  {
+   "id": "hadas-y-duendes",
+   "nombre": "Hadas y duendes",
+   "palabras": [
+    "HADA",
+    "DUENDE",
+    "VARITA",
+    "ALAS",
+    "POLVO",
+    "BOSQUE",
+    "HONGO",
+    "FLOR",
+    "BRILLO",
+    "DESEO",
+    "GNOMO",
+    "LUCIÉRNAGA"
+   ]
+  },
+  {
+   "id": "cuentos-clasicos",
+   "nombre": "Cuentos clásicos",
+   "palabras": [
+    "CAPERUCITA",
+    "CENICIENTA",
+    "BLANCANIEVES",
+    "PINOCHO",
+    "RAPUNZEL",
+    "ALADINO",
+    "PETER PAN",
+    "HANSEL",
+    "GRETEL",
+    "BELLA",
+    "BESTIA",
+    "SIRENITA"
+   ]
+  },
+  {
+   "id": "el-reino",
+   "nombre": "El reino",
+   "palabras": [
+    "REY",
+    "REINA",
+    "PRÍNCIPE",
+    "PRINCESA",
+    "CORONA",
+    "TRONO",
+    "PALACIO",
+    "REINO",
+    "SÚBDITO",
+    "BUFÓN",
+    "CONSEJERO",
+    "HERALDO"
+   ]
+  },
+  {
+   "id": "monstruos-de-fantasia",
+   "nombre": "Monstruos de fantasía",
+   "palabras": [
+    "OGRO",
+    "TROL",
+    "ORCO",
+    "GOBLIN",
+    "GÁRGOLA",
+    "QUIMERA",
+    "BASILISCO",
+    "GRIFO",
+    "GIGANTE",
+    "ESPECTRO",
+    "GÓLEM",
+    "KRAKEN"
+   ]
+  },
+  {
+   "id": "tesoros",
+   "nombre": "Tesoros",
+   "palabras": [
+    "ORO",
+    "PLATA",
+    "JOYA",
+    "CORONA",
+    "COFRE",
+    "MONEDA",
+    "RUBÍ",
+    "DIAMANTE",
+    "ESMERALDA",
+    "COLLAR",
+    "CÁLIZ",
+    "TESORO"
+   ]
+  },
+  {
+   "id": "armas-medievales",
+   "nombre": "Armas medievales",
+   "palabras": [
+    "ESPADA",
+    "ARCO",
+    "FLECHA",
+    "LANZA",
+    "HACHA",
+    "MAZA",
+    "BALLESTA",
+    "DAGA",
+    "ESCUDO",
+    "CATAPULTA",
+    "ALABARDA",
+    "MANGUAL"
+   ]
+  },
+  {
+   "id": "bosque-encantado",
+   "nombre": "Bosque encantado",
+   "palabras": [
+    "ÁRBOL",
+    "NIEBLA",
+    "SENDERO",
+    "LUCIÉRNAGA",
+    "HONGO",
+    "BÚHO",
+    "LOBO",
+    "CABAÑA",
+    "RÍO",
+    "HECHIZO",
+    "SOMBRA",
+    "ECO"
+   ]
+  }
+ ]
+}

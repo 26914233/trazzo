@@ -1,0 +1,278 @@
+{
+ "id": "cocina-del-mundo",
+ "nombre": "Cocina del mundo",
+ "color": "#EF4444",
+ "orden": 1,
+ "subtemas": [
+  {
+   "id": "comida-colombiana",
+   "nombre": "Comida colombiana",
+   "palabras": [
+    "AJIACO",
+    "BANDEJA PAISA",
+    "SANCOCHO",
+    "AREPA",
+    "TAMAL",
+    "LECHONA",
+    "EMPANADA",
+    "CHANGUA",
+    "MONDONGO",
+    "PATACÓN",
+    "BUÑUELO",
+    "NATILLA"
+   ]
+  },
+  {
+   "id": "comida-mexicana",
+   "nombre": "Comida mexicana",
+   "palabras": [
+    "TACO",
+    "BURRITO",
+    "ENCHILADA",
+    "QUESADILLA",
+    "TAMAL",
+    "POZOLE",
+    "MOLE",
+    "GUACAMOLE",
+    "NACHOS",
+    "TORTILLA",
+    "CHILAQUILES",
+    "TOSTADA"
+   ]
+  },
+  {
+   "id": "comida-italiana",
+   "nombre": "Comida italiana",
+   "palabras": [
+    "PIZZA",
+    "PASTA",
+    "LASAÑA",
+    "RISOTTO",
+    "RAVIOLI",
+    "ESPAGUETI",
+    "PESTO",
+    "TIRAMISÚ",
+    "ÑOQUIS",
+    "CALZONE",
+    "FOCACCIA",
+    "POLENTA"
+   ]
+  },
+  {
+   "id": "comida-japonesa",
+   "nombre": "Comida japonesa",
+   "palabras": [
+    "SUSHI",
+    "RAMEN",
+    "TEMPURA",
+    "SASHIMI",
+    "MISO",
+    "UDON",
+    "WASABI",
+    "TERIYAKI",
+    "ONIGIRI",
+    "GYOZA",
+    "TOFU",
+    "MATCHA"
+   ]
+  },
+  {
+   "id": "comida-china",
+   "nombre": "Comida china",
+   "palabras": [
+    "ARROZ CHINO",
+    "WANTÁN",
+    "CHOP SUEY",
+    "ROLLITO",
+    "TALLARÍN",
+    "AGRIDULCE",
+    "PATO LAQUEADO",
+    "DIM SUM",
+    "TOFU",
+    "JENGIBRE",
+    "SOYA",
+    "WOK"
+   ]
+  },
+  {
+   "id": "comida-peruana",
+   "nombre": "Comida peruana",
+   "palabras": [
+    "CEVICHE",
+    "LOMO SALTADO",
+    "AJÍ DE GALLINA",
+    "CAUSA",
+    "ANTICUCHO",
+    "HUANCAÍNA",
+    "ROCOTO",
+    "CHICHA MORADA",
+    "PICARONES",
+    "LECHE DE TIGRE",
+    "QUINUA",
+    "SUSPIRO"
+   ]
+  },
+  {
+   "id": "comida-espanola",
+   "nombre": "Comida española",
+   "palabras": [
+    "PAELLA",
+    "TORTILLA",
+    "GAZPACHO",
+    "CHURROS",
+    "JAMÓN",
+    "CHORIZO",
+    "CROQUETAS",
+    "TAPAS",
+    "FABADA",
+    "PULPO",
+    "SALMOREJO",
+    "TURRÓN"
+   ]
+  },
+  {
+   "id": "comida-francesa",
+   "nombre": "Comida francesa",
+   "palabras": [
+    "CREPE",
+    "CROISSANT",
+    "BAGUETTE",
+    "QUICHE",
+    "RATATOUILLE",
+    "SOUFFLÉ",
+    "MACARÓN",
+    "BRIOCHE",
+    "CAMEMBERT",
+    "FOIE GRAS",
+    "ESCARGOT",
+    "CRÈME BRÛLÉE"
+   ]
+  },
+  {
+   "id": "comida-india",
+   "nombre": "Comida india",
+   "palabras": [
+    "CURRY",
+    "MASALA",
+    "NAAN",
+    "SAMOSA",
+    "TANDOORI",
+    "CHUTNEY",
+    "BIRYANI",
+    "DAL",
+    "CÚRCUMA",
+    "LASSI",
+    "PANEER",
+    "CHAI"
+   ]
+  },
+  {
+   "id": "comida-arabe",
+   "nombre": "Comida árabe",
+   "palabras": [
+    "FALAFEL",
+    "HUMMUS",
+    "SHAWARMA",
+    "KEBAB",
+    "TABULE",
+    "KIBBE",
+    "BAKLAVA",
+    "CUSCÚS",
+    "PITA",
+    "TAHINI",
+    "DÁTIL",
+    "LABNEH"
+   ]
+  },
+  {
+   "id": "comida-argentina",
+   "nombre": "Comida argentina",
+   "palabras": [
+    "ASADO",
+    "EMPANADA",
+    "CHIMICHURRI",
+    "DULCE DE LECHE",
+    "ALFAJOR",
+    "MILANESA",
+    "CHORIPÁN",
+    "MATE",
+    "LOCRO",
+    "PROVOLETA",
+    "MATAMBRE",
+    "MEDIALUNA"
+   ]
+  },
+  {
+   "id": "comida-venezolana",
+   "nombre": "Comida venezolana",
+   "palabras": [
+    "AREPA",
+    "HALLACA",
+    "PABELLÓN",
+    "CACHAPA",
+    "TEQUEÑO",
+    "MANDOCA",
+    "QUESILLO",
+    "GOLFEADO",
+    "CHICHA",
+    "EMPANADA",
+    "ASADO NEGRO",
+    "PERICO"
+   ]
+  },
+  {
+   "id": "comida-coreana",
+   "nombre": "Comida coreana",
+   "palabras": [
+    "KIMCHI",
+    "BIBIMBAP",
+    "BULGOGI",
+    "TTEOKBOKKI",
+    "JAPCHAE",
+    "KIMBAP",
+    "SOJU",
+    "GOCHUJANG",
+    "RAMYEON",
+    "MANDU",
+    "GALBI",
+    "BANCHAN"
+   ]
+  },
+  {
+   "id": "comida-brasilena",
+   "nombre": "Comida brasileña",
+   "palabras": [
+    "FEIJOADA",
+    "BRIGADEIRO",
+    "PICANHA",
+    "AÇAÍ",
+    "COXINHA",
+    "FAROFA",
+    "PÃO DE QUEIJO",
+    "MOQUECA",
+    "TAPIOCA",
+    "GUARANÁ",
+    "CHURRASCO",
+    "QUINDIM"
+   ]
+  },
+  {
+   "id": "comida-tailandesa",
+   "nombre": "Comida tailandesa",
+   "palabras": [
+    "PAD THAI",
+    "TOM YUM",
+    "SATAY",
+    "CURRY",
+    "COCO",
+    "MANÍ",
+    "JENGIBRE",
+    "ALBAHACA",
+    "TAMARINDO",
+    "FIDEOS",
+    "MANGO",
+    "GALANGA"
+   ]
+  }
+ ]
+}

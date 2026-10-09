@@ -1,0 +1,224 @@
+{
+ "id": "transporte",
+ "nombre": "Transporte",
+ "color": "#0284C7",
+ "orden": 24,
+ "subtemas": [
+  {
+   "id": "vehiculos",
+   "nombre": "Vehículos",
+   "palabras": [
+    "CARRO",
+    "MOTO",
+    "BUS",
+    "CAMIÓN",
+    "TAXI",
+    "TREN",
+    "BICICLETA",
+    "CAMIONETA",
+    "TRACTOR",
+    "AMBULANCIA",
+    "JEEP",
+    "FURGONETA"
+   ]
+  },
+  {
+   "id": "aviones-y-aeropuerto",
+   "nombre": "Aviones y aeropuerto",
+   "palabras": [
+    "AVIÓN",
+    "PILOTO",
+    "AZAFATA",
+    "PISTA",
+    "TERMINAL",
+    "MALETA",
+    "PASAPORTE",
+    "VUELO",
+    "DESPEGUE",
+    "ATERRIZAJE",
+    "HANGAR",
+    "TORRE"
+   ]
+  },
+  {
+   "id": "barcos",
+   "nombre": "Barcos",
+   "palabras": [
+    "BARCO",
+    "VELERO",
+    "LANCHA",
+    "CANOA",
+    "YATE",
+    "FERRY",
+    "SUBMARINO",
+    "ANCLA",
+    "PUERTO",
+    "TIMÓN",
+    "PROA",
+    "POPA"
+   ]
+  },
+  {
+   "id": "partes-del-carro",
+   "nombre": "Partes del carro",
+   "palabras": [
+    "MOTOR",
+    "VOLANTE",
+    "LLANTA",
+    "FRENO",
+    "PEDAL",
+    "CAPÓ",
+    "BAÚL",
+    "FARO",
+    "ESPEJO",
+    "RADIADOR",
+    "EMBRAGUE",
+    "PARABRISAS"
+   ]
+  },
+  {
+   "id": "el-tren",
+   "nombre": "El tren",
+   "palabras": [
+    "TREN",
+    "VAGÓN",
+    "LOCOMOTORA",
+    "RIEL",
+    "ESTACIÓN",
+    "ANDÉN",
+    "MAQUINISTA",
+    "BOLETO",
+    "VÍA",
+    "TÚNEL",
+    "METRO",
+    "TRANVÍA"
+   ]
+  },
+  {
+   "id": "la-bicicleta",
+   "nombre": "La bicicleta",
+   "palabras": [
+    "PEDAL",
+    "CADENA",
+    "RUEDA",
+    "SILLÍN",
+    "MANUBRIO",
+    "FRENO",
+    "RADIO",
+    "PIÑÓN",
+    "TIMBRE",
+    "CASCO",
+    "LLANTA",
+    "CUADRO"
+   ]
+  },
+  {
+   "id": "senales-de-transito",
+   "nombre": "Señales de tránsito",
+   "palabras": [
+    "PARE",
+    "SEMÁFORO",
+    "CEBRA",
+    "CEDA",
+    "CURVA",
+    "VELOCIDAD",
+    "PEATÓN",
+    "CRUCE",
+    "GIRO",
+    "PROHIBIDO",
+    "DESVÍO",
+    "GLORIETA"
+   ]
+  },
+  {
+   "id": "motos",
+   "nombre": "Motos",
+   "palabras": [
+    "CASCO",
+    "MOTOR",
+    "MANUBRIO",
+    "ESCAPE",
+    "GUANTES",
+    "CHAQUETA",
+    "CILINDRAJE",
+    "ACELERADOR",
+    "CLUTCH",
+    "BOCINA",
+    "PLACA",
+    "RETROVISOR"
+   ]
+  },
+  {
+   "id": "transporte-publico",
+   "nombre": "Transporte público",
+   "palabras": [
+    "BUS",
+    "METRO",
+    "TRANVÍA",
+    "BUSETA",
+    "COLECTIVO",
+    "TAXI",
+    "PARADA",
+    "PASAJE",
+    "TARJETA",
+    "RUTA",
+    "ESTACIÓN",
+    "TELEFÉRICO"
+   ]
+  },
+  {
+   "id": "maquinaria-pesada",
+   "nombre": "Maquinaria pesada",
+   "palabras": [
+    "GRÚA",
+    "EXCAVADORA",
+    "TRACTOR",
+    "VOLQUETA",
+    "BULLDOZER",
+    "MONTACARGAS",
+    "APLANADORA",
+    "MEZCLADORA",
+    "CAMIÓN",
+    "ORUGA",
+    "CARGADOR",
+    "PALA"
+   ]
+  },
+  {
+   "id": "viaje-por-carretera",
+   "nombre": "Viaje por carretera",
+   "palabras": [
+    "PEAJE",
+    "GASOLINA",
+    "MAPA",
+    "RUTA",
+    "AUTOPISTA",
+    "CURVA",
+    "PARADOR",
+    "CARRETERA",
+    "KILÓMETRO",
+    "TÚNEL",
+    "PUENTE",
+    "VIAJE"
+   ]
+  },
+  {
+   "id": "vehiculos-aereos",
+   "nombre": "Vehículos aéreos",
+   "palabras": [
+    "AVIÓN",
+    "HELICÓPTERO",
+    "GLOBO",
+    "DRON",
+    "AVIONETA",
+    "PLANEADOR",
+    "JET",
+    "COHETE",
+    "ZEPELÍN",
+    "PARAPENTE",
+    "HIDROAVIÓN",
+    "CAZA"
+   ]
+  }
+ ]
+}

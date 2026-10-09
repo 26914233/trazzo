@@ -1,0 +1,16 @@
+# Tecnología | #64748B
+Computador: teclado, ratón, pantalla, monitor, torre, memoria, disco, procesador, puerto, cargador, cámara, parlante
+Internet: red, wifi, correo, navegador, página, enlace, servidor, nube, descarga, contraseña, usuario, buscador
+Programación: código, variable, función, bucle, clase, objeto, algoritmo, compilar, depurar, programa, script, error
+Lenguajes de programación: Python, Java, Ruby, Swift, Kotlin, Rust, Perl, Pascal, Cobol, Fortran, Haskell, Lua
+Redes sociales: perfil, seguidor, publicar, comentario, foto, video, historia, etiqueta, mensaje, compartir, me gusta, tendencia
+El celular: pantalla, batería, cámara, cargador, aplicación, mensaje, llamada, contacto, alarma, linterna, carcasa, tienda
+Robótica: robot, sensor, motor, brazo, servo, circuito, programa, autómata, dron, rueda, pinza, batería
+Inteligencia artificial: algoritmo, datos, modelo, red neuronal, aprender, predecir, robot, chatbot, visión, lenguaje, patrón, máquina
+Ciberseguridad: virus, contraseña, cifrado, antivirus, hacker, firewall, malware, phishing, respaldo, clave, bloqueo, spam
+Hardware: placa, chip, memoria, disco, fuente, ventilador, tarjeta, procesador, cable, puerto, batería, gabinete
+Software: sistema, programa, aplicación, archivo, carpeta, ventana, icono, menú, escritorio, actualizar, instalar, licencia
+Trabajo remoto: cámara, micrófono, audio, reunión, enlace, pantalla, compartir, chat, silencio, conexión, auricular, agenda
+Inventos tecnológicos: teléfono, radio, televisión, bombilla, imprenta, computadora, internet, telégrafo, satélite, láser, transistor, GPS
+Telecomunicaciones: antena, señal, fibra, router, módem, satélite, cable, wifi, bluetooth, frecuencia, cobertura, operador
+Inventores: Edison, Bell, Tesla, Marconi, Turing, Lovelace, Babbage, Morse, Gutenberg, Watt, Diesel, Wright

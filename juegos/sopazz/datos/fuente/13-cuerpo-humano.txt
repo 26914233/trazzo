@@ -1,0 +1,15 @@
+# Cuerpo humano | #F472B6
+Huesos: cráneo, fémur, tibia, peroné, costilla, columna, húmero, radio, cúbito, pelvis, clavícula, rótula
+Órganos: corazón, pulmón, hígado, riñón, cerebro, estómago, intestino, páncreas, bazo, vejiga, piel, útero
+Músculos: bíceps, tríceps, deltoides, pectoral, abdomen, glúteo, cuádriceps, gemelo, trapecio, dorsal, oblicuo, diafragma
+Los sentidos: vista, oído, olfato, gusto, tacto, ojo, oreja, nariz, lengua, piel, sabor, aroma
+La cara: frente, ceja, pestaña, ojo, nariz, mejilla, boca, labio, barbilla, mentón, oreja, pómulo
+Manos y pies: dedo, uña, palma, muñeca, nudillo, pulgar, índice, meñique, talón, tobillo, planta, empeine
+Sistema digestivo: boca, esófago, estómago, intestino, colon, hígado, páncreas, vesícula, saliva, bilis, digestión, recto
+Sangre y corazón: sangre, plasma, glóbulo, plaqueta, arteria, vena, capilar, aorta, aurícula, ventrículo, pulso, latido
+Los dientes: diente, muela, colmillo, incisivo, encía, esmalte, caries, raíz, corona, sarro, cepillo, ortodoncia
+El ojo: córnea, iris, pupila, retina, cristalino, párpado, pestaña, lágrima, nervio, esclera, mácula, visión
+Cerebro y nervios: cerebro, neurona, nervio, médula, cerebelo, memoria, sinapsis, reflejo, axón, dendrita, lóbulo, tálamo
+Respiración: pulmón, tráquea, bronquio, alvéolo, diafragma, nariz, laringe, faringe, oxígeno, aire, inhalar, exhalar
+Piel y pelo: piel, poro, sudor, pelo, cabello, uña, vello, lunar, peca, cana, melanina, dermis
+Articulaciones: rodilla, codo, hombro, cadera, muñeca, tobillo, cuello, mandíbula, nudillo, vértebra, cartílago, ligamento

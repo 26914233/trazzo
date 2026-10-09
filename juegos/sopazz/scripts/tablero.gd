@@ -9,7 +9,7 @@ signal seleccion_hecha(celdas: Array[Vector2i])
 const GROSOR_TRAZO := 0.78   ## fraccion del tamaño de celda
 
 var sopa: GeneradorSopa.Sopa
-var color_tema := Estilo.PRIMARIO
+var color_tema := Color.WHITE
 var escala_texto := 1.0
 var activo := true
 
@@ -143,18 +143,19 @@ func _draw() -> void:
 	var total := l * sopa.lado
 	var desplaza := Vector2(sin(_t * 60.0) * 14.0 * _sacudida, 0)
 	var marco := Rect2(_origen() - Vector2(18, 18), Vector2(total, total) + Vector2(36, 36))
-	draw_style_box(Estilo.caja(Estilo.TARJETA, 36, Estilo.GROSOR, 10), marco)
+	draw_style_box(Estilo.caja(Estilo.TABLERO, Estilo.RADIO + 10), marco)
+	var alfa := 0.55 if Estilo.es_oscuro() else 0.38
 
 	for e in _encontradas:
-		_trazo(e["celdas"], Color(e["color"], 0.45), desplaza * 0)
+		_trazo(e["celdas"], Color(e["color"], alfa), Vector2.ZERO)
 	if _seleccion.size() > 0:
-		_trazo(_seleccion, Color(color_tema, 0.75), desplaza)
+		_trazo(_seleccion, Color(Estilo.PRIMARIO, 0.45), desplaza)
 	if _pista.x >= 0:
 		var r := l * (0.42 + 0.06 * sin(_t * 6.0))
-		draw_circle(_centro(_pista), r, Color(Estilo.ORO, 0.55))
-		draw_arc(_centro(_pista), r, 0, TAU, 32, Estilo.BORDE, 4.0, true)
+		draw_circle(_centro(_pista), r, Color(Estilo.ACENTO, 0.35))
+		draw_arc(_centro(_pista), r, 0, TAU, 40, Estilo.ACENTO, 5.0, true)
 
-	var fuente := get_theme_default_font()
+	var fuente: Font = Estilo.FUENTE_NEGRITA
 	var tam := int(l * 0.58 * escala_texto)
 	var en_seleccion := {}
 	for c in _seleccion:
@@ -167,7 +168,7 @@ func _draw() -> void:
 			var base := _centro(c) + Vector2(-ancho / 2.0, tam * 0.36)
 			if en_seleccion.has(c):
 				base += desplaza
-			draw_string(fuente, base, letra, HORIZONTAL_ALIGNMENT_LEFT, -1, tam, Estilo.TEXTO)
+			draw_string(fuente, base, letra, HORIZONTAL_ALIGNMENT_LEFT, -1, tam, Estilo.LETRA)
 
 
 func _trazo(celdas: Array, color: Color, desplaza: Vector2) -> void:

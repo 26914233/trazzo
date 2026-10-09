@@ -1,0 +1,224 @@
+{
+ "id": "economia",
+ "nombre": "Economía",
+ "color": "#047857",
+ "orden": 32,
+ "subtemas": [
+  {
+   "id": "dinero",
+   "nombre": "Dinero",
+   "palabras": [
+    "DINERO",
+    "BILLETE",
+    "MONEDA",
+    "CAMBIO",
+    "AHORRO",
+    "GASTO",
+    "PRECIO",
+    "PAGO",
+    "CUENTA",
+    "DEUDA",
+    "PRÉSTAMO",
+    "INTERÉS"
+   ]
+  },
+  {
+   "id": "banco",
+   "nombre": "Banco",
+   "palabras": [
+    "BANCO",
+    "CAJERO",
+    "TARJETA",
+    "CUENTA",
+    "DEPÓSITO",
+    "RETIRO",
+    "CRÉDITO",
+    "DÉBITO",
+    "CHEQUE",
+    "SALDO",
+    "CLAVE",
+    "SUCURSAL"
+   ]
+  },
+  {
+   "id": "empresa",
+   "nombre": "Empresa",
+   "palabras": [
+    "EMPRESA",
+    "GERENTE",
+    "EMPLEADO",
+    "SOCIO",
+    "JUNTA",
+    "CONTRATO",
+    "SALARIO",
+    "OFICINA",
+    "CLIENTE",
+    "PROVEEDOR",
+    "MARCA",
+    "PRODUCTO"
+   ]
+  },
+  {
+   "id": "comercio",
+   "nombre": "Comercio",
+   "palabras": [
+    "VENTA",
+    "COMPRA",
+    "TIENDA",
+    "FACTURA",
+    "RECIBO",
+    "DESCUENTO",
+    "OFERTA",
+    "CLIENTE",
+    "INVENTARIO",
+    "PEDIDO",
+    "ENVÍO",
+    "CATÁLOGO"
+   ]
+  },
+  {
+   "id": "marketing",
+   "nombre": "Marketing",
+   "palabras": [
+    "MARCA",
+    "ANUNCIO",
+    "PUBLICIDAD",
+    "CAMPAÑA",
+    "LOGO",
+    "ESLOGAN",
+    "MERCADO",
+    "CLIENTE",
+    "ENCUESTA",
+    "PROMOCIÓN",
+    "RED",
+    "IMAGEN"
+   ]
+  },
+  {
+   "id": "bolsa-de-valores",
+   "nombre": "Bolsa de valores",
+   "palabras": [
+    "ACCIÓN",
+    "BOLSA",
+    "INVERSIÓN",
+    "DIVIDENDO",
+    "BONO",
+    "MERCADO",
+    "ÍNDICE",
+    "ALZA",
+    "BAJA",
+    "ACCIONISTA",
+    "RIESGO",
+    "CARTERA"
+   ]
+  },
+  {
+   "id": "emprendimiento",
+   "nombre": "Emprendimiento",
+   "palabras": [
+    "IDEA",
+    "NEGOCIO",
+    "PLAN",
+    "INVERSIÓN",
+    "SOCIO",
+    "CRECIMIENTO",
+    "META",
+    "RIESGO",
+    "INNOVAR",
+    "STARTUP",
+    "CAPITAL",
+    "ÉXITO"
+   ]
+  },
+  {
+   "id": "impuestos",
+   "nombre": "Impuestos",
+   "palabras": [
+    "IMPUESTO",
+    "IVA",
+    "RENTA",
+    "FACTURA",
+    "DECLARACIÓN",
+    "TRIBUTO",
+    "RETENCIÓN",
+    "MULTA",
+    "TASA",
+    "PREDIAL",
+    "CONTADOR",
+    "DEDUCIBLE"
+   ]
+  },
+  {
+   "id": "contabilidad",
+   "nombre": "Contabilidad",
+   "palabras": [
+    "ACTIVO",
+    "PASIVO",
+    "BALANCE",
+    "INGRESO",
+    "EGRESO",
+    "UTILIDAD",
+    "PÉRDIDA",
+    "CUENTA",
+    "LIBRO",
+    "AUDITORÍA",
+    "PRESUPUESTO",
+    "COSTO"
+   ]
+  },
+  {
+   "id": "supermercado",
+   "nombre": "Supermercado",
+   "palabras": [
+    "CARRITO",
+    "GÓNDOLA",
+    "CAJA",
+    "CAJERO",
+    "BOLSA",
+    "OFERTA",
+    "FILA",
+    "PASILLO",
+    "PRODUCTO",
+    "FACTURA",
+    "CÓDIGO",
+    "CANASTA"
+   ]
+  },
+  {
+   "id": "oficina",
+   "nombre": "Oficina",
+   "palabras": [
+    "ESCRITORIO",
+    "COMPUTADOR",
+    "IMPRESORA",
+    "ARCHIVO",
+    "CARPETA",
+    "GRAPADORA",
+    "REUNIÓN",
+    "AGENDA",
+    "TELÉFONO",
+    "INFORME",
+    "CORREO",
+    "SELLO"
+   ]
+  },
+  {
+   "id": "trabajo",
+   "nombre": "Trabajo",
+   "palabras": [
+    "EMPLEO",
+    "ENTREVISTA",
+    "CONTRATO",
+    "SUELDO",
+    "JEFE",
+    "HORARIO",
+    "TURNO",
+    "VACACIONES",
+    "PENSIÓN",
+    "ASCENSO",
+    "EQUIPO",
+    "TAREA"
+   ]
+  }
+ ]
+}

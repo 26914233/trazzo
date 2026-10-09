@@ -1,0 +1,278 @@
+{
+ "id": "arte",
+ "nombre": "Arte",
+ "color": "#A855F7",
+ "orden": 16,
+ "subtemas": [
+  {
+   "id": "pintura",
+   "nombre": "Pintura",
+   "palabras": [
+    "LIENZO",
+    "PINCEL",
+    "PALETA",
+    "ÓLEO",
+    "ACUARELA",
+    "ACRÍLICO",
+    "CABALLETE",
+    "BOCETO",
+    "RETRATO",
+    "PAISAJE",
+    "MURAL",
+    "CUADRO"
+   ]
+  },
+  {
+   "id": "colores",
+   "nombre": "Colores",
+   "palabras": [
+    "ROJO",
+    "AZUL",
+    "AMARILLO",
+    "VERDE",
+    "NARANJA",
+    "MORADO",
+    "ROSADO",
+    "BLANCO",
+    "NEGRO",
+    "GRIS",
+    "CAFÉ",
+    "CELESTE"
+   ]
+  },
+  {
+   "id": "tonos-de-color",
+   "nombre": "Tonos de color",
+   "palabras": [
+    "TURQUESA",
+    "MAGENTA",
+    "CIAN",
+    "LILA",
+    "VIOLETA",
+    "GRANATE",
+    "OCRE",
+    "BEIGE",
+    "DORADO",
+    "PLATEADO",
+    "CORAL",
+    "AÑIL"
+   ]
+  },
+  {
+   "id": "escultura",
+   "nombre": "Escultura",
+   "palabras": [
+    "ESCULTURA",
+    "CINCEL",
+    "MÁRMOL",
+    "BRONCE",
+    "ARCILLA",
+    "YESO",
+    "MARTILLO",
+    "MOLDE",
+    "BUSTO",
+    "ESTATUA",
+    "RELIEVE",
+    "TALLA"
+   ]
+  },
+  {
+   "id": "pintores-famosos",
+   "nombre": "Pintores famosos",
+   "palabras": [
+    "PICASSO",
+    "BOTERO",
+    "DALÍ",
+    "KAHLO",
+    "GOYA",
+    "MONET",
+    "REMBRANDT",
+    "VELÁZQUEZ",
+    "MIRÓ",
+    "RIVERA",
+    "MATISSE",
+    "KLIMT"
+   ]
+  },
+  {
+   "id": "materiales-de-arte",
+   "nombre": "Materiales de arte",
+   "palabras": [
+    "LÁPIZ",
+    "BORRADOR",
+    "CARBONCILLO",
+    "PASTEL",
+    "TINTA",
+    "PAPEL",
+    "CARTULINA",
+    "TÉMPERA",
+    "PLASTILINA",
+    "CRAYÓN",
+    "MARCADOR",
+    "TIJERAS"
+   ]
+  },
+  {
+   "id": "fotografia",
+   "nombre": "Fotografía",
+   "palabras": [
+    "CÁMARA",
+    "LENTE",
+    "FLASH",
+    "FOTO",
+    "ENFOQUE",
+    "DIAFRAGMA",
+    "OBTURADOR",
+    "TRÍPODE",
+    "RETRATO",
+    "FILTRO",
+    "REVELADO",
+    "ENCUADRE"
+   ]
+  },
+  {
+   "id": "arquitectura",
+   "nombre": "Arquitectura",
+   "palabras": [
+    "COLUMNA",
+    "ARCO",
+    "CÚPULA",
+    "BÓVEDA",
+    "FACHADA",
+    "PLANO",
+    "TORRE",
+    "MURO",
+    "VENTANA",
+    "BALCÓN",
+    "ESCALERA",
+    "PILAR"
+   ]
+  },
+  {
+   "id": "estilos-artisticos",
+   "nombre": "Estilos artísticos",
+   "palabras": [
+    "BARROCO",
+    "GÓTICO",
+    "CUBISMO",
+    "SURREALISMO",
+    "REALISMO",
+    "ROMANTICISMO",
+    "RENACIMIENTO",
+    "MODERNISMO",
+    "POP ART",
+    "ABSTRACTO",
+    "NEOCLÁSICO",
+    "MINIMALISMO"
+   ]
+  },
+  {
+   "id": "teatro",
+   "nombre": "Teatro",
+   "palabras": [
+    "ESCENARIO",
+    "TELÓN",
+    "ACTOR",
+    "ACTRIZ",
+    "GUION",
+    "OBRA",
+    "ACTO",
+    "ESCENA",
+    "PÚBLICO",
+    "APLAUSO",
+    "MÁSCARA",
+    "VESTUARIO"
+   ]
+  },
+  {
+   "id": "dibujo",
+   "nombre": "Dibujo",
+   "palabras": [
+    "LÍNEA",
+    "TRAZO",
+    "SOMBRA",
+    "CONTORNO",
+    "PERSPECTIVA",
+    "BOCETO",
+    "LÁPIZ",
+    "CARBONCILLO",
+    "DIFUMINAR",
+    "PROPORCIÓN",
+    "CÓMIC",
+    "CARICATURA"
+   ]
+  },
+  {
+   "id": "artesania",
+   "nombre": "Artesanía",
+   "palabras": [
+    "CERÁMICA",
+    "TEJIDO",
+    "CESTERÍA",
+    "MOCHILA",
+    "SOMBRERO",
+    "HAMACA",
+    "ALFARERÍA",
+    "BORDADO",
+    "MACRAMÉ",
+    "TALLADO",
+    "FILIGRANA",
+    "TELAR"
+   ]
+  },
+  {
+   "id": "museo",
+   "nombre": "Museo",
+   "palabras": [
+    "MUSEO",
+    "GALERÍA",
+    "EXPOSICIÓN",
+    "OBRA",
+    "CURADOR",
+    "SALA",
+    "COLECCIÓN",
+    "VISITA",
+    "GUÍA",
+    "VITRINA",
+    "ESCULTURA",
+    "CUADRO"
+   ]
+  },
+  {
+   "id": "artistas-colombianos",
+   "nombre": "Artistas colombianos",
+   "palabras": [
+    "BOTERO",
+    "OBREGÓN",
+    "GRAU",
+    "NEGRET",
+    "ARANGO",
+    "MANZUR",
+    "RODA",
+    "RAYO",
+    "CABALLERO",
+    "GONZÁLEZ",
+    "HOYOS",
+    "SALCEDO"
+   ]
+  },
+  {
+   "id": "danza",
+   "nombre": "Danza",
+   "palabras": [
+    "BALLET",
+    "ZAPATILLA",
+    "TUTÚ",
+    "COREOGRAFÍA",
+    "BAILARÍN",
+    "GIRO",
+    "SALTO",
+    "PAREJA",
+    "RITMO",
+    "ESCENARIO",
+    "ENSAYO",
+    "PUNTAS"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,224 @@
+{
+ "id": "biologia",
+ "nombre": "Biología",
+ "color": "#10B981",
+ "orden": 4,
+ "subtemas": [
+  {
+   "id": "la-celula",
+   "nombre": "La célula",
+   "palabras": [
+    "CÉLULA",
+    "NÚCLEO",
+    "MEMBRANA",
+    "CITOPLASMA",
+    "RIBOSOMA",
+    "MITOCONDRIA",
+    "VACUOLA",
+    "LISOSOMA",
+    "CLOROPLASTO",
+    "PARED",
+    "ORGANELO",
+    "CENTRÍOLO"
+   ]
+  },
+  {
+   "id": "genetica",
+   "nombre": "Genética",
+   "palabras": [
+    "GEN",
+    "ADN",
+    "ARN",
+    "CROMOSOMA",
+    "HERENCIA",
+    "MUTACIÓN",
+    "ALELO",
+    "GENOMA",
+    "CLON",
+    "MENDEL",
+    "DOMINANTE",
+    "RECESIVO"
+   ]
+  },
+  {
+   "id": "microorganismos",
+   "nombre": "Microorganismos",
+   "palabras": [
+    "BACTERIA",
+    "VIRUS",
+    "HONGO",
+    "LEVADURA",
+    "AMEBA",
+    "ALGA",
+    "PROTOZOO",
+    "MOHO",
+    "BACILO",
+    "MICROBIO",
+    "GERMEN",
+    "PARAMECIO"
+   ]
+  },
+  {
+   "id": "partes-de-la-planta",
+   "nombre": "Partes de la planta",
+   "palabras": [
+    "RAÍZ",
+    "TALLO",
+    "HOJA",
+    "FLOR",
+    "FRUTO",
+    "SEMILLA",
+    "POLEN",
+    "SAVIA",
+    "CLOROFILA",
+    "ESTAMBRE",
+    "PISTILO",
+    "PÉTALO"
+   ]
+  },
+  {
+   "id": "fotosintesis",
+   "nombre": "Fotosíntesis",
+   "palabras": [
+    "LUZ",
+    "SOL",
+    "AGUA",
+    "OXÍGENO",
+    "GLUCOSA",
+    "CLOROFILA",
+    "ENERGÍA",
+    "CARBONO",
+    "HOJA",
+    "ALMIDÓN",
+    "ESTOMA",
+    "SAVIA"
+   ]
+  },
+  {
+   "id": "ecosistemas",
+   "nombre": "Ecosistemas",
+   "palabras": [
+    "SELVA",
+    "BOSQUE",
+    "DESIERTO",
+    "SABANA",
+    "TUNDRA",
+    "ARRECIFE",
+    "PRADERA",
+    "MANGLAR",
+    "PÁRAMO",
+    "HUMEDAL",
+    "TAIGA",
+    "OCÉANO"
+   ]
+  },
+  {
+   "id": "cadena-alimenticia",
+   "nombre": "Cadena alimenticia",
+   "palabras": [
+    "PRODUCTOR",
+    "CONSUMIDOR",
+    "HERBÍVORO",
+    "CARNÍVORO",
+    "OMNÍVORO",
+    "DEPREDADOR",
+    "PRESA",
+    "CARROÑERO",
+    "PARÁSITO",
+    "HUÉSPED",
+    "HONGO",
+    "PLANCTON"
+   ]
+  },
+  {
+   "id": "evolucion",
+   "nombre": "Evolución",
+   "palabras": [
+    "DARWIN",
+    "ESPECIE",
+    "SELECCIÓN",
+    "ADAPTACIÓN",
+    "FÓSIL",
+    "ANCESTRO",
+    "MUTACIÓN",
+    "EXTINCIÓN",
+    "VARIACIÓN",
+    "LINAJE",
+    "HÍBRIDO",
+    "EVOLUCIÓN"
+   ]
+  },
+  {
+   "id": "clasificacion-de-los-seres-vivos",
+   "nombre": "Clasificación de los seres vivos",
+   "palabras": [
+    "ANIMAL",
+    "VEGETAL",
+    "HONGO",
+    "BACTERIA",
+    "PROTISTA",
+    "ARQUEA",
+    "ESPECIE",
+    "GÉNERO",
+    "FAMILIA",
+    "ORDEN",
+    "CLASE",
+    "FILO"
+   ]
+  },
+  {
+   "id": "sistema-inmune",
+   "nombre": "Sistema inmune",
+   "palabras": [
+    "ANTICUERPO",
+    "ANTÍGENO",
+    "VACUNA",
+    "GLÓBULO",
+    "LINFOCITO",
+    "FIEBRE",
+    "DEFENSA",
+    "VIRUS",
+    "INFECCIÓN",
+    "ALERGIA",
+    "INMUNIDAD",
+    "LEUCOCITO"
+   ]
+  },
+  {
+   "id": "botanica",
+   "nombre": "Botánica",
+   "palabras": [
+    "HELECHO",
+    "MUSGO",
+    "CACTUS",
+    "ORQUÍDEA",
+    "PALMERA",
+    "PINO",
+    "ROBLE",
+    "BAMBÚ",
+    "GIRASOL",
+    "ROSA",
+    "TRÉBOL",
+    "LIQUEN"
+   ]
+  },
+  {
+   "id": "biologos-famosos",
+   "nombre": "Biólogos famosos",
+   "palabras": [
+    "DARWIN",
+    "MENDEL",
+    "PASTEUR",
+    "LINNEO",
+    "FLEMING",
+    "GOODALL",
+    "WALLACE",
+    "LAMARCK",
+    "KOCH",
+    "HOOKE",
+    "WATSON",
+    "CRICK"
+   ]
+  }
+ ]
+}

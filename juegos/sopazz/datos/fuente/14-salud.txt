@@ -1,0 +1,13 @@
+# Salud | #06B6D4
+Hospital: médico, enfermera, camilla, urgencias, quirófano, receta, paciente, consulta, ambulancia, sala, cirugía, vendaje
+Especialidades médicas: pediatra, cardiólogo, dermatólogo, neurólogo, oftalmólogo, dentista, cirujano, psicólogo, ginecólogo, ortopedista, oncólogo, urólogo
+Primeros auxilios: botiquín, venda, gasa, curita, alcohol, yodo, termómetro, tijeras, guantes, algodón, férula, suero
+Enfermedades comunes: gripe, resfriado, fiebre, tos, alergia, asma, gastritis, migraña, varicela, dengue, otitis, anemia
+Vitaminas y minerales: vitamina, calcio, hierro, zinc, magnesio, potasio, sodio, yodo, fósforo, ácido fólico, retinol, biotina
+Nutrición: proteína, carbohidrato, grasa, fibra, caloría, vitamina, mineral, agua, azúcar, dieta, porción, nutriente
+Ejercicio: correr, caminar, nadar, saltar, estirar, flexión, sentadilla, abdominal, pesas, cardio, yoga, pilates
+Higiene: jabón, champú, cepillo, crema dental, toalla, ducha, desodorante, peine, hilo dental, gel, esponja, cortaúñas
+Emociones: alegría, tristeza, miedo, ira, sorpresa, calma, amor, ansiedad, orgullo, ternura, nostalgia, esperanza
+Yoga y meditación: postura, respiración, mantra, loto, árbol, guerrero, cobra, perro, calma, relajación, esterilla, meditación
+Medicamentos: pastilla, jarabe, cápsula, inyección, pomada, gotas, vacuna, antibiótico, analgésico, receta, dosis, tableta
+Sueño y descanso: sueño, siesta, almohada, cama, cobija, pijama, ronquido, bostezo, pesadilla, insomnio, despertar, descanso

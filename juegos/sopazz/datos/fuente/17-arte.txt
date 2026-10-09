@@ -1,0 +1,16 @@
+# Arte | #A855F7
+Pintura: lienzo, pincel, paleta, óleo, acuarela, acrílico, caballete, boceto, retrato, paisaje, mural, cuadro
+Colores: rojo, azul, amarillo, verde, naranja, morado, rosado, blanco, negro, gris, café, celeste
+Tonos de color: turquesa, magenta, cian, lila, violeta, granate, ocre, beige, dorado, plateado, coral, añil
+Escultura: escultura, cincel, mármol, bronce, arcilla, yeso, martillo, molde, busto, estatua, relieve, talla
+Pintores famosos: Picasso, Botero, Dalí, Kahlo, Goya, Monet, Rembrandt, Velázquez, Miró, Rivera, Matisse, Klimt
+Materiales de arte: lápiz, borrador, carboncillo, pastel, tinta, papel, cartulina, témpera, plastilina, crayón, marcador, tijeras
+Fotografía: cámara, lente, flash, foto, enfoque, diafragma, obturador, trípode, retrato, filtro, revelado, encuadre
+Arquitectura: columna, arco, cúpula, bóveda, fachada, plano, torre, muro, ventana, balcón, escalera, pilar
+Estilos artísticos: barroco, gótico, cubismo, surrealismo, realismo, romanticismo, renacimiento, modernismo, pop art, abstracto, neoclásico, minimalismo
+Teatro: escenario, telón, actor, actriz, guion, obra, acto, escena, público, aplauso, máscara, vestuario
+Dibujo: línea, trazo, sombra, contorno, perspectiva, boceto, lápiz, carboncillo, difuminar, proporción, cómic, caricatura
+Artesanía: cerámica, tejido, cestería, mochila, sombrero, hamaca, alfarería, bordado, macramé, tallado, filigrana, telar
+Museo: museo, galería, exposición, obra, curador, sala, colección, visita, guía, vitrina, escultura, cuadro
+Artistas colombianos: Botero, Obregón, Grau, Negret, Arango, Manzur, Roda, Rayo, Caballero, González, Hoyos, Salcedo
+Danza: ballet, zapatilla, tutú, coreografía, bailarín, giro, salto, pareja, ritmo, escenario, ensayo, puntas

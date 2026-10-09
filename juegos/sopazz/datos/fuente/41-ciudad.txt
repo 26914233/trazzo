@@ -1,0 +1,11 @@
+# Ciudad | #475569
+En la ciudad: calle, avenida, semáforo, edificio, parque, plaza, puente, esquina, andén, tráfico, alcaldía, barrio
+Lugares de la ciudad: hospital, colegio, banco, iglesia, museo, teatro, estadio, mercado, biblioteca, cine, hotel, restaurante
+La tienda de barrio: tendero, mostrador, pan, leche, huevos, gaseosa, dulces, fiado, bolsa, vuelto, nevera, cliente
+Restaurante: mesa, mesero, menú, carta, plato, cuenta, propina, cocina, chef, reserva, postre, entrada
+El parque: columpio, rodadero, banca, árbol, fuente, sendero, pasto, kiosco, perro, bicicleta, patineta, picnic
+Panadería: pan, horno, masa, harina, levadura, panadero, croissant, galleta, torta, almojábana, pandebono, mogolla
+Farmacia: farmacia, droguería, receta, pastilla, jarabe, venda, termómetro, curita, alcohol, crema, vitamina, farmaceuta
+Correo: carta, sobre, sello, paquete, cartero, buzón, envío, remitente, destinatario, dirección, código, entrega
+Policía y bomberos: patrulla, sirena, policía, bombero, manguera, escalera, alarma, extintor, rescate, uniforme, estación, emergencia
+Centro comercial: tienda, vitrina, escalera, ascensor, cine, comida, parqueadero, oferta, bolsa, probador, cajero, juegos

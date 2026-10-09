@@ -1,0 +1,11 @@
+# Mascotas | #FB7185
+Cuidado de mascotas: comida, agua, plato, collar, correa, cama, juguete, baño, cepillo, vacuna, paseo, premio
+Veterinaria: veterinario, vacuna, chequeo, peso, jeringa, vendaje, receta, consulta, cirugía, collar, pulga, garrapata
+Perros: ladrar, morder, olfatear, correr, jugar, cola, hueso, pelota, patita, olfato, cachorro, guardián
+Gatos: maullar, ronronear, arañar, bigotes, garras, ovillo, caja, arena, siesta, saltar, cazar, ratón
+Aves de casa: canario, periquito, loro, cacatúa, agapornis, jaula, alpiste, plumas, pico, trino, nido, columpio
+Acuario: pez, pecera, acuario, filtro, bomba, grava, alga, betta, guppy, neón, escalar, tetra
+Roedores y pequeños: hámster, cobayo, conejo, chinchilla, hurón, ratón, rueda, jaula, viruta, heno, zanahoria, túnel
+Reptiles como mascota: tortuga, iguana, gecko, camaleón, serpiente, terrario, lámpara, calor, grillo, muda, escama, cueva
+Entrenamiento: sentado, quieto, ven, echado, pata, premio, clicker, obediencia, correa, paciencia, orden, truco
+Accesorios para mascotas: collar, correa, arnés, placa, cama, guacal, rascador, comedero, bebedero, juguete, suéter, bozal

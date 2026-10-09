@@ -1,0 +1,8 @@
+# Clima | #38BDF8
+Nubes: cúmulo, estrato, cirro, nimbo, cumulonimbo, altocúmulo, nube, niebla, bruma, neblina, vapor, gota
+Instrumentos del clima: termómetro, barómetro, higrómetro, anemómetro, pluviómetro, veleta, radar, satélite, globo, estación, sensor, pronóstico
+Estaciones del año: primavera, verano, otoño, invierno, solsticio, equinoccio, calor, frío, hojas, flores, nieve, sol
+La lluvia: lluvia, aguacero, llovizna, chubasco, gota, charco, paraguas, impermeable, botas, trueno, relámpago, diluvio
+Tormentas: tormenta, huracán, tornado, ciclón, tifón, rayo, trueno, granizo, ventisca, ráfaga, vendaval, tempestad
+El viento: brisa, ráfaga, vendaval, huracán, alisio, monzón, veleta, cometa, molino, remolino, corriente, ventarrón
+Frío y calor: helada, escarcha, nieve, hielo, ola de calor, sequía, bochorno, sofoco, sudor, abrigo, sombra, termómetro

@@ -1,0 +1,278 @@
+{
+ "id": "tecnologia",
+ "nombre": "Tecnología",
+ "color": "#64748B",
+ "orden": 18,
+ "subtemas": [
+  {
+   "id": "computador",
+   "nombre": "Computador",
+   "palabras": [
+    "TECLADO",
+    "RATÓN",
+    "PANTALLA",
+    "MONITOR",
+    "TORRE",
+    "MEMORIA",
+    "DISCO",
+    "PROCESADOR",
+    "PUERTO",
+    "CARGADOR",
+    "CÁMARA",
+    "PARLANTE"
+   ]
+  },
+  {
+   "id": "internet",
+   "nombre": "Internet",
+   "palabras": [
+    "RED",
+    "WIFI",
+    "CORREO",
+    "NAVEGADOR",
+    "PÁGINA",
+    "ENLACE",
+    "SERVIDOR",
+    "NUBE",
+    "DESCARGA",
+    "CONTRASEÑA",
+    "USUARIO",
+    "BUSCADOR"
+   ]
+  },
+  {
+   "id": "programacion",
+   "nombre": "Programación",
+   "palabras": [
+    "CÓDIGO",
+    "VARIABLE",
+    "FUNCIÓN",
+    "BUCLE",
+    "CLASE",
+    "OBJETO",
+    "ALGORITMO",
+    "COMPILAR",
+    "DEPURAR",
+    "PROGRAMA",
+    "SCRIPT",
+    "ERROR"
+   ]
+  },
+  {
+   "id": "lenguajes-de-programacion",
+   "nombre": "Lenguajes de programación",
+   "palabras": [
+    "PYTHON",
+    "JAVA",
+    "RUBY",
+    "SWIFT",
+    "KOTLIN",
+    "RUST",
+    "PERL",
+    "PASCAL",
+    "COBOL",
+    "FORTRAN",
+    "HASKELL",
+    "LUA"
+   ]
+  },
+  {
+   "id": "redes-sociales",
+   "nombre": "Redes sociales",
+   "palabras": [
+    "PERFIL",
+    "SEGUIDOR",
+    "PUBLICAR",
+    "COMENTARIO",
+    "FOTO",
+    "VIDEO",
+    "HISTORIA",
+    "ETIQUETA",
+    "MENSAJE",
+    "COMPARTIR",
+    "ME GUSTA",
+    "TENDENCIA"
+   ]
+  },
+  {
+   "id": "el-celular",
+   "nombre": "El celular",
+   "palabras": [
+    "PANTALLA",
+    "BATERÍA",
+    "CÁMARA",
+    "CARGADOR",
+    "APLICACIÓN",
+    "MENSAJE",
+    "LLAMADA",
+    "CONTACTO",
+    "ALARMA",
+    "LINTERNA",
+    "CARCASA",
+    "TIENDA"
+   ]
+  },
+  {
+   "id": "robotica",
+   "nombre": "Robótica",
+   "palabras": [
+    "ROBOT",
+    "SENSOR",
+    "MOTOR",
+    "BRAZO",
+    "SERVO",
+    "CIRCUITO",
+    "PROGRAMA",
+    "AUTÓMATA",
+    "DRON",
+    "RUEDA",
+    "PINZA",
+    "BATERÍA"
+   ]
+  },
+  {
+   "id": "inteligencia-artificial",
+   "nombre": "Inteligencia artificial",
+   "palabras": [
+    "ALGORITMO",
+    "DATOS",
+    "MODELO",
+    "RED NEURONAL",
+    "APRENDER",
+    "PREDECIR",
+    "ROBOT",
+    "CHATBOT",
+    "VISIÓN",
+    "LENGUAJE",
+    "PATRÓN",
+    "MÁQUINA"
+   ]
+  },
+  {
+   "id": "ciberseguridad",
+   "nombre": "Ciberseguridad",
+   "palabras": [
+    "VIRUS",
+    "CONTRASEÑA",
+    "CIFRADO",
+    "ANTIVIRUS",
+    "HACKER",
+    "FIREWALL",
+    "MALWARE",
+    "PHISHING",
+    "RESPALDO",
+    "CLAVE",
+    "BLOQUEO",
+    "SPAM"
+   ]
+  },
+  {
+   "id": "hardware",
+   "nombre": "Hardware",
+   "palabras": [
+    "PLACA",
+    "CHIP",
+    "MEMORIA",
+    "DISCO",
+    "FUENTE",
+    "VENTILADOR",
+    "TARJETA",
+    "PROCESADOR",
+    "CABLE",
+    "PUERTO",
+    "BATERÍA",
+    "GABINETE"
+   ]
+  },
+  {
+   "id": "software",
+   "nombre": "Software",
+   "palabras": [
+    "SISTEMA",
+    "PROGRAMA",
+    "APLICACIÓN",
+    "ARCHIVO",
+    "CARPETA",
+    "VENTANA",
+    "ICONO",
+    "MENÚ",
+    "ESCRITORIO",
+    "ACTUALIZAR",
+    "INSTALAR",
+    "LICENCIA"
+   ]
+  },
+  {
+   "id": "trabajo-remoto",
+   "nombre": "Trabajo remoto",
+   "palabras": [
+    "CÁMARA",
+    "MICRÓFONO",
+    "AUDIO",
+    "REUNIÓN",
+    "ENLACE",
+    "PANTALLA",
+    "COMPARTIR",
+    "CHAT",
+    "SILENCIO",
+    "CONEXIÓN",
+    "AURICULAR",
+    "AGENDA"
+   ]
+  },
+  {
+   "id": "inventos-tecnologicos",
+   "nombre": "Inventos tecnológicos",
+   "palabras": [
+    "TELÉFONO",
+    "RADIO",
+    "TELEVISIÓN",
+    "BOMBILLA",
+    "IMPRENTA",
+    "COMPUTADORA",
+    "INTERNET",
+    "TELÉGRAFO",
+    "SATÉLITE",
+    "LÁSER",
+    "TRANSISTOR",
+    "GPS"
+   ]
+  },
+  {
+   "id": "telecomunicaciones",
+   "nombre": "Telecomunicaciones",
+   "palabras": [
+    "ANTENA",
+    "SEÑAL",
+    "FIBRA",
+    "ROUTER",
+    "MÓDEM",
+    "SATÉLITE",
+    "CABLE",
+    "WIFI",
+    "BLUETOOTH",
+    "FRECUENCIA",
+    "COBERTURA",
+    "OPERADOR"
+   ]
+  },
+  {
+   "id": "inventores",
+   "nombre": "Inventores",
+   "palabras": [
+    "EDISON",
+    "BELL",
+    "TESLA",
+    "MARCONI",
+    "TURING",
+    "LOVELACE",
+    "BABBAGE",
+    "MORSE",
+    "GUTENBERG",
+    "WATT",
+    "DIESEL",
+    "WRIGHT"
+   ]
+  }
+ ]
+}

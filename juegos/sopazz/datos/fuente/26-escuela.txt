@@ -1,0 +1,13 @@
+# Escuela | #2563EB
+Útiles escolares: cuaderno, lápiz, borrador, regla, tijeras, pegante, colores, morral, sacapuntas, compás, marcador, carpeta
+Materias: matemáticas, español, ciencias, historia, geografía, inglés, música, arte, química, física, biología, ética
+El salón de clase: tablero, pupitre, silla, profesor, alumno, tiza, borrador, mapa, reloj, ventana, puerta, lista
+La universidad: facultad, carrera, semestre, campus, rector, decano, matrícula, tesis, crédito, profesor, examen, grado
+Carreras universitarias: medicina, derecho, ingeniería, psicología, economía, arquitectura, enfermería, contaduría, filosofía, periodismo, diseño, biología
+Exámenes y notas: examen, prueba, nota, quiz, tarea, pregunta, respuesta, aprobar, repasar, estudiar, calificación, boletín
+Biblioteca: libro, estante, préstamo, lector, silencio, revista, diccionario, enciclopedia, mesa, ficha, autor, lectura
+Gramática: sustantivo, verbo, adjetivo, adverbio, artículo, pronombre, sujeto, predicado, oración, sílaba, acento, palabra
+Recreo: recreo, patio, merienda, lonchera, balón, juego, amigo, timbre, cancha, columpio, risa, descanso
+Lectura y escritura: lectura, escritura, cuento, poema, letra, renglón, párrafo, título, resumen, ensayo, dictado, caligrafía
+Ciencias en el colegio: experimento, microscopio, hipótesis, maqueta, laboratorio, planta, semilla, imán, lupa, volcán, feria, informe
+Personas del colegio: rector, profesor, alumno, compañero, coordinador, orientador, celador, secretaria, padres, acudiente, monitor, director

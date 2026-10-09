@@ -1,0 +1,14 @@
+# Electricidad | #EAB308
+Componentes: resistencia, condensador, bobina, diodo, transistor, fusible, relé, interruptor, batería, cable, led, enchufe
+Unidades eléctricas: voltio, amperio, ohmio, vatio, julio, culombio, faradio, henrio, siemens, tesla, weber, kilovatio
+Circuitos: circuito, serie, paralelo, nodo, malla, corriente, voltaje, carga, tierra, polo, fase, neutro
+Herramientas del electricista: alicate, pelacables, multímetro, pinza, cinta, tester, soldador, estaño, taladro, escalera, guantes, voltímetro
+Energías renovables: solar, eólica, hidráulica, geotérmica, biomasa, mareomotriz, panel, turbina, molino, represa, inversor, batería
+Electrodomésticos: nevera, lavadora, horno, licuadora, plancha, ventilador, televisor, microondas, tostadora, aspiradora, secador, cafetera
+Electrónica: chip, placa, circuito, sensor, procesador, memoria, antena, transistor, oscilador, señal, frecuencia, amplificador
+Instalación en casa: enchufe, toma, interruptor, breaker, tablero, medidor, cableado, tubo, caja, bombillo, lámpara, extensión
+Iluminación: bombillo, lámpara, foco, led, halógeno, fluorescente, neón, linterna, reflector, farol, vela, candil
+Pilas y baterías: pila, batería, litio, alcalina, carga, ánodo, cátodo, electrolito, recargable, cargador, celda, voltaje
+Seguridad eléctrica: corto, chispa, descarga, aislante, guante, tierra, fusible, breaker, peligro, alto voltaje, señal, casco
+Pioneros de la electricidad: Tesla, Edison, Faraday, Volta, Ampère, Ohm, Franklin, Maxwell, Galvani, Coulomb, Westinghouse, Kirchhoff
+Motores y generadores: imán, motor, generador, dinamo, bobina, rotor, estator, alternador, inducción, campo, eje, escobilla

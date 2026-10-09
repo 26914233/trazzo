@@ -1,0 +1,13 @@
+# Economía | #047857
+Dinero: dinero, billete, moneda, cambio, ahorro, gasto, precio, pago, cuenta, deuda, préstamo, interés
+Banco: banco, cajero, tarjeta, cuenta, depósito, retiro, crédito, débito, cheque, saldo, clave, sucursal
+Empresa: empresa, gerente, empleado, socio, junta, contrato, salario, oficina, cliente, proveedor, marca, producto
+Comercio: venta, compra, tienda, factura, recibo, descuento, oferta, cliente, inventario, pedido, envío, catálogo
+Marketing: marca, anuncio, publicidad, campaña, logo, eslogan, mercado, cliente, encuesta, promoción, red, imagen
+Bolsa de valores: acción, bolsa, inversión, dividendo, bono, mercado, índice, alza, baja, accionista, riesgo, cartera
+Emprendimiento: idea, negocio, plan, inversión, socio, crecimiento, meta, riesgo, innovar, startup, capital, éxito
+Impuestos: impuesto, IVA, renta, factura, declaración, tributo, retención, multa, tasa, predial, contador, deducible
+Contabilidad: activo, pasivo, balance, ingreso, egreso, utilidad, pérdida, cuenta, libro, auditoría, presupuesto, costo
+Supermercado: carrito, góndola, caja, cajero, bolsa, oferta, fila, pasillo, producto, factura, código, canasta
+Oficina: escritorio, computador, impresora, archivo, carpeta, grapadora, reunión, agenda, teléfono, informe, correo, sello
+Trabajo: empleo, entrevista, contrato, sueldo, jefe, horario, turno, vacaciones, pensión, ascenso, equipo, tarea

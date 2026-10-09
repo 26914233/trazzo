@@ -1,0 +1,13 @@
+# Palabras | #0D9488
+Palíndromos: oso, ojo, ana, radar, reconocer, somos, salas, solos, rotor, seres, sometemos, anilina
+Palabras con eñe: niño, año, señal, montaña, sueño, baño, araña, mañana, piña, uña, caña, pañuelo
+Onomatopeyas: miau, guau, pío, muu, cuac, tictac, bum, achís, zas, crac, ring, plaf
+Verbos de acción: correr, saltar, nadar, comer, dormir, cantar, bailar, leer, escribir, pensar, jugar, reír
+Adjetivos: grande, pequeño, alto, bajo, feliz, triste, rápido, lento, fuerte, suave, bonito, nuevo
+Sentimientos: amor, alegría, miedo, tristeza, enojo, calma, celos, orgullo, cariño, ternura, gratitud, empatía
+Saludos y cortesía: hola, adiós, gracias, por favor, perdón, disculpa, bienvenido, chao, saludo, permiso, buenas noches, de nada
+Contrarios: día, noche, frío, calor, alto, bajo, lleno, vacío, rápido, lento, abrir, cerrar
+Días de la semana: lunes, martes, miércoles, jueves, viernes, sábado, domingo, semana, hoy, ayer, mañana, feriado
+Meses del año: enero, febrero, marzo, abril, mayo, junio, julio, agosto, septiembre, octubre, noviembre, diciembre
+Signos de puntuación: punto, coma, guion, comillas, paréntesis, corchete, llave, asterisco, apóstrofo, exclamación, diéresis, tilde
+El abecedario: vocal, consonante, letra, alfabeto, mayúscula, minúscula, sílaba, acento, eñe, hache, equis, zeta

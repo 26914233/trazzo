@@ -1,0 +1,170 @@
+{
+ "id": "construccion",
+ "nombre": "Construcción",
+ "color": "#78716C",
+ "orden": 35,
+ "subtemas": [
+  {
+   "id": "materiales",
+   "nombre": "Materiales",
+   "palabras": [
+    "LADRILLO",
+    "CEMENTO",
+    "ARENA",
+    "GRAVA",
+    "VARILLA",
+    "CONCRETO",
+    "MADERA",
+    "VIDRIO",
+    "TEJA",
+    "YESO",
+    "ACERO",
+    "BLOQUE"
+   ]
+  },
+  {
+   "id": "herramientas-de-obra",
+   "nombre": "Herramientas de obra",
+   "palabras": [
+    "PALA",
+    "PICA",
+    "CARRETILLA",
+    "NIVEL",
+    "PLOMADA",
+    "PALUSTRE",
+    "MARTILLO",
+    "MEZCLADORA",
+    "ANDAMIO",
+    "METRO",
+    "CINCEL",
+    "LLANA"
+   ]
+  },
+  {
+   "id": "estructuras",
+   "nombre": "Estructuras",
+   "palabras": [
+    "VIGA",
+    "COLUMNA",
+    "LOSA",
+    "MURO",
+    "CIMIENTO",
+    "ZAPATA",
+    "TECHO",
+    "ESCALERA",
+    "RAMPA",
+    "ARCO",
+    "PILOTE",
+    "CUBIERTA"
+   ]
+  },
+  {
+   "id": "carpinteria",
+   "nombre": "Carpintería",
+   "palabras": [
+    "MADERA",
+    "SIERRA",
+    "CEPILLO",
+    "CLAVO",
+    "TORNILLO",
+    "LIJA",
+    "BARNIZ",
+    "COLA",
+    "FORMÓN",
+    "TABLA",
+    "SERRUCHO",
+    "EBANISTA"
+   ]
+  },
+  {
+   "id": "plomeria",
+   "nombre": "Plomería",
+   "palabras": [
+    "TUBO",
+    "LLAVE",
+    "GRIFO",
+    "CODO",
+    "VÁLVULA",
+    "DESAGÜE",
+    "SIFÓN",
+    "TANQUE",
+    "FUGA",
+    "EMPAQUE",
+    "TEFLÓN",
+    "BOMBA"
+   ]
+  },
+  {
+   "id": "pintar-la-casa",
+   "nombre": "Pintar la casa",
+   "palabras": [
+    "BROCHA",
+    "RODILLO",
+    "PINTURA",
+    "BANDEJA",
+    "CINTA",
+    "LIJA",
+    "MASILLA",
+    "ESTUCO",
+    "SELLADOR",
+    "ESMALTE",
+    "COLOR",
+    "ESCALERA"
+   ]
+  },
+  {
+   "id": "grandes-obras",
+   "nombre": "Grandes obras",
+   "palabras": [
+    "PUENTE",
+    "TÚNEL",
+    "REPRESA",
+    "AUTOPISTA",
+    "VIADUCTO",
+    "CANAL",
+    "DIQUE",
+    "TORRE",
+    "CARRETERA",
+    "ACUEDUCTO",
+    "FARO",
+    "MUELLE"
+   ]
+  },
+  {
+   "id": "en-la-obra",
+   "nombre": "En la obra",
+   "palabras": [
+    "CASCO",
+    "CHALECO",
+    "BOTAS",
+    "GUANTES",
+    "OBRERO",
+    "CAPATAZ",
+    "INGENIERO",
+    "PLANO",
+    "PERMISO",
+    "GRÚA",
+    "CEMENTO",
+    "POLVO"
+   ]
+  },
+  {
+   "id": "edificios",
+   "nombre": "Edificios",
+   "palabras": [
+    "EDIFICIO",
+    "RASCACIELOS",
+    "TORRE",
+    "CASA",
+    "APARTAMENTO",
+    "BODEGA",
+    "IGLESIA",
+    "ESTADIO",
+    "HOSPITAL",
+    "COLEGIO",
+    "OFICINA",
+    "CASTILLO"
+   ]
+  }
+ ]
+}

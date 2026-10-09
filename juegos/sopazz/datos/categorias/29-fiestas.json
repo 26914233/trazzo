@@ -1,0 +1,224 @@
+{
+ "id": "fiestas",
+ "nombre": "Fiestas",
+ "color": "#F43F5E",
+ "orden": 28,
+ "subtemas": [
+  {
+   "id": "navidad",
+   "nombre": "Navidad",
+   "palabras": [
+    "ÁRBOL",
+    "PESEBRE",
+    "REGALO",
+    "ESTRELLA",
+    "VILLANCICO",
+    "NOVENA",
+    "BUÑUELO",
+    "NATILLA",
+    "RENO",
+    "TRINEO",
+    "PAPÁ NOEL",
+    "AGUINALDO"
+   ]
+  },
+  {
+   "id": "halloween",
+   "nombre": "Halloween",
+   "palabras": [
+    "CALABAZA",
+    "DISFRAZ",
+    "BRUJA",
+    "FANTASMA",
+    "DULCE",
+    "MURCIÉLAGO",
+    "ARAÑA",
+    "ESQUELETO",
+    "VAMPIRO",
+    "ESCOBA",
+    "CALDERO",
+    "TELARAÑA"
+   ]
+  },
+  {
+   "id": "cumpleanos",
+   "nombre": "Cumpleaños",
+   "palabras": [
+    "TORTA",
+    "VELA",
+    "REGALO",
+    "GLOBO",
+    "PIÑATA",
+    "FIESTA",
+    "INVITADO",
+    "SORPRESA",
+    "DESEO",
+    "CANCIÓN",
+    "SOMBRERO",
+    "CONFETI"
+   ]
+  },
+  {
+   "id": "ano-nuevo",
+   "nombre": "Año nuevo",
+   "palabras": [
+    "UVAS",
+    "BRINDIS",
+    "MALETA",
+    "PÓLVORA",
+    "ABRAZO",
+    "RELOJ",
+    "CAMPANADA",
+    "CHAMPAÑA",
+    "PROPÓSITO",
+    "CALENDARIO",
+    "DESEO",
+    "CELEBRAR"
+   ]
+  },
+  {
+   "id": "boda",
+   "nombre": "Boda",
+   "palabras": [
+    "NOVIA",
+    "NOVIO",
+    "ANILLO",
+    "VELO",
+    "RAMO",
+    "ALTAR",
+    "PASTEL",
+    "VALS",
+    "PADRINO",
+    "MADRINA",
+    "BRINDIS",
+    "LUNA DE MIEL"
+   ]
+  },
+  {
+   "id": "carnaval",
+   "nombre": "Carnaval",
+   "palabras": [
+    "DISFRAZ",
+    "MÁSCARA",
+    "COMPARSA",
+    "DESFILE",
+    "CARROZA",
+    "CONFETI",
+    "SERPENTINA",
+    "REINA",
+    "MÚSICA",
+    "BAILE",
+    "MAICENA",
+    "MARIMONDA"
+   ]
+  },
+  {
+   "id": "dia-de-muertos",
+   "nombre": "Día de muertos",
+   "palabras": [
+    "ALTAR",
+    "OFRENDA",
+    "CALAVERA",
+    "CATRINA",
+    "CEMPASÚCHIL",
+    "VELA",
+    "PAN",
+    "PAPEL PICADO",
+    "PANTEÓN",
+    "RECUERDO",
+    "FLORES",
+    "COPAL"
+   ]
+  },
+  {
+   "id": "san-valentin",
+   "nombre": "San Valentín",
+   "palabras": [
+    "AMOR",
+    "CORAZÓN",
+    "ROSA",
+    "CHOCOLATE",
+    "CITA",
+    "BESO",
+    "CARTA",
+    "REGALO",
+    "CUPIDO",
+    "FLECHA",
+    "PAREJA",
+    "AMISTAD"
+   ]
+  },
+  {
+   "id": "pascua",
+   "nombre": "Pascua",
+   "palabras": [
+    "HUEVO",
+    "CONEJO",
+    "CANASTA",
+    "PRIMAVERA",
+    "CHOCOLATE",
+    "FLOR",
+    "POLLITO",
+    "RESURRECCIÓN",
+    "DOMINGO",
+    "RAMOS",
+    "PALMA",
+    "CAMPANA"
+   ]
+  },
+  {
+   "id": "graduacion",
+   "nombre": "Graduación",
+   "palabras": [
+    "TOGA",
+    "BIRRETE",
+    "DIPLOMA",
+    "TÍTULO",
+    "DISCURSO",
+    "CEREMONIA",
+    "PROMOCIÓN",
+    "ANILLO",
+    "FOTO",
+    "APLAUSO",
+    "LOGRO",
+    "FUTURO"
+   ]
+  },
+  {
+   "id": "fiesta-en-casa",
+   "nombre": "Fiesta en casa",
+   "palabras": [
+    "MÚSICA",
+    "BAILE",
+    "COMIDA",
+    "BEBIDA",
+    "INVITADO",
+    "JUEGO",
+    "LUCES",
+    "GLOBO",
+    "KARAOKE",
+    "PASABOCAS",
+    "AMIGOS",
+    "RISA"
+   ]
+  },
+  {
+   "id": "picnic",
+   "nombre": "Picnic",
+   "palabras": [
+    "CANASTA",
+    "MANTEL",
+    "SÁNDWICH",
+    "FRUTA",
+    "JUGO",
+    "SOMBRA",
+    "PASTO",
+    "PARQUE",
+    "HORMIGA",
+    "TERMO",
+    "SERVILLETA",
+    "SOL"
+   ]
+  }
+ ]
+}

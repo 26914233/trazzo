@@ -1,0 +1,12 @@
+# Geografía | #0369A1
+Continentes y globo: América, Europa, Asia, África, Oceanía, Antártida, continente, hemisferio, ecuador, trópico, polo, meridiano
+Accidentes geográficos: montaña, valle, meseta, llanura, cordillera, península, istmo, golfo, bahía, cabo, delta, estrecho
+Ríos del mundo: Amazonas, Nilo, Misisipi, Danubio, Rin, Volga, Ganges, Yangtsé, Orinoco, Paraná, Támesis, Sena
+Lagos: Titicaca, Victoria, Superior, Baikal, Tota, Maracaibo, Ness, Ginebra, Malaui, Erie, Hurón, Chad
+Desiertos: Sahara, Atacama, Gobi, Kalahari, Mojave, Sonora, Namib, Tatacoa, Arábigo, Patagonia, Thar, Guajira
+Islas: Cuba, Groenlandia, Madagascar, Islandia, Sicilia, Cerdeña, Hawái, Galápagos, Bali, Java, Borneo, Tahití
+Mapas y orientación: mapa, brújula, norte, sur, este, oeste, latitud, longitud, escala, leyenda, globo, coordenada
+Climas del mundo: tropical, desértico, polar, templado, árido, húmedo, monzón, tundra, ecuatorial, continental, alpino, oceánico
+Cordilleras: Andes, Himalaya, Alpes, Rocosas, Urales, Pirineos, Apalaches, Atlas, Cárpatos, Sierra Nevada, Cáucaso, Balcanes
+Cataratas: Iguazú, Niágara, Victoria, Ángel, Tequendama, Gocta, Kaieteur, Yosemite, Sutherland, Tugela, salto, cascada
+Población y ciudades: ciudad, pueblo, aldea, capital, metrópoli, habitante, censo, barrio, municipio, frontera, región, provincia

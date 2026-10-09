@@ -1,0 +1,224 @@
+{
+ "id": "ropa-y-moda",
+ "nombre": "Ropa y moda",
+ "color": "#DB2777",
+ "orden": 23,
+ "subtemas": [
+  {
+   "id": "prendas",
+   "nombre": "Prendas",
+   "palabras": [
+    "CAMISA",
+    "PANTALÓN",
+    "FALDA",
+    "VESTIDO",
+    "BLUSA",
+    "CHAQUETA",
+    "ABRIGO",
+    "SUÉTER",
+    "CAMISETA",
+    "SHORT",
+    "JEAN",
+    "CHALECO"
+   ]
+  },
+  {
+   "id": "calzado",
+   "nombre": "Calzado",
+   "palabras": [
+    "ZAPATO",
+    "BOTA",
+    "SANDALIA",
+    "TENIS",
+    "CHANCLA",
+    "MOCASÍN",
+    "TACÓN",
+    "PANTUFLA",
+    "ALPARGATA",
+    "BOTÍN",
+    "ZUECO",
+    "GUAYO"
+   ]
+  },
+  {
+   "id": "accesorios",
+   "nombre": "Accesorios",
+   "palabras": [
+    "GORRA",
+    "SOMBRERO",
+    "BUFANDA",
+    "GUANTES",
+    "CINTURÓN",
+    "CORBATA",
+    "BOLSO",
+    "CARTERA",
+    "GAFAS",
+    "RELOJ",
+    "PARAGUAS",
+    "PAÑUELO"
+   ]
+  },
+  {
+   "id": "joyas",
+   "nombre": "Joyas",
+   "palabras": [
+    "ANILLO",
+    "COLLAR",
+    "PULSERA",
+    "ARETE",
+    "CADENA",
+    "DIJE",
+    "BROCHE",
+    "TOBILLERA",
+    "DIADEMA",
+    "PERLA",
+    "ORO",
+    "PLATA"
+   ]
+  },
+  {
+   "id": "telas",
+   "nombre": "Telas",
+   "palabras": [
+    "ALGODÓN",
+    "SEDA",
+    "LANA",
+    "LINO",
+    "CUERO",
+    "MEZCLILLA",
+    "POLIÉSTER",
+    "TERCIOPELO",
+    "ENCAJE",
+    "SATÍN",
+    "FRANELA",
+    "GAMUZA"
+   ]
+  },
+  {
+   "id": "ropa-de-invierno",
+   "nombre": "Ropa de invierno",
+   "palabras": [
+    "ABRIGO",
+    "BUFANDA",
+    "GORRO",
+    "GUANTES",
+    "CHAQUETA",
+    "SUÉTER",
+    "BOTAS",
+    "PONCHO",
+    "RUANA",
+    "CHAL",
+    "OREJERAS",
+    "TÉRMICA"
+   ]
+  },
+  {
+   "id": "ropa-de-playa",
+   "nombre": "Ropa de playa",
+   "palabras": [
+    "BIKINI",
+    "BAÑADOR",
+    "PAREO",
+    "SANDALIA",
+    "SOMBRERO",
+    "GAFAS",
+    "TOALLA",
+    "BERMUDA",
+    "CHANCLA",
+    "VISERA",
+    "BLOQUEADOR",
+    "CAFTÁN"
+   ]
+  },
+  {
+   "id": "costura",
+   "nombre": "Costura",
+   "palabras": [
+    "AGUJA",
+    "HILO",
+    "DEDAL",
+    "TIJERAS",
+    "BOTÓN",
+    "CREMALLERA",
+    "TELA",
+    "PATRÓN",
+    "MÁQUINA",
+    "PUNTADA",
+    "ALFILER",
+    "MOLDE"
+   ]
+  },
+  {
+   "id": "maquillaje",
+   "nombre": "Maquillaje",
+   "palabras": [
+    "LABIAL",
+    "RÍMEL",
+    "RUBOR",
+    "BASE",
+    "SOMBRA",
+    "DELINEADOR",
+    "POLVO",
+    "BROCHA",
+    "ESMALTE",
+    "CORRECTOR",
+    "ILUMINADOR",
+    "PERFUME"
+   ]
+  },
+  {
+   "id": "peinados",
+   "nombre": "Peinados",
+   "palabras": [
+    "TRENZA",
+    "MOÑO",
+    "COLETA",
+    "FLEQUILLO",
+    "RIZOS",
+    "RAPADO",
+    "MELENA",
+    "MOHICANO",
+    "CRESPOS",
+    "COLA",
+    "COPETE",
+    "AFRO"
+   ]
+  },
+  {
+   "id": "partes-de-la-camisa",
+   "nombre": "Partes de la camisa",
+   "palabras": [
+    "CUELLO",
+    "MANGA",
+    "PUÑO",
+    "BOTÓN",
+    "OJAL",
+    "BOLSILLO",
+    "COSTURA",
+    "ESPALDA",
+    "PECHERA",
+    "HOMBRO",
+    "ETIQUETA",
+    "DOBLADILLO"
+   ]
+  },
+  {
+   "id": "estilos-de-moda",
+   "nombre": "Estilos de moda",
+   "palabras": [
+    "CASUAL",
+    "ELEGANTE",
+    "DEPORTIVO",
+    "VINTAGE",
+    "CLÁSICO",
+    "URBANO",
+    "BOHEMIO",
+    "FORMAL",
+    "HIPPIE",
+    "PUNK",
+    "GÓTICO",
+    "MINIMALISTA"
+   ]
+  }
+ ]
+}

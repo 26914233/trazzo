@@ -1,0 +1,17 @@
+# Animales | #22C55E
+Mamíferos: león, tigre, elefante, jirafa, oso, lobo, zorro, caballo, vaca, mono, ballena, murciélago
+Aves: águila, búho, loro, colibrí, pingüino, avestruz, flamenco, cóndor, paloma, gallina, pato, halcón
+Peces: tiburón, salmón, atún, trucha, sardina, mero, pez espada, payaso, carpa, anguila, raya, piraña
+Reptiles: serpiente, cocodrilo, lagarto, iguana, tortuga, camaleón, caimán, boa, anaconda, víbora, gecko, cobra
+Anfibios y moluscos: rana, sapo, salamandra, tritón, ajolote, caracol, babosa, almeja, ostra, calamar, pulpo, sepia
+Animales de granja: vaca, cerdo, oveja, cabra, gallina, pato, caballo, burro, conejo, pavo, toro, gallo
+Animales marinos: delfín, ballena, foca, morsa, tiburón, pulpo, calamar, medusa, cangrejo, langosta, orca, manatí
+Animales de la selva: jaguar, tucán, guacamaya, perezoso, anaconda, tapir, mono, rana, ocelote, puma, iguana, armadillo
+Animales del desierto: camello, dromedario, escorpión, fénec, coyote, lagarto, serpiente, buitre, suricato, dingo, correcaminos, tarántula
+Animales del frío: oso polar, pingüino, morsa, foca, reno, alce, lince, armiño, yak, orca, narval, beluga
+Razas de perros: labrador, beagle, bulldog, caniche, pastor, chihuahua, dálmata, bóxer, pug, husky, rottweiler, dóberman
+Razas de gatos: persa, siamés, angora, bengalí, esfinge, maine coon, ragdoll, birmano, siberiano, abisinio, azul ruso, carey
+Crías de animales: cachorro, gatito, potro, ternero, cordero, pollito, renacuajo, lechón, cabrito, osezno, lobezno, cervatillo
+Dinosaurios: tiranosaurio, raptor, triceratops, estegosaurio, diplodocus, pterodáctilo, iguanodonte, espinosaurio, alosaurio, apatosaurio, mosasaurio, fósil
+Arácnidos y bichos: araña, tarántula, escorpión, garrapata, ácaro, ciempiés, milpiés, lombriz, caracol, babosa, cochinilla, viuda negra
+Animales de Australia: canguro, koala, ornitorrinco, wombat, dingo, emú, cacatúa, equidna, demonio, ualabí, casuario, cocodrilo

@@ -1,0 +1,188 @@
+{
+ "id": "literatura",
+ "nombre": "Literatura",
+ "color": "#92400E",
+ "orden": 36,
+ "subtemas": [
+  {
+   "id": "generos-literarios",
+   "nombre": "Géneros literarios",
+   "palabras": [
+    "NOVELA",
+    "CUENTO",
+    "POESÍA",
+    "ENSAYO",
+    "FÁBULA",
+    "LEYENDA",
+    "DRAMA",
+    "COMEDIA",
+    "TRAGEDIA",
+    "CRÓNICA",
+    "BIOGRAFÍA",
+    "MITO"
+   ]
+  },
+  {
+   "id": "escritores-latinoamericanos",
+   "nombre": "Escritores latinoamericanos",
+   "palabras": [
+    "GABO",
+    "BORGES",
+    "NERUDA",
+    "CORTÁZAR",
+    "MISTRAL",
+    "PAZ",
+    "FUENTES",
+    "ALLENDE",
+    "RULFO",
+    "VARGAS LLOSA",
+    "ISAACS",
+    "BENEDETTI"
+   ]
+  },
+  {
+   "id": "escritores-universales",
+   "nombre": "Escritores universales",
+   "palabras": [
+    "CERVANTES",
+    "SHAKESPEARE",
+    "HOMERO",
+    "DANTE",
+    "TOLSTÓI",
+    "KAFKA",
+    "POE",
+    "DICKENS",
+    "AUSTEN",
+    "ORWELL",
+    "HUGO",
+    "GOETHE"
+   ]
+  },
+  {
+   "id": "partes-de-un-libro",
+   "nombre": "Partes de un libro",
+   "palabras": [
+    "PORTADA",
+    "TÍTULO",
+    "AUTOR",
+    "ÍNDICE",
+    "CAPÍTULO",
+    "PÁGINA",
+    "PRÓLOGO",
+    "EPÍLOGO",
+    "LOMO",
+    "SOLAPA",
+    "PÁRRAFO",
+    "EDITORIAL"
+   ]
+  },
+  {
+   "id": "poesia",
+   "nombre": "Poesía",
+   "palabras": [
+    "VERSO",
+    "ESTROFA",
+    "RIMA",
+    "POEMA",
+    "POETA",
+    "SONETO",
+    "MÉTRICA",
+    "HAIKU",
+    "ODA",
+    "ELEGÍA",
+    "METÁFORA",
+    "MUSA"
+   ]
+  },
+  {
+   "id": "personajes-clasicos",
+   "nombre": "Personajes clásicos",
+   "palabras": [
+    "QUIJOTE",
+    "SANCHO",
+    "ROMEO",
+    "JULIETA",
+    "HAMLET",
+    "ULISES",
+    "DRÁCULA",
+    "ALICIA",
+    "SHERLOCK",
+    "GULLIVER",
+    "ROBINSON",
+    "FRANKENSTEIN"
+   ]
+  },
+  {
+   "id": "figuras-literarias",
+   "nombre": "Figuras literarias",
+   "palabras": [
+    "METÁFORA",
+    "SÍMIL",
+    "HIPÉRBOLE",
+    "IRONÍA",
+    "ANÁFORA",
+    "ALITERACIÓN",
+    "EPÍTETO",
+    "OXÍMORON",
+    "HIPÉRBATON",
+    "PARADOJA",
+    "SINESTESIA",
+    "METONIMIA"
+   ]
+  },
+  {
+   "id": "cien-anos-de-soledad",
+   "nombre": "Cien años de soledad",
+   "palabras": [
+    "MACONDO",
+    "AURELIANO",
+    "BUENDÍA",
+    "ÚRSULA",
+    "MELQUÍADES",
+    "REMEDIOS",
+    "AMARANTA",
+    "REBECA",
+    "GITANOS",
+    "MARIPOSAS",
+    "SOLEDAD",
+    "ARCADIO"
+   ]
+  },
+  {
+   "id": "escribir-una-historia",
+   "nombre": "Escribir una historia",
+   "palabras": [
+    "PERSONAJE",
+    "TRAMA",
+    "CONFLICTO",
+    "FINAL",
+    "NARRADOR",
+    "DIÁLOGO",
+    "ESCENA",
+    "INICIO",
+    "NUDO",
+    "DESENLACE",
+    "TEMA",
+    "AMBIENTE"
+   ]
+  },
+  {
+   "id": "el-mundo-editorial",
+   "nombre": "El mundo editorial",
+   "palabras": [
+    "EDITOR",
+    "AUTOR",
+    "IMPRENTA",
+    "LIBRO",
+    "MANUSCRITO",
+    "CORRECTOR",
+    "PORTADA",
+    "EDICIÓN",
+    "TIRAJE",
+    "LIBRERÍA",
+    "LECTOR",
+    "RESEÑA"
+   ]
+  }
+ ]
+}

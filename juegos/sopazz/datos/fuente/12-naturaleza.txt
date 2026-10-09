@@ -1,0 +1,15 @@
+# Naturaleza | #16A34A
+Árboles: roble, pino, ceiba, cedro, sauce, olmo, abeto, palmera, eucalipto, ciprés, nogal, almendro
+Flores: rosa, tulipán, girasol, orquídea, margarita, clavel, lirio, azucena, hortensia, violeta, jazmín, dalia
+Paisajes: montaña, valle, río, lago, playa, bosque, desierto, cascada, pradera, colina, cañón, llanura
+El tiempo: sol, lluvia, nube, viento, nieve, granizo, niebla, tormenta, trueno, rayo, arcoíris, rocío
+Fenómenos naturales: huracán, tornado, terremoto, tsunami, sequía, inundación, avalancha, erupción, ciclón, tifón, derrumbe, aurora
+Montañas del mundo: Everest, Aconcagua, Kilimanjaro, Mont Blanc, Fuji, Elbrus, Denali, Chimborazo, Huascarán, Matterhorn, Annapurna, Cotopaxi
+Océanos y mares: Pacífico, Atlántico, Índico, Ártico, Antártico, Caribe, Mediterráneo, Báltico, Rojo, Negro, Muerto, Arábigo
+Piedras preciosas: diamante, rubí, zafiro, esmeralda, topacio, amatista, ópalo, perla, jade, ámbar, turquesa, granate
+Minerales y rocas: cuarzo, granito, mármol, basalto, pizarra, caliza, arcilla, yeso, sal, carbón, obsidiana, pirita
+Volcanes: volcán, cráter, lava, magma, ceniza, erupción, fumarola, géiser, caldera, Etna, Vesubio, Galeras
+Plantas medicinales: manzanilla, menta, sábila, caléndula, eucalipto, jengibre, valeriana, ruda, toronjil, cidrón, romero, árnica
+Selva y bosque: liana, musgo, helecho, hojarasca, dosel, raíz, tronco, rama, hongo, orquídea, bromelia, sendero
+Medio ambiente: reciclaje, reutilizar, reducir, compost, residuo, emisión, ozono, ecología, sostenible, planeta, bosque, agua
+El agua: río, lago, mar, lluvia, nieve, hielo, vapor, nube, gota, manantial, glaciar, acuífero

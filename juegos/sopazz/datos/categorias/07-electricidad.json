@@ -1,0 +1,242 @@
+{
+ "id": "electricidad",
+ "nombre": "Electricidad",
+ "color": "#EAB308",
+ "orden": 6,
+ "subtemas": [
+  {
+   "id": "componentes",
+   "nombre": "Componentes",
+   "palabras": [
+    "RESISTENCIA",
+    "CONDENSADOR",
+    "BOBINA",
+    "DIODO",
+    "TRANSISTOR",
+    "FUSIBLE",
+    "RELÉ",
+    "INTERRUPTOR",
+    "BATERÍA",
+    "CABLE",
+    "LED",
+    "ENCHUFE"
+   ]
+  },
+  {
+   "id": "unidades-electricas",
+   "nombre": "Unidades eléctricas",
+   "palabras": [
+    "VOLTIO",
+    "AMPERIO",
+    "OHMIO",
+    "VATIO",
+    "JULIO",
+    "CULOMBIO",
+    "FARADIO",
+    "HENRIO",
+    "SIEMENS",
+    "TESLA",
+    "WEBER",
+    "KILOVATIO"
+   ]
+  },
+  {
+   "id": "circuitos",
+   "nombre": "Circuitos",
+   "palabras": [
+    "CIRCUITO",
+    "SERIE",
+    "PARALELO",
+    "NODO",
+    "MALLA",
+    "CORRIENTE",
+    "VOLTAJE",
+    "CARGA",
+    "TIERRA",
+    "POLO",
+    "FASE",
+    "NEUTRO"
+   ]
+  },
+  {
+   "id": "herramientas-del-electricista",
+   "nombre": "Herramientas del electricista",
+   "palabras": [
+    "ALICATE",
+    "PELACABLES",
+    "MULTÍMETRO",
+    "PINZA",
+    "CINTA",
+    "TESTER",
+    "SOLDADOR",
+    "ESTAÑO",
+    "TALADRO",
+    "ESCALERA",
+    "GUANTES",
+    "VOLTÍMETRO"
+   ]
+  },
+  {
+   "id": "energias-renovables",
+   "nombre": "Energías renovables",
+   "palabras": [
+    "SOLAR",
+    "EÓLICA",
+    "HIDRÁULICA",
+    "GEOTÉRMICA",
+    "BIOMASA",
+    "MAREOMOTRIZ",
+    "PANEL",
+    "TURBINA",
+    "MOLINO",
+    "REPRESA",
+    "INVERSOR",
+    "BATERÍA"
+   ]
+  },
+  {
+   "id": "electrodomesticos",
+   "nombre": "Electrodomésticos",
+   "palabras": [
+    "NEVERA",
+    "LAVADORA",
+    "HORNO",
+    "LICUADORA",
+    "PLANCHA",
+    "VENTILADOR",
+    "TELEVISOR",
+    "MICROONDAS",
+    "TOSTADORA",
+    "ASPIRADORA",
+    "SECADOR",
+    "CAFETERA"
+   ]
+  },
+  {
+   "id": "electronica",
+   "nombre": "Electrónica",
+   "palabras": [
+    "CHIP",
+    "PLACA",
+    "CIRCUITO",
+    "SENSOR",
+    "PROCESADOR",
+    "MEMORIA",
+    "ANTENA",
+    "TRANSISTOR",
+    "OSCILADOR",
+    "SEÑAL",
+    "FRECUENCIA",
+    "AMPLIFICADOR"
+   ]
+  },
+  {
+   "id": "instalacion-en-casa",
+   "nombre": "Instalación en casa",
+   "palabras": [
+    "ENCHUFE",
+    "TOMA",
+    "INTERRUPTOR",
+    "BREAKER",
+    "TABLERO",
+    "MEDIDOR",
+    "CABLEADO",
+    "TUBO",
+    "CAJA",
+    "BOMBILLO",
+    "LÁMPARA",
+    "EXTENSIÓN"
+   ]
+  },
+  {
+   "id": "iluminacion",
+   "nombre": "Iluminación",
+   "palabras": [
+    "BOMBILLO",
+    "LÁMPARA",
+    "FOCO",
+    "LED",
+    "HALÓGENO",
+    "FLUORESCENTE",
+    "NEÓN",
+    "LINTERNA",
+    "REFLECTOR",
+    "FAROL",
+    "VELA",
+    "CANDIL"
+   ]
+  },
+  {
+   "id": "pilas-y-baterias",
+   "nombre": "Pilas y baterías",
+   "palabras": [
+    "PILA",
+    "BATERÍA",
+    "LITIO",
+    "ALCALINA",
+    "CARGA",
+    "ÁNODO",
+    "CÁTODO",
+    "ELECTROLITO",
+    "RECARGABLE",
+    "CARGADOR",
+    "CELDA",
+    "VOLTAJE"
+   ]
+  },
+  {
+   "id": "seguridad-electrica",
+   "nombre": "Seguridad eléctrica",
+   "palabras": [
+    "CORTO",
+    "CHISPA",
+    "DESCARGA",
+    "AISLANTE",
+    "GUANTE",
+    "TIERRA",
+    "FUSIBLE",
+    "BREAKER",
+    "PELIGRO",
+    "ALTO VOLTAJE",
+    "SEÑAL",
+    "CASCO"
+   ]
+  },
+  {
+   "id": "pioneros-de-la-electricidad",
+   "nombre": "Pioneros de la electricidad",
+   "palabras": [
+    "TESLA",
+    "EDISON",
+    "FARADAY",
+    "VOLTA",
+    "AMPÈRE",
+    "OHM",
+    "FRANKLIN",
+    "MAXWELL",
+    "GALVANI",
+    "COULOMB",
+    "WESTINGHOUSE",
+    "KIRCHHOFF"
+   ]
+  },
+  {
+   "id": "motores-y-generadores",
+   "nombre": "Motores y generadores",
+   "palabras": [
+    "IMÁN",
+    "MOTOR",
+    "GENERADOR",
+    "DINAMO",
+    "BOBINA",
+    "ROTOR",
+    "ESTATOR",
+    "ALTERNADOR",
+    "INDUCCIÓN",
+    "CAMPO",
+    "EJE",
+    "ESCOBILLA"
+   ]
+  }
+ ]
+}

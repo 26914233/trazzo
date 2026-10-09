@@ -1,0 +1,260 @@
+{
+ "id": "cuerpo-humano",
+ "nombre": "Cuerpo humano",
+ "color": "#F472B6",
+ "orden": 12,
+ "subtemas": [
+  {
+   "id": "huesos",
+   "nombre": "Huesos",
+   "palabras": [
+    "CRÁNEO",
+    "FÉMUR",
+    "TIBIA",
+    "PERONÉ",
+    "COSTILLA",
+    "COLUMNA",
+    "HÚMERO",
+    "RADIO",
+    "CÚBITO",
+    "PELVIS",
+    "CLAVÍCULA",
+    "RÓTULA"
+   ]
+  },
+  {
+   "id": "organos",
+   "nombre": "Órganos",
+   "palabras": [
+    "CORAZÓN",
+    "PULMÓN",
+    "HÍGADO",
+    "RIÑÓN",
+    "CEREBRO",
+    "ESTÓMAGO",
+    "INTESTINO",
+    "PÁNCREAS",
+    "BAZO",
+    "VEJIGA",
+    "PIEL",
+    "ÚTERO"
+   ]
+  },
+  {
+   "id": "musculos",
+   "nombre": "Músculos",
+   "palabras": [
+    "BÍCEPS",
+    "TRÍCEPS",
+    "DELTOIDES",
+    "PECTORAL",
+    "ABDOMEN",
+    "GLÚTEO",
+    "CUÁDRICEPS",
+    "GEMELO",
+    "TRAPECIO",
+    "DORSAL",
+    "OBLICUO",
+    "DIAFRAGMA"
+   ]
+  },
+  {
+   "id": "los-sentidos",
+   "nombre": "Los sentidos",
+   "palabras": [
+    "VISTA",
+    "OÍDO",
+    "OLFATO",
+    "GUSTO",
+    "TACTO",
+    "OJO",
+    "OREJA",
+    "NARIZ",
+    "LENGUA",
+    "PIEL",
+    "SABOR",
+    "AROMA"
+   ]
+  },
+  {
+   "id": "la-cara",
+   "nombre": "La cara",
+   "palabras": [
+    "FRENTE",
+    "CEJA",
+    "PESTAÑA",
+    "OJO",
+    "NARIZ",
+    "MEJILLA",
+    "BOCA",
+    "LABIO",
+    "BARBILLA",
+    "MENTÓN",
+    "OREJA",
+    "PÓMULO"
+   ]
+  },
+  {
+   "id": "manos-y-pies",
+   "nombre": "Manos y pies",
+   "palabras": [
+    "DEDO",
+    "UÑA",
+    "PALMA",
+    "MUÑECA",
+    "NUDILLO",
+    "PULGAR",
+    "ÍNDICE",
+    "MEÑIQUE",
+    "TALÓN",
+    "TOBILLO",
+    "PLANTA",
+    "EMPEINE"
+   ]
+  },
+  {
+   "id": "sistema-digestivo",
+   "nombre": "Sistema digestivo",
+   "palabras": [
+    "BOCA",
+    "ESÓFAGO",
+    "ESTÓMAGO",
+    "INTESTINO",
+    "COLON",
+    "HÍGADO",
+    "PÁNCREAS",
+    "VESÍCULA",
+    "SALIVA",
+    "BILIS",
+    "DIGESTIÓN",
+    "RECTO"
+   ]
+  },
+  {
+   "id": "sangre-y-corazon",
+   "nombre": "Sangre y corazón",
+   "palabras": [
+    "SANGRE",
+    "PLASMA",
+    "GLÓBULO",
+    "PLAQUETA",
+    "ARTERIA",
+    "VENA",
+    "CAPILAR",
+    "AORTA",
+    "AURÍCULA",
+    "VENTRÍCULO",
+    "PULSO",
+    "LATIDO"
+   ]
+  },
+  {
+   "id": "los-dientes",
+   "nombre": "Los dientes",
+   "palabras": [
+    "DIENTE",
+    "MUELA",
+    "COLMILLO",
+    "INCISIVO",
+    "ENCÍA",
+    "ESMALTE",
+    "CARIES",
+    "RAÍZ",
+    "CORONA",
+    "SARRO",
+    "CEPILLO",
+    "ORTODONCIA"
+   ]
+  },
+  {
+   "id": "el-ojo",
+   "nombre": "El ojo",
+   "palabras": [
+    "CÓRNEA",
+    "IRIS",
+    "PUPILA",
+    "RETINA",
+    "CRISTALINO",
+    "PÁRPADO",
+    "PESTAÑA",
+    "LÁGRIMA",
+    "NERVIO",
+    "ESCLERA",
+    "MÁCULA",
+    "VISIÓN"
+   ]
+  },
+  {
+   "id": "cerebro-y-nervios",
+   "nombre": "Cerebro y nervios",
+   "palabras": [
+    "CEREBRO",
+    "NEURONA",
+    "NERVIO",
+    "MÉDULA",
+    "CEREBELO",
+    "MEMORIA",
+    "SINAPSIS",
+    "REFLEJO",
+    "AXÓN",
+    "DENDRITA",
+    "LÓBULO",
+    "TÁLAMO"
+   ]
+  },
+  {
+   "id": "respiracion",
+   "nombre": "Respiración",
+   "palabras": [
+    "PULMÓN",
+    "TRÁQUEA",
+    "BRONQUIO",
+    "ALVÉOLO",
+    "DIAFRAGMA",
+    "NARIZ",
+    "LARINGE",
+    "FARINGE",
+    "OXÍGENO",
+    "AIRE",
+    "INHALAR",
+    "EXHALAR"
+   ]
+  },
+  {
+   "id": "piel-y-pelo",
+   "nombre": "Piel y pelo",
+   "palabras": [
+    "PIEL",
+    "PORO",
+    "SUDOR",
+    "PELO",
+    "CABELLO",
+    "UÑA",
+    "VELLO",
+    "LUNAR",
+    "PECA",
+    "CANA",
+    "MELANINA",
+    "DERMIS"
+   ]
+  },
+  {
+   "id": "articulaciones",
+   "nombre": "Articulaciones",
+   "palabras": [
+    "RODILLA",
+    "CODO",
+    "HOMBRO",
+    "CADERA",
+    "MUÑECA",
+    "TOBILLO",
+    "CUELLO",
+    "MANDÍBULA",
+    "NUDILLO",
+    "VÉRTEBRA",
+    "CARTÍLAGO",
+    "LIGAMENTO"
+   ]
+  }
+ ]
+}

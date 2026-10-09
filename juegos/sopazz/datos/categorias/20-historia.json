@@ -1,0 +1,278 @@
+{
+ "id": "historia",
+ "nombre": "Historia",
+ "color": "#B45309",
+ "orden": 19,
+ "subtemas": [
+  {
+   "id": "antiguo-egipto",
+   "nombre": "Antiguo Egipto",
+   "palabras": [
+    "FARAÓN",
+    "PIRÁMIDE",
+    "MOMIA",
+    "ESFINGE",
+    "NILO",
+    "PAPIRO",
+    "JEROGLÍFICO",
+    "CLEOPATRA",
+    "TUTANKAMÓN",
+    "SARCÓFAGO",
+    "RAMSÉS",
+    "OASIS"
+   ]
+  },
+  {
+   "id": "grecia-antigua",
+   "nombre": "Grecia antigua",
+   "palabras": [
+    "ATENAS",
+    "ESPARTA",
+    "OLIMPIA",
+    "FILÓSOFO",
+    "SÓCRATES",
+    "PLATÓN",
+    "ARISTÓTELES",
+    "TEMPLO",
+    "DEMOCRACIA",
+    "ÁGORA",
+    "PARTENÓN",
+    "HOPLITA"
+   ]
+  },
+  {
+   "id": "roma-antigua",
+   "nombre": "Roma antigua",
+   "palabras": [
+    "CÉSAR",
+    "LEGIÓN",
+    "GLADIADOR",
+    "COLISEO",
+    "SENADO",
+    "FORO",
+    "ACUEDUCTO",
+    "IMPERIO",
+    "TOGA",
+    "AUGUSTO",
+    "NERÓN",
+    "CENTURIÓN"
+   ]
+  },
+  {
+   "id": "edad-media",
+   "nombre": "Edad Media",
+   "palabras": [
+    "CASTILLO",
+    "CABALLERO",
+    "REY",
+    "FEUDO",
+    "SIERVO",
+    "ARMADURA",
+    "CATEDRAL",
+    "MONJE",
+    "CRUZADA",
+    "JUGLAR",
+    "PESTE",
+    "SEÑOR"
+   ]
+  },
+  {
+   "id": "vikingos",
+   "nombre": "Vikingos",
+   "palabras": [
+    "VIKINGO",
+    "DRAKKAR",
+    "ODÍN",
+    "THOR",
+    "HACHA",
+    "ESCUDO",
+    "SAGA",
+    "RUNA",
+    "FIORDO",
+    "VALHALLA",
+    "GUERRERO",
+    "BARCO"
+   ]
+  },
+  {
+   "id": "aztecas",
+   "nombre": "Aztecas",
+   "palabras": [
+    "TENOCHTITLAN",
+    "MOCTEZUMA",
+    "AZTECA",
+    "NÁHUATL",
+    "TEMPLO",
+    "CALENDARIO",
+    "CACAO",
+    "MAÍZ",
+    "CHINAMPA",
+    "JAGUAR",
+    "CUAUHTÉMOC",
+    "PIRÁMIDE"
+   ]
+  },
+  {
+   "id": "mayas",
+   "nombre": "Mayas",
+   "palabras": [
+    "MAYA",
+    "CHICHÉN ITZÁ",
+    "TIKAL",
+    "PALENQUE",
+    "GLIFO",
+    "CÓDICE",
+    "CALENDARIO",
+    "CENOTE",
+    "JADE",
+    "CACAO",
+    "KUKULKÁN",
+    "PIRÁMIDE"
+   ]
+  },
+  {
+   "id": "incas",
+   "nombre": "Incas",
+   "palabras": [
+    "INCA",
+    "CUSCO",
+    "MACHU PICCHU",
+    "ATAHUALPA",
+    "QUECHUA",
+    "QUIPU",
+    "LLAMA",
+    "INTI",
+    "TERRAZA",
+    "PACHACÚTEC",
+    "CHASQUI",
+    "ANDES"
+   ]
+  },
+  {
+   "id": "prehistoria",
+   "nombre": "Prehistoria",
+   "palabras": [
+    "CAVERNÍCOLA",
+    "FUEGO",
+    "LANZA",
+    "MAMUT",
+    "CUEVA",
+    "PINTURA",
+    "PIEDRA",
+    "HUESO",
+    "NÓMADA",
+    "CAZADOR",
+    "TRIBU",
+    "FÓSIL"
+   ]
+  },
+  {
+   "id": "grandes-inventos",
+   "nombre": "Grandes inventos",
+   "palabras": [
+    "RUEDA",
+    "IMPRENTA",
+    "BRÚJULA",
+    "PÓLVORA",
+    "PAPEL",
+    "TELESCOPIO",
+    "RELOJ",
+    "VAPOR",
+    "BOMBILLA",
+    "TELÉFONO",
+    "VACUNA",
+    "AVIÓN"
+   ]
+  },
+  {
+   "id": "exploradores",
+   "nombre": "Exploradores",
+   "palabras": [
+    "COLÓN",
+    "MAGALLANES",
+    "VESPUCIO",
+    "CORTÉS",
+    "PIZARRO",
+    "BALBOA",
+    "MARCO POLO",
+    "ELCANO",
+    "COOK",
+    "HUMBOLDT",
+    "AMUNDSEN",
+    "LIVINGSTONE"
+   ]
+  },
+  {
+   "id": "independencia-de-america",
+   "nombre": "Independencia de América",
+   "palabras": [
+    "BOLÍVAR",
+    "SANTANDER",
+    "NARIÑO",
+    "SUCRE",
+    "SAN MARTÍN",
+    "MIRANDA",
+    "O'HIGGINS",
+    "POLICARPA",
+    "LIBERTAD",
+    "BATALLA",
+    "PRÓCER",
+    "GRITO"
+   ]
+  },
+  {
+   "id": "reyes-e-imperios",
+   "nombre": "Reyes e imperios",
+   "palabras": [
+    "REVOLUCIÓN",
+    "IMPERIO",
+    "REY",
+    "REINA",
+    "REPÚBLICA",
+    "COLONIA",
+    "GUERRA",
+    "TRATADO",
+    "CORONA",
+    "DINASTÍA",
+    "MONARQUÍA",
+    "BANDERA"
+   ]
+  },
+  {
+   "id": "antigua-china",
+   "nombre": "Antigua China",
+   "palabras": [
+    "DINASTÍA",
+    "MURALLA",
+    "EMPERADOR",
+    "SEDA",
+    "PÓLVORA",
+    "PAPEL",
+    "PORCELANA",
+    "DRAGÓN",
+    "CONFUCIO",
+    "TERRACOTA",
+    "JADE",
+    "PAGODA"
+   ]
+  },
+  {
+   "id": "mesopotamia",
+   "nombre": "Mesopotamia",
+   "palabras": [
+    "BABILONIA",
+    "SUMERIA",
+    "ASIRIA",
+    "ZIGURAT",
+    "CUNEIFORME",
+    "HAMMURABI",
+    "TIGRIS",
+    "ÉUFRATES",
+    "URUK",
+    "GILGAMESH",
+    "ESCRIBA",
+    "NÍNIVE"
+   ]
+  }
+ ]
+}

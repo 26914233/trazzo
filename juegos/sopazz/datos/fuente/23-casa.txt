@@ -1,0 +1,13 @@
+# Casa | #D97706
+Utensilios de cocina: olla, sartén, cuchara, tenedor, cuchillo, plato, vaso, taza, colador, rallador, cucharón, licuadora
+Baño: ducha, inodoro, lavamanos, espejo, toalla, jabón, cepillo, bañera, grifo, cortina, tapete, champú
+Dormitorio: cama, almohada, sábana, cobija, colchón, armario, mesita, lámpara, cortina, cajón, pijama, despertador
+Sala: sofá, sillón, televisor, mesa, cojín, tapete, cuadro, lámpara, estante, florero, chimenea, cortina
+Muebles: silla, mesa, sofá, cama, armario, estante, escritorio, cómoda, banco, repisa, vitrina, perchero
+Herramientas: martillo, serrucho, alicate, llave, taladro, clavo, tornillo, nivel, metro, lija, brocha, tuerca
+Jardín: pala, rastrillo, manguera, maceta, semilla, abono, césped, regadera, tijeras, carretilla, flor, cerca
+Limpieza: escoba, trapero, recogedor, balde, detergente, jabón, esponja, cloro, plumero, aspiradora, trapo, guantes
+Partes de la casa: puerta, ventana, techo, pared, piso, escalera, balcón, garaje, patio, sótano, ático, chimenea
+Lavandería: lavadora, secadora, plancha, gancho, tendedero, ropa, detergente, suavizante, canasta, pinza, mancha, cloro
+Decoración: cuadro, florero, vela, cojín, espejo, alfombra, cortina, planta, lámpara, marco, adorno, reloj
+Electrodomésticos de cocina: nevera, estufa, horno, microondas, licuadora, tostadora, cafetera, batidora, extractor, lavaplatos, freidora, arrocera

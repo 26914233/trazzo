@@ -1,0 +1,296 @@
+{
+ "id": "animales",
+ "nombre": "Animales",
+ "color": "#22C55E",
+ "orden": 10,
+ "subtemas": [
+  {
+   "id": "mamiferos",
+   "nombre": "Mamíferos",
+   "palabras": [
+    "LEÓN",
+    "TIGRE",
+    "ELEFANTE",
+    "JIRAFA",
+    "OSO",
+    "LOBO",
+    "ZORRO",
+    "CABALLO",
+    "VACA",
+    "MONO",
+    "BALLENA",
+    "MURCIÉLAGO"
+   ]
+  },
+  {
+   "id": "aves",
+   "nombre": "Aves",
+   "palabras": [
+    "ÁGUILA",
+    "BÚHO",
+    "LORO",
+    "COLIBRÍ",
+    "PINGÜINO",
+    "AVESTRUZ",
+    "FLAMENCO",
+    "CÓNDOR",
+    "PALOMA",
+    "GALLINA",
+    "PATO",
+    "HALCÓN"
+   ]
+  },
+  {
+   "id": "peces",
+   "nombre": "Peces",
+   "palabras": [
+    "TIBURÓN",
+    "SALMÓN",
+    "ATÚN",
+    "TRUCHA",
+    "SARDINA",
+    "MERO",
+    "PEZ ESPADA",
+    "PAYASO",
+    "CARPA",
+    "ANGUILA",
+    "RAYA",
+    "PIRAÑA"
+   ]
+  },
+  {
+   "id": "reptiles",
+   "nombre": "Reptiles",
+   "palabras": [
+    "SERPIENTE",
+    "COCODRILO",
+    "LAGARTO",
+    "IGUANA",
+    "TORTUGA",
+    "CAMALEÓN",
+    "CAIMÁN",
+    "BOA",
+    "ANACONDA",
+    "VÍBORA",
+    "GECKO",
+    "COBRA"
+   ]
+  },
+  {
+   "id": "anfibios-y-moluscos",
+   "nombre": "Anfibios y moluscos",
+   "palabras": [
+    "RANA",
+    "SAPO",
+    "SALAMANDRA",
+    "TRITÓN",
+    "AJOLOTE",
+    "CARACOL",
+    "BABOSA",
+    "ALMEJA",
+    "OSTRA",
+    "CALAMAR",
+    "PULPO",
+    "SEPIA"
+   ]
+  },
+  {
+   "id": "animales-de-granja",
+   "nombre": "Animales de granja",
+   "palabras": [
+    "VACA",
+    "CERDO",
+    "OVEJA",
+    "CABRA",
+    "GALLINA",
+    "PATO",
+    "CABALLO",
+    "BURRO",
+    "CONEJO",
+    "PAVO",
+    "TORO",
+    "GALLO"
+   ]
+  },
+  {
+   "id": "animales-marinos",
+   "nombre": "Animales marinos",
+   "palabras": [
+    "DELFÍN",
+    "BALLENA",
+    "FOCA",
+    "MORSA",
+    "TIBURÓN",
+    "PULPO",
+    "CALAMAR",
+    "MEDUSA",
+    "CANGREJO",
+    "LANGOSTA",
+    "ORCA",
+    "MANATÍ"
+   ]
+  },
+  {
+   "id": "animales-de-la-selva",
+   "nombre": "Animales de la selva",
+   "palabras": [
+    "JAGUAR",
+    "TUCÁN",
+    "GUACAMAYA",
+    "PEREZOSO",
+    "ANACONDA",
+    "TAPIR",
+    "MONO",
+    "RANA",
+    "OCELOTE",
+    "PUMA",
+    "IGUANA",
+    "ARMADILLO"
+   ]
+  },
+  {
+   "id": "animales-del-desierto",
+   "nombre": "Animales del desierto",
+   "palabras": [
+    "CAMELLO",
+    "DROMEDARIO",
+    "ESCORPIÓN",
+    "FÉNEC",
+    "COYOTE",
+    "LAGARTO",
+    "SERPIENTE",
+    "BUITRE",
+    "SURICATO",
+    "DINGO",
+    "CORRECAMINOS",
+    "TARÁNTULA"
+   ]
+  },
+  {
+   "id": "animales-del-frio",
+   "nombre": "Animales del frío",
+   "palabras": [
+    "OSO POLAR",
+    "PINGÜINO",
+    "MORSA",
+    "FOCA",
+    "RENO",
+    "ALCE",
+    "LINCE",
+    "ARMIÑO",
+    "YAK",
+    "ORCA",
+    "NARVAL",
+    "BELUGA"
+   ]
+  },
+  {
+   "id": "razas-de-perros",
+   "nombre": "Razas de perros",
+   "palabras": [
+    "LABRADOR",
+    "BEAGLE",
+    "BULLDOG",
+    "CANICHE",
+    "PASTOR",
+    "CHIHUAHUA",
+    "DÁLMATA",
+    "BÓXER",
+    "PUG",
+    "HUSKY",
+    "ROTTWEILER",
+    "DÓBERMAN"
+   ]
+  },
+  {
+   "id": "razas-de-gatos",
+   "nombre": "Razas de gatos",
+   "palabras": [
+    "PERSA",
+    "SIAMÉS",
+    "ANGORA",
+    "BENGALÍ",
+    "ESFINGE",
+    "MAINE COON",
+    "RAGDOLL",
+    "BIRMANO",
+    "SIBERIANO",
+    "ABISINIO",
+    "AZUL RUSO",
+    "CAREY"
+   ]
+  },
+  {
+   "id": "crias-de-animales",
+   "nombre": "Crías de animales",
+   "palabras": [
+    "CACHORRO",
+    "GATITO",
+    "POTRO",
+    "TERNERO",
+    "CORDERO",
+    "POLLITO",
+    "RENACUAJO",
+    "LECHÓN",
+    "CABRITO",
+    "OSEZNO",
+    "LOBEZNO",
+    "CERVATILLO"
+   ]
+  },
+  {
+   "id": "dinosaurios",
+   "nombre": "Dinosaurios",
+   "palabras": [
+    "TIRANOSAURIO",
+    "RAPTOR",
+    "TRICERATOPS",
+    "ESTEGOSAURIO",
+    "DIPLODOCUS",
+    "PTERODÁCTILO",
+    "IGUANODONTE",
+    "ESPINOSAURIO",
+    "ALOSAURIO",
+    "APATOSAURIO",
+    "MOSASAURIO",
+    "FÓSIL"
+   ]
+  },
+  {
+   "id": "aracnidos-y-bichos",
+   "nombre": "Arácnidos y bichos",
+   "palabras": [
+    "ARAÑA",
+    "TARÁNTULA",
+    "ESCORPIÓN",
+    "GARRAPATA",
+    "ÁCARO",
+    "CIEMPIÉS",
+    "MILPIÉS",
+    "LOMBRIZ",
+    "CARACOL",
+    "BABOSA",
+    "COCHINILLA",
+    "VIUDA NEGRA"
+   ]
+  },
+  {
+   "id": "animales-de-australia",
+   "nombre": "Animales de Australia",
+   "palabras": [
+    "CANGURO",
+    "KOALA",
+    "ORNITORRINCO",
+    "WOMBAT",
+    "DINGO",
+    "EMÚ",
+    "CACATÚA",
+    "EQUIDNA",
+    "DEMONIO",
+    "UALABÍ",
+    "CASUARIO",
+    "COCODRILO"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+# Ropa y moda | #DB2777
+Prendas: camisa, pantalón, falda, vestido, blusa, chaqueta, abrigo, suéter, camiseta, short, jean, chaleco
+Calzado: zapato, bota, sandalia, tenis, chancla, mocasín, tacón, pantufla, alpargata, botín, zueco, guayo
+Accesorios: gorra, sombrero, bufanda, guantes, cinturón, corbata, bolso, cartera, gafas, reloj, paraguas, pañuelo
+Joyas: anillo, collar, pulsera, arete, cadena, dije, broche, tobillera, diadema, perla, oro, plata
+Telas: algodón, seda, lana, lino, cuero, mezclilla, poliéster, terciopelo, encaje, satín, franela, gamuza
+Ropa de invierno: abrigo, bufanda, gorro, guantes, chaqueta, suéter, botas, poncho, ruana, chal, orejeras, térmica
+Ropa de playa: bikini, bañador, pareo, sandalia, sombrero, gafas, toalla, bermuda, chancla, visera, bloqueador, caftán
+Costura: aguja, hilo, dedal, tijeras, botón, cremallera, tela, patrón, máquina, puntada, alfiler, molde
+Maquillaje: labial, rímel, rubor, base, sombra, delineador, polvo, brocha, esmalte, corrector, iluminador, perfume
+Peinados: trenza, moño, coleta, flequillo, rizos, rapado, melena, mohicano, crespos, cola, copete, afro
+Partes de la camisa: cuello, manga, puño, botón, ojal, bolsillo, costura, espalda, pechera, hombro, etiqueta, dobladillo
+Estilos de moda: casual, elegante, deportivo, vintage, clásico, urbano, bohemio, formal, hippie, punk, gótico, minimalista

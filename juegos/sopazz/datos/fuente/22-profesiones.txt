@@ -1,0 +1,14 @@
+# Profesiones | #14B8A6
+Salud: médico, enfermero, dentista, cirujano, pediatra, farmacéutico, psicólogo, veterinario, terapeuta, paramédico, partera, optómetra
+Construcción: albañil, arquitecto, ingeniero, carpintero, plomero, electricista, pintor, soldador, obrero, capataz, topógrafo, maestro
+Educación: profesor, maestro, rector, tutor, pedagogo, investigador, coordinador, orientador, catedrático, docente, decano, monitor
+Arte y espectáculo: actor, cantante, músico, pintor, bailarín, escultor, fotógrafo, payaso, mago, escritor, poeta, director
+Oficios manuales: sastre, zapatero, herrero, joyero, relojero, tapicero, ebanista, alfarero, panadero, carnicero, peluquero, barbero
+Transporte: piloto, conductor, chofer, taxista, camionero, maquinista, capitán, marinero, azafata, mensajero, controlador, mecánico
+Seguridad y emergencias: policía, bombero, soldado, guardia, vigilante, rescatista, salvavidas, detective, escolta, agente, militar, socorrista
+El campo: agricultor, ganadero, campesino, jornalero, pescador, apicultor, caficultor, vaquero, granjero, pastor, recolector, floricultor
+Oficina: secretario, contador, abogado, gerente, asistente, auxiliar, analista, economista, consultor, archivista, cajero, jefe
+Gastronomía: chef, cocinero, mesero, panadero, pastelero, barista, cantinero, sumiller, carnicero, repostero, ayudante, pizzero
+Tecnología: programador, diseñador, ingeniero, analista, técnico, tester, científico, soporte, editor, animador, redactor, streamer
+Comercio: vendedor, comerciante, cajero, tendero, bodeguero, repartidor, mensajero, distribuidor, asesor, promotor, comprador, librero
+Ciencia: científico, biólogo, químico, físico, astrónomo, geólogo, matemático, investigador, botánico, zoólogo, arqueólogo, ingeniero

@@ -1,0 +1,16 @@
+# Cine y televisión | #E11D48
+Géneros de cine: acción, comedia, drama, terror, suspenso, romance, aventura, musical, western, animación, documental, fantasía
+Rodaje: cámara, toma, escena, plano, claqueta, set, guion, director, actor, foco, grúa, corte
+Oficios del cine: director, productor, guionista, actor, actriz, editor, maquillador, sonidista, camarógrafo, doble, extra, vestuarista
+En el cine: pantalla, butaca, boleto, palomitas, estreno, cartelera, taquilla, proyector, fila, sala, gaseosa, tráiler
+Televisión: serie, capítulo, temporada, episodio, canal, noticiero, telenovela, reality, presentador, control, comercial, estreno
+Animación: dibujo, fotograma, personaje, guion, voz, doblaje, caricatura, stop motion, píxel, render, storyboard, animador
+Ciencia ficción: robot, nave, alien, láser, galaxia, futuro, clon, androide, portal, mutante, planeta, cíborg
+Terror: fantasma, zombi, vampiro, bruja, monstruo, momia, hombre lobo, demonio, grito, sangre, cementerio, calavera
+Superhéroes: héroe, villano, capa, máscara, poder, rescate, guarida, escudo, rayo, vuelo, fuerza, identidad
+Premios y festivales: Óscar, Globo, Goya, Emmy, alfombra, estatuilla, nominado, ganador, gala, discurso, jurado, Cannes
+Cine clásico: blanco, negro, mudo, cine, rollo, proyector, diva, galán, Chaplin, carrete, sepia, noir
+Efectos especiales: maqueta, explosión, croma, maquillaje, prótesis, doble, cable, humo, lluvia, digital, pantalla, sangre
+Cómic: viñeta, globo, onomatopeya, tira, historieta, dibujante, guionista, portada, héroe, villano, edición, colección
+Superpoderes: vuelo, fuerza, velocidad, invisible, telepatía, rayos, escudo, fuego, hielo, agilidad, elástico, regeneración
+Villanos: villano, guarida, plan, trampa, secuaz, láser, robot, monstruo, venganza, malvado, caos, ejército

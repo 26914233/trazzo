@@ -1,0 +1,16 @@
+# Países | #3B82F6
+América del Sur: Colombia, Venezuela, Ecuador, Perú, Bolivia, Chile, Argentina, Uruguay, Paraguay, Brasil, Guyana, Surinam
+Centroamérica y Caribe: México, Guatemala, Honduras, Belice, Nicaragua, Panamá, Cuba, Haití, Jamaica, Bahamas, Dominicana, Barbados
+Europa occidental: España, Francia, Portugal, Italia, Alemania, Bélgica, Holanda, Suiza, Austria, Irlanda, Inglaterra, Luxemburgo
+Europa del norte y del este: Noruega, Suecia, Finlandia, Dinamarca, Islandia, Polonia, Rusia, Ucrania, Hungría, Rumania, Grecia, Croacia
+Asia: China, Japón, Corea, India, Tailandia, Vietnam, Indonesia, Filipinas, Malasia, Mongolia, Nepal, Camboya
+Medio Oriente: Turquía, Israel, Irán, Irak, Jordania, Líbano, Siria, Arabia, Catar, Kuwait, Yemen, Omán
+África: Egipto, Marruecos, Nigeria, Kenia, Etiopía, Sudáfrica, Ghana, Senegal, Argelia, Túnez, Angola, Camerún
+Oceanía e islas: Australia, Fiyi, Samoa, Tonga, Palaos, Tuvalu, Kiribati, Nauru, Vanuatu, Madagascar, Maldivas, Mauricio
+Capitales de América: Bogotá, Lima, Quito, Caracas, Santiago, Asunción, Montevideo, Brasilia, Panamá, Managua, Habana, Ottawa
+Capitales de Europa: Madrid, París, Roma, Berlín, Lisboa, Londres, Viena, Atenas, Oslo, Praga, Varsovia, Dublín
+Capitales de Asia: Tokio, Pekín, Seúl, Bangkok, Hanói, Manila, Yakarta, Teherán, Bagdad, Kabul, Katmandú, Doha
+Capitales de África y Oceanía: Cairo, Nairobi, Dakar, Rabat, Acra, Abuja, Luanda, Argel, Túnez, Canberra, Wellington, Suva
+Gentilicios: colombiano, mexicano, peruano, chileno, argentino, español, francés, alemán, japonés, chino, ruso, brasileño
+Idiomas: español, inglés, francés, alemán, italiano, portugués, chino, japonés, árabe, ruso, hindi, coreano
+Monedas del mundo: peso, dólar, euro, libra, yen, yuan, rublo, real, sol, bolívar, franco, rupia

@@ -1,0 +1,278 @@
+{
+ "id": "colombia",
+ "nombre": "Colombia",
+ "color": "#FACC15",
+ "orden": 9,
+ "subtemas": [
+  {
+   "id": "departamentos",
+   "nombre": "Departamentos",
+   "palabras": [
+    "ANTIOQUIA",
+    "BOYACÁ",
+    "CUNDINAMARCA",
+    "SANTANDER",
+    "NARIÑO",
+    "CAUCA",
+    "HUILA",
+    "TOLIMA",
+    "CALDAS",
+    "META",
+    "CHOCÓ",
+    "BOLÍVAR"
+   ]
+  },
+  {
+   "id": "capitales-departamentales",
+   "nombre": "Capitales departamentales",
+   "palabras": [
+    "MEDELLÍN",
+    "TUNJA",
+    "BUCARAMANGA",
+    "PASTO",
+    "POPAYÁN",
+    "NEIVA",
+    "IBAGUÉ",
+    "MANIZALES",
+    "VALLEDUPAR",
+    "QUIBDÓ",
+    "CARTAGENA",
+    "MONTERÍA"
+   ]
+  },
+  {
+   "id": "rios-de-colombia",
+   "nombre": "Ríos de Colombia",
+   "palabras": [
+    "MAGDALENA",
+    "CAUCA",
+    "ATRATO",
+    "META",
+    "GUAVIARE",
+    "CAQUETÁ",
+    "PUTUMAYO",
+    "AMAZONAS",
+    "SINÚ",
+    "ORINOCO",
+    "ARAUCA",
+    "VICHADA"
+   ]
+  },
+  {
+   "id": "platos-tipicos",
+   "nombre": "Platos típicos",
+   "palabras": [
+    "AJIACO",
+    "SANCOCHO",
+    "BANDEJA PAISA",
+    "TAMAL",
+    "LECHONA",
+    "AREPA",
+    "CHANGUA",
+    "MONDONGO",
+    "CAZUELA",
+    "VIUDO",
+    "MUTE",
+    "PATACÓN"
+   ]
+  },
+  {
+   "id": "ritmos-colombianos",
+   "nombre": "Ritmos colombianos",
+   "palabras": [
+    "CUMBIA",
+    "VALLENATO",
+    "BAMBUCO",
+    "JOROPO",
+    "CURRULAO",
+    "CHAMPETA",
+    "PORRO",
+    "PASILLO",
+    "GUABINA",
+    "SALSA",
+    "MAPALÉ",
+    "BULLERENGUE"
+   ]
+  },
+  {
+   "id": "frutas-colombianas",
+   "nombre": "Frutas colombianas",
+   "palabras": [
+    "LULO",
+    "CURUBA",
+    "GUANÁBANA",
+    "MARACUYÁ",
+    "UCHUVA",
+    "PITAHAYA",
+    "BOROJÓ",
+    "FEIJOA",
+    "CHONTADURO",
+    "ZAPOTE",
+    "GRANADILLA",
+    "GUAMA"
+   ]
+  },
+  {
+   "id": "fauna-colombiana",
+   "nombre": "Fauna colombiana",
+   "palabras": [
+    "CÓNDOR",
+    "JAGUAR",
+    "DANTA",
+    "CHIGÜIRO",
+    "ARMADILLO",
+    "PEREZOSO",
+    "TUCÁN",
+    "COLIBRÍ",
+    "GUACAMAYA",
+    "CAIMÁN",
+    "MANATÍ",
+    "TITÍ"
+   ]
+  },
+  {
+   "id": "flora-colombiana",
+   "nombre": "Flora colombiana",
+   "palabras": [
+    "ORQUÍDEA",
+    "FRAILEJÓN",
+    "PALMA DE CERA",
+    "CEIBA",
+    "GUAYACÁN",
+    "YARUMO",
+    "HELICONIA",
+    "CAFETO",
+    "GUADUA",
+    "SAMÁN",
+    "ROBLE",
+    "CEDRO"
+   ]
+  },
+  {
+   "id": "ciudades",
+   "nombre": "Ciudades",
+   "palabras": [
+    "BOGOTÁ",
+    "MEDELLÍN",
+    "CALI",
+    "BARRANQUILLA",
+    "CARTAGENA",
+    "CÚCUTA",
+    "PEREIRA",
+    "SANTA MARTA",
+    "LETICIA",
+    "RIOHACHA",
+    "SINCELEJO",
+    "ARMENIA"
+   ]
+  },
+  {
+   "id": "palabras-colombianas",
+   "nombre": "Palabras colombianas",
+   "palabras": [
+    "PARCERO",
+    "CHÉVERE",
+    "BACANO",
+    "BERRACO",
+    "TINTO",
+    "GUAYABO",
+    "CAMELLO",
+    "RUMBA",
+    "POLA",
+    "LUCAS",
+    "CHINO",
+    "ÑAPA"
+   ]
+  },
+  {
+   "id": "fiestas-y-carnavales",
+   "nombre": "Fiestas y carnavales",
+   "palabras": [
+    "CARNAVAL",
+    "FERIA",
+    "FESTIVAL",
+    "DESFILE",
+    "COMPARSA",
+    "SILLETEROS",
+    "REINADO",
+    "MARIMONDA",
+    "CUMBIAMBA",
+    "TABLADO",
+    "MURGA",
+    "ALBORADA"
+   ]
+  },
+  {
+   "id": "regiones-naturales",
+   "nombre": "Regiones naturales",
+   "palabras": [
+    "ANDINA",
+    "CARIBE",
+    "PACÍFICA",
+    "ORINOQUÍA",
+    "AMAZONÍA",
+    "INSULAR",
+    "PÁRAMO",
+    "LLANO",
+    "SABANA",
+    "SIERRA",
+    "SELVA",
+    "COSTA"
+   ]
+  },
+  {
+   "id": "simbolos-patrios",
+   "nombre": "Símbolos patrios",
+   "palabras": [
+    "BANDERA",
+    "ESCUDO",
+    "HIMNO",
+    "CÓNDOR",
+    "ORQUÍDEA",
+    "PALMA",
+    "AMARILLO",
+    "AZUL",
+    "ROJO",
+    "LIBERTAD",
+    "ORDEN",
+    "PATRIA"
+   ]
+  },
+  {
+   "id": "comida-callejera",
+   "nombre": "Comida callejera",
+   "palabras": [
+    "EMPANADA",
+    "AREPA",
+    "SALCHIPAPA",
+    "MAZORCA",
+    "CHUZO",
+    "OBLEAS",
+    "RASPADO",
+    "BUÑUELO",
+    "MANGO BICHE",
+    "SALPICÓN",
+    "CHONTADURO",
+    "PANDEBONO"
+   ]
+  },
+  {
+   "id": "bogota",
+   "nombre": "Bogotá",
+   "palabras": [
+    "MONSERRATE",
+    "CANDELARIA",
+    "USAQUÉN",
+    "CHAPINERO",
+    "TRANSMILENIO",
+    "SUBA",
+    "KENNEDY",
+    "CICLOVÍA",
+    "TEUSAQUILLO",
+    "BOSA",
+    "FONTIBÓN",
+    "ENGATIVÁ"
+   ]
+  }
+ ]
+}

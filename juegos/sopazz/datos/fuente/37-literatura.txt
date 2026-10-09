@@ -1,0 +1,11 @@
+# Literatura | #92400E
+Géneros literarios: novela, cuento, poesía, ensayo, fábula, leyenda, drama, comedia, tragedia, crónica, biografía, mito
+Escritores latinoamericanos: Gabo, Borges, Neruda, Cortázar, Mistral, Paz, Fuentes, Allende, Rulfo, Vargas Llosa, Isaacs, Benedetti
+Escritores universales: Cervantes, Shakespeare, Homero, Dante, Tolstói, Kafka, Poe, Dickens, Austen, Orwell, Hugo, Goethe
+Partes de un libro: portada, título, autor, índice, capítulo, página, prólogo, epílogo, lomo, solapa, párrafo, editorial
+Poesía: verso, estrofa, rima, poema, poeta, soneto, métrica, haiku, oda, elegía, metáfora, musa
+Personajes clásicos: Quijote, Sancho, Romeo, Julieta, Hamlet, Ulises, Drácula, Alicia, Sherlock, Gulliver, Robinson, Frankenstein
+Figuras literarias: metáfora, símil, hipérbole, ironía, anáfora, aliteración, epíteto, oxímoron, hipérbaton, paradoja, sinestesia, metonimia
+Cien años de soledad: Macondo, Aureliano, Buendía, Úrsula, Melquíades, Remedios, Amaranta, Rebeca, gitanos, mariposas, soledad, Arcadio
+Escribir una historia: personaje, trama, conflicto, final, narrador, diálogo, escena, inicio, nudo, desenlace, tema, ambiente
+El mundo editorial: editor, autor, imprenta, libro, manuscrito, corrector, portada, edición, tiraje, librería, lector, reseña

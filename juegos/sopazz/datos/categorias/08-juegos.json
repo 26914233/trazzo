@@ -1,0 +1,260 @@
+{
+ "id": "juegos",
+ "nombre": "Juegos",
+ "color": "#EC4899",
+ "orden": 7,
+ "subtemas": [
+  {
+   "id": "juegos-de-mesa",
+   "nombre": "Juegos de mesa",
+   "palabras": [
+    "AJEDREZ",
+    "DAMAS",
+    "PARQUÉS",
+    "DOMINÓ",
+    "BINGO",
+    "LOTERÍA",
+    "DADOS",
+    "TABLERO",
+    "FICHA",
+    "OCA",
+    "BACKGAMMON",
+    "PARCHÍS"
+   ]
+  },
+  {
+   "id": "ajedrez",
+   "nombre": "Ajedrez",
+   "palabras": [
+    "REY",
+    "REINA",
+    "TORRE",
+    "ALFIL",
+    "CABALLO",
+    "PEÓN",
+    "JAQUE",
+    "MATE",
+    "ENROQUE",
+    "TABLERO",
+    "APERTURA",
+    "GAMBITO"
+   ]
+  },
+  {
+   "id": "cartas-y-naipes",
+   "nombre": "Cartas y naipes",
+   "palabras": [
+    "BARAJA",
+    "CARTA",
+    "REY",
+    "REINA",
+    "JOTA",
+    "COMODÍN",
+    "CORAZÓN",
+    "DIAMANTE",
+    "TRÉBOL",
+    "PICA",
+    "PÓQUER",
+    "SOLITARIO"
+   ]
+  },
+  {
+   "id": "videojuegos",
+   "nombre": "Videojuegos",
+   "palabras": [
+    "CONSOLA",
+    "CONTROL",
+    "MANDO",
+    "NIVEL",
+    "VIDA",
+    "JEFE",
+    "PUNTOS",
+    "MISIÓN",
+    "AVATAR",
+    "MAPA",
+    "PANTALLA",
+    "PARTIDA"
+   ]
+  },
+  {
+   "id": "generos-de-videojuegos",
+   "nombre": "Géneros de videojuegos",
+   "palabras": [
+    "ACCIÓN",
+    "AVENTURA",
+    "PLATAFORMAS",
+    "ESTRATEGIA",
+    "CARRERAS",
+    "DEPORTES",
+    "ROL",
+    "TERROR",
+    "PUZZLE",
+    "SIMULACIÓN",
+    "DISPAROS",
+    "ARCADE"
+   ]
+  },
+  {
+   "id": "juegos-de-ninos",
+   "nombre": "Juegos de niños",
+   "palabras": [
+    "ESCONDITE",
+    "RAYUELA",
+    "TROMPO",
+    "CANICAS",
+    "COMETA",
+    "YOYO",
+    "COLUMPIO",
+    "RONDA",
+    "LLEVA",
+    "GOLOSA",
+    "CUERDA",
+    "BALERO"
+   ]
+  },
+  {
+   "id": "juguetes",
+   "nombre": "Juguetes",
+   "palabras": [
+    "MUÑECA",
+    "PELOTA",
+    "CARRITO",
+    "PELUCHE",
+    "BLOQUES",
+    "COMETA",
+    "TROMPO",
+    "YOYO",
+    "TREN",
+    "ROBOT",
+    "TÍTERE",
+    "PATINETA"
+   ]
+  },
+  {
+   "id": "acertijos",
+   "nombre": "Acertijos",
+   "palabras": [
+    "ACERTIJO",
+    "ADIVINANZA",
+    "ENIGMA",
+    "LABERINTO",
+    "CRUCIGRAMA",
+    "SUDOKU",
+    "PIEZA",
+    "LÓGICA",
+    "PISTA",
+    "CLAVE",
+    "SOLUCIÓN",
+    "SOPA"
+   ]
+  },
+  {
+   "id": "juegos-de-rol",
+   "nombre": "Juegos de rol",
+   "palabras": [
+    "DRAGÓN",
+    "MAGO",
+    "GUERRERO",
+    "ELFO",
+    "ENANO",
+    "HECHIZO",
+    "MAZMORRA",
+    "DADO",
+    "MISIÓN",
+    "GREMIO",
+    "POCIÓN",
+    "ESPADA"
+   ]
+  },
+  {
+   "id": "juegos-tradicionales",
+   "nombre": "Juegos tradicionales",
+   "palabras": [
+    "TEJO",
+    "RANA",
+    "TROMPO",
+    "COCA",
+    "GOLOSA",
+    "PARQUÉS",
+    "BOLAS",
+    "COMETA",
+    "LLEVA",
+    "CHUCHA",
+    "YERMIS",
+    "PONCHADO"
+   ]
+  },
+  {
+   "id": "consolas-y-accesorios",
+   "nombre": "Consolas y accesorios",
+   "palabras": [
+    "CONSOLA",
+    "CONTROL",
+    "JOYSTICK",
+    "AURICULARES",
+    "TECLADO",
+    "RATÓN",
+    "PANTALLA",
+    "CARGADOR",
+    "CARTUCHO",
+    "DISCO",
+    "MEMORIA",
+    "CABLE"
+   ]
+  },
+  {
+   "id": "lenguaje-gamer",
+   "nombre": "Lenguaje gamer",
+   "palabras": [
+    "NIVEL",
+    "JEFE",
+    "VIDAS",
+    "PUNTOS",
+    "COMBO",
+    "LOGRO",
+    "PARTIDA",
+    "GUARDAR",
+    "PAUSA",
+    "BONUS",
+    "TROFEO",
+    "RANKING"
+   ]
+  },
+  {
+   "id": "deportes-electronicos",
+   "nombre": "Deportes electrónicos",
+   "palabras": [
+    "TORNEO",
+    "EQUIPO",
+    "JUGADOR",
+    "LIGA",
+    "CLAN",
+    "FINAL",
+    "CAMPEÓN",
+    "PREMIO",
+    "ENTRENADOR",
+    "ESTRATEGIA",
+    "PÚBLICO",
+    "TRANSMISIÓN"
+   ]
+  },
+  {
+   "id": "videojuegos-clasicos",
+   "nombre": "Videojuegos clásicos",
+   "palabras": [
+    "PÍXEL",
+    "ARCADE",
+    "FICHA",
+    "JOYSTICK",
+    "PUNTAJE",
+    "VIDAS",
+    "NAVE",
+    "LABERINTO",
+    "PLATAFORMA",
+    "JEFE",
+    "MONEDAS",
+    "RÉCORD"
+   ]
+  }
+ ]
+}

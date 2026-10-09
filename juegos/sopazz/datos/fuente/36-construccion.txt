@@ -1,0 +1,10 @@
+# Construcción | #78716C
+Materiales: ladrillo, cemento, arena, grava, varilla, concreto, madera, vidrio, teja, yeso, acero, bloque
+Herramientas de obra: pala, pica, carretilla, nivel, plomada, palustre, martillo, mezcladora, andamio, metro, cincel, llana
+Estructuras: viga, columna, losa, muro, cimiento, zapata, techo, escalera, rampa, arco, pilote, cubierta
+Carpintería: madera, sierra, cepillo, clavo, tornillo, lija, barniz, cola, formón, tabla, serrucho, ebanista
+Plomería: tubo, llave, grifo, codo, válvula, desagüe, sifón, tanque, fuga, empaque, teflón, bomba
+Pintar la casa: brocha, rodillo, pintura, bandeja, cinta, lija, masilla, estuco, sellador, esmalte, color, escalera
+Grandes obras: puente, túnel, represa, autopista, viaducto, canal, dique, torre, carretera, acueducto, faro, muelle
+En la obra: casco, chaleco, botas, guantes, obrero, capataz, ingeniero, plano, permiso, grúa, cemento, polvo
+Edificios: edificio, rascacielos, torre, casa, apartamento, bodega, iglesia, estadio, hospital, colegio, oficina, castillo

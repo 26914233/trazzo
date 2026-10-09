@@ -1,0 +1,13 @@
+# Transporte | #0284C7
+Vehículos: carro, moto, bus, camión, taxi, tren, bicicleta, camioneta, tractor, ambulancia, jeep, furgoneta
+Aviones y aeropuerto: avión, piloto, azafata, pista, terminal, maleta, pasaporte, vuelo, despegue, aterrizaje, hangar, torre
+Barcos: barco, velero, lancha, canoa, yate, ferry, submarino, ancla, puerto, timón, proa, popa
+Partes del carro: motor, volante, llanta, freno, pedal, capó, baúl, faro, espejo, radiador, embrague, parabrisas
+El tren: tren, vagón, locomotora, riel, estación, andén, maquinista, boleto, vía, túnel, metro, tranvía
+La bicicleta: pedal, cadena, rueda, sillín, manubrio, freno, radio, piñón, timbre, casco, llanta, cuadro
+Señales de tránsito: pare, semáforo, cebra, ceda, curva, velocidad, peatón, cruce, giro, prohibido, desvío, glorieta
+Motos: casco, motor, manubrio, escape, guantes, chaqueta, cilindraje, acelerador, clutch, bocina, placa, retrovisor
+Transporte público: bus, metro, tranvía, buseta, colectivo, taxi, parada, pasaje, tarjeta, ruta, estación, teleférico
+Maquinaria pesada: grúa, excavadora, tractor, volqueta, bulldozer, montacargas, aplanadora, mezcladora, camión, oruga, cargador, pala
+Viaje por carretera: peaje, gasolina, mapa, ruta, autopista, curva, parador, carretera, kilómetro, túnel, puente, viaje
+Vehículos aéreos: avión, helicóptero, globo, dron, avioneta, planeador, jet, cohete, zepelín, parapente, hidroavión, caza

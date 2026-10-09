@@ -1,0 +1,278 @@
+{
+ "id": "musica",
+ "nombre": "Música",
+ "color": "#F97316",
+ "orden": 15,
+ "subtemas": [
+  {
+   "id": "instrumentos-de-cuerda",
+   "nombre": "Instrumentos de cuerda",
+   "palabras": [
+    "GUITARRA",
+    "VIOLÍN",
+    "VIOLA",
+    "VIOLONCHELO",
+    "CONTRABAJO",
+    "ARPA",
+    "BAJO",
+    "TIPLE",
+    "UKELELE",
+    "BANJO",
+    "MANDOLINA",
+    "CHARANGO"
+   ]
+  },
+  {
+   "id": "instrumentos-de-viento",
+   "nombre": "Instrumentos de viento",
+   "palabras": [
+    "FLAUTA",
+    "TROMPETA",
+    "SAXOFÓN",
+    "CLARINETE",
+    "OBOE",
+    "FAGOT",
+    "TROMBÓN",
+    "TUBA",
+    "CORNO",
+    "GAITA",
+    "ARMÓNICA",
+    "QUENA"
+   ]
+  },
+  {
+   "id": "percusion",
+   "nombre": "Percusión",
+   "palabras": [
+    "TAMBOR",
+    "BOMBO",
+    "PLATILLO",
+    "BONGÓ",
+    "CONGA",
+    "TIMBAL",
+    "MARACA",
+    "XILÓFONO",
+    "TRIÁNGULO",
+    "PANDERETA",
+    "CAJÓN",
+    "GUACHARACA"
+   ]
+  },
+  {
+   "id": "generos-musicales",
+   "nombre": "Géneros musicales",
+   "palabras": [
+    "ROCK",
+    "POP",
+    "JAZZ",
+    "BLUES",
+    "REGUETÓN",
+    "SALSA",
+    "BACHATA",
+    "MERENGUE",
+    "TANGO",
+    "METAL",
+    "CLÁSICA",
+    "RAP"
+   ]
+  },
+  {
+   "id": "teoria-musical",
+   "nombre": "Teoría musical",
+   "palabras": [
+    "NOTA",
+    "ESCALA",
+    "ACORDE",
+    "COMPÁS",
+    "RITMO",
+    "MELODÍA",
+    "ARMONÍA",
+    "TEMPO",
+    "CLAVE",
+    "PENTAGRAMA",
+    "SILENCIO",
+    "OCTAVA"
+   ]
+  },
+  {
+   "id": "figuras-musicales",
+   "nombre": "Figuras musicales",
+   "palabras": [
+    "REDONDA",
+    "BLANCA",
+    "NEGRA",
+    "CORCHEA",
+    "SEMICORCHEA",
+    "FUSA",
+    "PUNTILLO",
+    "LIGADURA",
+    "SOSTENIDO",
+    "BEMOL",
+    "BECUADRO",
+    "CALDERÓN"
+   ]
+  },
+  {
+   "id": "orquesta",
+   "nombre": "Orquesta",
+   "palabras": [
+    "DIRECTOR",
+    "BATUTA",
+    "PARTITURA",
+    "ATRIL",
+    "SOLISTA",
+    "CORO",
+    "ENSAYO",
+    "CONCIERTO",
+    "VIOLÍN",
+    "VIOLA",
+    "TIMBAL",
+    "SINFONÍA"
+   ]
+  },
+  {
+   "id": "partes-de-la-guitarra",
+   "nombre": "Partes de la guitarra",
+   "palabras": [
+    "MÁSTIL",
+    "TRASTE",
+    "CUERDA",
+    "CLAVIJA",
+    "PUENTE",
+    "BOCA",
+    "DIAPASÓN",
+    "CAJA",
+    "CEJILLA",
+    "PÚA",
+    "CABEZA",
+    "TAPA"
+   ]
+  },
+  {
+   "id": "bailes",
+   "nombre": "Bailes",
+   "palabras": [
+    "SALSA",
+    "CUMBIA",
+    "TANGO",
+    "VALS",
+    "FLAMENCO",
+    "MERENGUE",
+    "BACHATA",
+    "SAMBA",
+    "MAMBO",
+    "POLCA",
+    "JOROPO",
+    "HIPHOP"
+   ]
+  },
+  {
+   "id": "voces-y-canto",
+   "nombre": "Voces y canto",
+   "palabras": [
+    "SOPRANO",
+    "CONTRALTO",
+    "TENOR",
+    "BARÍTONO",
+    "BAJO",
+    "CORO",
+    "SOLISTA",
+    "FALSETE",
+    "AFINAR",
+    "CANTAR",
+    "VOZ",
+    "DUETO"
+   ]
+  },
+  {
+   "id": "equipo-de-sonido",
+   "nombre": "Equipo de sonido",
+   "palabras": [
+    "MICRÓFONO",
+    "PARLANTE",
+    "AUDÍFONOS",
+    "AMPLIFICADOR",
+    "MEZCLADORA",
+    "CONSOLA",
+    "GRABADORA",
+    "VINILO",
+    "CASETE",
+    "ALTAVOZ",
+    "AURICULAR",
+    "CABLE"
+   ]
+  },
+  {
+   "id": "compositores-clasicos",
+   "nombre": "Compositores clásicos",
+   "palabras": [
+    "MOZART",
+    "BACH",
+    "BEETHOVEN",
+    "VIVALDI",
+    "CHOPIN",
+    "HAYDN",
+    "HANDEL",
+    "VERDI",
+    "WAGNER",
+    "DEBUSSY",
+    "BRAHMS",
+    "SCHUBERT"
+   ]
+  },
+  {
+   "id": "conciertos",
+   "nombre": "Conciertos",
+   "palabras": [
+    "ESCENARIO",
+    "PÚBLICO",
+    "BANDA",
+    "GIRA",
+    "ENTRADA",
+    "APLAUSOS",
+    "TELONERO",
+    "LUCES",
+    "SONIDO",
+    "ENSAYO",
+    "GUITARRISTA",
+    "BATERISTA"
+   ]
+  },
+  {
+   "id": "rock",
+   "nombre": "Rock",
+   "palabras": [
+    "GUITARRA",
+    "BATERÍA",
+    "BAJO",
+    "AMPLIFICADOR",
+    "RIFF",
+    "SOLO",
+    "BANDA",
+    "CONCIERTO",
+    "ROCKERO",
+    "DISTORSIÓN",
+    "BALADA",
+    "METAL"
+   ]
+  },
+  {
+   "id": "ritmos-latinos",
+   "nombre": "Ritmos latinos",
+   "palabras": [
+    "SALSA",
+    "MERENGUE",
+    "BACHATA",
+    "CUMBIA",
+    "REGUETÓN",
+    "MAMBO",
+    "CHACHACHÁ",
+    "BOLERO",
+    "TANGO",
+    "SON",
+    "RUMBA",
+    "VALLENATO"
+   ]
+  }
+ ]
+}

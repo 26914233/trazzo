@@ -1,0 +1,11 @@
+# Pasatiempos | #C026D3
+Jardinería: maceta, tierra, semilla, regar, podar, abono, flor, cactus, suculenta, trasplantar, hoja, raíz
+Pesca: caña, anzuelo, carnada, sedal, red, río, bote, pez, lombriz, carrete, flotador, paciencia
+Cocinar: receta, horno, sartén, sal, sazón, picar, freír, hervir, hornear, mezclar, batir, delantal
+Lectura: libro, novela, página, lector, separador, biblioteca, autor, capítulo, historia, cómic, revista, cuento
+Manualidades: papel, tijeras, pegante, cartón, origami, pintura, pincel, brillantina, cinta, botones, lana, collage
+Coleccionismo: sellos, monedas, cromos, álbum, postales, figuras, colección, rareza, billetes, insignias, llaveros, discos
+Tejido: lana, aguja, crochet, punto, ovillo, bufanda, gorro, patrón, hilo, telar, macramé, puntada
+Senderismo: sendero, mochila, botas, bastón, mapa, cumbre, camino, mirador, cantimplora, montaña, paisaje, naturaleza
+Origami: papel, pliegue, grulla, rana, barco, avión, flor, caja, estrella, doblar, cuadrado, figura
+Música en casa: cantar, tocar, guitarra, piano, ukelele, partitura, karaoke, ensayo, canción, ritmo, afinar, melodía

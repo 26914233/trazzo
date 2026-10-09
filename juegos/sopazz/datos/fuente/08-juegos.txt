@@ -1,0 +1,15 @@
+# Juegos | #EC4899
+Juegos de mesa: ajedrez, damas, parqués, dominó, bingo, lotería, dados, tablero, ficha, oca, backgammon, parchís
+Ajedrez: rey, reina, torre, alfil, caballo, peón, jaque, mate, enroque, tablero, apertura, gambito
+Cartas y naipes: baraja, carta, rey, reina, jota, comodín, corazón, diamante, trébol, pica, póquer, solitario
+Videojuegos: consola, control, mando, nivel, vida, jefe, puntos, misión, avatar, mapa, pantalla, partida
+Géneros de videojuegos: acción, aventura, plataformas, estrategia, carreras, deportes, rol, terror, puzzle, simulación, disparos, arcade
+Juegos de niños: escondite, rayuela, trompo, canicas, cometa, yoyo, columpio, ronda, lleva, golosa, cuerda, balero
+Juguetes: muñeca, pelota, carrito, peluche, bloques, cometa, trompo, yoyo, tren, robot, títere, patineta
+Acertijos: acertijo, adivinanza, enigma, laberinto, crucigrama, sudoku, pieza, lógica, pista, clave, solución, sopa
+Juegos de rol: dragón, mago, guerrero, elfo, enano, hechizo, mazmorra, dado, misión, gremio, poción, espada
+Juegos tradicionales: tejo, rana, trompo, coca, golosa, parqués, bolas, cometa, lleva, chucha, yermis, ponchado
+Consolas y accesorios: consola, control, joystick, auriculares, teclado, ratón, pantalla, cargador, cartucho, disco, memoria, cable
+Lenguaje gamer: nivel, jefe, vidas, puntos, combo, logro, partida, guardar, pausa, bonus, trofeo, ranking
+Deportes electrónicos: torneo, equipo, jugador, liga, clan, final, campeón, premio, entrenador, estrategia, público, transmisión
+Videojuegos clásicos: píxel, arcade, ficha, joystick, puntaje, vidas, nave, laberinto, plataforma, jefe, monedas, récord

@@ -20,7 +20,7 @@ const DIR_INVERSAS: Array[Vector2i] = [
 
 # Frecuencia aproximada de letras en español, para que el relleno no delate
 # las palabras: una cuadricula llena de K, W y X canta demasiado.
-const BOLSA_RELLENO := "AAAAAAAAAAAAEEEEEEEEEEEEOOOOOOOOOSSSSSSSSRRRRRRRNNNNNNNIIIIIIILLLLLDDDDDCCCCCTTTTTUUUUUMMMMPPPBBGGVVYYQQHHFFZJXKW"
+const BOLSA_RELLENO := "AAAAAAAAAAAAEEEEEEEEEEEEOOOOOOOOOSSSSSSSSRRRRRRRNNNNNNNIIIIIIILLLLLDDDDDCCCCCTTTTTUUUUUMMMMPPPBBGGVVYYQQHHFFZJXKWÑ"
 
 ## Una palabra ya situada en la cuadricula.
 class Colocada extends RefCounted:
@@ -66,19 +66,22 @@ class Sopa extends RefCounted:
 		return null
 
 
-## Pasa una palabra a la forma que se usa en la cuadricula:
-## mayusculas, sin tildes, Ñ -> N, sin espacios ni guiones.
+## Pasa una palabra a la forma que se usa en la cuadricula: mayusculas, sin
+## tildes, sin espacios ni signos. La Ñ se conserva: en español es una letra,
+## y convertirla en N cambia palabras (AÑO no es ANO).
+## La misma tabla vive en herramientas/construir_temas.py, que comprueba que
+## ninguna palabra de los temas trae una letra fuera de ella.
 static func normalizar(palabra: String) -> String:
 	var s := palabra.to_upper()
-	var de := "ÁÉÍÓÚÀÈÌÒÙÄËÏÖÜÂÊÎÔÛÑÇ"
-	var a := "AEIOUAEIOUAEIOUAEIOUNC"
+	var de := "ÁÉÍÓÚÀÈÌÒÙÄËÏÖÜÂÊÎÔÛÃÕÇ"
+	var a := "AEIOUAEIOUAEIOUAEIOUAOC"
 	var salida := ""
 	for i in s.length():
 		var ch := s[i]
 		var pos := de.find(ch)
 		if pos != -1:
 			ch = a[pos]
-		if ch >= "A" and ch <= "Z":
+		if (ch >= "A" and ch <= "Z") or ch == "Ñ":
 			salida += ch
 	return salida
 

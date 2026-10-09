@@ -1,0 +1,18 @@
+# Comida | #F59E0B
+Frutas: manzana, pera, uva, mango, fresa, banano, piña, sandía, melón, cereza, durazno, kiwi
+Frutas tropicales: guayaba, papaya, maracuyá, lulo, guanábana, mamoncillo, pitahaya, coco, tamarindo, curuba, granadilla, chontaduro
+Verduras: lechuga, tomate, zanahoria, cebolla, pepino, brócoli, espinaca, apio, repollo, pimentón, ajo, calabacín
+Legumbres y granos: fríjol, lenteja, garbanzo, arveja, haba, soya, maíz, arroz, trigo, avena, cebada, quinua
+Carnes: res, cerdo, pollo, cordero, pavo, conejo, chorizo, salchicha, tocino, costilla, lomo, jamón
+Pescados y mariscos: atún, salmón, trucha, mojarra, bagre, camarón, langosta, pulpo, calamar, almeja, cangrejo, ostra
+Lácteos: leche, queso, yogur, mantequilla, crema, kumis, cuajada, kéfir, suero, requesón, arequipe, helado
+Postres: torta, flan, helado, brownie, galleta, pudín, gelatina, merengue, tiramisú, natilla, cocada, obleas
+Panadería: pan, croissant, baguette, almojábana, pandebono, buñuelo, mogolla, roscón, bizcocho, rosquilla, ponqué, hojaldre
+Bebidas: agua, jugo, café, chocolate, limonada, gaseosa, malteada, aguapanela, chicha, batido, horchata, infusión
+Desayuno: huevo, arepa, pan, café, jugo, cereal, avena, tostada, panqueque, calentado, changua, mantequilla
+Especias y hierbas: pimienta, canela, comino, orégano, albahaca, laurel, tomillo, romero, clavo, cilantro, perejil, azafrán
+Comida rápida: hamburguesa, pizza, papas fritas, salchipapa, empanada, sándwich, burrito, taco, nachos, alitas, combo, gaseosa
+Dulces y golosinas: chocolate, chicle, caramelo, bombón, gomita, paleta, turrón, mazapán, cocada, arequipe, bocadillo, chupeta
+Salsas: mayonesa, mostaza, kétchup, ají, guacamole, pesto, chimichurri, barbacoa, tártara, rosada, soya, vinagreta
+Frutos secos: almendra, nuez, maní, pistacho, avellana, marañón, castaña, pasa, dátil, pecana, macadamia, piñón
+Sopas: sancocho, ajiaco, consomé, crema, caldo, mondongo, minestrone, gazpacho, ramen, pozole, cuchuco, mazamorra

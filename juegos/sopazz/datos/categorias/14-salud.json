@@ -1,0 +1,224 @@
+{
+ "id": "salud",
+ "nombre": "Salud",
+ "color": "#06B6D4",
+ "orden": 13,
+ "subtemas": [
+  {
+   "id": "hospital",
+   "nombre": "Hospital",
+   "palabras": [
+    "MÉDICO",
+    "ENFERMERA",
+    "CAMILLA",
+    "URGENCIAS",
+    "QUIRÓFANO",
+    "RECETA",
+    "PACIENTE",
+    "CONSULTA",
+    "AMBULANCIA",
+    "SALA",
+    "CIRUGÍA",
+    "VENDAJE"
+   ]
+  },
+  {
+   "id": "especialidades-medicas",
+   "nombre": "Especialidades médicas",
+   "palabras": [
+    "PEDIATRA",
+    "CARDIÓLOGO",
+    "DERMATÓLOGO",
+    "NEURÓLOGO",
+    "OFTALMÓLOGO",
+    "DENTISTA",
+    "CIRUJANO",
+    "PSICÓLOGO",
+    "GINECÓLOGO",
+    "ORTOPEDISTA",
+    "ONCÓLOGO",
+    "URÓLOGO"
+   ]
+  },
+  {
+   "id": "primeros-auxilios",
+   "nombre": "Primeros auxilios",
+   "palabras": [
+    "BOTIQUÍN",
+    "VENDA",
+    "GASA",
+    "CURITA",
+    "ALCOHOL",
+    "YODO",
+    "TERMÓMETRO",
+    "TIJERAS",
+    "GUANTES",
+    "ALGODÓN",
+    "FÉRULA",
+    "SUERO"
+   ]
+  },
+  {
+   "id": "enfermedades-comunes",
+   "nombre": "Enfermedades comunes",
+   "palabras": [
+    "GRIPE",
+    "RESFRIADO",
+    "FIEBRE",
+    "TOS",
+    "ALERGIA",
+    "ASMA",
+    "GASTRITIS",
+    "MIGRAÑA",
+    "VARICELA",
+    "DENGUE",
+    "OTITIS",
+    "ANEMIA"
+   ]
+  },
+  {
+   "id": "vitaminas-y-minerales",
+   "nombre": "Vitaminas y minerales",
+   "palabras": [
+    "VITAMINA",
+    "CALCIO",
+    "HIERRO",
+    "ZINC",
+    "MAGNESIO",
+    "POTASIO",
+    "SODIO",
+    "YODO",
+    "FÓSFORO",
+    "ÁCIDO FÓLICO",
+    "RETINOL",
+    "BIOTINA"
+   ]
+  },
+  {
+   "id": "nutricion",
+   "nombre": "Nutrición",
+   "palabras": [
+    "PROTEÍNA",
+    "CARBOHIDRATO",
+    "GRASA",
+    "FIBRA",
+    "CALORÍA",
+    "VITAMINA",
+    "MINERAL",
+    "AGUA",
+    "AZÚCAR",
+    "DIETA",
+    "PORCIÓN",
+    "NUTRIENTE"
+   ]
+  },
+  {
+   "id": "ejercicio",
+   "nombre": "Ejercicio",
+   "palabras": [
+    "CORRER",
+    "CAMINAR",
+    "NADAR",
+    "SALTAR",
+    "ESTIRAR",
+    "FLEXIÓN",
+    "SENTADILLA",
+    "ABDOMINAL",
+    "PESAS",
+    "CARDIO",
+    "YOGA",
+    "PILATES"
+   ]
+  },
+  {
+   "id": "higiene",
+   "nombre": "Higiene",
+   "palabras": [
+    "JABÓN",
+    "CHAMPÚ",
+    "CEPILLO",
+    "CREMA DENTAL",
+    "TOALLA",
+    "DUCHA",
+    "DESODORANTE",
+    "PEINE",
+    "HILO DENTAL",
+    "GEL",
+    "ESPONJA",
+    "CORTAÚÑAS"
+   ]
+  },
+  {
+   "id": "emociones",
+   "nombre": "Emociones",
+   "palabras": [
+    "ALEGRÍA",
+    "TRISTEZA",
+    "MIEDO",
+    "IRA",
+    "SORPRESA",
+    "CALMA",
+    "AMOR",
+    "ANSIEDAD",
+    "ORGULLO",
+    "TERNURA",
+    "NOSTALGIA",
+    "ESPERANZA"
+   ]
+  },
+  {
+   "id": "yoga-y-meditacion",
+   "nombre": "Yoga y meditación",
+   "palabras": [
+    "POSTURA",
+    "RESPIRACIÓN",
+    "MANTRA",
+    "LOTO",
+    "ÁRBOL",
+    "GUERRERO",
+    "COBRA",
+    "PERRO",
+    "CALMA",
+    "RELAJACIÓN",
+    "ESTERILLA",
+    "MEDITACIÓN"
+   ]
+  },
+  {
+   "id": "medicamentos",
+   "nombre": "Medicamentos",
+   "palabras": [
+    "PASTILLA",
+    "JARABE",
+    "CÁPSULA",
+    "INYECCIÓN",
+    "POMADA",
+    "GOTAS",
+    "VACUNA",
+    "ANTIBIÓTICO",
+    "ANALGÉSICO",
+    "RECETA",
+    "DOSIS",
+    "TABLETA"
+   ]
+  },
+  {
+   "id": "sueno-y-descanso",
+   "nombre": "Sueño y descanso",
+   "palabras": [
+    "SUEÑO",
+    "SIESTA",
+    "ALMOHADA",
+    "CAMA",
+    "COBIJA",
+    "PIJAMA",
+    "RONQUIDO",
+    "BOSTEZO",
+    "PESADILLA",
+    "INSOMNIO",
+    "DESPERTAR",
+    "DESCANSO"
+   ]
+  }
+ ]
+}

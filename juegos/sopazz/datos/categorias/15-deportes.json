@@ -1,0 +1,278 @@
+{
+ "id": "deportes",
+ "nombre": "Deportes",
+ "color": "#0EA5E9",
+ "orden": 14,
+ "subtemas": [
+  {
+   "id": "futbol",
+   "nombre": "Fútbol",
+   "palabras": [
+    "GOL",
+    "BALÓN",
+    "ARQUERO",
+    "DELANTERO",
+    "DEFENSA",
+    "PENALTI",
+    "CÓRNER",
+    "ÁRBITRO",
+    "TARJETA",
+    "CANCHA",
+    "ESTADIO",
+    "HINCHA"
+   ]
+  },
+  {
+   "id": "baloncesto",
+   "nombre": "Baloncesto",
+   "palabras": [
+    "CANASTA",
+    "ARO",
+    "TABLERO",
+    "TRIPLE",
+    "REBOTE",
+    "BLOQUEO",
+    "PÍVOT",
+    "BASE",
+    "ALERO",
+    "CLAVADA",
+    "TIRO",
+    "FALTA"
+   ]
+  },
+  {
+   "id": "tenis",
+   "nombre": "Tenis",
+   "palabras": [
+    "RAQUETA",
+    "RED",
+    "SAQUE",
+    "SET",
+    "JUEGO",
+    "PUNTO",
+    "REVÉS",
+    "VOLEA",
+    "DRIVE",
+    "DOBLES",
+    "VENTAJA",
+    "CANCHA"
+   ]
+  },
+  {
+   "id": "beisbol",
+   "nombre": "Béisbol",
+   "palabras": [
+    "BATE",
+    "PELOTA",
+    "GUANTE",
+    "LANZADOR",
+    "RECEPTOR",
+    "JONRÓN",
+    "BASE",
+    "PONCHE",
+    "ENTRADA",
+    "CARRERA",
+    "DIAMANTE",
+    "MONTÍCULO"
+   ]
+  },
+  {
+   "id": "ciclismo",
+   "nombre": "Ciclismo",
+   "palabras": [
+    "BICICLETA",
+    "PEDAL",
+    "CADENA",
+    "CASCO",
+    "PIÑÓN",
+    "MANILLAR",
+    "ETAPA",
+    "MONTAÑA",
+    "SPRINT",
+    "PELOTÓN",
+    "MAILLOT",
+    "RUTA"
+   ]
+  },
+  {
+   "id": "natacion",
+   "nombre": "Natación",
+   "palabras": [
+    "PISCINA",
+    "CARRIL",
+    "CROL",
+    "BRAZA",
+    "ESPALDA",
+    "MARIPOSA",
+    "GAFAS",
+    "GORRO",
+    "CLAVADO",
+    "SALTO",
+    "TRAMPOLÍN",
+    "NADO"
+   ]
+  },
+  {
+   "id": "atletismo",
+   "nombre": "Atletismo",
+   "palabras": [
+    "MARATÓN",
+    "CARRERA",
+    "SALTO",
+    "VALLAS",
+    "RELEVO",
+    "JABALINA",
+    "DISCO",
+    "MARTILLO",
+    "PÉRTIGA",
+    "PODIO",
+    "META",
+    "PISTA"
+   ]
+  },
+  {
+   "id": "artes-marciales",
+   "nombre": "Artes marciales",
+   "palabras": [
+    "KARATE",
+    "JUDO",
+    "TAEKWONDO",
+    "BOXEO",
+    "KUNGFU",
+    "AIKIDO",
+    "CAPOEIRA",
+    "JIUJITSU",
+    "CINTURÓN",
+    "DOJO",
+    "KIMONO",
+    "PATADA"
+   ]
+  },
+  {
+   "id": "deportes-de-invierno",
+   "nombre": "Deportes de invierno",
+   "palabras": [
+    "ESQUÍ",
+    "SNOWBOARD",
+    "PATINAJE",
+    "TRINEO",
+    "HOCKEY",
+    "CURLING",
+    "BIATLÓN",
+    "BOBSLEIGH",
+    "SLALOM",
+    "NIEVE",
+    "HIELO",
+    "PISTA"
+   ]
+  },
+  {
+   "id": "deportes-acuaticos",
+   "nombre": "Deportes acuáticos",
+   "palabras": [
+    "SURF",
+    "REMO",
+    "VELA",
+    "KAYAK",
+    "CANOTAJE",
+    "BUCEO",
+    "WATERPOLO",
+    "WINDSURF",
+    "PIRAGÜISMO",
+    "NATACIÓN",
+    "RAFTING",
+    "APNEA"
+   ]
+  },
+  {
+   "id": "deportes-extremos",
+   "nombre": "Deportes extremos",
+   "palabras": [
+    "ESCALADA",
+    "PARAPENTE",
+    "RAFTING",
+    "PARACAIDISMO",
+    "PUENTING",
+    "SKATE",
+    "MOTOCROSS",
+    "RAPEL",
+    "BUNGEE",
+    "ALPINISMO",
+    "SANDBOARD",
+    "TIROLESA"
+   ]
+  },
+  {
+   "id": "gimnasio",
+   "nombre": "Gimnasio",
+   "palabras": [
+    "PESAS",
+    "BARRA",
+    "MANCUERNA",
+    "BANCO",
+    "CINTA",
+    "BICICLETA",
+    "COLCHONETA",
+    "ENTRENADOR",
+    "RUTINA",
+    "SERIE",
+    "REPETICIÓN",
+    "MÚSCULO"
+   ]
+  },
+  {
+   "id": "olimpiadas",
+   "nombre": "Olimpiadas",
+   "palabras": [
+    "ANTORCHA",
+    "MEDALLA",
+    "ORO",
+    "PLATA",
+    "BRONCE",
+    "PODIO",
+    "RÉCORD",
+    "ATLETA",
+    "ANILLOS",
+    "VILLA",
+    "CEREMONIA",
+    "BANDERA"
+   ]
+  },
+  {
+   "id": "golf",
+   "nombre": "Golf",
+   "palabras": [
+    "GOLF",
+    "HOYO",
+    "PALO",
+    "GREEN",
+    "BANDERA",
+    "CADDIE",
+    "BIRDIE",
+    "PAR",
+    "SWING",
+    "BÚNKER",
+    "TEE",
+    "BOLA"
+   ]
+  },
+  {
+   "id": "voleibol",
+   "nombre": "Voleibol",
+   "palabras": [
+    "RED",
+    "SAQUE",
+    "REMATE",
+    "BLOQUEO",
+    "COLOCADOR",
+    "LÍBERO",
+    "SET",
+    "PUNTO",
+    "ROTACIÓN",
+    "ARENA",
+    "PLAYA",
+    "BALÓN"
+   ]
+  }
+ ]
+}

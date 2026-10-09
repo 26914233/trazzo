@@ -1,0 +1,278 @@
+{
+ "id": "cine-y-television",
+ "nombre": "Cine y televisión",
+ "color": "#E11D48",
+ "orden": 17,
+ "subtemas": [
+  {
+   "id": "generos-de-cine",
+   "nombre": "Géneros de cine",
+   "palabras": [
+    "ACCIÓN",
+    "COMEDIA",
+    "DRAMA",
+    "TERROR",
+    "SUSPENSO",
+    "ROMANCE",
+    "AVENTURA",
+    "MUSICAL",
+    "WESTERN",
+    "ANIMACIÓN",
+    "DOCUMENTAL",
+    "FANTASÍA"
+   ]
+  },
+  {
+   "id": "rodaje",
+   "nombre": "Rodaje",
+   "palabras": [
+    "CÁMARA",
+    "TOMA",
+    "ESCENA",
+    "PLANO",
+    "CLAQUETA",
+    "SET",
+    "GUION",
+    "DIRECTOR",
+    "ACTOR",
+    "FOCO",
+    "GRÚA",
+    "CORTE"
+   ]
+  },
+  {
+   "id": "oficios-del-cine",
+   "nombre": "Oficios del cine",
+   "palabras": [
+    "DIRECTOR",
+    "PRODUCTOR",
+    "GUIONISTA",
+    "ACTOR",
+    "ACTRIZ",
+    "EDITOR",
+    "MAQUILLADOR",
+    "SONIDISTA",
+    "CAMARÓGRAFO",
+    "DOBLE",
+    "EXTRA",
+    "VESTUARISTA"
+   ]
+  },
+  {
+   "id": "en-el-cine",
+   "nombre": "En el cine",
+   "palabras": [
+    "PANTALLA",
+    "BUTACA",
+    "BOLETO",
+    "PALOMITAS",
+    "ESTRENO",
+    "CARTELERA",
+    "TAQUILLA",
+    "PROYECTOR",
+    "FILA",
+    "SALA",
+    "GASEOSA",
+    "TRÁILER"
+   ]
+  },
+  {
+   "id": "television",
+   "nombre": "Televisión",
+   "palabras": [
+    "SERIE",
+    "CAPÍTULO",
+    "TEMPORADA",
+    "EPISODIO",
+    "CANAL",
+    "NOTICIERO",
+    "TELENOVELA",
+    "REALITY",
+    "PRESENTADOR",
+    "CONTROL",
+    "COMERCIAL",
+    "ESTRENO"
+   ]
+  },
+  {
+   "id": "animacion",
+   "nombre": "Animación",
+   "palabras": [
+    "DIBUJO",
+    "FOTOGRAMA",
+    "PERSONAJE",
+    "GUION",
+    "VOZ",
+    "DOBLAJE",
+    "CARICATURA",
+    "STOP MOTION",
+    "PÍXEL",
+    "RENDER",
+    "STORYBOARD",
+    "ANIMADOR"
+   ]
+  },
+  {
+   "id": "ciencia-ficcion",
+   "nombre": "Ciencia ficción",
+   "palabras": [
+    "ROBOT",
+    "NAVE",
+    "ALIEN",
+    "LÁSER",
+    "GALAXIA",
+    "FUTURO",
+    "CLON",
+    "ANDROIDE",
+    "PORTAL",
+    "MUTANTE",
+    "PLANETA",
+    "CÍBORG"
+   ]
+  },
+  {
+   "id": "terror",
+   "nombre": "Terror",
+   "palabras": [
+    "FANTASMA",
+    "ZOMBI",
+    "VAMPIRO",
+    "BRUJA",
+    "MONSTRUO",
+    "MOMIA",
+    "HOMBRE LOBO",
+    "DEMONIO",
+    "GRITO",
+    "SANGRE",
+    "CEMENTERIO",
+    "CALAVERA"
+   ]
+  },
+  {
+   "id": "superheroes",
+   "nombre": "Superhéroes",
+   "palabras": [
+    "HÉROE",
+    "VILLANO",
+    "CAPA",
+    "MÁSCARA",
+    "PODER",
+    "RESCATE",
+    "GUARIDA",
+    "ESCUDO",
+    "RAYO",
+    "VUELO",
+    "FUERZA",
+    "IDENTIDAD"
+   ]
+  },
+  {
+   "id": "premios-y-festivales",
+   "nombre": "Premios y festivales",
+   "palabras": [
+    "ÓSCAR",
+    "GLOBO",
+    "GOYA",
+    "EMMY",
+    "ALFOMBRA",
+    "ESTATUILLA",
+    "NOMINADO",
+    "GANADOR",
+    "GALA",
+    "DISCURSO",
+    "JURADO",
+    "CANNES"
+   ]
+  },
+  {
+   "id": "cine-clasico",
+   "nombre": "Cine clásico",
+   "palabras": [
+    "BLANCO",
+    "NEGRO",
+    "MUDO",
+    "CINE",
+    "ROLLO",
+    "PROYECTOR",
+    "DIVA",
+    "GALÁN",
+    "CHAPLIN",
+    "CARRETE",
+    "SEPIA",
+    "NOIR"
+   ]
+  },
+  {
+   "id": "efectos-especiales",
+   "nombre": "Efectos especiales",
+   "palabras": [
+    "MAQUETA",
+    "EXPLOSIÓN",
+    "CROMA",
+    "MAQUILLAJE",
+    "PRÓTESIS",
+    "DOBLE",
+    "CABLE",
+    "HUMO",
+    "LLUVIA",
+    "DIGITAL",
+    "PANTALLA",
+    "SANGRE"
+   ]
+  },
+  {
+   "id": "comic",
+   "nombre": "Cómic",
+   "palabras": [
+    "VIÑETA",
+    "GLOBO",
+    "ONOMATOPEYA",
+    "TIRA",
+    "HISTORIETA",
+    "DIBUJANTE",
+    "GUIONISTA",
+    "PORTADA",
+    "HÉROE",
+    "VILLANO",
+    "EDICIÓN",
+    "COLECCIÓN"
+   ]
+  },
+  {
+   "id": "superpoderes",
+   "nombre": "Superpoderes",
+   "palabras": [
+    "VUELO",
+    "FUERZA",
+    "VELOCIDAD",
+    "INVISIBLE",
+    "TELEPATÍA",
+    "RAYOS",
+    "ESCUDO",
+    "FUEGO",
+    "HIELO",
+    "AGILIDAD",
+    "ELÁSTICO",
+    "REGENERACIÓN"
+   ]
+  },
+  {
+   "id": "villanos",
+   "nombre": "Villanos",
+   "palabras": [
+    "VILLANO",
+    "GUARIDA",
+    "PLAN",
+    "TRAMPA",
+    "SECUAZ",
+    "LÁSER",
+    "ROBOT",
+    "MONSTRUO",
+    "VENGANZA",
+    "MALVADO",
+    "CAOS",
+    "EJÉRCITO"
+   ]
+  }
+ ]
+}

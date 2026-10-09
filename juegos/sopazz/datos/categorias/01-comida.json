@@ -1,0 +1,314 @@
+{
+ "id": "comida",
+ "nombre": "Comida",
+ "color": "#F59E0B",
+ "orden": 0,
+ "subtemas": [
+  {
+   "id": "frutas",
+   "nombre": "Frutas",
+   "palabras": [
+    "MANZANA",
+    "PERA",
+    "UVA",
+    "MANGO",
+    "FRESA",
+    "BANANO",
+    "PIÑA",
+    "SANDÍA",
+    "MELÓN",
+    "CEREZA",
+    "DURAZNO",
+    "KIWI"
+   ]
+  },
+  {
+   "id": "frutas-tropicales",
+   "nombre": "Frutas tropicales",
+   "palabras": [
+    "GUAYABA",
+    "PAPAYA",
+    "MARACUYÁ",
+    "LULO",
+    "GUANÁBANA",
+    "MAMONCILLO",
+    "PITAHAYA",
+    "COCO",
+    "TAMARINDO",
+    "CURUBA",
+    "GRANADILLA",
+    "CHONTADURO"
+   ]
+  },
+  {
+   "id": "verduras",
+   "nombre": "Verduras",
+   "palabras": [
+    "LECHUGA",
+    "TOMATE",
+    "ZANAHORIA",
+    "CEBOLLA",
+    "PEPINO",
+    "BRÓCOLI",
+    "ESPINACA",
+    "APIO",
+    "REPOLLO",
+    "PIMENTÓN",
+    "AJO",
+    "CALABACÍN"
+   ]
+  },
+  {
+   "id": "legumbres-y-granos",
+   "nombre": "Legumbres y granos",
+   "palabras": [
+    "FRÍJOL",
+    "LENTEJA",
+    "GARBANZO",
+    "ARVEJA",
+    "HABA",
+    "SOYA",
+    "MAÍZ",
+    "ARROZ",
+    "TRIGO",
+    "AVENA",
+    "CEBADA",
+    "QUINUA"
+   ]
+  },
+  {
+   "id": "carnes",
+   "nombre": "Carnes",
+   "palabras": [
+    "RES",
+    "CERDO",
+    "POLLO",
+    "CORDERO",
+    "PAVO",
+    "CONEJO",
+    "CHORIZO",
+    "SALCHICHA",
+    "TOCINO",
+    "COSTILLA",
+    "LOMO",
+    "JAMÓN"
+   ]
+  },
+  {
+   "id": "pescados-y-mariscos",
+   "nombre": "Pescados y mariscos",
+   "palabras": [
+    "ATÚN",
+    "SALMÓN",
+    "TRUCHA",
+    "MOJARRA",
+    "BAGRE",
+    "CAMARÓN",
+    "LANGOSTA",
+    "PULPO",
+    "CALAMAR",
+    "ALMEJA",
+    "CANGREJO",
+    "OSTRA"
+   ]
+  },
+  {
+   "id": "lacteos",
+   "nombre": "Lácteos",
+   "palabras": [
+    "LECHE",
+    "QUESO",
+    "YOGUR",
+    "MANTEQUILLA",
+    "CREMA",
+    "KUMIS",
+    "CUAJADA",
+    "KÉFIR",
+    "SUERO",
+    "REQUESÓN",
+    "AREQUIPE",
+    "HELADO"
+   ]
+  },
+  {
+   "id": "postres",
+   "nombre": "Postres",
+   "palabras": [
+    "TORTA",
+    "FLAN",
+    "HELADO",
+    "BROWNIE",
+    "GALLETA",
+    "PUDÍN",
+    "GELATINA",
+    "MERENGUE",
+    "TIRAMISÚ",
+    "NATILLA",
+    "COCADA",
+    "OBLEAS"
+   ]
+  },
+  {
+   "id": "panaderia",
+   "nombre": "Panadería",
+   "palabras": [
+    "PAN",
+    "CROISSANT",
+    "BAGUETTE",
+    "ALMOJÁBANA",
+    "PANDEBONO",
+    "BUÑUELO",
+    "MOGOLLA",
+    "ROSCÓN",
+    "BIZCOCHO",
+    "ROSQUILLA",
+    "PONQUÉ",
+    "HOJALDRE"
+   ]
+  },
+  {
+   "id": "bebidas",
+   "nombre": "Bebidas",
+   "palabras": [
+    "AGUA",
+    "JUGO",
+    "CAFÉ",
+    "CHOCOLATE",
+    "LIMONADA",
+    "GASEOSA",
+    "MALTEADA",
+    "AGUAPANELA",
+    "CHICHA",
+    "BATIDO",
+    "HORCHATA",
+    "INFUSIÓN"
+   ]
+  },
+  {
+   "id": "desayuno",
+   "nombre": "Desayuno",
+   "palabras": [
+    "HUEVO",
+    "AREPA",
+    "PAN",
+    "CAFÉ",
+    "JUGO",
+    "CEREAL",
+    "AVENA",
+    "TOSTADA",
+    "PANQUEQUE",
+    "CALENTADO",
+    "CHANGUA",
+    "MANTEQUILLA"
+   ]
+  },
+  {
+   "id": "especias-y-hierbas",
+   "nombre": "Especias y hierbas",
+   "palabras": [
+    "PIMIENTA",
+    "CANELA",
+    "COMINO",
+    "ORÉGANO",
+    "ALBAHACA",
+    "LAUREL",
+    "TOMILLO",
+    "ROMERO",
+    "CLAVO",
+    "CILANTRO",
+    "PEREJIL",
+    "AZAFRÁN"
+   ]
+  },
+  {
+   "id": "comida-rapida",
+   "nombre": "Comida rápida",
+   "palabras": [
+    "HAMBURGUESA",
+    "PIZZA",
+    "PAPAS FRITAS",
+    "SALCHIPAPA",
+    "EMPANADA",
+    "SÁNDWICH",
+    "BURRITO",
+    "TACO",
+    "NACHOS",
+    "ALITAS",
+    "COMBO",
+    "GASEOSA"
+   ]
+  },
+  {
+   "id": "dulces-y-golosinas",
+   "nombre": "Dulces y golosinas",
+   "palabras": [
+    "CHOCOLATE",
+    "CHICLE",
+    "CARAMELO",
+    "BOMBÓN",
+    "GOMITA",
+    "PALETA",
+    "TURRÓN",
+    "MAZAPÁN",
+    "COCADA",
+    "AREQUIPE",
+    "BOCADILLO",
+    "CHUPETA"
+   ]
+  },
+  {
+   "id": "salsas",
+   "nombre": "Salsas",
+   "palabras": [
+    "MAYONESA",
+    "MOSTAZA",
+    "KÉTCHUP",
+    "AJÍ",
+    "GUACAMOLE",
+    "PESTO",
+    "CHIMICHURRI",
+    "BARBACOA",
+    "TÁRTARA",
+    "ROSADA",
+    "SOYA",
+    "VINAGRETA"
+   ]
+  },
+  {
+   "id": "frutos-secos",
+   "nombre": "Frutos secos",
+   "palabras": [
+    "ALMENDRA",
+    "NUEZ",
+    "MANÍ",
+    "PISTACHO",
+    "AVELLANA",
+    "MARAÑÓN",
+    "CASTAÑA",
+    "PASA",
+    "DÁTIL",
+    "PECANA",
+    "MACADAMIA",
+    "PIÑÓN"
+   ]
+  },
+  {
+   "id": "sopas",
+   "nombre": "Sopas",
+   "palabras": [
+    "SANCOCHO",
+    "AJIACO",
+    "CONSOMÉ",
+    "CREMA",
+    "CALDO",
+    "MONDONGO",
+    "MINESTRONE",
+    "GAZPACHO",
+    "RAMEN",
+    "POZOLE",
+    "CUCHUCO",
+    "MAZAMORRA"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,98 @@
+{
+ "id": "insectos",
+ "nombre": "Insectos",
+ "color": "#84CC16",
+ "orden": 43,
+ "subtemas": [
+  {
+   "id": "insectos-voladores",
+   "nombre": "Insectos voladores",
+   "palabras": [
+    "ABEJA",
+    "AVISPA",
+    "MOSCA",
+    "MOSQUITO",
+    "LIBÉLULA",
+    "MARIPOSA",
+    "POLILLA",
+    "CIGARRA",
+    "LUCIÉRNAGA",
+    "ABEJORRO",
+    "TÁBANO",
+    "ZANCUDO"
+   ]
+  },
+  {
+   "id": "bichos-del-jardin",
+   "nombre": "Bichos del jardín",
+   "palabras": [
+    "HORMIGA",
+    "MARIQUITA",
+    "GRILLO",
+    "SALTAMONTES",
+    "ESCARABAJO",
+    "ORUGA",
+    "PULGÓN",
+    "CHINCHE",
+    "COCHINILLA",
+    "CARACOL",
+    "LOMBRIZ",
+    "BABOSA"
+   ]
+  },
+  {
+   "id": "mariposas",
+   "nombre": "Mariposas",
+   "palabras": [
+    "ORUGA",
+    "CAPULLO",
+    "CRISÁLIDA",
+    "ALA",
+    "ANTENA",
+    "NÉCTAR",
+    "POLEN",
+    "METAMORFOSIS",
+    "ESCAMA",
+    "COLORES",
+    "MONARCA",
+    "MORFO"
+   ]
+  },
+  {
+   "id": "hormigas",
+   "nombre": "Hormigas",
+   "palabras": [
+    "HORMIGA",
+    "HORMIGUERO",
+    "REINA",
+    "OBRERA",
+    "SOLDADO",
+    "COLONIA",
+    "TÚNEL",
+    "LARVA",
+    "HUEVO",
+    "FEROMONA",
+    "ARRIERA",
+    "COMIDA"
+   ]
+  },
+  {
+   "id": "partes-de-un-insecto",
+   "nombre": "Partes de un insecto",
+   "palabras": [
+    "CABEZA",
+    "TÓRAX",
+    "ABDOMEN",
+    "ANTENA",
+    "PATA",
+    "ALA",
+    "OJO",
+    "MANDÍBULA",
+    "AGUIJÓN",
+    "EXOESQUELETO",
+    "ÉLITRO",
+    "PROBÓSCIDE"
+   ]
+  }
+ ]
+}

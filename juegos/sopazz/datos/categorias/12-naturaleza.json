@@ -1,0 +1,260 @@
+{
+ "id": "naturaleza",
+ "nombre": "Naturaleza",
+ "color": "#16A34A",
+ "orden": 11,
+ "subtemas": [
+  {
+   "id": "arboles",
+   "nombre": "Árboles",
+   "palabras": [
+    "ROBLE",
+    "PINO",
+    "CEIBA",
+    "CEDRO",
+    "SAUCE",
+    "OLMO",
+    "ABETO",
+    "PALMERA",
+    "EUCALIPTO",
+    "CIPRÉS",
+    "NOGAL",
+    "ALMENDRO"
+   ]
+  },
+  {
+   "id": "flores",
+   "nombre": "Flores",
+   "palabras": [
+    "ROSA",
+    "TULIPÁN",
+    "GIRASOL",
+    "ORQUÍDEA",
+    "MARGARITA",
+    "CLAVEL",
+    "LIRIO",
+    "AZUCENA",
+    "HORTENSIA",
+    "VIOLETA",
+    "JAZMÍN",
+    "DALIA"
+   ]
+  },
+  {
+   "id": "paisajes",
+   "nombre": "Paisajes",
+   "palabras": [
+    "MONTAÑA",
+    "VALLE",
+    "RÍO",
+    "LAGO",
+    "PLAYA",
+    "BOSQUE",
+    "DESIERTO",
+    "CASCADA",
+    "PRADERA",
+    "COLINA",
+    "CAÑÓN",
+    "LLANURA"
+   ]
+  },
+  {
+   "id": "el-tiempo",
+   "nombre": "El tiempo",
+   "palabras": [
+    "SOL",
+    "LLUVIA",
+    "NUBE",
+    "VIENTO",
+    "NIEVE",
+    "GRANIZO",
+    "NIEBLA",
+    "TORMENTA",
+    "TRUENO",
+    "RAYO",
+    "ARCOÍRIS",
+    "ROCÍO"
+   ]
+  },
+  {
+   "id": "fenomenos-naturales",
+   "nombre": "Fenómenos naturales",
+   "palabras": [
+    "HURACÁN",
+    "TORNADO",
+    "TERREMOTO",
+    "TSUNAMI",
+    "SEQUÍA",
+    "INUNDACIÓN",
+    "AVALANCHA",
+    "ERUPCIÓN",
+    "CICLÓN",
+    "TIFÓN",
+    "DERRUMBE",
+    "AURORA"
+   ]
+  },
+  {
+   "id": "montanas-del-mundo",
+   "nombre": "Montañas del mundo",
+   "palabras": [
+    "EVEREST",
+    "ACONCAGUA",
+    "KILIMANJARO",
+    "MONT BLANC",
+    "FUJI",
+    "ELBRUS",
+    "DENALI",
+    "CHIMBORAZO",
+    "HUASCARÁN",
+    "MATTERHORN",
+    "ANNAPURNA",
+    "COTOPAXI"
+   ]
+  },
+  {
+   "id": "oceanos-y-mares",
+   "nombre": "Océanos y mares",
+   "palabras": [
+    "PACÍFICO",
+    "ATLÁNTICO",
+    "ÍNDICO",
+    "ÁRTICO",
+    "ANTÁRTICO",
+    "CARIBE",
+    "MEDITERRÁNEO",
+    "BÁLTICO",
+    "ROJO",
+    "NEGRO",
+    "MUERTO",
+    "ARÁBIGO"
+   ]
+  },
+  {
+   "id": "piedras-preciosas",
+   "nombre": "Piedras preciosas",
+   "palabras": [
+    "DIAMANTE",
+    "RUBÍ",
+    "ZAFIRO",
+    "ESMERALDA",
+    "TOPACIO",
+    "AMATISTA",
+    "ÓPALO",
+    "PERLA",
+    "JADE",
+    "ÁMBAR",
+    "TURQUESA",
+    "GRANATE"
+   ]
+  },
+  {
+   "id": "minerales-y-rocas",
+   "nombre": "Minerales y rocas",
+   "palabras": [
+    "CUARZO",
+    "GRANITO",
+    "MÁRMOL",
+    "BASALTO",
+    "PIZARRA",
+    "CALIZA",
+    "ARCILLA",
+    "YESO",
+    "SAL",
+    "CARBÓN",
+    "OBSIDIANA",
+    "PIRITA"
+   ]
+  },
+  {
+   "id": "volcanes",
+   "nombre": "Volcanes",
+   "palabras": [
+    "VOLCÁN",
+    "CRÁTER",
+    "LAVA",
+    "MAGMA",
+    "CENIZA",
+    "ERUPCIÓN",
+    "FUMAROLA",
+    "GÉISER",
+    "CALDERA",
+    "ETNA",
+    "VESUBIO",
+    "GALERAS"
+   ]
+  },
+  {
+   "id": "plantas-medicinales",
+   "nombre": "Plantas medicinales",
+   "palabras": [
+    "MANZANILLA",
+    "MENTA",
+    "SÁBILA",
+    "CALÉNDULA",
+    "EUCALIPTO",
+    "JENGIBRE",
+    "VALERIANA",
+    "RUDA",
+    "TORONJIL",
+    "CIDRÓN",
+    "ROMERO",
+    "ÁRNICA"
+   ]
+  },
+  {
+   "id": "selva-y-bosque",
+   "nombre": "Selva y bosque",
+   "palabras": [
+    "LIANA",
+    "MUSGO",
+    "HELECHO",
+    "HOJARASCA",
+    "DOSEL",
+    "RAÍZ",
+    "TRONCO",
+    "RAMA",
+    "HONGO",
+    "ORQUÍDEA",
+    "BROMELIA",
+    "SENDERO"
+   ]
+  },
+  {
+   "id": "medio-ambiente",
+   "nombre": "Medio ambiente",
+   "palabras": [
+    "RECICLAJE",
+    "REUTILIZAR",
+    "REDUCIR",
+    "COMPOST",
+    "RESIDUO",
+    "EMISIÓN",
+    "OZONO",
+    "ECOLOGÍA",
+    "SOSTENIBLE",
+    "PLANETA",
+    "BOSQUE",
+    "AGUA"
+   ]
+  },
+  {
+   "id": "el-agua",
+   "nombre": "El agua",
+   "palabras": [
+    "RÍO",
+    "LAGO",
+    "MAR",
+    "LLUVIA",
+    "NIEVE",
+    "HIELO",
+    "VAPOR",
+    "NUBE",
+    "GOTA",
+    "MANANTIAL",
+    "GLACIAR",
+    "ACUÍFERO"
+   ]
+  }
+ ]
+}

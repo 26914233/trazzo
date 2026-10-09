@@ -1,0 +1,224 @@
+{
+ "id": "viajes",
+ "nombre": "Viajes",
+ "color": "#0891B2",
+ "orden": 29,
+ "subtemas": [
+  {
+   "id": "equipaje",
+   "nombre": "Equipaje",
+   "palabras": [
+    "MALETA",
+    "MOCHILA",
+    "PASAPORTE",
+    "BOLETO",
+    "CÁMARA",
+    "CARGADOR",
+    "TOALLA",
+    "BLOQUEADOR",
+    "GAFAS",
+    "MAPA",
+    "CANDADO",
+    "ETIQUETA"
+   ]
+  },
+  {
+   "id": "hotel",
+   "nombre": "Hotel",
+   "palabras": [
+    "HOTEL",
+    "HABITACIÓN",
+    "RECEPCIÓN",
+    "LLAVE",
+    "CAMA",
+    "PISCINA",
+    "DESAYUNO",
+    "RESERVA",
+    "HUÉSPED",
+    "BOTONES",
+    "SERVICIO",
+    "MALETERO"
+   ]
+  },
+  {
+   "id": "playa",
+   "nombre": "Playa",
+   "palabras": [
+    "ARENA",
+    "OLA",
+    "MAR",
+    "SOL",
+    "SOMBRILLA",
+    "TOALLA",
+    "CONCHA",
+    "CASTILLO",
+    "GAVIOTA",
+    "PALMERA",
+    "BRONCEADOR",
+    "ARRECIFE"
+   ]
+  },
+  {
+   "id": "camping",
+   "nombre": "Camping",
+   "palabras": [
+    "CARPA",
+    "FOGATA",
+    "LINTERNA",
+    "SACO",
+    "BRÚJULA",
+    "MOCHILA",
+    "LEÑA",
+    "CANTIMPLORA",
+    "SENDERO",
+    "MAPA",
+    "NAVAJA",
+    "MONTAÑA"
+   ]
+  },
+  {
+   "id": "maravillas-del-mundo",
+   "nombre": "Maravillas del mundo",
+   "palabras": [
+    "PETRA",
+    "CHICHÉN ITZÁ",
+    "COLISEO",
+    "TAJ MAHAL",
+    "CRISTO",
+    "MACHU PICCHU",
+    "GRAN MURALLA",
+    "PIRÁMIDES",
+    "STONEHENGE",
+    "ACRÓPOLIS",
+    "ALHAMBRA",
+    "ANGKOR"
+   ]
+  },
+  {
+   "id": "monumentos",
+   "nombre": "Monumentos",
+   "palabras": [
+    "EIFFEL",
+    "ESTATUA",
+    "BIG BEN",
+    "PARTENÓN",
+    "KREMLIN",
+    "OBELISCO",
+    "LOUVRE",
+    "PISA",
+    "SAGRADA",
+    "ARCO",
+    "ÓPERA",
+    "CAPITOLIO"
+   ]
+  },
+  {
+   "id": "ciudades-del-mundo",
+   "nombre": "Ciudades del mundo",
+   "palabras": [
+    "PARÍS",
+    "LONDRES",
+    "ROMA",
+    "TOKIO",
+    "NUEVA YORK",
+    "MADRID",
+    "DUBÁI",
+    "SÍDNEY",
+    "MOSCÚ",
+    "BERLÍN",
+    "CARTAGENA",
+    "CANCÚN"
+   ]
+  },
+  {
+   "id": "aeropuerto",
+   "nombre": "Aeropuerto",
+   "palabras": [
+    "REGISTRO",
+    "PUERTA",
+    "EMBARQUE",
+    "ADUANA",
+    "MIGRACIÓN",
+    "EQUIPAJE",
+    "PASAPORTE",
+    "SALA",
+    "VUELO",
+    "RETRASO",
+    "ESCALA",
+    "CINTA"
+   ]
+  },
+  {
+   "id": "crucero",
+   "nombre": "Crucero",
+   "palabras": [
+    "BARCO",
+    "CAMAROTE",
+    "CUBIERTA",
+    "CAPITÁN",
+    "PUERTO",
+    "ISLA",
+    "PISCINA",
+    "ANCLA",
+    "BUFÉ",
+    "MARINERO",
+    "OCÉANO",
+    "EXCURSIÓN"
+   ]
+  },
+  {
+   "id": "mochilero",
+   "nombre": "Mochilero",
+   "palabras": [
+    "MOCHILA",
+    "ALBERGUE",
+    "HOSTAL",
+    "AVENTURA",
+    "MAPA",
+    "RUTA",
+    "AUTOSTOP",
+    "VIAJERO",
+    "FRONTERA",
+    "TREN",
+    "BUS",
+    "CAMINATA"
+   ]
+  },
+  {
+   "id": "turismo-en-colombia",
+   "nombre": "Turismo en Colombia",
+   "palabras": [
+    "CARTAGENA",
+    "GUATAPÉ",
+    "VILLA DE LEYVA",
+    "SALENTO",
+    "TAYRONA",
+    "LETICIA",
+    "SAN ANDRÉS",
+    "BARICHARA",
+    "MOMPOX",
+    "TATACOA",
+    "POPAYÁN",
+    "MINCA"
+   ]
+  },
+  {
+   "id": "documentos-de-viaje",
+   "nombre": "Documentos de viaje",
+   "palabras": [
+    "PASAPORTE",
+    "VISA",
+    "CÉDULA",
+    "BOLETO",
+    "RESERVA",
+    "SEGURO",
+    "PERMISO",
+    "VACUNA",
+    "CERTIFICADO",
+    "ITINERARIO",
+    "TARJETA",
+    "SELLO"
+   ]
+  }
+ ]
+}

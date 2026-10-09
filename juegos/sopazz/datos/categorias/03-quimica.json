@@ -1,0 +1,260 @@
+{
+ "id": "quimica",
+ "nombre": "Química",
+ "color": "#8B5CF6",
+ "orden": 2,
+ "subtemas": [
+  {
+   "id": "laboratorio",
+   "nombre": "Laboratorio",
+   "palabras": [
+    "PROBETA",
+    "MATRAZ",
+    "PIPETA",
+    "EMBUDO",
+    "MECHERO",
+    "BALANZA",
+    "TUBO",
+    "GRADILLA",
+    "BURETA",
+    "MORTERO",
+    "CRISOL",
+    "PINZA"
+   ]
+  },
+  {
+   "id": "metales-alcalinos",
+   "nombre": "Metales alcalinos",
+   "palabras": [
+    "LITIO",
+    "SODIO",
+    "POTASIO",
+    "RUBIDIO",
+    "CESIO",
+    "FRANCIO",
+    "BERILIO",
+    "MAGNESIO",
+    "CALCIO",
+    "ESTRONCIO",
+    "BARIO",
+    "RADIO"
+   ]
+  },
+  {
+   "id": "gases-nobles-y-halogenos",
+   "nombre": "Gases nobles y halógenos",
+   "palabras": [
+    "HELIO",
+    "NEÓN",
+    "ARGÓN",
+    "KRIPTÓN",
+    "XENÓN",
+    "RADÓN",
+    "FLÚOR",
+    "CLORO",
+    "BROMO",
+    "YODO",
+    "ASTATO",
+    "OGANESÓN"
+   ]
+  },
+  {
+   "id": "metales-de-transicion",
+   "nombre": "Metales de transición",
+   "palabras": [
+    "HIERRO",
+    "COBRE",
+    "ZINC",
+    "NÍQUEL",
+    "COBALTO",
+    "CROMO",
+    "TITANIO",
+    "PLATA",
+    "ORO",
+    "PLATINO",
+    "MERCURIO",
+    "MANGANESO"
+   ]
+  },
+  {
+   "id": "no-metales-y-metaloides",
+   "nombre": "No metales y metaloides",
+   "palabras": [
+    "HIDRÓGENO",
+    "CARBONO",
+    "NITRÓGENO",
+    "OXÍGENO",
+    "FÓSFORO",
+    "AZUFRE",
+    "SELENIO",
+    "BORO",
+    "SILICIO",
+    "ARSÉNICO",
+    "TELURIO",
+    "GERMANIO"
+   ]
+  },
+  {
+   "id": "conceptos-quimicos",
+   "nombre": "Conceptos químicos",
+   "palabras": [
+    "ÁTOMO",
+    "MOLÉCULA",
+    "ION",
+    "ENLACE",
+    "VALENCIA",
+    "ISÓTOPO",
+    "ELECTRÓN",
+    "PROTÓN",
+    "NEUTRÓN",
+    "NÚCLEO",
+    "ORBITAL",
+    "COMPUESTO"
+   ]
+  },
+  {
+   "id": "reacciones",
+   "nombre": "Reacciones",
+   "palabras": [
+    "REACCIÓN",
+    "REACTIVO",
+    "PRODUCTO",
+    "CATALIZADOR",
+    "OXIDACIÓN",
+    "REDUCCIÓN",
+    "COMBUSTIÓN",
+    "ÁCIDO",
+    "BASE",
+    "SAL",
+    "NEUTRALIZAR",
+    "ENZIMA"
+   ]
+  },
+  {
+   "id": "estados-de-la-materia",
+   "nombre": "Estados de la materia",
+   "palabras": [
+    "SÓLIDO",
+    "LÍQUIDO",
+    "GAS",
+    "PLASMA",
+    "FUSIÓN",
+    "EBULLICIÓN",
+    "EVAPORAR",
+    "CONDENSAR",
+    "SUBLIMAR",
+    "CONGELAR",
+    "VAPOR",
+    "PRESIÓN"
+   ]
+  },
+  {
+   "id": "quimica-organica",
+   "nombre": "Química orgánica",
+   "palabras": [
+    "CARBONO",
+    "METANO",
+    "ETANOL",
+    "BENCENO",
+    "POLÍMERO",
+    "ALCOHOL",
+    "ÁCIDO",
+    "ÉSTER",
+    "ÉTER",
+    "GLUCOSA",
+    "PROTEÍNA",
+    "LÍPIDO"
+   ]
+  },
+  {
+   "id": "quimica-en-casa",
+   "nombre": "Química en casa",
+   "palabras": [
+    "JABÓN",
+    "VINAGRE",
+    "BICARBONATO",
+    "CLORO",
+    "DETERGENTE",
+    "SAL",
+    "AZÚCAR",
+    "ALCOHOL",
+    "AMONÍACO",
+    "LIMÓN",
+    "LEVADURA",
+    "ACEITE"
+   ]
+  },
+  {
+   "id": "tabla-periodica",
+   "nombre": "Tabla periódica",
+   "palabras": [
+    "PERIODO",
+    "GRUPO",
+    "ELEMENTO",
+    "SÍMBOLO",
+    "MASA",
+    "NÚMERO",
+    "METAL",
+    "METALOIDE",
+    "LANTÁNIDO",
+    "ACTÍNIDO",
+    "FAMILIA",
+    "COLUMNA"
+   ]
+  },
+  {
+   "id": "quimicos-famosos",
+   "nombre": "Químicos famosos",
+   "palabras": [
+    "CURIE",
+    "LAVOISIER",
+    "MENDELÉIEV",
+    "DALTON",
+    "BOYLE",
+    "AVOGADRO",
+    "NOBEL",
+    "PAULING",
+    "BOHR",
+    "RUTHERFORD",
+    "FARADAY",
+    "PASTEUR"
+   ]
+  },
+  {
+   "id": "soluciones-y-mezclas",
+   "nombre": "Soluciones y mezclas",
+   "palabras": [
+    "SOLUCIÓN",
+    "SOLUTO",
+    "SOLVENTE",
+    "MEZCLA",
+    "DISOLVER",
+    "DILUIR",
+    "SATURADA",
+    "FILTRAR",
+    "DECANTAR",
+    "DESTILAR",
+    "EMULSIÓN",
+    "COLOIDE"
+   ]
+  },
+  {
+   "id": "elementos-raros",
+   "nombre": "Elementos raros",
+   "palabras": [
+    "URANIO",
+    "PLUTONIO",
+    "TORIO",
+    "POLONIO",
+    "NEODIMIO",
+    "ITRIO",
+    "CERIO",
+    "LANTANO",
+    "EUROPIO",
+    "GADOLINIO",
+    "TUNGSTENO",
+    "IRIDIO"
+   ]
+  }
+ ]
+}

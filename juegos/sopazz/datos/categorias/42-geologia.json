@@ -1,0 +1,152 @@
+{
+ "id": "geologia",
+ "nombre": "Geología",
+ "color": "#A16207",
+ "orden": 41,
+ "subtemas": [
+  {
+   "id": "rocas-igneas",
+   "nombre": "Rocas ígneas",
+   "palabras": [
+    "GRANITO",
+    "BASALTO",
+    "OBSIDIANA",
+    "PUMITA",
+    "ANDESITA",
+    "DIORITA",
+    "GABRO",
+    "RIOLITA",
+    "TOBA",
+    "PERIDOTITA",
+    "PEGMATITA",
+    "DACITA"
+   ]
+  },
+  {
+   "id": "rocas-sedimentarias",
+   "nombre": "Rocas sedimentarias",
+   "palabras": [
+    "ARENISCA",
+    "CALIZA",
+    "LUTITA",
+    "CONGLOMERADO",
+    "CARBÓN",
+    "YESO",
+    "SAL",
+    "DOLOMITA",
+    "TRAVERTINO",
+    "CRETA",
+    "MARGA",
+    "BRECHA"
+   ]
+  },
+  {
+   "id": "capas-de-la-tierra",
+   "nombre": "Capas de la Tierra",
+   "palabras": [
+    "CORTEZA",
+    "MANTO",
+    "NÚCLEO",
+    "LITOSFERA",
+    "ASTENOSFERA",
+    "MESOSFERA",
+    "MAGMA",
+    "PLACA",
+    "FALLA",
+    "SISMO",
+    "TECTÓNICA",
+    "CONTINENTE"
+   ]
+  },
+  {
+   "id": "terremotos",
+   "nombre": "Terremotos",
+   "palabras": [
+    "SISMO",
+    "TEMBLOR",
+    "EPICENTRO",
+    "HIPOCENTRO",
+    "FALLA",
+    "ONDA",
+    "ESCALA",
+    "RICHTER",
+    "RÉPLICA",
+    "TSUNAMI",
+    "SISMÓGRAFO",
+    "MAGNITUD"
+   ]
+  },
+  {
+   "id": "fosiles",
+   "nombre": "Fósiles",
+   "palabras": [
+    "FÓSIL",
+    "ÁMBAR",
+    "HUELLA",
+    "MOLDE",
+    "HUESO",
+    "CONCHA",
+    "TRILOBITE",
+    "AMONITE",
+    "EXCAVAR",
+    "PALEONTÓLOGO",
+    "ESTRATO",
+    "DINOSAURIO"
+   ]
+  },
+  {
+   "id": "cuevas",
+   "nombre": "Cuevas",
+   "palabras": [
+    "CUEVA",
+    "CAVERNA",
+    "ESTALACTITA",
+    "ESTALAGMITA",
+    "GRUTA",
+    "MURCIÉLAGO",
+    "OSCURIDAD",
+    "ECO",
+    "GALERÍA",
+    "SIMA",
+    "ESPELEÓLOGO",
+    "LINTERNA"
+   ]
+  },
+  {
+   "id": "mineria",
+   "nombre": "Minería",
+   "palabras": [
+    "MINA",
+    "MINERO",
+    "PICO",
+    "CASCO",
+    "TÚNEL",
+    "CARBÓN",
+    "ORO",
+    "ESMERALDA",
+    "SOCAVÓN",
+    "MINERAL",
+    "VETA",
+    "DINAMITA"
+   ]
+  },
+  {
+   "id": "el-suelo",
+   "nombre": "El suelo",
+   "palabras": [
+    "TIERRA",
+    "HUMUS",
+    "ARCILLA",
+    "ARENA",
+    "LIMO",
+    "GRAVA",
+    "ROCA",
+    "RAÍZ",
+    "LOMBRIZ",
+    "EROSIÓN",
+    "FÉRTIL",
+    "CAPA"
+   ]
+  }
+ ]
+}

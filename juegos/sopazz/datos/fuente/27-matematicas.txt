@@ -1,0 +1,13 @@
+# Matemáticas | #4F46E5
+Números: uno, dos, tres, cuatro, cinco, seis, siete, ocho, nueve, diez, cien, mil
+Números ordinales: primero, segundo, tercero, cuarto, quinto, sexto, séptimo, octavo, noveno, décimo, último, centésimo
+Operaciones: suma, resta, división, producto, cociente, factor, potencia, raíz, resultado, cálculo, total, multiplicar
+Figuras planas: círculo, triángulo, cuadrado, rectángulo, rombo, trapecio, pentágono, hexágono, óvalo, polígono, octágono, elipse
+Cuerpos geométricos: cubo, esfera, cilindro, cono, pirámide, prisma, tetraedro, octaedro, dodecaedro, icosaedro, toroide, ortoedro
+Geometría: ángulo, recta, punto, vértice, lado, arista, cara, radio, diámetro, perímetro, área, volumen
+Álgebra: variable, ecuación, incógnita, término, coeficiente, exponente, polinomio, función, gráfica, despejar, signo, igualdad
+Medidas: metro, centímetro, kilómetro, litro, gramo, kilo, libra, pulgada, milla, onza, galón, hectárea
+Estadística: promedio, media, moda, mediana, gráfico, muestra, encuesta, dato, porcentaje, frecuencia, tabla, rango
+Fracciones y decimales: fracción, numerador, denominador, decimal, entero, mitad, tercio, cuarto, coma, porcentaje, razón, proporción
+Matemáticos famosos: Pitágoras, Euclides, Arquímedes, Fibonacci, Gauss, Euler, Descartes, Newton, Leibniz, Hipatia, Turing, Fermat
+El tiempo y el reloj: segundo, minuto, hora, día, semana, mes, año, década, siglo, milenio, reloj, calendario

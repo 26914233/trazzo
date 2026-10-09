@@ -1,0 +1,242 @@
+{
+ "id": "fisica",
+ "nombre": "Física",
+ "color": "#6366F1",
+ "orden": 3,
+ "subtemas": [
+  {
+   "id": "mecanica",
+   "nombre": "Mecánica",
+   "palabras": [
+    "FUERZA",
+    "MASA",
+    "VELOCIDAD",
+    "ACELERACIÓN",
+    "INERCIA",
+    "PESO",
+    "FRICCIÓN",
+    "IMPULSO",
+    "PALANCA",
+    "POLEA",
+    "TRABAJO",
+    "POTENCIA"
+   ]
+  },
+  {
+   "id": "energia",
+   "nombre": "Energía",
+   "palabras": [
+    "CINÉTICA",
+    "POTENCIAL",
+    "TÉRMICA",
+    "ELÉCTRICA",
+    "NUCLEAR",
+    "QUÍMICA",
+    "SOLAR",
+    "EÓLICA",
+    "MECÁNICA",
+    "JOULE",
+    "CALORÍA",
+    "VATIO"
+   ]
+  },
+  {
+   "id": "ondas-y-sonido",
+   "nombre": "Ondas y sonido",
+   "palabras": [
+    "ONDA",
+    "FRECUENCIA",
+    "AMPLITUD",
+    "ECO",
+    "SONIDO",
+    "DECIBEL",
+    "VIBRACIÓN",
+    "TONO",
+    "RESONANCIA",
+    "LONGITUD",
+    "PERIODO",
+    "HERCIO"
+   ]
+  },
+  {
+   "id": "optica",
+   "nombre": "Óptica",
+   "palabras": [
+    "LUZ",
+    "LENTE",
+    "ESPEJO",
+    "PRISMA",
+    "REFLEXIÓN",
+    "REFRACCIÓN",
+    "LÁSER",
+    "FOTÓN",
+    "COLOR",
+    "RAYO",
+    "SOMBRA",
+    "LUPA"
+   ]
+  },
+  {
+   "id": "calor-y-temperatura",
+   "nombre": "Calor y temperatura",
+   "palabras": [
+    "CALOR",
+    "TEMPERATURA",
+    "GRADO",
+    "TERMÓMETRO",
+    "KELVIN",
+    "CELSIUS",
+    "CALORÍA",
+    "DILATACIÓN",
+    "CONDUCCIÓN",
+    "CONVECCIÓN",
+    "RADIACIÓN",
+    "ENTROPÍA"
+   ]
+  },
+  {
+   "id": "unidades-de-medida",
+   "nombre": "Unidades de medida",
+   "palabras": [
+    "METRO",
+    "KILOGRAMO",
+    "SEGUNDO",
+    "AMPERIO",
+    "KELVIN",
+    "MOL",
+    "CANDELA",
+    "NEWTON",
+    "JULIO",
+    "PASCAL",
+    "VOLTIO",
+    "OHMIO"
+   ]
+  },
+  {
+   "id": "fisica-moderna",
+   "nombre": "Física moderna",
+   "palabras": [
+    "CUÁNTICA",
+    "RELATIVIDAD",
+    "QUARK",
+    "FOTÓN",
+    "ÁTOMO",
+    "PARTÍCULA",
+    "NEUTRINO",
+    "BOSÓN",
+    "FISIÓN",
+    "FUSIÓN",
+    "PLASMA",
+    "ANTIMATERIA"
+   ]
+  },
+  {
+   "id": "fisicos-famosos",
+   "nombre": "Físicos famosos",
+   "palabras": [
+    "NEWTON",
+    "EINSTEIN",
+    "GALILEO",
+    "TESLA",
+    "PLANCK",
+    "CURIE",
+    "BOHR",
+    "HAWKING",
+    "MAXWELL",
+    "FARADAY",
+    "FEYNMAN",
+    "KEPLER"
+   ]
+  },
+  {
+   "id": "movimiento",
+   "nombre": "Movimiento",
+   "palabras": [
+    "TRAYECTORIA",
+    "DISTANCIA",
+    "RAPIDEZ",
+    "CAÍDA",
+    "ÓRBITA",
+    "PÉNDULO",
+    "ROTACIÓN",
+    "GIRO",
+    "SALTO",
+    "REBOTE",
+    "INERCIA",
+    "MOMENTO"
+   ]
+  },
+  {
+   "id": "gravedad",
+   "nombre": "Gravedad",
+   "palabras": [
+    "GRAVEDAD",
+    "PESO",
+    "MASA",
+    "ATRACCIÓN",
+    "ÓRBITA",
+    "SATÉLITE",
+    "CAÍDA",
+    "NEWTON",
+    "MANZANA",
+    "PLANETA",
+    "MAREA",
+    "INGRAVIDEZ"
+   ]
+  },
+  {
+   "id": "fluidos",
+   "nombre": "Fluidos",
+   "palabras": [
+    "PRESIÓN",
+    "DENSIDAD",
+    "FLOTAR",
+    "EMPUJE",
+    "CAUDAL",
+    "VISCOSIDAD",
+    "LÍQUIDO",
+    "GAS",
+    "BURBUJA",
+    "HIDRÁULICA",
+    "ARQUÍMEDES",
+    "PASCAL"
+   ]
+  },
+  {
+   "id": "magnetismo",
+   "nombre": "Magnetismo",
+   "palabras": [
+    "IMÁN",
+    "POLO",
+    "NORTE",
+    "SUR",
+    "BRÚJULA",
+    "CAMPO",
+    "ATRACCIÓN",
+    "REPULSIÓN",
+    "HIERRO",
+    "BOBINA",
+    "INDUCCIÓN",
+    "MAGNETITA"
+   ]
+  },
+  {
+   "id": "instrumentos-de-medicion",
+   "nombre": "Instrumentos de medición",
+   "palabras": [
+    "REGLA",
+    "BALANZA",
+    "CRONÓMETRO",
+    "TERMÓMETRO",
+    "VOLTÍMETRO",
+    "DINAMÓMETRO",
+    "BARÓMETRO",
+    "CALIBRADOR",
+    "MANÓMETRO",
+    "PROBETA",
+    "METRO",
+    "RELOJ"
+   ]
+  }
+ ]
+}

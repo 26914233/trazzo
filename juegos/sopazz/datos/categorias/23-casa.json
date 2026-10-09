@@ -1,0 +1,224 @@
+{
+ "id": "casa",
+ "nombre": "Casa",
+ "color": "#D97706",
+ "orden": 22,
+ "subtemas": [
+  {
+   "id": "utensilios-de-cocina",
+   "nombre": "Utensilios de cocina",
+   "palabras": [
+    "OLLA",
+    "SARTÉN",
+    "CUCHARA",
+    "TENEDOR",
+    "CUCHILLO",
+    "PLATO",
+    "VASO",
+    "TAZA",
+    "COLADOR",
+    "RALLADOR",
+    "CUCHARÓN",
+    "LICUADORA"
+   ]
+  },
+  {
+   "id": "bano",
+   "nombre": "Baño",
+   "palabras": [
+    "DUCHA",
+    "INODORO",
+    "LAVAMANOS",
+    "ESPEJO",
+    "TOALLA",
+    "JABÓN",
+    "CEPILLO",
+    "BAÑERA",
+    "GRIFO",
+    "CORTINA",
+    "TAPETE",
+    "CHAMPÚ"
+   ]
+  },
+  {
+   "id": "dormitorio",
+   "nombre": "Dormitorio",
+   "palabras": [
+    "CAMA",
+    "ALMOHADA",
+    "SÁBANA",
+    "COBIJA",
+    "COLCHÓN",
+    "ARMARIO",
+    "MESITA",
+    "LÁMPARA",
+    "CORTINA",
+    "CAJÓN",
+    "PIJAMA",
+    "DESPERTADOR"
+   ]
+  },
+  {
+   "id": "sala",
+   "nombre": "Sala",
+   "palabras": [
+    "SOFÁ",
+    "SILLÓN",
+    "TELEVISOR",
+    "MESA",
+    "COJÍN",
+    "TAPETE",
+    "CUADRO",
+    "LÁMPARA",
+    "ESTANTE",
+    "FLORERO",
+    "CHIMENEA",
+    "CORTINA"
+   ]
+  },
+  {
+   "id": "muebles",
+   "nombre": "Muebles",
+   "palabras": [
+    "SILLA",
+    "MESA",
+    "SOFÁ",
+    "CAMA",
+    "ARMARIO",
+    "ESTANTE",
+    "ESCRITORIO",
+    "CÓMODA",
+    "BANCO",
+    "REPISA",
+    "VITRINA",
+    "PERCHERO"
+   ]
+  },
+  {
+   "id": "herramientas",
+   "nombre": "Herramientas",
+   "palabras": [
+    "MARTILLO",
+    "SERRUCHO",
+    "ALICATE",
+    "LLAVE",
+    "TALADRO",
+    "CLAVO",
+    "TORNILLO",
+    "NIVEL",
+    "METRO",
+    "LIJA",
+    "BROCHA",
+    "TUERCA"
+   ]
+  },
+  {
+   "id": "jardin",
+   "nombre": "Jardín",
+   "palabras": [
+    "PALA",
+    "RASTRILLO",
+    "MANGUERA",
+    "MACETA",
+    "SEMILLA",
+    "ABONO",
+    "CÉSPED",
+    "REGADERA",
+    "TIJERAS",
+    "CARRETILLA",
+    "FLOR",
+    "CERCA"
+   ]
+  },
+  {
+   "id": "limpieza",
+   "nombre": "Limpieza",
+   "palabras": [
+    "ESCOBA",
+    "TRAPERO",
+    "RECOGEDOR",
+    "BALDE",
+    "DETERGENTE",
+    "JABÓN",
+    "ESPONJA",
+    "CLORO",
+    "PLUMERO",
+    "ASPIRADORA",
+    "TRAPO",
+    "GUANTES"
+   ]
+  },
+  {
+   "id": "partes-de-la-casa",
+   "nombre": "Partes de la casa",
+   "palabras": [
+    "PUERTA",
+    "VENTANA",
+    "TECHO",
+    "PARED",
+    "PISO",
+    "ESCALERA",
+    "BALCÓN",
+    "GARAJE",
+    "PATIO",
+    "SÓTANO",
+    "ÁTICO",
+    "CHIMENEA"
+   ]
+  },
+  {
+   "id": "lavanderia",
+   "nombre": "Lavandería",
+   "palabras": [
+    "LAVADORA",
+    "SECADORA",
+    "PLANCHA",
+    "GANCHO",
+    "TENDEDERO",
+    "ROPA",
+    "DETERGENTE",
+    "SUAVIZANTE",
+    "CANASTA",
+    "PINZA",
+    "MANCHA",
+    "CLORO"
+   ]
+  },
+  {
+   "id": "decoracion",
+   "nombre": "Decoración",
+   "palabras": [
+    "CUADRO",
+    "FLORERO",
+    "VELA",
+    "COJÍN",
+    "ESPEJO",
+    "ALFOMBRA",
+    "CORTINA",
+    "PLANTA",
+    "LÁMPARA",
+    "MARCO",
+    "ADORNO",
+    "RELOJ"
+   ]
+  },
+  {
+   "id": "electrodomesticos-de-cocina",
+   "nombre": "Electrodomésticos de cocina",
+   "palabras": [
+    "NEVERA",
+    "ESTUFA",
+    "HORNO",
+    "MICROONDAS",
+    "LICUADORA",
+    "TOSTADORA",
+    "CAFETERA",
+    "BATIDORA",
+    "EXTRACTOR",
+    "LAVAPLATOS",
+    "FREIDORA",
+    "ARROCERA"
+   ]
+  }
+ ]
+}
