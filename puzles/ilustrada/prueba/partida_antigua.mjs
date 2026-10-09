@@ -6,7 +6,10 @@
 // (con la B, que es la que ofrece «Seguir»), sin jugar ni internet: tarda poco y no necesita WebGL.
 import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
 
-const navegador = await chromium.launch({ headless: true, executablePath: '/opt/pw-browsers/chromium' });
+// (con WebGL: sin la escena 3D, la portada ya no ofrece «Seguir», que es lo que se quiere en un móvil sin 3D)
+const navegador = await chromium.launch({ headless: true, executablePath: '/opt/pw-browsers/chromium',
+  args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+const cache = new Map();
 // CAJA_VIVA_URL prueba otra copia de la página (por ejemplo, la web del APK: apk/LEEME.md); con SIN_RED=1, cualquier
 // petición fuera de localhost falla
 const BASE = process.env.CAJA_VIVA_URL || 'http://localhost:8765/';
@@ -22,7 +25,17 @@ function comprobar(nombre, condicion, detalle = '') {
 // abre la portada con esta partida guardada (o sin ninguna) y devuelve lo que dice «Seguir» y la partida leída
 async function portada(guardada, despues) {
   const contexto = await navegador.newContext({ viewport: { width: 844, height: 390 }, isMobile: true, hasTouch: true });
-  await contexto.route(url => !url.href.startsWith('http://localhost'), ruta => ruta.abort());
+  // Three.js viene de jsDelivr (se baja con el fetch de Node); con SIN_RED=1, nada sale de localhost
+  if (SIN_RED) await contexto.route(url => !url.href.startsWith('http://localhost'), ruta => ruta.abort());
+  else {
+    await contexto.route('https://cdn.jsdelivr.net/**', async ruta => {
+      const url = ruta.request().url();
+      if (!cache.has(url)) { const r = await fetch(url); cache.set(url, { s: r.status, b: Buffer.from(await r.arrayBuffer()), t: r.headers.get('content-type') }); }
+      const c = cache.get(url);
+      await ruta.fulfill({ status: c.s, body: c.b, headers: { 'content-type': c.t || 'text/javascript', 'access-control-allow-origin': '*' } });
+    });
+    await contexto.route('https://fonts.*/**', ruta => ruta.abort());
+  }
   if (guardada) await contexto.addInitScript(g => { try { localStorage.setItem('caja_viva_partida', g); } catch (e) {} }, JSON.stringify(guardada));
   const pagina = await contexto.newPage();
   const errores = [];
