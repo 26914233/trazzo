@@ -13,5 +13,5 @@ Razas de perros: labrador, beagle, bulldog, caniche, pastor, chihuahua, dálmata
 Razas de gatos: persa, siamés, angora, bengalí, esfinge, maine coon, ragdoll, birmano, siberiano, abisinio, azul ruso, carey
 Crías de animales: cachorro, gatito, potro, ternero, cordero, pollito, renacuajo, lechón, cabrito, osezno, lobezno, cervatillo
 Dinosaurios: tiranosaurio, raptor, triceratops, estegosaurio, diplodocus, pterodáctilo, iguanodonte, espinosaurio, alosaurio, apatosaurio, mosasaurio, fósil
-Arácnidos y bichos: araña, tarántula, escorpión, garrapata, ácaro, ciempiés, milpiés, lombriz, caracol, babosa, cochinilla, viuda negra
+Arañas y compañía: araña, tarántula, escorpión, garrapata, ácaro, ciempiés, milpiés, lombriz, caracol, babosa, cochinilla, viuda negra
 Animales de Australia: canguro, koala, ornitorrinco, wombat, dingo, emú, cacatúa, equidna, demonio, ualabí, casuario, cocodrilo

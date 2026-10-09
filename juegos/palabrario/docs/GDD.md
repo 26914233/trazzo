@@ -12,8 +12,8 @@ un dedo: arrastras sobre las letras y, si forman una palabra de la lista, queda 
 Sin derrota y sin presión: el reloj y las pistas solo deciden las estrellas.
 
 **Por qué de pago:** el público de este género está cansado de juegos llenos de anuncios.
-Palabrario se vende como lo contrario: pagas una vez y tienes todo, sin anuncios, sin
-compras dentro y sin límites. Ver `MONETIZACION.md`.
+Palabrario se vende como lo contrario: pagas una vez y tienes todo el contenido, sin
+anuncios. Lo único opcional son paquetes de pistas. Ver `MONETIZACION.md`.
 
 ## 2. Bucle principal
 
@@ -55,8 +55,9 @@ para todo el mundo. Las 2.180 combinaciones sopa/dificultad están probadas.
 - **Soltar** valida. Correcta: se marca con el color del tema y se tacha en la lista.
   Incorrecta: pequeña sacudida.
 - Las palabras cuentan en los dos sentidos.
-- **Pista**: marca dónde empieza una palabra que falta. Sin límite; cada pista resta
-  una estrella.
+- **Pista**: marca dónde empieza una palabra que falta y resta una estrella. 3 gratis
+  cada día; después, paquetes opcionales (ver `MONETIZACION.md`). La tienda se abre
+  dentro de la partida, sin perder la sopa.
 
 ## 6. Progresión
 

@@ -1,7 +1,7 @@
 # Viajes | #0891B2
 Equipaje: maleta, mochila, pasaporte, boleto, cámara, cargador, toalla, bloqueador, gafas, mapa, candado, etiqueta
 Hotel: hotel, habitación, recepción, llave, cama, piscina, desayuno, reserva, huésped, botones, servicio, maletero
-Playa: arena, ola, mar, sol, sombrilla, toalla, concha, castillo, gaviota, palmera, bronceador, arrecife
+Playa: arena, ola, mar, sol, sombrilla, toalla, caracola, castillo, gaviota, palmera, bronceador, arrecife
 Camping: carpa, fogata, linterna, saco, brújula, mochila, leña, cantimplora, sendero, mapa, navaja, montaña
 Maravillas del mundo: Petra, Chichén Itzá, Coliseo, Taj Mahal, Cristo, Machu Picchu, Gran Muralla, pirámides, Stonehenge, Acrópolis, Alhambra, Angkor
 Monumentos: Eiffel, estatua, Big Ben, Partenón, Kremlin, obelisco, Louvre, Pisa, Sagrada, arco, ópera, Capitolio

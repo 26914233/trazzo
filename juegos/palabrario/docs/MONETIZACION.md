@@ -1,16 +1,30 @@
 # Modelo de negocio — Palabrario
 
-**App de pago: 4,99 US$ en Google Play.** Todo incluido desde la primera partida:
-545 sopas, cuatro dificultades, pistas sin límite, tres diseños.
-**Sin anuncios, sin compras dentro de la app, sin suscripción.**
+**App de pago: 4,99 US$ en Google Play.** Todo el contenido incluido desde la primera
+partida: 545 sopas, cuatro dificultades, tres diseños. **Sin anuncios y sin suscripción.**
 
-Decisión del dueño (octubre 2026). La misma fórmula se usará en Pintazz.
+**Única compra dentro: paquetes de pistas (opcionales).** Cada día se regalan 3 pistas;
+quien quiera más compra un paquete:
+
+| Producto (ID en Play Console) | Tipo | Pistas | Precio |
+|---|---|---|---|
+| `pistas_10` | consumible | 10 | 0,99 US$ |
+| `pistas_30` | consumible | 30 | 1,99 US$ |
+| `pistas_100` | consumible | 100 | 4,99 US$ |
+
+Las pistas compradas no caducan y se gastan después de las 3 gratis del día. Nada del
+contenido depende de ellas: se puede terminar el juego sin comprar ninguna.
+
+Decisiones del dueño (octubre 2026): app de pago; pistas monetizadas con paquetes y sin
+anuncios. La misma fórmula de base se usará en Pintazz.
 
 ## Por qué funciona (y qué hay que tener en cuenta)
 
 - **A favor:** es el argumento de venta. "Sin anuncios" es lo que más se pide en las
-  reseñas de este género. El juego es más simple: no hay SDK de anuncios ni de pagos,
-  no pide permisos de red y el formulario de datos de Play queda en "no recoge datos".
+  reseñas de este género. No hay SDK de anuncios ni analítica: el formulario de datos de
+  Play queda en "no recoge datos".
+- **Pistas:** un ingreso extra de los jugadores más enganchados, sin tocar la promesa
+  "todo el contenido incluido". La ficha debe decir que hay compras opcionales.
 - **En contra:** en Play casi todo lo casual es gratis y una app de pago se descarga
   mucho menos. La ficha (capturas, descripción y primeras reseñas) tiene que convencer
   sin que nadie pueda probar antes.
@@ -31,8 +45,9 @@ Decisión del dueño (octubre 2026). La misma fórmula se usará en Pintazz.
 | Anuncios premiados e intersticiales (AdMob) | Eliminados |
 | Fichas, paquetes y temas de pago | Eliminados |
 | Versión gratis con 3 sopas por tema | Todo abierto |
-| 3 pistas al día | Pistas ilimitadas (cuestan estrellas) |
-| Plugins de AdMob y Play Billing | No hacen falta |
+| 3 pistas al día + anuncio premiado | 3 pistas al día + paquetes de pistas |
+| Plugin de AdMob | No hace falta |
+| Plugin de Play Billing | Sí, solo para las pistas |
 
 El código de anuncios y compras sigue en el historial de git
 (hasta el commit `e0ed81a`; se quitó en `a98b1df`) por si algún día se quiere un modelo gratis.

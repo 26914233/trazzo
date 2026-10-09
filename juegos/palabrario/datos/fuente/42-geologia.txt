@@ -3,7 +3,7 @@ Rocas ígneas: granito, basalto, obsidiana, pumita, andesita, diorita, gabro, ri
 Rocas sedimentarias: arenisca, caliza, lutita, conglomerado, carbón, yeso, sal, dolomita, travertino, creta, marga, brecha
 Capas de la Tierra: corteza, manto, núcleo, litosfera, astenosfera, mesosfera, magma, placa, falla, sismo, tectónica, continente
 Terremotos: sismo, temblor, epicentro, hipocentro, falla, onda, escala, Richter, réplica, tsunami, sismógrafo, magnitud
-Fósiles: fósil, ámbar, huella, molde, hueso, concha, trilobite, amonite, excavar, paleontólogo, estrato, dinosaurio
+Fósiles: fósil, ámbar, huella, molde, hueso, molusco, trilobite, amonite, excavar, paleontólogo, estrato, dinosaurio
 Cuevas: cueva, caverna, estalactita, estalagmita, gruta, murciélago, oscuridad, eco, galería, sima, espeleólogo, linterna
-Minería: mina, minero, pico, casco, túnel, carbón, oro, esmeralda, socavón, mineral, veta, dinamita
+Minería: mina, minero, piqueta, casco, túnel, carbón, oro, esmeralda, socavón, mineral, veta, dinamita
 El suelo: tierra, humus, arcilla, arena, limo, grava, roca, raíz, lombriz, erosión, fértil, capa

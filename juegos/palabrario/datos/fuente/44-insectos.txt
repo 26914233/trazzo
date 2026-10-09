@@ -1,6 +1,6 @@
 # Insectos | #84CC16
 Insectos voladores: abeja, avispa, mosca, mosquito, libélula, mariposa, polilla, cigarra, luciérnaga, abejorro, tábano, zancudo
-Bichos del jardín: hormiga, mariquita, grillo, saltamontes, escarabajo, oruga, pulgón, chinche, cochinilla, caracol, lombriz, babosa
+Animalitos del jardín: hormiga, mariquita, grillo, saltamontes, escarabajo, oruga, pulgón, chinche, cochinilla, caracol, lombriz, babosa
 Mariposas: oruga, capullo, crisálida, ala, antena, néctar, polen, metamorfosis, escama, colores, monarca, morfo
 Hormigas: hormiga, hormiguero, reina, obrera, soldado, colonia, túnel, larva, huevo, feromona, arriera, comida
 Partes de un insecto: cabeza, tórax, abdomen, antena, pata, ala, ojo, mandíbula, aguijón, exoesqueleto, élitro, probóscide
