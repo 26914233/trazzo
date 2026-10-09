@@ -1,9 +1,10 @@
-# Tareas: Sopazz (sopa de letras, Godot 4 → Android)
+# Tareas: Palabrario (antes Sopazz; sopa de letras, Godot 4 → Android)
 
-> Estado 2026-10-09: 126/126 comprobaciones headless en verde; APK de prueba exportado
-> y verificado. T13 y T12 verificados con stub y Billing falso; AdMob/UMP reales
-> pendientes de prueba en dispositivo. APK y AAB de release exportados y firmados. Auditoría hecha; SEC-001
-> queda parcialmente abierto (decisión del dueño). Ver `juegos/sopazz/docs/LANZAMIENTO.md`.
+> Estado 2026-10-09 (actualizado): el modelo cambió a **app de pago sin anuncios ni
+> compras** y el contenido a **545 sopas en 44 temas**. Las tareas T9–T13 (anuncios,
+> pistas de pago, intersticial, tienda, consentimiento) se hicieron y luego se
+> **retiraron** por decisión del dueño. Vigente: `tasks/plan.md` y
+> `juegos/palabrario/docs/LANZAMIENTO.md`.
 
 Plan completo en `tasks/plan.md`. Marcar solo lo verificado de verdad.
 
@@ -101,7 +102,7 @@ Plan completo en `tasks/plan.md`. Marcar solo lo verificado de verdad.
 - [x] **T17: Auditoría anti-trampa y de economía** — M
   - Criterios: guardado, monedas y pistas revisados con `security-audit-juegos`;
     hallazgos con rastro en el código, los no resueltos como `needs_validation`.
-  - Verificación: resumen y estado en `juegos/sopazz/docs/LANZAMIENTO.md` §5.
+  - Verificación: resumen y estado en `juegos/palabrario/docs/LANZAMIENTO.md` §5.
 - [x] **T18: Checklist de lanzamiento** — S
   - Criterios: `launch-checklist` repasado, con lo que falta marcado como pendiente real.
   - Verificación: `docs/LANZAMIENTO.md`.

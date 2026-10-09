@@ -4,25 +4,32 @@ Orden acordado: uno completo primero y después los demás sobre el mismo molde.
 
 | # | Juego | Estado | Esfuerzo estimado* |
 |---|---|---|---|
-| 1 | **Sopazz** — sopa de letras | Jugable, monetizado, APK exportado. Falta lo de `sopazz/docs/LANZAMIENTO.md` | — |
-| 2 | **Pintazz** — dibujo libre, colorear y mandalas | Diseño abajo | Medio |
+| 1 | **Palabrario** — sopa de letras (antes "Palabrario") | 545 sopas, app de pago, APK y AAB exportados. Falta lo de `palabrario/docs/LANZAMIENTO.md` | — |
+| 2 | **Pintazz** (nombre de trabajo) — dibujo libre, colorear y mandalas | Diseño abajo | Medio |
 | 3 | **Rebotazz** — plataforma, bola y bloques | Diseño abajo | Bajo-medio |
 | 4 | **Zona Zero** — supervivencia zombi 2D | Diseño abajo, alcance recortado | Alto |
 
 \* Relativo entre ellos, no en horas: depende de cuánto arte nuevo haga falta.
 
-## Lo que se reutiliza de Sopazz (el molde)
+## Modelo de negocio común
+
+Decisión del dueño: **apps de pago de 4,99 US$, todo incluido, sin anuncios ni compras
+dentro** (Palabrario y Pintazz). Ver `palabrario/docs/MONETIZACION.md`. El código de
+anuncios y compras que se escribió y probó para Palabrario está en el historial de git
+(hasta el commit `e0ed81a`) si algún juego necesitara un modelo gratis.
+
+## Lo que se reutiliza de Palabrario (el molde)
 
 Se copia y se adapta, sin convertirlo en un framework hasta que haya un segundo
 juego que lo use de verdad:
 
 - `autoload/progreso.gd` — guardado firmado con HMAC y escritura atómica.
-- `autoload/monetizacion.gd` + `scripts/proveedores/` — AdMob y Play Billing con stub,
-  timeout, entrega solo tras confirmación de Play, IDs de prueba en depuración.
-- `scripts/reglas_anuncios.gd` — reglas del intersticial (cambiar los números por juego).
-- `scripts/estilo.gd` — botones, diálogos, avisos, zona segura; cambiar la paleta.
-- `tests/pruebas.tscn` (patrón), `tests/capturas.tscn`, `tests/falso_billing.gd`.
-- `export_presets.cfg`, `.gitignore`, `docs/INTEGRACION_ANDROID.md`, `PLAY_DATA_SAFETY.md`.
+- `scripts/estilo.gd` — diseños intercambiables (Cielo, Papel, Noche), botones,
+  tarjetas, diálogos, avisos y zona segura.
+- `tests/pruebas.tscn` (patrón, con contraste y carga de pantallas), `tests/capturas.tscn`.
+- `herramientas/construir_temas.py` — patrón de contenido en texto validado → JSON.
+- `export_presets.cfg` (sin permisos de red), `.gitignore`, `docs/PUBLICAR.md`,
+  `PLAY_DATA_SAFETY.md` ("no recoge datos").
 
 ---
 
@@ -33,7 +40,7 @@ rellenan con un toque), *Mandalas* (simetría radial: lo que trazas se repite en
 sectores) y *Lienzo libre* (pinceles, goma, deshacer).
 
 **Por qué funciona en Play:** "colorear para adultos" y "mandalas" son búsquedas con
-mucho volumen y público que paga por contenido. Sesiones largas = muchos premiados.
+mucho volumen y público que paga por contenido sin interrupciones.
 
 **Núcleo técnico:**
 - Relleno por zonas: cada dibujo es una imagen de líneas + un mapa de regiones
@@ -42,14 +49,14 @@ mucho volumen y público que paga por contenido. Sesiones largas = muchos premia
 - Deshacer con historial de trazos, no de imágenes (memoria).
 - Guardar y compartir la obra como PNG (Android share intent).
 
-**Monetización:** dibujos gratis cada día + paquetes temáticos de pago; paletas y
-pinceles premium; premiado para desbloquear un dibujo del día; "quitar anuncios".
-Intersticial solo al terminar o salir de una obra, nunca mientras se pinta.
+**Monetización:** app de pago de 4,99 US$ con todos los dibujos, mandalas, paletas y
+pinceles incluidos; sin anuncios ni compras (mismo modelo que Palabrario).
 
 **Riesgo principal:** el contenido. Cada dibujo es arte. Hace falta un flujo para
 producir láminas (vectoriales propias o generadas y retocadas) con licencia clara.
-**Ojo con Familias:** colorear atrae a niños; si se apunta a menores de 13 cambian las
-reglas de anuncios (ver `sopazz/docs/FICHA_PLAY.md`).
+**Ojo con Familias:** colorear atrae a niños. Sin anuncios ni datos es mucho más fácil
+cumplir la política de Familias de Play, pero hay que revisarla si se apunta a menores.
+**Nombre:** "Pintazz" es de trabajo; buscarle uno a la altura de Palabrario.
 
 ---
 
@@ -68,7 +75,7 @@ con bloques que bajan.
 - Ángulo de salida según dónde golpea la bola en la plataforma: es lo que da control.
 - Niveles en JSON (rejilla de caracteres), editor mínimo para hacerlos rápido.
 
-**Monetización:** vidas extra con premiado al perder (*continuar*), power-ups de
+**Monetización (por decidir; el dueño solo fijó el pago único para Palabrario y Pintazz):** vidas extra con premiado al perder (*continuar*), power-ups de
 inicio con fichas, paquetes de niveles, quitar anuncios. Aquí sí hay derrota: el
 intersticial va tras 2–3 partidas y el "continuar con anuncio" es el premiado estrella.
 
@@ -94,7 +101,7 @@ desbloquea entre partidas son personajes y ventajas.
 3. Inventario por peso, necesidades (hambre, sed, sueño, heridas) y crafteo corto.
 4. Ciclo día/noche y oleadas; generación de mapas por plantillas de manzanas.
 
-**Monetización:** premium-lite: personajes y modos con fichas, premiado para revivir
+**Monetización (por decidir):** premium-lite: personajes y modos con fichas, premiado para revivir
 una vez por partida, sin pay-to-win. Considerar también versión de pago única.
 
 **Riesgo principal:** alcance y rendimiento en móviles baratos. Empezar con un
@@ -105,7 +112,7 @@ y escribir su GDD con `design-system` y `map-systems` antes de producir.
 
 ## Siguiente paso recomendado
 
-1. Cerrar Sopazz: instalar plugins, probar en un móvil y subir a prueba interna
-   (`sopazz/docs/LANZAMIENTO.md`).
-2. Con datos reales de retención de Sopazz, elegir el segundo: **Rebotazz** es el más
-   barato de producir; **Pintazz** el de más potencial comercial pero necesita arte.
+1. Cerrar Palabrario: revisión humana de las palabras, prueba en un móvil y subida a
+   prueba interna (`palabrario/docs/LANZAMIENTO.md`).
+2. Siguiente: **Pintazz**, con el mismo modelo de pago. Es el de más potencial comercial,
+   pero necesita arte (láminas para colorear y mandalas).
