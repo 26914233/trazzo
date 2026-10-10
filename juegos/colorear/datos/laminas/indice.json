@@ -8,811 +8,811 @@
    "laminas": [
     {
      "id": "animales_i001",
-     "zonas": 167
+     "zonas": 580
     },
     {
      "id": "animales_i002",
-     "zonas": 104
+     "zonas": 419
     },
     {
      "id": "animales_i003",
-     "zonas": 160
+     "zonas": 528
     },
     {
      "id": "animales_i004",
-     "zonas": 137
+     "zonas": 498
     },
     {
      "id": "animales_i005",
-     "zonas": 225
+     "zonas": 661
     },
     {
      "id": "animales_i006",
-     "zonas": 188
+     "zonas": 585
     },
     {
      "id": "animales_i007",
-     "zonas": 121
+     "zonas": 550
     },
     {
      "id": "animales_i008",
-     "zonas": 154
+     "zonas": 597
     },
     {
      "id": "animales_i009",
-     "zonas": 110
+     "zonas": 419
     },
     {
      "id": "animales_i010",
-     "zonas": 150
+     "zonas": 454
     },
     {
      "id": "animales_i011",
-     "zonas": 81
+     "zonas": 353
     },
     {
      "id": "animales_i012",
-     "zonas": 274
+     "zonas": 774
     },
     {
      "id": "animales_i013",
-     "zonas": 85
+     "zonas": 338
     },
     {
      "id": "animales_i014",
-     "zonas": 134
+     "zonas": 519
     },
     {
      "id": "animales_i015",
-     "zonas": 119
+     "zonas": 500
     },
     {
      "id": "animales_i016",
-     "zonas": 404
+     "zonas": 880
     },
     {
      "id": "animales_i017",
-     "zonas": 135
+     "zonas": 503
     },
     {
      "id": "animales_i018",
-     "zonas": 136
+     "zonas": 461
     },
     {
      "id": "animales_i019",
-     "zonas": 270
+     "zonas": 580
     },
     {
      "id": "animales_i020",
-     "zonas": 229
+     "zonas": 624
     },
     {
      "id": "animales_i021",
-     "zonas": 179
+     "zonas": 621
     },
     {
      "id": "animales_i022",
-     "zonas": 100
+     "zonas": 316
     },
     {
      "id": "animales_i023",
-     "zonas": 154
+     "zonas": 617
     },
     {
      "id": "animales_i024",
-     "zonas": 91
+     "zonas": 464
     },
     {
      "id": "animales_i025",
-     "zonas": 189
+     "zonas": 465
     },
     {
      "id": "animales_i026",
-     "zonas": 164
+     "zonas": 379
     },
     {
      "id": "animales_i027",
-     "zonas": 155
+     "zonas": 534
     },
     {
      "id": "animales_i028",
-     "zonas": 182
+     "zonas": 541
     },
     {
      "id": "animales_i029",
-     "zonas": 122
+     "zonas": 414
     },
     {
      "id": "animales_i030",
-     "zonas": 117
+     "zonas": 390
     },
     {
      "id": "animales_i031",
-     "zonas": 99
-    },
-    {
-     "id": "animales_i032",
-     "zonas": 122
-    },
-    {
-     "id": "animales_i033",
-     "zonas": 136
-    },
-    {
-     "id": "animales_i034",
-     "zonas": 147
-    },
-    {
-     "id": "animales_i035",
-     "zonas": 280
-    },
-    {
-     "id": "animales_i036",
-     "zonas": 124
-    },
-    {
-     "id": "animales_i037",
-     "zonas": 132
-    },
-    {
-     "id": "animales_i038",
-     "zonas": 180
-    },
-    {
-     "id": "animales_i039",
-     "zonas": 186
-    },
-    {
-     "id": "animales_i040",
-     "zonas": 239
-    },
-    {
-     "id": "animales_i041",
-     "zonas": 119
-    },
-    {
-     "id": "animales_i042",
-     "zonas": 133
-    },
-    {
-     "id": "animales_i043",
-     "zonas": 137
-    },
-    {
-     "id": "animales_i044",
-     "zonas": 133
-    },
-    {
-     "id": "animales_i045",
-     "zonas": 327
-    },
-    {
-     "id": "animales_i046",
-     "zonas": 214
-    },
-    {
-     "id": "animales_i047",
-     "zonas": 188
-    },
-    {
-     "id": "animales_i048",
-     "zonas": 174
-    },
-    {
-     "id": "animales_i049",
-     "zonas": 158
-    },
-    {
-     "id": "animales_i050",
-     "zonas": 192
-    },
-    {
-     "id": "animales_i051",
-     "zonas": 201
-    },
-    {
-     "id": "animales_i052",
-     "zonas": 84
-    },
-    {
-     "id": "animales_i053",
-     "zonas": 103
-    },
-    {
-     "id": "animales_i054",
-     "zonas": 111
-    },
-    {
-     "id": "animales_i055",
-     "zonas": 86
-    },
-    {
-     "id": "animales_i056",
-     "zonas": 145
-    },
-    {
-     "id": "animales_i057",
-     "zonas": 116
-    },
-    {
-     "id": "animales_i058",
-     "zonas": 161
-    },
-    {
-     "id": "animales_i059",
-     "zonas": 111
-    },
-    {
-     "id": "animales_i060",
-     "zonas": 167
-    },
-    {
-     "id": "animales_i061",
-     "zonas": 184
-    },
-    {
-     "id": "animales_i062",
-     "zonas": 81
-    },
-    {
-     "id": "animales_i063",
-     "zonas": 191
-    },
-    {
-     "id": "animales_i064",
-     "zonas": 367
-    },
-    {
-     "id": "animales_i065",
-     "zonas": 201
-    },
-    {
-     "id": "animales_i066",
-     "zonas": 230
-    },
-    {
-     "id": "animales_i067",
-     "zonas": 93
-    },
-    {
-     "id": "animales_i068",
-     "zonas": 201
-    },
-    {
-     "id": "animales_i069",
-     "zonas": 142
-    },
-    {
-     "id": "animales_i070",
-     "zonas": 83
-    },
-    {
-     "id": "animales_i071",
-     "zonas": 134
-    },
-    {
-     "id": "animales_i072",
-     "zonas": 175
-    },
-    {
-     "id": "animales_i073",
-     "zonas": 108
-    },
-    {
-     "id": "animales_i074",
-     "zonas": 305
-    },
-    {
-     "id": "animales_i075",
-     "zonas": 400
-    },
-    {
-     "id": "animales_i076",
-     "zonas": 224
-    },
-    {
-     "id": "animales_i077",
-     "zonas": 106
-    },
-    {
-     "id": "animales_i078",
-     "zonas": 357
-    },
-    {
-     "id": "animales_i079",
-     "zonas": 197
-    },
-    {
-     "id": "animales_i080",
-     "zonas": 96
-    },
-    {
-     "id": "animales_i081",
-     "zonas": 108
-    },
-    {
-     "id": "animales_i082",
-     "zonas": 184
-    },
-    {
-     "id": "animales_i083",
-     "zonas": 136
-    },
-    {
-     "id": "animales_i084",
-     "zonas": 614
-    },
-    {
-     "id": "animales_i085",
-     "zonas": 203
-    },
-    {
-     "id": "animales_i086",
-     "zonas": 150
-    },
-    {
-     "id": "animales_i087",
-     "zonas": 110
-    },
-    {
-     "id": "animales_i088",
-     "zonas": 394
-    },
-    {
-     "id": "animales_i089",
-     "zonas": 101
-    },
-    {
-     "id": "animales_i090",
-     "zonas": 98
-    },
-    {
-     "id": "animales_i091",
-     "zonas": 87
-    },
-    {
-     "id": "animales_i092",
-     "zonas": 146
-    },
-    {
-     "id": "animales_i093",
-     "zonas": 224
-    },
-    {
-     "id": "animales_i094",
-     "zonas": 162
-    },
-    {
-     "id": "animales_i095",
-     "zonas": 295
-    },
-    {
-     "id": "animales_i096",
-     "zonas": 123
-    },
-    {
-     "id": "animales_i097",
-     "zonas": 189
-    },
-    {
-     "id": "animales_i098",
-     "zonas": 347
-    },
-    {
-     "id": "animales_i099",
-     "zonas": 432
-    },
-    {
-     "id": "animales_i100",
-     "zonas": 331
-    },
-    {
-     "id": "animales_i101",
-     "zonas": 192
-    },
-    {
-     "id": "animales_i102",
-     "zonas": 207
-    },
-    {
-     "id": "animales_i103",
-     "zonas": 146
-    },
-    {
-     "id": "animales_i104",
-     "zonas": 127
-    },
-    {
-     "id": "animales_i105",
-     "zonas": 81
-    },
-    {
-     "id": "animales_i106",
-     "zonas": 185
-    },
-    {
-     "id": "animales_i107",
-     "zonas": 143
-    },
-    {
-     "id": "animales_i108",
-     "zonas": 315
-    },
-    {
-     "id": "animales_i109",
-     "zonas": 154
-    },
-    {
-     "id": "animales_i110",
-     "zonas": 97
-    },
-    {
-     "id": "animales_i111",
-     "zonas": 224
-    },
-    {
-     "id": "animales_i112",
-     "zonas": 99
-    },
-    {
-     "id": "animales_i113",
-     "zonas": 180
-    },
-    {
-     "id": "animales_i114",
-     "zonas": 126
-    },
-    {
-     "id": "animales_i115",
-     "zonas": 543
-    },
-    {
-     "id": "animales_i116",
-     "zonas": 416
-    },
-    {
-     "id": "animales_i117",
-     "zonas": 82
-    },
-    {
-     "id": "animales_i118",
-     "zonas": 273
-    },
-    {
-     "id": "animales_i119",
-     "zonas": 142
-    },
-    {
-     "id": "animales_i120",
-     "zonas": 80
-    },
-    {
-     "id": "animales_i121",
-     "zonas": 101
-    },
-    {
-     "id": "animales_i122",
-     "zonas": 103
-    },
-    {
-     "id": "animales_i123",
-     "zonas": 206
-    },
-    {
-     "id": "animales_i124",
-     "zonas": 216
-    },
-    {
-     "id": "animales_i125",
-     "zonas": 124
-    },
-    {
-     "id": "animales_i126",
-     "zonas": 160
-    },
-    {
-     "id": "animales_i127",
-     "zonas": 80
-    },
-    {
-     "id": "animales_i128",
-     "zonas": 111
-    },
-    {
-     "id": "animales_i129",
-     "zonas": 492
-    },
-    {
-     "id": "animales_i130",
-     "zonas": 100
-    },
-    {
-     "id": "animales_i131",
-     "zonas": 181
-    },
-    {
-     "id": "animales_i132",
-     "zonas": 106
-    },
-    {
-     "id": "animales_i133",
-     "zonas": 196
-    },
-    {
-     "id": "animales_i134",
-     "zonas": 174
-    },
-    {
-     "id": "animales_i135",
-     "zonas": 447
-    },
-    {
-     "id": "animales_i136",
-     "zonas": 110
-    },
-    {
-     "id": "animales_i137",
-     "zonas": 129
-    },
-    {
-     "id": "animales_i138",
-     "zonas": 101
-    },
-    {
-     "id": "animales_i139",
-     "zonas": 282
-    },
-    {
-     "id": "animales_i140",
-     "zonas": 141
-    },
-    {
-     "id": "animales_i141",
-     "zonas": 101
-    },
-    {
-     "id": "animales_i142",
-     "zonas": 155
-    },
-    {
-     "id": "animales_i143",
-     "zonas": 80
-    },
-    {
-     "id": "animales_i144",
-     "zonas": 86
-    },
-    {
-     "id": "animales_i145",
-     "zonas": 340
-    },
-    {
-     "id": "animales_i146",
-     "zonas": 93
-    },
-    {
-     "id": "animales_i147",
-     "zonas": 180
-    },
-    {
-     "id": "animales_i148",
-     "zonas": 171
-    },
-    {
-     "id": "animales_i149",
-     "zonas": 208
-    },
-    {
-     "id": "animales_i150",
-     "zonas": 378
-    },
-    {
-     "id": "animales_i151",
-     "zonas": 140
-    },
-    {
-     "id": "animales_i152",
-     "zonas": 259
-    },
-    {
-     "id": "animales_i153",
-     "zonas": 438
-    },
-    {
-     "id": "animales_i154",
-     "zonas": 304
-    },
-    {
-     "id": "animales_i155",
-     "zonas": 159
-    },
-    {
-     "id": "animales_i156",
-     "zonas": 175
-    },
-    {
-     "id": "animales_i157",
-     "zonas": 239
-    },
-    {
-     "id": "animales_i158",
-     "zonas": 250
-    },
-    {
-     "id": "animales_i159",
-     "zonas": 321
-    },
-    {
-     "id": "animales_i160",
-     "zonas": 393
-    },
-    {
-     "id": "animales_i161",
-     "zonas": 143
-    },
-    {
-     "id": "animales_i162",
-     "zonas": 378
-    },
-    {
-     "id": "animales_i163",
-     "zonas": 327
-    },
-    {
-     "id": "animales_i164",
-     "zonas": 250
-    },
-    {
-     "id": "animales_i165",
-     "zonas": 352
-    },
-    {
-     "id": "animales_i166",
-     "zonas": 194
-    },
-    {
-     "id": "animales_i167",
-     "zonas": 105
-    },
-    {
-     "id": "animales_i168",
-     "zonas": 462
-    },
-    {
-     "id": "animales_i169",
-     "zonas": 488
-    },
-    {
-     "id": "animales_i170",
-     "zonas": 148
-    },
-    {
-     "id": "animales_i171",
-     "zonas": 158
-    },
-    {
-     "id": "animales_i172",
-     "zonas": 202
-    },
-    {
-     "id": "animales_i173",
-     "zonas": 377
-    },
-    {
-     "id": "animales_i174",
-     "zonas": 337
-    },
-    {
-     "id": "animales_i175",
-     "zonas": 306
-    },
-    {
-     "id": "animales_i176",
-     "zonas": 234
-    },
-    {
-     "id": "animales_i177",
-     "zonas": 340
-    },
-    {
-     "id": "animales_i178",
-     "zonas": 364
-    },
-    {
-     "id": "animales_i179",
-     "zonas": 116
-    },
-    {
-     "id": "animales_i180",
-     "zonas": 85
-    },
-    {
-     "id": "animales_i181",
-     "zonas": 400
-    },
-    {
-     "id": "animales_i182",
-     "zonas": 433
-    },
-    {
-     "id": "animales_i183",
      "zonas": 389
     },
     {
+     "id": "animales_i032",
+     "zonas": 370
+    },
+    {
+     "id": "animales_i033",
+     "zonas": 460
+    },
+    {
+     "id": "animales_i034",
+     "zonas": 478
+    },
+    {
+     "id": "animales_i035",
+     "zonas": 762
+    },
+    {
+     "id": "animales_i036",
+     "zonas": 404
+    },
+    {
+     "id": "animales_i037",
+     "zonas": 524
+    },
+    {
+     "id": "animales_i038",
+     "zonas": 741
+    },
+    {
+     "id": "animales_i039",
+     "zonas": 631
+    },
+    {
+     "id": "animales_i040",
+     "zonas": 678
+    },
+    {
+     "id": "animales_i041",
+     "zonas": 444
+    },
+    {
+     "id": "animales_i042",
+     "zonas": 550
+    },
+    {
+     "id": "animales_i043",
+     "zonas": 374
+    },
+    {
+     "id": "animales_i044",
+     "zonas": 450
+    },
+    {
+     "id": "animales_i045",
+     "zonas": 785
+    },
+    {
+     "id": "animales_i046",
+     "zonas": 584
+    },
+    {
+     "id": "animales_i047",
+     "zonas": 456
+    },
+    {
+     "id": "animales_i048",
+     "zonas": 685
+    },
+    {
+     "id": "animales_i049",
+     "zonas": 523
+    },
+    {
+     "id": "animales_i050",
+     "zonas": 521
+    },
+    {
+     "id": "animales_i051",
+     "zonas": 461
+    },
+    {
+     "id": "animales_i052",
+     "zonas": 340
+    },
+    {
+     "id": "animales_i053",
+     "zonas": 450
+    },
+    {
+     "id": "animales_i054",
+     "zonas": 393
+    },
+    {
+     "id": "animales_i055",
+     "zonas": 309
+    },
+    {
+     "id": "animales_i056",
+     "zonas": 461
+    },
+    {
+     "id": "animales_i057",
+     "zonas": 491
+    },
+    {
+     "id": "animales_i058",
+     "zonas": 458
+    },
+    {
+     "id": "animales_i059",
+     "zonas": 523
+    },
+    {
+     "id": "animales_i060",
+     "zonas": 520
+    },
+    {
+     "id": "animales_i061",
+     "zonas": 684
+    },
+    {
+     "id": "animales_i062",
+     "zonas": 442
+    },
+    {
+     "id": "animales_i063",
+     "zonas": 591
+    },
+    {
+     "id": "animales_i064",
+     "zonas": 933
+    },
+    {
+     "id": "animales_i065",
+     "zonas": 570
+    },
+    {
+     "id": "animales_i066",
+     "zonas": 786
+    },
+    {
+     "id": "animales_i067",
+     "zonas": 459
+    },
+    {
+     "id": "animales_i068",
+     "zonas": 683
+    },
+    {
+     "id": "animales_i069",
+     "zonas": 566
+    },
+    {
+     "id": "animales_i070",
+     "zonas": 358
+    },
+    {
+     "id": "animales_i071",
+     "zonas": 427
+    },
+    {
+     "id": "animales_i072",
+     "zonas": 591
+    },
+    {
+     "id": "animales_i073",
+     "zonas": 411
+    },
+    {
+     "id": "animales_i074",
+     "zonas": 848
+    },
+    {
+     "id": "animales_i075",
+     "zonas": 802
+    },
+    {
+     "id": "animales_i076",
+     "zonas": 604
+    },
+    {
+     "id": "animales_i077",
+     "zonas": 479
+    },
+    {
+     "id": "animales_i078",
+     "zonas": 748
+    },
+    {
+     "id": "animales_i079",
+     "zonas": 653
+    },
+    {
+     "id": "animales_i080",
+     "zonas": 425
+    },
+    {
+     "id": "animales_i081",
+     "zonas": 431
+    },
+    {
+     "id": "animales_i082",
+     "zonas": 562
+    },
+    {
+     "id": "animales_i083",
+     "zonas": 472
+    },
+    {
+     "id": "animales_i084",
+     "zonas": 1088
+    },
+    {
+     "id": "animales_i085",
+     "zonas": 611
+    },
+    {
+     "id": "animales_i086",
+     "zonas": 503
+    },
+    {
+     "id": "animales_i087",
+     "zonas": 496
+    },
+    {
+     "id": "animales_i088",
+     "zonas": 975
+    },
+    {
+     "id": "animales_i089",
+     "zonas": 445
+    },
+    {
+     "id": "animales_i090",
+     "zonas": 419
+    },
+    {
+     "id": "animales_i091",
+     "zonas": 455
+    },
+    {
+     "id": "animales_i092",
+     "zonas": 483
+    },
+    {
+     "id": "animales_i093",
+     "zonas": 660
+    },
+    {
+     "id": "animales_i094",
+     "zonas": 454
+    },
+    {
+     "id": "animales_i095",
+     "zonas": 794
+    },
+    {
+     "id": "animales_i096",
+     "zonas": 423
+    },
+    {
+     "id": "animales_i097",
+     "zonas": 708
+    },
+    {
+     "id": "animales_i098",
+     "zonas": 796
+    },
+    {
+     "id": "animales_i099",
+     "zonas": 752
+    },
+    {
+     "id": "animales_i100",
+     "zonas": 733
+    },
+    {
+     "id": "animales_i101",
+     "zonas": 317
+    },
+    {
+     "id": "animales_i102",
+     "zonas": 361
+    },
+    {
+     "id": "animales_i103",
+     "zonas": 689
+    },
+    {
+     "id": "animales_i104",
+     "zonas": 459
+    },
+    {
+     "id": "animales_i105",
+     "zonas": 348
+    },
+    {
+     "id": "animales_i106",
+     "zonas": 616
+    },
+    {
+     "id": "animales_i107",
+     "zonas": 407
+    },
+    {
+     "id": "animales_i108",
+     "zonas": 872
+    },
+    {
+     "id": "animales_i109",
+     "zonas": 562
+    },
+    {
+     "id": "animales_i110",
+     "zonas": 349
+    },
+    {
+     "id": "animales_i111",
+     "zonas": 490
+    },
+    {
+     "id": "animales_i112",
+     "zonas": 343
+    },
+    {
+     "id": "animales_i113",
+     "zonas": 698
+    },
+    {
+     "id": "animales_i114",
+     "zonas": 542
+    },
+    {
+     "id": "animales_i115",
+     "zonas": 959
+    },
+    {
+     "id": "animales_i116",
+     "zonas": 1102
+    },
+    {
+     "id": "animales_i117",
+     "zonas": 365
+    },
+    {
+     "id": "animales_i118",
+     "zonas": 734
+    },
+    {
+     "id": "animales_i119",
+     "zonas": 354
+    },
+    {
+     "id": "animales_i120",
+     "zonas": 389
+    },
+    {
+     "id": "animales_i121",
+     "zonas": 450
+    },
+    {
+     "id": "animales_i122",
+     "zonas": 331
+    },
+    {
+     "id": "animales_i123",
+     "zonas": 371
+    },
+    {
+     "id": "animales_i124",
+     "zonas": 746
+    },
+    {
+     "id": "animales_i125",
+     "zonas": 481
+    },
+    {
+     "id": "animales_i126",
+     "zonas": 435
+    },
+    {
+     "id": "animales_i127",
+     "zonas": 348
+    },
+    {
+     "id": "animales_i128",
+     "zonas": 469
+    },
+    {
+     "id": "animales_i129",
+     "zonas": 780
+    },
+    {
+     "id": "animales_i130",
+     "zonas": 472
+    },
+    {
+     "id": "animales_i131",
+     "zonas": 615
+    },
+    {
+     "id": "animales_i132",
+     "zonas": 368
+    },
+    {
+     "id": "animales_i133",
+     "zonas": 613
+    },
+    {
+     "id": "animales_i134",
+     "zonas": 650
+    },
+    {
+     "id": "animales_i135",
+     "zonas": 717
+    },
+    {
+     "id": "animales_i136",
+     "zonas": 406
+    },
+    {
+     "id": "animales_i137",
+     "zonas": 513
+    },
+    {
+     "id": "animales_i138",
+     "zonas": 469
+    },
+    {
+     "id": "animales_i139",
+     "zonas": 624
+    },
+    {
+     "id": "animales_i140",
+     "zonas": 490
+    },
+    {
+     "id": "animales_i141",
+     "zonas": 471
+    },
+    {
+     "id": "animales_i142",
+     "zonas": 569
+    },
+    {
+     "id": "animales_i143",
+     "zonas": 458
+    },
+    {
+     "id": "animales_i144",
+     "zonas": 443
+    },
+    {
+     "id": "animales_i145",
+     "zonas": 838
+    },
+    {
+     "id": "animales_i146",
+     "zonas": 385
+    },
+    {
+     "id": "animales_i147",
+     "zonas": 497
+    },
+    {
+     "id": "animales_i148",
+     "zonas": 570
+    },
+    {
+     "id": "animales_i149",
+     "zonas": 626
+    },
+    {
+     "id": "animales_i150",
+     "zonas": 904
+    },
+    {
+     "id": "animales_i151",
+     "zonas": 508
+    },
+    {
+     "id": "animales_i152",
+     "zonas": 699
+    },
+    {
+     "id": "animales_i153",
+     "zonas": 903
+    },
+    {
+     "id": "animales_i154",
+     "zonas": 705
+    },
+    {
+     "id": "animales_i155",
+     "zonas": 311
+    },
+    {
+     "id": "animales_i156",
+     "zonas": 543
+    },
+    {
+     "id": "animales_i157",
+     "zonas": 598
+    },
+    {
+     "id": "animales_i158",
+     "zonas": 543
+    },
+    {
+     "id": "animales_i159",
+     "zonas": 717
+    },
+    {
+     "id": "animales_i160",
+     "zonas": 521
+    },
+    {
+     "id": "animales_i161",
+     "zonas": 280
+    },
+    {
+     "id": "animales_i162",
+     "zonas": 688
+    },
+    {
+     "id": "animales_i163",
+     "zonas": 783
+    },
+    {
+     "id": "animales_i164",
+     "zonas": 779
+    },
+    {
+     "id": "animales_i165",
+     "zonas": 792
+    },
+    {
+     "id": "animales_i166",
+     "zonas": 336
+    },
+    {
+     "id": "animales_i167",
+     "zonas": 250
+    },
+    {
+     "id": "animales_i168",
+     "zonas": 756
+    },
+    {
+     "id": "animales_i169",
+     "zonas": 780
+    },
+    {
+     "id": "animales_i170",
+     "zonas": 260
+    },
+    {
+     "id": "animales_i171",
+     "zonas": 293
+    },
+    {
+     "id": "animales_i172",
+     "zonas": 769
+    },
+    {
+     "id": "animales_i173",
+     "zonas": 531
+    },
+    {
+     "id": "animales_i174",
+     "zonas": 407
+    },
+    {
+     "id": "animales_i175",
+     "zonas": 553
+    },
+    {
+     "id": "animales_i176",
+     "zonas": 570
+    },
+    {
+     "id": "animales_i177",
+     "zonas": 834
+    },
+    {
+     "id": "animales_i178",
+     "zonas": 839
+    },
+    {
+     "id": "animales_i179",
+     "zonas": 226
+    },
+    {
+     "id": "animales_i180",
+     "zonas": 159
+    },
+    {
+     "id": "animales_i181",
+     "zonas": 891
+    },
+    {
+     "id": "animales_i182",
+     "zonas": 821
+    },
+    {
+     "id": "animales_i183",
+     "zonas": 941
+    },
+    {
      "id": "animales_i184",
-     "zonas": 306
+     "zonas": 733
     },
     {
      "id": "animales_i185",
-     "zonas": 388
+     "zonas": 673
     },
     {
      "id": "animales_i186",
-     "zonas": 225
+     "zonas": 400
     },
     {
      "id": "animales_i187",
-     "zonas": 150
+     "zonas": 491
     },
     {
      "id": "animales_i188",
-     "zonas": 256
+     "zonas": 578
     },
     {
      "id": "animales_i189",
-     "zonas": 131
+     "zonas": 463
     },
     {
      "id": "animales_i190",
-     "zonas": 122
+     "zonas": 508
     },
     {
      "id": "animales_i191",
-     "zonas": 186
+     "zonas": 729
     },
     {
      "id": "animales_i192",
-     "zonas": 174
+     "zonas": 492
     },
     {
      "id": "animales_i193",
-     "zonas": 173
+     "zonas": 764
     },
     {
      "id": "animales_i194",
-     "zonas": 141
+     "zonas": 501
     },
     {
      "id": "animales_i195",
-     "zonas": 335
+     "zonas": 682
     },
     {
      "id": "animales_i196",
-     "zonas": 258
+     "zonas": 371
     },
     {
      "id": "animales_i197",
-     "zonas": 212
+     "zonas": 313
     },
     {
      "id": "animales_i198",
-     "zonas": 118
+     "zonas": 402
     },
     {
      "id": "animales_i199",
-     "zonas": 205
+     "zonas": 597
     },
     {
      "id": "animales_i200",
-     "zonas": 133
+     "zonas": 456
     },
     {
      "id": "animales_i201",
-     "zonas": 323
+     "zonas": 848
     },
     {
      "id": "animales_i202",
-     "zonas": 175
+     "zonas": 594
     }
    ]
   },
@@ -822,279 +822,279 @@
    "laminas": [
     {
      "id": "aves_i001",
-     "zonas": 204
+     "zonas": 555
     },
     {
      "id": "aves_i002",
-     "zonas": 268
+     "zonas": 787
     },
     {
      "id": "aves_i003",
-     "zonas": 141
+     "zonas": 480
     },
     {
      "id": "aves_i004",
-     "zonas": 133
+     "zonas": 391
     },
     {
      "id": "aves_i005",
-     "zonas": 237
+     "zonas": 619
     },
     {
      "id": "aves_i006",
-     "zonas": 167
+     "zonas": 362
     },
     {
      "id": "aves_i007",
-     "zonas": 103
+     "zonas": 271
     },
     {
      "id": "aves_i008",
-     "zonas": 223
+     "zonas": 680
     },
     {
      "id": "aves_i009",
-     "zonas": 226
+     "zonas": 625
     },
     {
      "id": "aves_i010",
-     "zonas": 108
+     "zonas": 197
     },
     {
      "id": "aves_i011",
-     "zonas": 145
+     "zonas": 415
     },
     {
      "id": "aves_i012",
-     "zonas": 161
+     "zonas": 449
     },
     {
      "id": "aves_i013",
-     "zonas": 516
+     "zonas": 856
     },
     {
      "id": "aves_i014",
-     "zonas": 232
+     "zonas": 580
     },
     {
      "id": "aves_i015",
-     "zonas": 104
+     "zonas": 219
     },
     {
      "id": "aves_i016",
-     "zonas": 397
+     "zonas": 635
     },
     {
      "id": "aves_i017",
-     "zonas": 210
+     "zonas": 508
     },
     {
      "id": "aves_i018",
-     "zonas": 250
+     "zonas": 649
     },
     {
      "id": "aves_i019",
-     "zonas": 93
+     "zonas": 286
     },
     {
      "id": "aves_i020",
-     "zonas": 88
+     "zonas": 253
     },
     {
      "id": "aves_i021",
-     "zonas": 361
+     "zonas": 827
     },
     {
      "id": "aves_i022",
-     "zonas": 201
+     "zonas": 276
     },
     {
      "id": "aves_i023",
-     "zonas": 174
+     "zonas": 289
     },
     {
      "id": "aves_i024",
-     "zonas": 473
+     "zonas": 968
     },
     {
      "id": "aves_i025",
-     "zonas": 702
+     "zonas": 1066
     },
     {
      "id": "aves_i026",
-     "zonas": 541
+     "zonas": 968
     },
     {
      "id": "aves_i027",
-     "zonas": 114
+     "zonas": 295
     },
     {
      "id": "aves_i028",
-     "zonas": 443
+     "zonas": 753
     },
     {
      "id": "aves_i029",
-     "zonas": 266
+     "zonas": 646
     },
     {
      "id": "aves_i030",
-     "zonas": 175
+     "zonas": 375
     },
     {
      "id": "aves_i031",
-     "zonas": 207
+     "zonas": 660
     },
     {
      "id": "aves_i032",
-     "zonas": 238
+     "zonas": 608
     },
     {
      "id": "aves_i033",
-     "zonas": 302
+     "zonas": 835
     },
     {
      "id": "aves_i034",
-     "zonas": 111
+     "zonas": 165
     },
     {
      "id": "aves_i035",
-     "zonas": 81
+     "zonas": 188
     },
     {
      "id": "aves_i036",
-     "zonas": 263
+     "zonas": 692
     },
     {
      "id": "aves_i037",
-     "zonas": 107
+     "zonas": 179
     },
     {
      "id": "aves_i038",
-     "zonas": 431
+     "zonas": 897
     },
     {
      "id": "aves_i039",
-     "zonas": 176
+     "zonas": 357
     },
     {
      "id": "aves_i040",
-     "zonas": 326
+     "zonas": 713
     },
     {
      "id": "aves_i041",
-     "zonas": 80
+     "zonas": 178
     },
     {
      "id": "aves_i042",
-     "zonas": 159
+     "zonas": 388
     },
     {
      "id": "aves_i043",
-     "zonas": 163
+     "zonas": 397
     },
     {
      "id": "aves_i044",
-     "zonas": 348
+     "zonas": 736
     },
     {
      "id": "aves_i045",
-     "zonas": 313
+     "zonas": 717
     },
     {
      "id": "aves_i046",
-     "zonas": 106
+     "zonas": 262
     },
     {
      "id": "aves_i047",
-     "zonas": 103
+     "zonas": 289
     },
     {
      "id": "aves_i048",
-     "zonas": 334
+     "zonas": 672
     },
     {
      "id": "aves_i049",
-     "zonas": 176
+     "zonas": 434
     },
     {
      "id": "aves_i050",
-     "zonas": 222
+     "zonas": 730
     },
     {
      "id": "aves_i051",
-     "zonas": 227
+     "zonas": 633
     },
     {
      "id": "aves_i052",
-     "zonas": 410
+     "zonas": 895
     },
     {
      "id": "aves_i053",
-     "zonas": 114
+     "zonas": 586
     },
     {
      "id": "aves_i054",
-     "zonas": 411
+     "zonas": 936
     },
     {
      "id": "aves_i055",
-     "zonas": 324
+     "zonas": 797
     },
     {
      "id": "aves_i056",
-     "zonas": 140
+     "zonas": 454
     },
     {
      "id": "aves_i057",
-     "zonas": 379
+     "zonas": 676
     },
     {
      "id": "aves_i058",
-     "zonas": 479
+     "zonas": 1016
     },
     {
      "id": "aves_i059",
-     "zonas": 88
+     "zonas": 141
     },
     {
      "id": "aves_i060",
-     "zonas": 99
+     "zonas": 143
     },
     {
      "id": "aves_i061",
-     "zonas": 205
+     "zonas": 445
     },
     {
      "id": "aves_i062",
-     "zonas": 302
+     "zonas": 486
     },
     {
      "id": "aves_i063",
-     "zonas": 115
+     "zonas": 235
     },
     {
      "id": "aves_i064",
-     "zonas": 259
+     "zonas": 654
     },
     {
      "id": "aves_i065",
-     "zonas": 93
+     "zonas": 321
     },
     {
      "id": "aves_i066",
-     "zonas": 285
+     "zonas": 630
     },
     {
      "id": "aves_i067",
-     "zonas": 164
+     "zonas": 212
     },
     {
      "id": "aves_i068",
-     "zonas": 232
+     "zonas": 486
     },
     {
      "id": "aves_i069",
-     "zonas": 186
+     "zonas": 411
     }
    ]
   },
@@ -1104,255 +1104,255 @@
    "laminas": [
     {
      "id": "fantasia_i001",
-     "zonas": 100
+     "zonas": 333
     },
     {
      "id": "fantasia_i002",
-     "zonas": 193
+     "zonas": 601
     },
     {
      "id": "fantasia_i003",
-     "zonas": 138
+     "zonas": 435
     },
     {
      "id": "fantasia_i004",
-     "zonas": 311
+     "zonas": 797
     },
     {
      "id": "fantasia_i005",
-     "zonas": 256
+     "zonas": 705
     },
     {
      "id": "fantasia_i006",
-     "zonas": 287
+     "zonas": 739
     },
     {
      "id": "fantasia_i007",
-     "zonas": 199
+     "zonas": 679
     },
     {
      "id": "fantasia_i008",
-     "zonas": 145
+     "zonas": 443
     },
     {
      "id": "fantasia_i009",
-     "zonas": 103
+     "zonas": 354
     },
     {
      "id": "fantasia_i010",
-     "zonas": 111
+     "zonas": 473
     },
     {
      "id": "fantasia_i011",
-     "zonas": 93
+     "zonas": 436
     },
     {
      "id": "fantasia_i012",
-     "zonas": 110
+     "zonas": 311
     },
     {
      "id": "fantasia_i013",
-     "zonas": 85
+     "zonas": 318
     },
     {
      "id": "fantasia_i014",
-     "zonas": 105
+     "zonas": 402
     },
     {
      "id": "fantasia_i015",
-     "zonas": 222
+     "zonas": 494
     },
     {
      "id": "fantasia_i016",
-     "zonas": 195
+     "zonas": 556
     },
     {
      "id": "fantasia_i017",
-     "zonas": 179
+     "zonas": 483
     },
     {
      "id": "fantasia_i018",
-     "zonas": 113
+     "zonas": 349
     },
     {
      "id": "fantasia_i019",
-     "zonas": 147
+     "zonas": 456
     },
     {
      "id": "fantasia_i020",
-     "zonas": 145
+     "zonas": 445
     },
     {
      "id": "fantasia_i021",
-     "zonas": 145
+     "zonas": 334
     },
     {
      "id": "fantasia_i022",
-     "zonas": 85
+     "zonas": 340
     },
     {
      "id": "fantasia_i023",
-     "zonas": 124
+     "zonas": 352
     },
     {
      "id": "fantasia_i024",
-     "zonas": 143
+     "zonas": 542
     },
     {
      "id": "fantasia_i025",
-     "zonas": 273
+     "zonas": 685
     },
     {
      "id": "fantasia_i026",
-     "zonas": 206
+     "zonas": 634
     },
     {
      "id": "fantasia_i027",
-     "zonas": 118
+     "zonas": 428
     },
     {
      "id": "fantasia_i028",
-     "zonas": 99
+     "zonas": 308
     },
     {
      "id": "fantasia_i029",
-     "zonas": 168
+     "zonas": 577
     },
     {
      "id": "fantasia_i030",
-     "zonas": 364
+     "zonas": 863
     },
     {
      "id": "fantasia_i031",
-     "zonas": 475
+     "zonas": 855
     },
     {
      "id": "fantasia_i032",
-     "zonas": 99
+     "zonas": 389
     },
     {
      "id": "fantasia_i033",
-     "zonas": 106
+     "zonas": 586
     },
     {
      "id": "fantasia_i034",
-     "zonas": 115
+     "zonas": 456
     },
     {
      "id": "fantasia_i035",
-     "zonas": 154
+     "zonas": 530
     },
     {
      "id": "fantasia_i036",
-     "zonas": 233
+     "zonas": 669
     },
     {
      "id": "fantasia_i037",
-     "zonas": 245
+     "zonas": 733
     },
     {
      "id": "fantasia_i038",
-     "zonas": 120
+     "zonas": 451
     },
     {
      "id": "fantasia_i039",
-     "zonas": 270
+     "zonas": 555
     },
     {
      "id": "fantasia_i040",
-     "zonas": 203
+     "zonas": 577
     },
     {
      "id": "fantasia_i041",
-     "zonas": 263
+     "zonas": 735
     },
     {
      "id": "fantasia_i042",
-     "zonas": 188
+     "zonas": 727
     },
     {
      "id": "fantasia_i043",
-     "zonas": 294
+     "zonas": 839
     },
     {
      "id": "fantasia_i044",
-     "zonas": 101
+     "zonas": 370
     },
     {
      "id": "fantasia_i045",
-     "zonas": 146
+     "zonas": 533
     },
     {
      "id": "fantasia_i046",
-     "zonas": 261
+     "zonas": 776
     },
     {
      "id": "fantasia_i047",
-     "zonas": 310
+     "zonas": 816
     },
     {
      "id": "fantasia_i048",
-     "zonas": 94
+     "zonas": 381
     },
     {
      "id": "fantasia_i049",
-     "zonas": 153
+     "zonas": 486
     },
     {
      "id": "fantasia_i050",
-     "zonas": 83
+     "zonas": 391
     },
     {
      "id": "fantasia_i051",
-     "zonas": 92
+     "zonas": 320
     },
     {
      "id": "fantasia_i052",
-     "zonas": 148
+     "zonas": 436
     },
     {
      "id": "fantasia_i053",
-     "zonas": 105
+     "zonas": 354
     },
     {
      "id": "fantasia_i054",
-     "zonas": 188
+     "zonas": 532
     },
     {
      "id": "fantasia_i055",
-     "zonas": 117
+     "zonas": 411
     },
     {
      "id": "fantasia_i056",
-     "zonas": 165
+     "zonas": 561
     },
     {
      "id": "fantasia_i057",
-     "zonas": 135
+     "zonas": 533
     },
     {
      "id": "fantasia_i058",
-     "zonas": 159
+     "zonas": 638
     },
     {
      "id": "fantasia_i059",
-     "zonas": 113
+     "zonas": 461
     },
     {
      "id": "fantasia_i060",
-     "zonas": 243
+     "zonas": 554
     },
     {
      "id": "fantasia_i061",
-     "zonas": 249
+     "zonas": 572
     },
     {
      "id": "fantasia_i062",
-     "zonas": 121
+     "zonas": 387
     },
     {
      "id": "fantasia_i063",
-     "zonas": 95
+     "zonas": 513
     }
    ]
   },
@@ -1362,191 +1362,191 @@
    "laminas": [
     {
      "id": "oceano_i001",
-     "zonas": 474
+     "zonas": 907
     },
     {
      "id": "oceano_i002",
-     "zonas": 277
+     "zonas": 729
     },
     {
      "id": "oceano_i003",
-     "zonas": 137
+     "zonas": 409
     },
     {
      "id": "oceano_i004",
-     "zonas": 196
+     "zonas": 483
     },
     {
      "id": "oceano_i005",
-     "zonas": 124
+     "zonas": 544
     },
     {
      "id": "oceano_i006",
-     "zonas": 220
+     "zonas": 763
     },
     {
      "id": "oceano_i007",
-     "zonas": 214
+     "zonas": 748
     },
     {
      "id": "oceano_i008",
-     "zonas": 148
+     "zonas": 552
     },
     {
      "id": "oceano_i009",
-     "zonas": 181
+     "zonas": 544
     },
     {
      "id": "oceano_i010",
-     "zonas": 106
+     "zonas": 255
     },
     {
      "id": "oceano_i011",
-     "zonas": 436
+     "zonas": 802
     },
     {
      "id": "oceano_i012",
-     "zonas": 225
+     "zonas": 606
     },
     {
      "id": "oceano_i013",
-     "zonas": 85
+     "zonas": 333
     },
     {
      "id": "oceano_i014",
-     "zonas": 293
+     "zonas": 797
     },
     {
      "id": "oceano_i015",
-     "zonas": 305
+     "zonas": 630
     },
     {
      "id": "oceano_i016",
-     "zonas": 319
+     "zonas": 512
     },
     {
      "id": "oceano_i017",
-     "zonas": 342
+     "zonas": 765
     },
     {
      "id": "oceano_i018",
-     "zonas": 375
+     "zonas": 814
     },
     {
      "id": "oceano_i019",
-     "zonas": 174
+     "zonas": 524
     },
     {
      "id": "oceano_i020",
-     "zonas": 228
+     "zonas": 489
     },
     {
      "id": "oceano_i021",
-     "zonas": 251
+     "zonas": 555
     },
     {
      "id": "oceano_i022",
-     "zonas": 135
+     "zonas": 452
     },
     {
      "id": "oceano_i023",
-     "zonas": 131
+     "zonas": 441
     },
     {
      "id": "oceano_i024",
-     "zonas": 120
+     "zonas": 499
     },
     {
      "id": "oceano_i025",
-     "zonas": 155
+     "zonas": 504
     },
     {
      "id": "oceano_i026",
-     "zonas": 281
+     "zonas": 749
     },
     {
      "id": "oceano_i027",
-     "zonas": 286
+     "zonas": 638
     },
     {
      "id": "oceano_i028",
-     "zonas": 84
+     "zonas": 213
     },
     {
      "id": "oceano_i029",
-     "zonas": 131
+     "zonas": 422
     },
     {
      "id": "oceano_i030",
-     "zonas": 97
+     "zonas": 291
     },
     {
      "id": "oceano_i031",
-     "zonas": 89
+     "zonas": 267
     },
     {
      "id": "oceano_i032",
-     "zonas": 114
+     "zonas": 364
     },
     {
      "id": "oceano_i033",
-     "zonas": 208
+     "zonas": 528
     },
     {
      "id": "oceano_i034",
-     "zonas": 131
+     "zonas": 360
     },
     {
      "id": "oceano_i035",
-     "zonas": 320
+     "zonas": 702
     },
     {
      "id": "oceano_i036",
-     "zonas": 369
+     "zonas": 847
     },
     {
      "id": "oceano_i037",
-     "zonas": 199
+     "zonas": 429
     },
     {
      "id": "oceano_i038",
-     "zonas": 457
+     "zonas": 835
     },
     {
      "id": "oceano_i039",
-     "zonas": 259
+     "zonas": 493
     },
     {
      "id": "oceano_i040",
-     "zonas": 369
+     "zonas": 540
     },
     {
      "id": "oceano_i041",
-     "zonas": 193
+     "zonas": 642
     },
     {
      "id": "oceano_i042",
-     "zonas": 470
+     "zonas": 953
     },
     {
      "id": "oceano_i043",
-     "zonas": 199
+     "zonas": 575
     },
     {
      "id": "oceano_i044",
-     "zonas": 93
+     "zonas": 466
     },
     {
      "id": "oceano_i045",
-     "zonas": 243
+     "zonas": 557
     },
     {
      "id": "oceano_i046",
-     "zonas": 87
+     "zonas": 329
     },
     {
      "id": "oceano_i047",
-     "zonas": 173
+     "zonas": 637
     }
    ]
   },
@@ -1556,199 +1556,199 @@
    "laminas": [
     {
      "id": "insectos_i001",
-     "zonas": 208
+     "zonas": 516
     },
     {
      "id": "insectos_i002",
-     "zonas": 134
+     "zonas": 505
     },
     {
      "id": "insectos_i003",
-     "zonas": 216
+     "zonas": 593
     },
     {
      "id": "insectos_i004",
-     "zonas": 202
+     "zonas": 578
     },
     {
      "id": "insectos_i005",
-     "zonas": 233
+     "zonas": 712
     },
     {
      "id": "insectos_i006",
-     "zonas": 153
+     "zonas": 500
     },
     {
      "id": "insectos_i007",
-     "zonas": 103
+     "zonas": 467
     },
     {
      "id": "insectos_i008",
-     "zonas": 161
+     "zonas": 415
     },
     {
      "id": "insectos_i009",
-     "zonas": 305
+     "zonas": 808
     },
     {
      "id": "insectos_i010",
-     "zonas": 199
+     "zonas": 644
     },
     {
      "id": "insectos_i011",
-     "zonas": 110
+     "zonas": 290
     },
     {
      "id": "insectos_i012",
-     "zonas": 183
+     "zonas": 546
     },
     {
      "id": "insectos_i013",
-     "zonas": 101
+     "zonas": 253
     },
     {
      "id": "insectos_i014",
-     "zonas": 262
+     "zonas": 561
     },
     {
      "id": "insectos_i015",
-     "zonas": 150
+     "zonas": 469
     },
     {
      "id": "insectos_i016",
-     "zonas": 191
+     "zonas": 515
     },
     {
      "id": "insectos_i017",
-     "zonas": 508
+     "zonas": 852
     },
     {
      "id": "insectos_i018",
-     "zonas": 327
+     "zonas": 768
     },
     {
      "id": "insectos_i019",
-     "zonas": 123
+     "zonas": 424
     },
     {
      "id": "insectos_i020",
-     "zonas": 341
+     "zonas": 747
     },
     {
      "id": "insectos_i021",
-     "zonas": 403
+     "zonas": 682
     },
     {
      "id": "insectos_i022",
-     "zonas": 198
+     "zonas": 548
     },
     {
      "id": "insectos_i023",
-     "zonas": 168
+     "zonas": 466
     },
     {
      "id": "insectos_i024",
-     "zonas": 179
+     "zonas": 363
     },
     {
      "id": "insectos_i025",
-     "zonas": 286
+     "zonas": 713
     },
     {
      "id": "insectos_i026",
-     "zonas": 207
+     "zonas": 377
     },
     {
      "id": "insectos_i027",
-     "zonas": 186
+     "zonas": 451
     },
     {
      "id": "insectos_i028",
-     "zonas": 80
+     "zonas": 232
     },
     {
      "id": "insectos_i029",
-     "zonas": 104
+     "zonas": 287
     },
     {
      "id": "insectos_i030",
-     "zonas": 264
+     "zonas": 577
     },
     {
      "id": "insectos_i031",
-     "zonas": 605
+     "zonas": 1047
     },
     {
      "id": "insectos_i032",
-     "zonas": 449
+     "zonas": 657
     },
     {
      "id": "insectos_i033",
-     "zonas": 332
+     "zonas": 715
     },
     {
      "id": "insectos_i034",
-     "zonas": 249
+     "zonas": 587
     },
     {
      "id": "insectos_i035",
-     "zonas": 128
+     "zonas": 410
     },
     {
      "id": "insectos_i036",
-     "zonas": 278
+     "zonas": 616
     },
     {
      "id": "insectos_i037",
-     "zonas": 517
+     "zonas": 839
     },
     {
      "id": "insectos_i038",
-     "zonas": 436
+     "zonas": 788
     },
     {
      "id": "insectos_i039",
-     "zonas": 207
+     "zonas": 603
     },
     {
      "id": "insectos_i040",
-     "zonas": 206
+     "zonas": 460
     },
     {
      "id": "insectos_i041",
-     "zonas": 256
+     "zonas": 725
     },
     {
      "id": "insectos_i042",
-     "zonas": 158
+     "zonas": 391
     },
     {
      "id": "insectos_i043",
-     "zonas": 164
+     "zonas": 510
     },
     {
      "id": "insectos_i044",
-     "zonas": 215
+     "zonas": 536
     },
     {
      "id": "insectos_i045",
-     "zonas": 142
+     "zonas": 368
     },
     {
      "id": "insectos_i046",
-     "zonas": 434
+     "zonas": 877
     },
     {
      "id": "insectos_i047",
-     "zonas": 324
+     "zonas": 683
     },
     {
      "id": "insectos_i048",
-     "zonas": 156
+     "zonas": 375
     },
     {
      "id": "insectos_i049",
-     "zonas": 224
+     "zonas": 554
     }
    ]
   },
@@ -1878,167 +1878,167 @@
     },
     {
      "id": "flores_i001",
-     "zonas": 331
+     "zonas": 733
     },
     {
      "id": "flores_i002",
-     "zonas": 80
+     "zonas": 309
     },
     {
      "id": "flores_i003",
-     "zonas": 156
+     "zonas": 440
     },
     {
      "id": "flores_i004",
-     "zonas": 301
+     "zonas": 752
     },
     {
      "id": "flores_i005",
-     "zonas": 89
+     "zonas": 419
     },
     {
      "id": "flores_i006",
-     "zonas": 202
+     "zonas": 493
     },
     {
      "id": "flores_i007",
-     "zonas": 84
+     "zonas": 410
     },
     {
      "id": "flores_i008",
-     "zonas": 103
+     "zonas": 493
     },
     {
      "id": "flores_i009",
-     "zonas": 170
+     "zonas": 380
     },
     {
      "id": "flores_i010",
-     "zonas": 80
+     "zonas": 353
     },
     {
      "id": "flores_i011",
-     "zonas": 92
+     "zonas": 206
     },
     {
      "id": "flores_i012",
-     "zonas": 103
+     "zonas": 259
     },
     {
      "id": "flores_i013",
-     "zonas": 279
+     "zonas": 481
     },
     {
      "id": "flores_i014",
-     "zonas": 95
+     "zonas": 225
     },
     {
      "id": "flores_i015",
-     "zonas": 89
+     "zonas": 396
     },
     {
      "id": "flores_i016",
-     "zonas": 401
+     "zonas": 921
     },
     {
      "id": "flores_i017",
-     "zonas": 88
+     "zonas": 493
     },
     {
      "id": "flores_i018",
-     "zonas": 325
+     "zonas": 653
     },
     {
      "id": "flores_i019",
-     "zonas": 101
+     "zonas": 300
     },
     {
      "id": "flores_i020",
-     "zonas": 221
+     "zonas": 409
     },
     {
      "id": "flores_i021",
-     "zonas": 160
+     "zonas": 481
     },
     {
      "id": "flores_i022",
-     "zonas": 390
+     "zonas": 758
     },
     {
      "id": "flores_i023",
-     "zonas": 176
+     "zonas": 454
     },
     {
      "id": "flores_i024",
-     "zonas": 307
+     "zonas": 632
     },
     {
      "id": "flores_i025",
-     "zonas": 121
+     "zonas": 513
     },
     {
      "id": "flores_i026",
-     "zonas": 88
+     "zonas": 192
     },
     {
      "id": "flores_i027",
-     "zonas": 215
+     "zonas": 730
     },
     {
      "id": "flores_i028",
-     "zonas": 302
+     "zonas": 723
     },
     {
      "id": "flores_i029",
-     "zonas": 213
+     "zonas": 462
     },
     {
      "id": "flores_i030",
-     "zonas": 347
+     "zonas": 749
     },
     {
      "id": "flores_i031",
-     "zonas": 130
+     "zonas": 470
     },
     {
      "id": "flores_i032",
-     "zonas": 82
+     "zonas": 342
     },
     {
      "id": "flores_i033",
-     "zonas": 238
+     "zonas": 707
     },
     {
      "id": "flores_i034",
-     "zonas": 120
+     "zonas": 366
     },
     {
      "id": "flores_i035",
-     "zonas": 138
+     "zonas": 560
     },
     {
      "id": "flores_i036",
-     "zonas": 324
+     "zonas": 730
     },
     {
      "id": "flores_i037",
-     "zonas": 105
+     "zonas": 401
     },
     {
      "id": "flores_i038",
-     "zonas": 317
+     "zonas": 745
     },
     {
      "id": "flores_i039",
-     "zonas": 93
+     "zonas": 178
     },
     {
      "id": "flores_i040",
-     "zonas": 224
+     "zonas": 604
     },
     {
      "id": "flores_i041",
-     "zonas": 183
+     "zonas": 461
     }
    ]
   },
@@ -2288,79 +2288,79 @@
     },
     {
      "id": "mandalas_i001",
-     "zonas": 286
+     "zonas": 772
     },
     {
      "id": "mandalas_i002",
-     "zonas": 176
+     "zonas": 748
     },
     {
      "id": "mandalas_i003",
-     "zonas": 241
+     "zonas": 826
     },
     {
      "id": "mandalas_i004",
-     "zonas": 169
+     "zonas": 721
     },
     {
      "id": "mandalas_i005",
-     "zonas": 256
+     "zonas": 881
     },
     {
      "id": "mandalas_i006",
-     "zonas": 433
+     "zonas": 1036
     },
     {
      "id": "mandalas_i007",
-     "zonas": 224
+     "zonas": 845
     },
     {
      "id": "mandalas_i008",
-     "zonas": 140
+     "zonas": 462
     },
     {
      "id": "mandalas_i009",
-     "zonas": 175
+     "zonas": 635
     },
     {
      "id": "mandalas_i010",
-     "zonas": 197
+     "zonas": 539
     },
     {
      "id": "mandalas_i011",
-     "zonas": 160
+     "zonas": 533
     },
     {
      "id": "mandalas_i012",
-     "zonas": 269
+     "zonas": 794
     },
     {
      "id": "mandalas_i013",
-     "zonas": 177
+     "zonas": 602
     },
     {
      "id": "mandalas_i014",
-     "zonas": 124
+     "zonas": 531
     },
     {
      "id": "mandalas_i015",
-     "zonas": 248
+     "zonas": 662
     },
     {
      "id": "mandalas_i016",
-     "zonas": 317
+     "zonas": 769
     },
     {
      "id": "mandalas_i017",
-     "zonas": 86
+     "zonas": 389
     },
     {
      "id": "mandalas_i018",
-     "zonas": 156
+     "zonas": 465
     },
     {
      "id": "mandalas_i019",
-     "zonas": 223
+     "zonas": 501
     }
    ]
   },
@@ -2370,123 +2370,123 @@
    "laminas": [
     {
      "id": "objetos_i001",
-     "zonas": 133
+     "zonas": 373
     },
     {
      "id": "objetos_i002",
-     "zonas": 81
+     "zonas": 184
     },
     {
      "id": "objetos_i003",
-     "zonas": 229
+     "zonas": 600
     },
     {
      "id": "objetos_i004",
-     "zonas": 89
+     "zonas": 270
     },
     {
      "id": "objetos_i005",
-     "zonas": 96
+     "zonas": 250
     },
     {
      "id": "objetos_i006",
-     "zonas": 83
+     "zonas": 367
     },
     {
      "id": "objetos_i007",
-     "zonas": 100
+     "zonas": 419
     },
     {
      "id": "objetos_i008",
-     "zonas": 98
+     "zonas": 274
     },
     {
      "id": "objetos_i009",
-     "zonas": 109
+     "zonas": 211
     },
     {
      "id": "objetos_i010",
-     "zonas": 133
+     "zonas": 229
     },
     {
      "id": "objetos_i011",
-     "zonas": 139
+     "zonas": 429
     },
     {
      "id": "objetos_i012",
-     "zonas": 89
+     "zonas": 330
     },
     {
      "id": "objetos_i013",
-     "zonas": 102
+     "zonas": 315
     },
     {
      "id": "objetos_i014",
-     "zonas": 83
+     "zonas": 231
     },
     {
      "id": "objetos_i015",
-     "zonas": 205
+     "zonas": 690
     },
     {
      "id": "objetos_i016",
-     "zonas": 88
+     "zonas": 317
     },
     {
      "id": "objetos_i017",
-     "zonas": 83
+     "zonas": 340
     },
     {
      "id": "objetos_i018",
-     "zonas": 118
+     "zonas": 461
     },
     {
      "id": "objetos_i019",
-     "zonas": 179
+     "zonas": 577
     },
     {
      "id": "objetos_i020",
-     "zonas": 166
+     "zonas": 600
     },
     {
      "id": "objetos_i021",
-     "zonas": 99
+     "zonas": 346
     },
     {
      "id": "objetos_i022",
-     "zonas": 89
+     "zonas": 360
     },
     {
      "id": "objetos_i023",
-     "zonas": 136
+     "zonas": 310
     },
     {
      "id": "objetos_i024",
-     "zonas": 189
+     "zonas": 395
     },
     {
      "id": "objetos_i025",
-     "zonas": 197
+     "zonas": 462
     },
     {
      "id": "objetos_i026",
-     "zonas": 118
+     "zonas": 412
     },
     {
      "id": "objetos_i027",
-     "zonas": 80
+     "zonas": 351
     },
     {
      "id": "objetos_i028",
-     "zonas": 113
+     "zonas": 435
     },
     {
      "id": "objetos_i029",
-     "zonas": 117
+     "zonas": 417
     },
     {
      "id": "objetos_i030",
-     "zonas": 162
+     "zonas": 642
     }
    ]
   },
@@ -2496,163 +2496,163 @@
    "laminas": [
     {
      "id": "vehiculos_i001",
-     "zonas": 177
+     "zonas": 297
     },
     {
      "id": "vehiculos_i002",
-     "zonas": 121
+     "zonas": 206
     },
     {
      "id": "vehiculos_i003",
-     "zonas": 116
+     "zonas": 336
     },
     {
      "id": "vehiculos_i004",
-     "zonas": 144
+     "zonas": 317
     },
     {
      "id": "vehiculos_i005",
-     "zonas": 112
+     "zonas": 272
     },
     {
      "id": "vehiculos_i006",
-     "zonas": 92
+     "zonas": 215
     },
     {
      "id": "vehiculos_i007",
-     "zonas": 208
+     "zonas": 384
     },
     {
      "id": "vehiculos_i008",
-     "zonas": 178
+     "zonas": 327
     },
     {
      "id": "vehiculos_i009",
-     "zonas": 183
+     "zonas": 292
     },
     {
      "id": "vehiculos_i010",
-     "zonas": 149
+     "zonas": 217
     },
     {
      "id": "vehiculos_i011",
-     "zonas": 278
+     "zonas": 376
     },
     {
      "id": "vehiculos_i012",
-     "zonas": 231
-    },
-    {
-     "id": "vehiculos_i013",
-     "zonas": 234
-    },
-    {
-     "id": "vehiculos_i014",
-     "zonas": 169
-    },
-    {
-     "id": "vehiculos_i015",
-     "zonas": 84
-    },
-    {
-     "id": "vehiculos_i016",
-     "zonas": 92
-    },
-    {
-     "id": "vehiculos_i017",
-     "zonas": 126
-    },
-    {
-     "id": "vehiculos_i018",
-     "zonas": 96
-    },
-    {
-     "id": "vehiculos_i019",
-     "zonas": 84
-    },
-    {
-     "id": "vehiculos_i020",
-     "zonas": 113
-    },
-    {
-     "id": "vehiculos_i021",
-     "zonas": 80
-    },
-    {
-     "id": "vehiculos_i022",
-     "zonas": 164
-    },
-    {
-     "id": "vehiculos_i023",
-     "zonas": 144
-    },
-    {
-     "id": "vehiculos_i024",
-     "zonas": 335
-    },
-    {
-     "id": "vehiculos_i025",
-     "zonas": 125
-    },
-    {
-     "id": "vehiculos_i026",
-     "zonas": 87
-    },
-    {
-     "id": "vehiculos_i027",
-     "zonas": 153
-    },
-    {
-     "id": "vehiculos_i028",
-     "zonas": 82
-    },
-    {
-     "id": "vehiculos_i029",
      "zonas": 324
     },
     {
-     "id": "vehiculos_i030",
-     "zonas": 145
+     "id": "vehiculos_i013",
+     "zonas": 358
     },
     {
-     "id": "vehiculos_i031",
-     "zonas": 112
+     "id": "vehiculos_i014",
+     "zonas": 290
     },
     {
-     "id": "vehiculos_i032",
+     "id": "vehiculos_i015",
+     "zonas": 303
+    },
+    {
+     "id": "vehiculos_i016",
+     "zonas": 231
+    },
+    {
+     "id": "vehiculos_i017",
+     "zonas": 335
+    },
+    {
+     "id": "vehiculos_i018",
+     "zonas": 273
+    },
+    {
+     "id": "vehiculos_i019",
      "zonas": 193
     },
     {
-     "id": "vehiculos_i033",
-     "zonas": 188
+     "id": "vehiculos_i020",
+     "zonas": 219
     },
     {
-     "id": "vehiculos_i034",
-     "zonas": 139
-    },
-    {
-     "id": "vehiculos_i035",
-     "zonas": 141
-    },
-    {
-     "id": "vehiculos_i036",
-     "zonas": 128
-    },
-    {
-     "id": "vehiculos_i037",
+     "id": "vehiculos_i021",
      "zonas": 145
     },
     {
+     "id": "vehiculos_i022",
+     "zonas": 422
+    },
+    {
+     "id": "vehiculos_i023",
+     "zonas": 231
+    },
+    {
+     "id": "vehiculos_i024",
+     "zonas": 559
+    },
+    {
+     "id": "vehiculos_i025",
+     "zonas": 314
+    },
+    {
+     "id": "vehiculos_i026",
+     "zonas": 179
+    },
+    {
+     "id": "vehiculos_i027",
+     "zonas": 426
+    },
+    {
+     "id": "vehiculos_i028",
+     "zonas": 286
+    },
+    {
+     "id": "vehiculos_i029",
+     "zonas": 645
+    },
+    {
+     "id": "vehiculos_i030",
+     "zonas": 224
+    },
+    {
+     "id": "vehiculos_i031",
+     "zonas": 230
+    },
+    {
+     "id": "vehiculos_i032",
+     "zonas": 363
+    },
+    {
+     "id": "vehiculos_i033",
+     "zonas": 324
+    },
+    {
+     "id": "vehiculos_i034",
+     "zonas": 310
+    },
+    {
+     "id": "vehiculos_i035",
+     "zonas": 221
+    },
+    {
+     "id": "vehiculos_i036",
+     "zonas": 228
+    },
+    {
+     "id": "vehiculos_i037",
+     "zonas": 391
+    },
+    {
      "id": "vehiculos_i038",
-     "zonas": 168
+     "zonas": 422
     },
     {
      "id": "vehiculos_i039",
-     "zonas": 124
+     "zonas": 281
     },
     {
      "id": "vehiculos_i040",
-     "zonas": 181
+     "zonas": 413
     }
    ]
   },
@@ -2662,155 +2662,155 @@
    "laminas": [
     {
      "id": "lugares_i001",
-     "zonas": 113
+     "zonas": 224
     },
     {
      "id": "lugares_i002",
-     "zonas": 97
+     "zonas": 207
     },
     {
      "id": "lugares_i003",
-     "zonas": 185
+     "zonas": 279
     },
     {
      "id": "lugares_i004",
-     "zonas": 86
+     "zonas": 299
     },
     {
      "id": "lugares_i005",
-     "zonas": 153
+     "zonas": 284
     },
     {
      "id": "lugares_i006",
-     "zonas": 173
+     "zonas": 260
     },
     {
      "id": "lugares_i007",
-     "zonas": 170
+     "zonas": 551
     },
     {
      "id": "lugares_i008",
-     "zonas": 220
+     "zonas": 570
     },
     {
      "id": "lugares_i009",
-     "zonas": 129
+     "zonas": 284
     },
     {
      "id": "lugares_i010",
-     "zonas": 91
+     "zonas": 132
     },
     {
      "id": "lugares_i011",
-     "zonas": 88
+     "zonas": 158
     },
     {
      "id": "lugares_i012",
-     "zonas": 131
+     "zonas": 193
     },
     {
      "id": "lugares_i013",
-     "zonas": 209
+     "zonas": 377
     },
     {
      "id": "lugares_i014",
-     "zonas": 160
+     "zonas": 388
     },
     {
      "id": "lugares_i015",
-     "zonas": 114
+     "zonas": 296
     },
     {
      "id": "lugares_i016",
-     "zonas": 93
+     "zonas": 214
     },
     {
      "id": "lugares_i017",
-     "zonas": 82
+     "zonas": 229
     },
     {
      "id": "lugares_i018",
-     "zonas": 292
+     "zonas": 648
     },
     {
      "id": "lugares_i019",
-     "zonas": 101
+     "zonas": 208
     },
     {
      "id": "lugares_i020",
-     "zonas": 95
+     "zonas": 232
     },
     {
      "id": "lugares_i021",
-     "zonas": 113
+     "zonas": 338
     },
     {
      "id": "lugares_i022",
-     "zonas": 179
+     "zonas": 372
     },
     {
      "id": "lugares_i023",
-     "zonas": 230
+     "zonas": 416
     },
     {
      "id": "lugares_i024",
-     "zonas": 114
+     "zonas": 316
     },
     {
      "id": "lugares_i025",
-     "zonas": 148
+     "zonas": 338
     },
     {
      "id": "lugares_i026",
-     "zonas": 185
+     "zonas": 460
     },
     {
      "id": "lugares_i027",
-     "zonas": 84
+     "zonas": 231
     },
     {
      "id": "lugares_i028",
-     "zonas": 96
+     "zonas": 340
     },
     {
      "id": "lugares_i029",
-     "zonas": 195
+     "zonas": 241
     },
     {
      "id": "lugares_i030",
-     "zonas": 88
+     "zonas": 263
     },
     {
      "id": "lugares_i031",
-     "zonas": 306
+     "zonas": 652
     },
     {
      "id": "lugares_i032",
-     "zonas": 164
+     "zonas": 530
     },
     {
      "id": "lugares_i033",
-     "zonas": 166
+     "zonas": 440
     },
     {
      "id": "lugares_i034",
-     "zonas": 251
+     "zonas": 529
     },
     {
      "id": "lugares_i035",
-     "zonas": 125
+     "zonas": 440
     },
     {
      "id": "lugares_i036",
-     "zonas": 106
+     "zonas": 446
     },
     {
      "id": "lugares_i037",
-     "zonas": 195
+     "zonas": 556
     },
     {
      "id": "lugares_i038",
-     "zonas": 111
+     "zonas": 342
     }
    ]
   },

@@ -29,11 +29,14 @@ NOMBRES = {
 ORDEN = ["animales", "criaturas", "aves", "fantasia", "oceano", "insectos", "flores", "mandalas",
          "objetos", "vehiculos", "lugares", "vitrales", "geometria", "fachadas"]
 DESTINO = os.path.join(RAIZ, "datos", "laminas")
+# Radio para cerrar huecos de los trazos al separar zonas (ver laminas.procesar_tinta).
+# Con 0, en muchas ilustraciones el fondo ocupaba el 80-95 % de la lamina.
+CERRAR = 3
 
 
 def _convertir(trabajo):
     ruta, cat, lid = trabajo
-    lin, reg, mini, k = procesar_tinta(tinta_de(Image.open(ruta), 0, limpiar=True))
+    lin, reg, mini, k = procesar_tinta(tinta_de(Image.open(ruta), 0, limpiar=True), cerrar=CERRAR)
     base = os.path.join(DESTINO, cat, lid)
     lin.save(base + "_lineas.png", optimize=True)
     reg.save(base + "_regiones.png", optimize=True)

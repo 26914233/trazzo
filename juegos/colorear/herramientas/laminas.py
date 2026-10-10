@@ -548,9 +548,21 @@ def procesar(lz):
     return procesar_tinta(255 - np.asarray(fino, dtype=np.int32))
 
 
-def procesar_tinta(tinta):
-    """Igual que procesar() a partir de la tinta (0 papel, 255 línea) a LADO x LADO."""
+def _disco(r):
+    y, x = np.ogrid[-r:r + 1, -r:r + 1]
+    return x * x + y * y <= r * r
+
+
+def procesar_tinta(tinta, cerrar=0):
+    """Igual que procesar() a partir de la tinta (0 papel, 255 línea) a LADO x LADO.
+
+    cerrar: radio en px para cerrar huecos de las líneas antes de separar zonas. Las
+    ilustraciones generadas tienen trazos que no llegan a tocarse y el fondo se colaba
+    dentro del dibujo (un toque pintaba casi toda la lámina). Solo cambia el mapa de
+    zonas: las líneas que se ven son las originales."""
     linea = tinta >= UMBRAL_LINEA
+    if cerrar:
+        linea = ndimage.binary_closing(linea, structure=_disco(cerrar))
     etiquetas, n = ndimage.label(~linea)                     # 4-conexas
     tam = ndimage.sum_labels(np.ones_like(etiquetas), etiquetas, index=np.arange(n + 1))
     chicas = (tam < AREA_MINIMA)

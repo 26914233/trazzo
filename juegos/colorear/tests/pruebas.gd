@@ -41,6 +41,7 @@ func _ready() -> void:
 	prueba_mis_colores()
 	prueba_musica()
 	prueba_misterio()
+	prueba_fondo_cerrado()
 	await prueba_pantallas()
 	await prueba_ajustes_menu()
 	await prueba_celebracion()
@@ -638,3 +639,25 @@ func prueba_misterio_en_pantalla() -> void:
 	await get_tree().process_frame
 	Obras.borrar(m)
 	Diario.misterios = []
+
+
+## Las ilustraciones tienen trazos con huecos: sin cerrarlos, el fondo se colaba
+## dentro del dibujo y un toque pintaba casi toda la lamina (antes 81-92 % aqui).
+func prueba_fondo_cerrado() -> void:
+	caso("el fondo no se cuela dentro del dibujo")
+	for id in ["oceano_i025", "animales_i034", "insectos_i002"]:
+		var l := Laminas.abrir(id)
+		var r: Image = l.regiones.duplicate()
+		r.convert(Image.FORMAT_RGB8)
+		var d: PackedByteArray = r.get_data()
+		var area := PackedInt32Array()
+		area.resize(l.zonas + 1)
+		for i in range(0, d.size(), 3):
+			var z: int = d[i] + d[i + 1] * 256
+			if z <= l.zonas:
+				area[z] += 1
+		var mayor := 0
+		for a in area:
+			mayor = maxi(mayor, a)
+		var parte := float(mayor) / (d.size() / 3)
+		comprobar(parte < 0.6, "%s: la zona mas grande ocupa %d %%" % [id, roundi(parte * 100)])
