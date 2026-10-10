@@ -187,6 +187,22 @@ func prueba_arrastrar_pinta() -> void:
 	_tocar(v, 0, Vector2(200, 200), false)
 	comprobar(l.avance() == 0.0, "al poner el segundo dedo no queda nada pintado")
 	comprobar(v.zoom > 1.0, "y los dos dedos hacen zoom")
+
+	caso("modo tocar: solo la zona tocada; arrastrar mueve")
+	v.reiniciar_zoom()
+	v.arrastrar_pinta = false
+	_tocar(v, 0, Vector2(500, 500), true)
+	_tocar(v, 0, Vector2(500, 500), false)
+	var z := l.zona_en(v.a_lamina(Vector2(500, 500)))
+	comprobar(l.colores[z] == color and is_equal_approx(l.avance(), 1.0 / l.zonas), "tocar rellena una sola zona")
+	comprobar(l.deshacer() and l.avance() == 0.0, "y se deshace")
+	v.ampliar(3.0, Vector2(500, 500))
+	var antes := v.desplazamiento
+	_tocar(v, 0, Vector2(300, 500), true)
+	_arrastrar(v, 0, Vector2(500, 500))
+	_tocar(v, 0, Vector2(500, 500), false)
+	comprobar(l.avance() == 0.0, "arrastrar no pinta")
+	comprobar(v.desplazamiento != antes, "arrastrar mueve el dibujo ampliado")
 	v.queue_free()
 
 

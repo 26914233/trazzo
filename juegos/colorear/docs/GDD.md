@@ -1,4 +1,4 @@
-# GDD — juego de colorear y mandalas (nombre por decidir; de trabajo «Pintazz»)
+# GDD — Lienzo Zen (colorear para relajarse)
 
 ## Concepto
 App tranquila para colorear en el móvil, sin prisa ni derrota. Tres modos:
@@ -10,6 +10,11 @@ App tranquila para colorear en el móvil, sin prisa ni derrota. Tres modos:
 3. **Lienzo libre:** pinceles, goma, colores y deshacer.
 
 Las obras se guardan solas y se ven en «Mis obras».
+
+**Dos formas de pintar** (botón en la pantalla de la lámina, se recuerda):
+- **Pincel:** el dedo pinta cada zona por la que pasa; tocar pinta una.
+- **Tocar:** solo se rellena la zona tocada; arrastrar mueve el dibujo.
+En las dos, dos dedos hacen zoom. Un trazo se deshace de una vez.
 
 ## Público y tono
 Adultos que colorean para relajarse (búsquedas «colorear para adultos», «mandalas»), y

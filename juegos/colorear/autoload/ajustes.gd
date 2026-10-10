@@ -2,7 +2,7 @@
 # No se firma: no guarda nada que valga dinero (todo el contenido viene incluido).
 extends Node
 
-const POR_DEFECTO := {"sonido": true, "vibracion": true, "diseno": "cielo", "paleta": 0}
+const POR_DEFECTO := {"sonido": true, "vibracion": true, "diseno": "cielo", "paleta": 0, "pincel": true}
 
 var ruta := "user://ajustes.json"
 var datos: Dictionary = {}

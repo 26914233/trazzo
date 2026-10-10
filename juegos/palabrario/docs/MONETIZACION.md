@@ -16,7 +16,7 @@ Las pistas compradas no caducan y se gastan después de las 3 gratis del día. N
 contenido depende de ellas: se puede terminar el juego sin comprar ninguna.
 
 Decisiones del dueño (octubre 2026): app de pago; pistas monetizadas con paquetes y sin
-anuncios. La misma fórmula de base se usará en Pintazz.
+anuncios. La misma fórmula de base se usará en Lienzo Zen.
 
 ## Por qué funciona (y qué hay que tener en cuenta)
 

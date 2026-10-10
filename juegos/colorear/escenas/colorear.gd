@@ -13,6 +13,7 @@ var _nombre_paleta: Label
 var _deshacer: Button
 var _rehacer: Button
 var _goma: Button
+var _modo: Button
 
 
 func _ready() -> void:
@@ -24,6 +25,14 @@ func _ready() -> void:
 	var col := Estilo.pantalla(self)
 	col.add_theme_constant_override("separation", 24)
 	var botones := HBoxContainer.new()
+	# Modo de pintar: pincel (arrastrar pinta) o tocar (solo la zona tocada).
+	_modo = Estilo.boton("", "suave", 112)
+	_modo.custom_minimum_size.x = 210
+	_modo.add_theme_font_size_override("font_size", 34)
+	_modo.pressed.connect(func():
+		Ajustes.fijar("pincel", not bool(Ajustes.valor("pincel")))
+		_poner_modo())
+	botones.add_child(_modo)
 	_deshacer = _boton_icono("↶", func(): if lamina.deshacer(): _al_cambiar())
 	_rehacer = _boton_icono("↷", func(): if lamina.rehacer(): _al_cambiar())
 	botones.add_child(_deshacer)
@@ -41,6 +50,7 @@ func _ready() -> void:
 		_al_cambiar())
 	col.add_child(vista)
 	vista.mostrar(lamina)
+	_poner_modo()
 
 	var fila := HBoxContainer.new()
 	fila.add_theme_constant_override("separation", 16)
@@ -71,6 +81,11 @@ func _boton_icono(texto: String, al_tocar: Callable) -> Button:
 	b.add_theme_font_size_override("font_size", 56)
 	b.pressed.connect(al_tocar)
 	return b
+
+
+func _poner_modo() -> void:
+	vista.arrastrar_pinta = bool(Ajustes.valor("pincel"))
+	_modo.text = "✎ Pincel" if vista.arrastrar_pinta else "☝ Tocar"
 
 
 func _cambiar_paleta(paso: int) -> void:

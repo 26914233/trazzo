@@ -32,7 +32,7 @@ Detalle de lo pendiente en `juegos/palabrario/docs/LANZAMIENTO.md`.
 ## Siguiente
 
 1. Revisión humana de las palabras, prueba en un móvil y subida a prueba interna.
-2. Pintazz (dibujo, colorear, mandalas) con el mismo modelo de pago — `juegos/HOJA_DE_RUTA.md`.
+2. Lienzo Zen (dibujo, colorear, mandalas) con el mismo modelo de pago — `juegos/HOJA_DE_RUTA.md`.
 
 ## Preguntas abiertas para el dueño
 

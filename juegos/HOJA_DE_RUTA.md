@@ -5,7 +5,7 @@ Orden acordado: uno completo primero y después los demás sobre el mismo molde.
 | # | Juego | Estado | Esfuerzo estimado* |
 |---|---|---|---|
 | 1 | **Palabrario** — sopa de letras | **Casi terminado, en espera**: 545 sopas, app de pago + paquetes de pistas, auditado, APK y AAB exportados. Se sube cuando la cuenta de Play esté lista (`palabrario/docs/LANZAMIENTO.md`) | — |
-| 2 | **Pintazz** (nombre de trabajo) — dibujo libre, colorear y mandalas | **En curso** | Medio |
+| 2 | **Lienzo Zen** — colorear (749 láminas), dos formas de pintar | **En curso** | Medio |
 | 3 | **Rebotazz** — plataforma, bola y bloques | Diseño abajo | Bajo-medio |
 | 4 | **Zona Zero** — supervivencia zombi 2D | Diseño abajo, alcance recortado | Alto |
 
@@ -14,7 +14,7 @@ Orden acordado: uno completo primero y después los demás sobre el mismo molde.
 ## Modelo de negocio común
 
 Decisión del dueño: **apps de pago de 4,99 US$, todo incluido, sin anuncios ni compras
-dentro** (Palabrario y Pintazz). Ver `palabrario/docs/MONETIZACION.md`. El código de
+dentro** (Palabrario y Lienzo Zen). Ver `palabrario/docs/MONETIZACION.md`. El código de
 anuncios y compras que se escribió y probó para Palabrario está en el historial de git
 (hasta el commit `e0ed81a`) si algún juego necesitara un modelo gratis.
 
@@ -33,7 +33,7 @@ juego que lo use de verdad:
 
 ---
 
-## 2. Pintazz — dibujo, colorear y mandalas
+## 2. Lienzo Zen — dibujo, colorear y mandalas
 
 **Qué es:** tres modos en una app tranquila: *Colorear* (dibujos con zonas que se
 rellenan con un toque), *Mandalas* (simetría radial: lo que trazas se repite en 6–16
@@ -56,7 +56,7 @@ pinceles incluidos; sin anuncios ni compras (mismo modelo que Palabrario).
 producir láminas (vectoriales propias o generadas y retocadas) con licencia clara.
 **Ojo con Familias:** colorear atrae a niños. Sin anuncios ni datos es mucho más fácil
 cumplir la política de Familias de Play, pero hay que revisarla si se apunta a menores.
-**Nombre:** "Pintazz" es de trabajo; buscarle uno a la altura de Palabrario.
+**Nombre:** "Lienzo Zen" es de trabajo; buscarle uno a la altura de Palabrario.
 
 ---
 
@@ -75,7 +75,7 @@ con bloques que bajan.
 - Ángulo de salida según dónde golpea la bola en la plataforma: es lo que da control.
 - Niveles en JSON (rejilla de caracteres), editor mínimo para hacerlos rápido.
 
-**Monetización (por decidir; el dueño solo fijó el pago único para Palabrario y Pintazz):** vidas extra con premiado al perder (*continuar*), power-ups de
+**Monetización (por decidir; el dueño solo fijó el pago único para Palabrario y Lienzo Zen):** vidas extra con premiado al perder (*continuar*), power-ups de
 inicio con fichas, paquetes de niveles, quitar anuncios. Aquí sí hay derrota: el
 intersticial va tras 2–3 partidas y el "continuar con anuncio" es el premiado estrella.
 
@@ -114,4 +114,4 @@ y escribir su GDD con `design-system` y `map-systems` antes de producir.
 
 1. Palabrario: en espera de la cuenta de Play; luego prueba en un móvil y subida a
    prueba interna (`palabrario/docs/LANZAMIENTO.md`).
-2. En curso: **Pintazz**, con el mismo modelo de pago.
+2. En curso: **Lienzo Zen**, con el mismo modelo de pago.
