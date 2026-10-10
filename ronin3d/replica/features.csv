@@ -1,0 +1,42 @@
+feature,area,priority,original,clone,notes
+Personajes pixel art en 8 direcciones en un mundo 3D,arte,must,yes,yes,DECISIÓN 20E; sprites horneados
+Cámara elevada en tercera persona que gira,cámara,must,yes,yes,orbital; horizontal como EthrA (en vertical fija el ancho)
+Sacudida de cámara en golpes fuertes,cámara,should,yes,yes,trauma por corte; separada del encuadre
+Fijado de objetivo con retícula,cámara,must,yes,yes,automático y se mantiene; «Fijar» cambia de objetivo (0.13)
+Cadena de 3 cortes con la espada,combate,must,yes,yes,katana: 4 cortes de iai
+Ataque cargado de 360°,combate,must,yes,yes,iai de luna creciente
+Ataque a la carrera,combate,should,yes,yes,uno por arma (0.12)
+Lanza: estocadas rápidas y largas,combate,must,yes,yes,yari
+Mandoble: barridos lentos que rompen la postura,combate,must,yes,yes,nodachi
+Cambiar de arma en combate,combate,must,yes,yes,botón Arma
+Animación propia por corte y arma,animación,must,yes,yes,poses horneadas (0.11)
+Esquiva con invulnerabilidad que gasta aguante,defensa,must,yes,yes,cancela la recuperación
+Paso corto con el objetivo fijado y voltereta sin fijar,defensa,could,yes,partial,un solo tipo de esquiva
+Bloqueo que gasta postura,defensa,should,yes,no,RONIN usa el iaidō en vez del bloqueo
+Parada perfecta que aturde y abre el contraataque,defensa,must,yes,yes,iai perfecto; la cadena sigue tras él
+Congelación de 2-5 cuadros al golpear,impacto,must,yes,yes,pausa por corte
+Chispas y estela del arma,impacto,must,yes,yes,
+Destello del enemigo al recibir daño,impacto,must,yes,yes,
+Números de daño,impacto,should,yes,yes,
+Retroceso según el golpe y el último lanza lejos,impacto,must,yes,yes,empuje por corte y peso
+Polvo de píxeles al morir,impacto,should,yes,yes,
+Barra de postura o equilibrio del enemigo,combate,should,yes,yes,remate con la postura rota
+Enemigos con escudo que bloquean,enemigos,should,yes,no,
+Enemigos con resistencias (físico frente a magia),enemigos,could,yes,partial,el oni aguanta el iai; no hay magia
+Enemigo de veneno en área,enemigos,could,yes,no,setas en EthrA
+Variedad de enemigos con patrones,enemigos,must,yes,yes,kappa; Aka-oni; onibi; soldados
+Jefe con ataques legibles y fases,jefes,must,yes,yes,oni gigante en dos fases
+Esbirros durante el jefe,jefes,should,yes,no,
+Barra de vida del jefe,interfaz,must,yes,yes,
+HUD con vida y aguante,interfaz,must,yes,yes,y espíritu
+Brújula con objetivos,interfaz,could,yes,no,
+Objetos rápidos de curación,interfaz,should,yes,no,
+Guardado de partida,progresión,must,yes,yes,automático
+Saltar y plataformas,movimiento,should,yes,yes,
+Correr gastando aguante,movimiento,could,yes,partial,se corre sin gastar aguante
+Desenfoque de fondo en diálogos y menús,interfaz,could,yes,partial,tilt-shift; sin profundidad de campo en Compatibility
+Controles táctiles en horizontal,controles,must,no,yes,EthrA es de PC con mando; propio de RONIN
+Compañero mago Veil y su rueda de órdenes,compañero,could,yes,skip,identidad de EthrA; RONIN tiene a Shiro
+Oficios: forja cocina pesca granja casa,oficios,could,yes,skip,fuera del capítulo 1 y de «sin farmeo automático»
+Atributos de RPG,progresión,could,yes,skip,RONIN es de precisión (decisión del 01-10-2026)
+Cooperativo en línea,red,could,yes,skip,sin servidor en el plan

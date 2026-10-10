@@ -81,7 +81,9 @@ Segundos: preparación / corte / recuperación.
   sigue desde el 2.º corte (0.12).
 - **Fijado de objetivo** automático con retícula: anillo rojo y rombo.
 - **Vista de depuración** con F3: conos de los cortes, zonas de golpe y franjas de los ataques.
-- **Juego en vertical** (720×1280).
+- Juego en vertical (720×1280) en la 0.10-0.12; **en horizontal (1280×720) desde la 0.13**, a petición del usuario.
+- **«Fijar»** cambia de objetivo; el fijado se mantiene mientras el enemigo siga vivo y cerca (0.13).
+- **Replica** (`replica/recon.md`, `features.csv`, `parity.md`): paridad con EthrA en el núcleo de combate.
 - **Enemigos del bestiario** (kappa, Aka-oni, onibi) y el **oni gigante** como jefe con dos
   fases, según las fichas de `BESTIARIO.md` §3.
 

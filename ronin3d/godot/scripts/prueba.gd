@@ -1028,6 +1028,22 @@ func _comprobar_reticula_y_depuracion() -> void:
 		"retícula=%s, fijado=%s, superficies=%d" % [juego.reticula.visible, juego.objetivo_fijado == muneco,
 		juego.depuracion.malla.get_surface_count()])
 	juego.depuracion.alternar()
+	# «Fijar» salta al siguiente enemigo cercano y vuelve.
+	var otro = Soldado.new()
+	juego.add_child(otro)
+	otro.configurar(muneco.global_position + Vector3(0, 0, 2.0), muneco.global_position + Vector3(0.1, 0, 2.0), juego.akira)
+	otro.visual = juego._crear_visual(true)
+	otro.add_child(otro.visual)
+	otro.process_mode = Node.PROCESS_MODE_DISABLED
+	juego.soldados.append(otro)
+	juego.objetivo_fijado = muneco
+	juego.cambiar_objetivo()
+	var salto: bool = juego.objetivo_fijado != muneco and juego.objetivo_fijado != null
+	juego.cambiar_objetivo()
+	juego.cambiar_objetivo()
+	_registrar("«Fijar» cambia de objetivo entre los enemigos cercanos", salto, "cambió=%s" % salto)
+	juego.objetivo_fijado = muneco
+	otro.recibir_golpe(Vector3.ZERO, true)
 
 
 func _comprobar_combo() -> void:

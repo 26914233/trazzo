@@ -423,8 +423,8 @@ func completar_texto() -> void:
 	cuerpo.visible_characters = -1
 
 
-const AYUDA_TECLADO := "WASD: moverse · SHIFT: correr · ESPACIO: saltar · J: atacar (mantén: cargado) · C: esquivar · I: arma · K: iaidō (mantén y suelta al «!») · L: corte de luna · Q/E: cámara · T: animación · ESC: pausa"
-const AYUDA_TACTIL := "Joystick: moverse · «Atacar» encadena cortes; mantenlo para cargar\n«Iai»: suéltalo justo al «!» · «Esquivar» · «Arma» cambia de arma"
+const AYUDA_TECLADO := "WASD: moverse · SHIFT: correr · ESPACIO: saltar · J: atacar (mantén: cargado) · C: esquivar · I: arma · TAB: fijar · K: iaidō (mantén y suelta al «!») · L: corte de luna · Q/E: cámara · T: animación · ESC: pausa"
+const AYUDA_TACTIL := "Joystick: moverse · «Atacar» encadena cortes; mantenlo para cargar\n«Iai»: suéltalo justo al «!» · «Esquivar» · «Arma» cambia de arma · «Fijar» cambia de objetivo"
 
 
 func mostrar_ayuda(tactil := false) -> void:
@@ -433,7 +433,7 @@ func mostrar_ayuda(tactil := false) -> void:
 		poner_aviso_interaccion(texto_interaccion)
 	# En el móvil la ayuda va arriba: abajo están el joystick y los botones.
 	# En el móvil, además, con letra más grande: la pantalla es pequeña.
-	# El juego va en vertical: la ayuda siempre arriba, bajo el marcador, y en varias líneas.
+	# La ayuda siempre arriba, bajo el marcador, y en varias líneas (abajo van los botones).
 	_colocar(etiqueta_ayuda, Control.PRESET_CENTER_TOP, Rect2(-ANCHO_UTIL / 2.0, 104, ANCHO_UTIL, 96))
 	etiqueta_ayuda.add_theme_font_size_override("font_size", 20 if tactil else 16)
 	etiqueta_ayuda.text = AYUDA_TACTIL if tactil else AYUDA_TECLADO

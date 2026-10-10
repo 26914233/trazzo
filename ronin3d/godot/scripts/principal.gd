@@ -19,7 +19,7 @@ const VisualSprite := preload("res://scripts/visual_sprite.gd")
 const Galeria := preload("res://scripts/galeria.gd")
 const Apariencias := preload("res://scripts/apariencias_akira.gd")
 const Partida := preload("res://scripts/partida.gd")
-const VERSION := "RONIN · prototipo 0.12"
+const VERSION := "RONIN · prototipo 0.13"
 
 var hud
 var juego
@@ -80,6 +80,7 @@ func _registrar_acciones(clic_ataca: bool) -> void:
 		"especial": [KEY_L],
 		"esquivar": [KEY_C],
 		"cambiar_arma": [KEY_I],
+		"cambiar_objetivo": [KEY_TAB],
 		"depurar_golpes": [KEY_F3],
 		"estilo_animacion": [KEY_T],
 		"galeria": [KEY_G],
@@ -127,6 +128,7 @@ func _registrar_acciones(clic_ataca: bool) -> void:
 		"correr": JOY_BUTTON_RIGHT_SHOULDER, "pausa": JOY_BUTTON_START,
 		"acercar": JOY_BUTTON_DPAD_UP, "alejar": JOY_BUTTON_DPAD_DOWN,
 		"esquivar": JOY_BUTTON_B, "cambiar_arma": JOY_BUTTON_DPAD_RIGHT,
+		"cambiar_objetivo": JOY_BUTTON_RIGHT_STICK,
 	}
 	for accion in botones:
 		var boton := InputEventJoypadButton.new()

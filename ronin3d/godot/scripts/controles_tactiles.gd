@@ -84,8 +84,8 @@ func centro_reposo() -> Vector2:
 
 func _colocar_botones() -> void:
 	var pantalla := get_viewport().get_visible_rect().size
-	# En abanico alrededor de «Atacar», al alcance del pulgar derecho (vale en vertical y en
-	# horizontal: todo se mide desde la esquina inferior derecha).
+	# En abanico alrededor de «Atacar», al alcance del pulgar derecho (vale en horizontal y en
+	# vertical: todo se mide desde la esquina inferior derecha).
 	botones = {
 		"atacar": {"centro": pantalla - Vector2(130, 170), "radio": 72.0, "texto": "Atacar", "accion": "atacar", "dedo": -1},
 		"esquivar": {"centro": pantalla - Vector2(292, 118), "radio": 54.0, "texto": "Esquivar", "accion": "esquivar", "dedo": -1},
@@ -93,6 +93,7 @@ func _colocar_botones() -> void:
 		"parar": {"centro": pantalla - Vector2(130, 350), "radio": 58.0, "texto": "Iai", "accion": "parar", "dedo": -1},
 		"especial": {"centro": pantalla - Vector2(262, 432), "radio": 44.0, "texto": "Luna", "accion": "especial", "dedo": -1},
 		"arma": {"centro": pantalla - Vector2(110, 500), "radio": 40.0, "texto": "Arma", "accion": "cambiar_arma", "dedo": -1},
+		"fijar": {"centro": pantalla - Vector2(390, 210), "radio": 38.0, "texto": "Fijar", "accion": "cambiar_objetivo", "dedo": -1},
 		"pausa": {"centro": Vector2(pantalla.x - 60, 110), "radio": 34.0, "texto": "II", "accion": "", "dedo": -1},
 	}
 

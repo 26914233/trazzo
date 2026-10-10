@@ -85,7 +85,7 @@ func iniciar(con_intro := true) -> void:
 	efectos.camara = camara
 	add_child(efectos)
 	_crear_profundidad()
-	akira.buscar_rival = soldado_mas_cercano
+	akira.buscar_rival = rival_para_akira
 	akira.ataco.connect(func(): efectos.tajo(akira.global_position + Vector3.UP * 1.2))
 	akira.desenvaino.connect(func(): efectos.desenvaine(akira.global_position + Vector3.UP * 1.2))
 	akira.paro.connect(_al_iai_perfecto)
@@ -165,8 +165,15 @@ func _crear_reticula() -> void:
 	add_child(reticula)
 
 
+# El objetivo se mantiene mientras siga vivo y cerca (como el fijado de EthrA); si cae o se aleja,
+# pasa al más cercano. «Fijar» (TAB, clic del stick derecho o el botón táctil) salta al siguiente.
 func _actualizar_reticula() -> void:
-	objetivo_fijado = soldado_mas_cercano(akira.global_position, ALCANCE_FIJADO) if akira.vivo() else null
+	var sigue: bool = objetivo_fijado != null and is_instance_valid(objetivo_fijado) and objetivo_fijado.vivo() \
+		and objetivo_fijado.global_position.distance_to(akira.global_position) < ALCANCE_FIJADO * 1.4
+	if not akira.vivo():
+		objetivo_fijado = null
+	elif not sigue:
+		objetivo_fijado = soldado_mas_cercano(akira.global_position, ALCANCE_FIJADO)
 	reticula.visible = objetivo_fijado != null and fase == "jugando"
 	if not reticula.visible:
 		return
@@ -179,6 +186,25 @@ func _actualizar_reticula() -> void:
 	reticula.scale = Vector3.ONE * radio
 	var rombo: Label3D = reticula.get_node("Rombo")
 	rombo.position.y = 2.3 / radio + sin(Time.get_ticks_msec() / 160.0) * 0.08
+
+
+func cambiar_objetivo() -> void:
+	var cerca: Array = soldados_vivos().filter(func(e):
+		return e.global_position.distance_to(akira.global_position) < ALCANCE_FIJADO * 1.4)
+	if cerca.is_empty():
+		return
+	cerca.sort_custom(func(a, b):
+		return a.global_position.distance_to(akira.global_position) < b.global_position.distance_to(akira.global_position))
+	var indice: int = cerca.find(objetivo_fijado)
+	objetivo_fijado = cerca[(indice + 1) % cerca.size()]
+
+
+# Para los cortes y el iai: el objetivo fijado si está a mano; si no, el más cercano.
+func rival_para_akira(desde: Vector3, alcance: float):
+	if objetivo_fijado != null and is_instance_valid(objetivo_fijado) and objetivo_fijado.vivo() \
+			and objetivo_fijado.global_position.distance_to(desde) < alcance:
+		return objetivo_fijado
+	return soldado_mas_cercano(desde, alcance)
 
 
 # Yōkai del bestiario (kappa, oni, onibi), con las fichas del capítulo 1.
@@ -447,6 +473,8 @@ func _al_pedir_corte_de_luna() -> void:
 func _physics_process(delta: float) -> void:
 	constructor.actualizar(delta)
 	_actualizar_reticula()
+	if fase == "jugando" and Input.is_action_just_pressed("cambiar_objetivo"):
+		cambiar_objetivo()
 	if Input.is_action_just_pressed("depurar_golpes"):
 		depuracion.alternar()
 	cerca_del_jizo = fase == "jugando" and akira.vivo() \
