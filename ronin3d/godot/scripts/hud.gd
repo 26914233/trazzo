@@ -99,6 +99,10 @@ class MarcadorVida extends Control:
 			draw_polyline(borde, Color(1, 0.6, 0.5) if i < vida else Color(0.45, 0.3, 0.32), 2.0)
 
 
+# Ancho de los textos: cabe en la pantalla vertical (720 px de ancho) con margen.
+const ANCHO_UTIL := 660.0
+
+
 func _ready() -> void:
 	layer = 10
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -123,9 +127,11 @@ func _ready() -> void:
 	_colocar(etiqueta_soldados, Control.PRESET_TOP_RIGHT, Rect2(-320, 18, 298, 30))
 	etiqueta_soldados.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 
+	# En vertical la ayuda va arriba, bajo el marcador: abajo están los botones táctiles.
 	etiqueta_ayuda = _etiqueta(16, Datos.CREMA)
-	_colocar(etiqueta_ayuda, Control.PRESET_CENTER_BOTTOM, Rect2(-600, -68, 1200, 30))
+	_colocar(etiqueta_ayuda, Control.PRESET_CENTER_TOP, Rect2(-ANCHO_UTIL / 2.0, 104, ANCHO_UTIL, 64))
 	etiqueta_ayuda.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	etiqueta_ayuda.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	etiqueta_ayuda.modulate.a = 0.0
 
 	etiqueta_version = _etiqueta(15, Color(0.85, 0.82, 0.72))
@@ -133,7 +139,7 @@ func _ready() -> void:
 	etiqueta_version.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 
 	aviso_interaccion = _etiqueta(20, Datos.CREMA)
-	_colocar(aviso_interaccion, Control.PRESET_CENTER_BOTTOM, Rect2(-330, -132, 660, 44))
+	_colocar(aviso_interaccion, Control.PRESET_CENTER_TOP, Rect2(-ANCHO_UTIL / 2.0, 230, ANCHO_UTIL, 44))
 	aviso_interaccion.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	aviso_interaccion.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	var marco_aviso := StyleBoxFlat.new()
@@ -145,7 +151,7 @@ func _ready() -> void:
 	aviso_interaccion.visible = false
 
 	etiqueta_mensaje = _etiqueta(20, Datos.DORADO)
-	_colocar(etiqueta_mensaje, Control.PRESET_CENTER_TOP, Rect2(-420, 136, 840, 32))
+	_colocar(etiqueta_mensaje, Control.PRESET_CENTER_TOP, Rect2(-ANCHO_UTIL / 2.0, 176, ANCHO_UTIL, 32))
 	etiqueta_mensaje.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	etiqueta_mensaje.modulate.a = 0.0
 
@@ -186,7 +192,7 @@ func _crear_capa_texto() -> void:
 	capa_texto.add_child(velo)
 	var caja := VBoxContainer.new()
 	caja.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	caja.custom_minimum_size = Vector2(820, 0)
+	caja.custom_minimum_size = Vector2(ANCHO_UTIL, 0)
 	caja.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	caja.grow_vertical = Control.GROW_DIRECTION_BOTH
 	caja.add_theme_constant_override("separation", 10)
@@ -203,7 +209,7 @@ func _crear_capa_texto() -> void:
 	subtitulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	pie.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	cuerpo.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	cuerpo.custom_minimum_size = Vector2(820, 180)
+	cuerpo.custom_minimum_size = Vector2(ANCHO_UTIL, 180)
 	var fondo_cuerpo := StyleBoxFlat.new()
 	fondo_cuerpo.bg_color = Color(0.04, 0.035, 0.07, 0.72)
 	fondo_cuerpo.border_color = Color(0.55, 0.45, 0.28)
@@ -233,7 +239,7 @@ func _crear_capa_pausa() -> void:
 	indicacion_pausa = _etiqueta(22, Datos.CREMA)
 	remove_child(indicacion_pausa)
 	capa_pausa.add_child(indicacion_pausa)
-	_colocar(indicacion_pausa, Control.PRESET_CENTER, Rect2(-400, 0, 800, 36))
+	_colocar(indicacion_pausa, Control.PRESET_CENTER, Rect2(-ANCHO_UTIL / 2.0, 0, ANCHO_UTIL, 36))
 	indicacion_pausa.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	boton_animacion = _etiqueta(20, Datos.CREMA)
 	remove_child(boton_animacion)
@@ -393,11 +399,9 @@ func mostrar_ayuda(tactil := false) -> void:
 		poner_aviso_interaccion(texto_interaccion)
 	# En el móvil la ayuda va arriba: abajo están el joystick y los botones.
 	# En el móvil, además, con letra más grande: la pantalla es pequeña.
-	if tactil:
-		_colocar(etiqueta_ayuda, Control.PRESET_CENTER_TOP, Rect2(-560, 62, 1120, 64))
-	else:
-		_colocar(etiqueta_ayuda, Control.PRESET_CENTER_BOTTOM, Rect2(-600, -68, 1200, 30))
-	etiqueta_ayuda.add_theme_font_size_override("font_size", 22 if tactil else 16)
+	# El juego va en vertical: la ayuda siempre arriba, bajo el marcador, y en varias líneas.
+	_colocar(etiqueta_ayuda, Control.PRESET_CENTER_TOP, Rect2(-ANCHO_UTIL / 2.0, 104, ANCHO_UTIL, 96))
+	etiqueta_ayuda.add_theme_font_size_override("font_size", 20 if tactil else 16)
 	etiqueta_ayuda.text = AYUDA_TACTIL if tactil else AYUDA_TECLADO
 	tiempo_ayuda = 0.0
 

@@ -119,6 +119,11 @@ const CAMARA_DISTANCIA := 12.0
 const CAMARA_INCLINACION := 38.0
 const CAMARA_GIRO := -60.0
 const CAMARA_FOV := 38.0
+# Juego en vertical (móvil): la cámara fija el ancho de la vista en vez del alto, para no
+# perder los lados, y mira más desde arriba, como la cámara elevada de EthrA.
+const CAMARA_FOV_VERTICAL := 56.0     # grados de ancho con la pantalla en vertical
+const CAMARA_INCLINACION_VERTICAL := 46.0
+const CAMARA_DISTANCIA_VERTICAL := 9.5
 const CAMARA_DISTANCIA_MIN := 7.0
 const CAMARA_DISTANCIA_MAX := 18.0
 const CAMARA_INCLINACION_MIN := -5.0

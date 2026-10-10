@@ -86,9 +86,9 @@ func _ready() -> void:
 		[16.9, _comprobar_pausa],
 		[17.3, _comprobar_reanudar],
 		[17.5, _activar_tactil],
-		[17.6, _tocar.bind(Vector2(640, 360))],
-		[17.9, _tocar.bind(Vector2(640, 360))],
-		[18.2, _tocar.bind(Vector2(640, 360))],
+		[17.6, _tocar_centro],
+		[17.9, _tocar_centro],
+		[18.2, _tocar_centro],
 		[18.4, _comprobar_toques],
 		[19.6, _empezar_joystick],
 		[20.3, _capturar.bind("tactil")],
@@ -404,10 +404,16 @@ func _activar_tactil() -> void:
 	principal.tactil.activar(true)
 
 
+# Las posiciones de la prueba son de la pantalla del juego (720×1280); los toques llegan en
+# píxeles de la ventana, que en el escritorio es más pequeña.
+func _a_ventana(posicion: Vector2) -> Vector2:
+	return get_viewport().get_final_transform() * posicion
+
+
 func _evento_toque(posicion: Vector2, pulsado: bool) -> void:
 	var toque := InputEventScreenTouch.new()
 	toque.index = 0
-	toque.position = posicion
+	toque.position = _a_ventana(posicion)
 	toque.pressed = pulsado
 	Input.parse_input_event(toque)
 
@@ -415,6 +421,10 @@ func _evento_toque(posicion: Vector2, pulsado: bool) -> void:
 func _tocar(posicion: Vector2) -> void:
 	_evento_toque(posicion, true)
 	_evento_toque(posicion, false)
+
+
+func _tocar_centro() -> void:
+	_tocar(get_viewport().get_visible_rect().size / 2.0)
 
 
 func _comprobar_toques() -> void:
@@ -428,8 +438,8 @@ func _empezar_joystick() -> void:
 	_evento_toque(Vector2(200, 520), true)
 	var arrastre := InputEventScreenDrag.new()
 	arrastre.index = 0
-	arrastre.position = Vector2(300, 520)
-	arrastre.relative = Vector2(100, 0)
+	arrastre.position = _a_ventana(Vector2(300, 520))
+	arrastre.relative = _a_ventana(Vector2(300, 520)) - _a_ventana(Vector2(200, 520))
 	Input.parse_input_event(arrastre)
 
 

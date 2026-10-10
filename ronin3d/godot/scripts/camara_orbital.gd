@@ -28,7 +28,30 @@ func _ready() -> void:
 	add_child(camara)
 	camara.current = true
 	ruido.frequency = 0.3
+	if en_vertical():
+		inclinacion = Datos.CAMARA_INCLINACION_VERTICAL
+		distancia = Datos.CAMARA_DISTANCIA_VERTICAL
+	_ajustar_aspecto()
 	colocar_de_golpe()
+
+
+func en_vertical() -> bool:
+	if not is_inside_tree():
+		return false
+	var tamano := get_viewport().get_visible_rect().size
+	return tamano.y > tamano.x
+
+
+# En vertical se fija el ancho de la vista (si no, con el alto fijo los lados quedan fuera).
+func _ajustar_aspecto() -> void:
+	if camara == null:
+		return
+	if en_vertical():
+		camara.keep_aspect = Camera3D.KEEP_WIDTH
+		camara.fov = Datos.CAMARA_FOV_VERTICAL
+	else:
+		camara.keep_aspect = Camera3D.KEEP_HEIGHT
+		camara.fov = Datos.CAMARA_FOV
 
 
 func colocar_de_golpe() -> void:
@@ -65,6 +88,7 @@ func sacudir(fuerza: float) -> void:
 
 func _process(delta: float) -> void:
 	tiempo += delta
+	_ajustar_aspecto()
 	# La sacudida sigue en tiempo real aunque el juego esté congelado por el impacto.
 	var real := delta / maxf(Engine.time_scale, 0.001)
 	trauma = maxf(0.0, trauma - real * 1.6)
