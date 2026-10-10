@@ -59,6 +59,8 @@ func _ready() -> void:
 		Input.emulate_touch_from_mouse = true
 		tactil.activar(true)
 	_iniciar_juego(true)
+	if "--depurar" in argumentos:
+		juego.depuracion.alternar()
 	if "--prueba" in argumentos:
 		var prueba = Prueba.new()
 		prueba.principal = self

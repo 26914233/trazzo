@@ -129,6 +129,7 @@ func _ready() -> void:
 		[42.5, _capturar.bind("jizo")],
 		[42.6, _comprobar_guardado],
 		[42.7, _preparar_combo],
+		[42.72, _comprobar_reticula_y_depuracion],
 	]
 	# Cadena de la katana: pulsar atacar cada 0,1 s (las pulsaciones se guardan y encadenan).
 	for i in 16:
@@ -1013,6 +1014,19 @@ func _preparar_combo() -> void:
 	numeros_antes = _juego().efectos.numeros_creados
 	_crear_muneco(Datos.VIDA_SOLDADO)
 	pasos_vistos.clear()
+
+
+func _comprobar_reticula_y_depuracion() -> void:
+	var juego = _juego()
+	juego.depuracion.activa = true
+	await get_tree().process_frame
+	await get_tree().process_frame
+	_capturar("depuracion")
+	_registrar("La retícula fija al enemigo más cercano y F3 dibuja conos y zonas de golpe",
+		juego.reticula.visible and juego.objetivo_fijado == muneco and juego.depuracion.malla.get_surface_count() > 0,
+		"retícula=%s, fijado=%s, superficies=%d" % [juego.reticula.visible, juego.objetivo_fijado == muneco,
+		juego.depuracion.malla.get_surface_count()])
+	juego.depuracion.alternar()
 
 
 func _comprobar_combo() -> void:

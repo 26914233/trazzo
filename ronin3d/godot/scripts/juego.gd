@@ -21,6 +21,8 @@ const Jizo := preload("res://scripts/jizo.gd")
 const Yokai := preload("res://scripts/yokai.gd")
 const JefeOni := preload("res://scripts/jefe_oni.gd")
 const Enemigos := preload("res://scripts/enemigos.gd")
+const Depuracion := preload("res://scripts/depuracion.gd")
+const ALCANCE_FIJADO := 7.0          # el enemigo más cercano a esta distancia queda fijado
 const SHADER_PROFUNDIDAD := preload("res://shaders/profundidad.gdshader")
 
 signal fase_cambiada(fase: String)
@@ -43,6 +45,9 @@ var camara
 var soldados: Array = []             # todos los enemigos: soldados, yōkai y el jefe
 var jefe                             # el oni gigante del portón
 var aviso_porton := 0.0
+var depuracion
+var reticula: Node3D                 # anillo rojo bajo el enemigo fijado (como en EthrA)
+var objetivo_fijado = null
 var shiro
 var monedas_suelo                    # las monedas que hay por el suelo (monedas.gd)
 var monedas := 0                     # las que lleva Akira (las guarda partida.gd)
@@ -116,12 +121,64 @@ func iniciar(con_intro := true) -> void:
 		soldados.append(soldado)
 	_crear_yokai()
 	_crear_jefe()
+	_crear_reticula()
+	depuracion = Depuracion.new()
+	depuracion.juego = self
+	add_child(depuracion)
 
 	if con_intro:
 		camara.modo_presentacion = true
 		_cambiar_fase("intro")
 	else:
 		comenzar()
+
+
+# Retícula del objetivo fijado: un anillo rojo en el suelo y un rombo encima. El fijado es
+# automático (el enemigo vivo más cercano), pensado para jugar con el pulgar en el móvil; los
+# cortes de Akira se orientan hacia él (akira.gd, _encarar_al_atacar).
+func _crear_reticula() -> void:
+	reticula = Node3D.new()
+	reticula.top_level = true
+	var anillo := MeshInstance3D.new()
+	var toro := TorusMesh.new()
+	toro.inner_radius = 0.62
+	toro.outer_radius = 0.72
+	anillo.mesh = toro
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.albedo_color = Color(1.0, 0.2, 0.15, 0.85)
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	anillo.material_override = material
+	anillo.scale = Vector3(1, 0.05, 1)
+	reticula.add_child(anillo)
+	var rombo := Label3D.new()
+	rombo.text = "◆"
+	rombo.font_size = 64
+	rombo.pixel_size = 0.005
+	rombo.modulate = Color(1.0, 0.25, 0.2)
+	rombo.outline_size = 10
+	rombo.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	rombo.no_depth_test = true
+	rombo.name = "Rombo"
+	reticula.add_child(rombo)
+	reticula.visible = false
+	add_child(reticula)
+
+
+func _actualizar_reticula() -> void:
+	objetivo_fijado = soldado_mas_cercano(akira.global_position, ALCANCE_FIJADO) if akira.vivo() else null
+	reticula.visible = objetivo_fijado != null and fase == "jugando"
+	if not reticula.visible:
+		return
+	var puntos := puntos_de_golpe(objetivo_fijado)
+	var lugar: Vector3 = objetivo_fijado.global_position
+	if not puntos.is_empty() and objetivo_fijado.has_method("puntos_de_golpe"):
+		lugar = puntos[0].posicion
+	var radio := 1.0 if objetivo_fijado.has_method("puntos_de_golpe") else 0.7
+	reticula.global_position = Vector3(lugar.x, objetivo_fijado.global_position.y + 0.06, lugar.z)
+	reticula.scale = Vector3.ONE * radio
+	var rombo: Label3D = reticula.get_node("Rombo")
+	rombo.position.y = 2.3 / radio + sin(Time.get_ticks_msec() / 160.0) * 0.08
 
 
 # Yōkai del bestiario (kappa, oni, onibi), con las fichas del capítulo 1.
@@ -389,6 +446,9 @@ func _al_pedir_corte_de_luna() -> void:
 
 func _physics_process(delta: float) -> void:
 	constructor.actualizar(delta)
+	_actualizar_reticula()
+	if Input.is_action_just_pressed("depurar_golpes"):
+		depuracion.alternar()
 	cerca_del_jizo = fase == "jugando" and akira.vivo() \
 		and akira.global_position.distance_to(jizo.global_position) < Datos.RADIO_JIZO
 	var aviso := _texto_jizo() if cerca_del_jizo else ""
