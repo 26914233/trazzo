@@ -436,10 +436,11 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   criaturas y jefes nuevos en `enemigos.gd`, con sus conductas en `yokai.gd` (proyectiles en
   `proyectil.gd`, golpes de área en `zona_peligro.gd`). Sōjōbō enseña el paso del tengu (esquivar cuesta la
   mitad). La partida guarda el escenario alcanzado; en la pausa se elige cualquiera ya abierto (N).
-  - **Textos de los capítulos 2 a 4 pendientes de su visto bueno:** `HISTORIA.md` §10 (Genzo, Bahamut y
-    Tamamo quedan sin morir del todo; el Silencio, DECISIÓN 11, no está).
+  - **Textos de los capítulos 2 a 4 aprobados por el usuario el 10-10-2026** («vamos con eso»): `HISTORIA.md`
+    §10. Genzo, Bahamut y Tamamo quedan sin morir del todo; el Silencio (DECISIÓN 11) sigue abierto y no está.
   - **Gemini sin saldo** (402 de AI Studio) desde la hoja de los aldeanos: los aldeanos son provisionales
-    (`herramientas/aldeanos_provisionales.py`). No recargar sin que lo pida el usuario.
+    (`herramientas/aldeanos_provisionales.py`). El usuario autorizó recargar «solo lo justo» (10-10-2026); la
+    recarga la hace él en AI Studio (mínimo de compra, sin recarga automática).
   - Recorte de todas las hojas: `sh ronin3d/herramientas/recortar_hojas_enemigos.sh`; revisión con
     `vista_hoja.py`; para ver un escenario: `-- --escenario N --sin-intro --captura ruta.png 5`.
 - **Todos los enemigos en ese estilo (10-10-2026, 0.15):** el usuario pidió el mismo estilo para los

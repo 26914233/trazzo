@@ -11,7 +11,7 @@ OK     Los soldados derrotados sueltan monedas  1 derrotados, 4 monedas soltadas
 OK     El muro oeste detiene a Akira  x=-23.65 (el muro empieza en −24)
 OK     El oni bloquea el portón mientras vive  fase=jugando, x=24.1
 OK     Llegar al portón cierra el capítulo  fase=cierre
-FALLO  Tras el cierre del castillo se sigue en la planicie  escenario=0, fase=cierre
+OK     Tras el cierre del castillo se sigue en la planicie  escenario=1, fase=intro
 OK     ESC pausa el juego de verdad (soldados y Shiro quietos) y lo reanuda  pausado=true, el juego seguía=false, después=false
 OK     Tocar la pantalla sigue los textos  fase=jugando
 OK     El joystick táctil mueve a Akira  recorrió 7.2 m
@@ -23,7 +23,7 @@ OK     Animación anime: 12 poses por segundo; T cambia a suave (cada paso)  ani
 OK     La galería de criaturas se abre desde la pausa y reparte páginas  10 páginas; la tercera tiene 7 criaturas y 125 piezas
 OK     Al cerrar la galería se vuelve a la pausa y el juego sigue entero  en pausa=true, juego en el árbol=true
 OK     El catálogo del bestiario se carga y todos sus datos son válidos  929 criaturas (123 con modelo propio), 0 con datos no válidos
-OK     Todas las criaturas del catálogo se construyen dentro del presupuesto de piezas  929 criaturas (1163 construcciones con los rangos 2 y 3 de 1 de cada 8) en 1081 ms; rango 1: media 20.5 piezas, máximo 42; máximo con rangos: 42
+OK     Todas las criaturas del catálogo se construyen dentro del presupuesto de piezas  929 criaturas (1163 construcciones con los rangos 2 y 3 de 1 de cada 8) en 1118 ms; rango 1: media 20.5 piezas, máximo 42; máximo con rangos: 42
 OK     Los modelos detallados se cargan con textura y cel-shading (el Aka-oni, con sus tres rangos)  rango 1: 14024 triángulos, 1.91 m; rango 2: 14024 triángulos, 2.29 m; rango 3: 14024 triángulos, 1.91 m; modelo 353: 41471 triángulos; modelo 680: 2588 triángulos
 OK     Los cuatro aspectos de Akira llevan la cicatriz y el sastre los enseña en la pausa  triángulos: { "joven": 3594, "curtido": 3642, "veterano": 3671, "mujer": 3469 }
 OK     Personajes en pixel art: Akira y Shiro en 8 direcciones; los enemigos, en hojas del estilo del oni  hojas bien: 6 de 6 · hojas de enemigos: 4 de 4 · dirección 7 → 3 al girar la cámara 180°
@@ -80,5 +80,5 @@ OK     Hoshiyama: tras caer el jefe aparece tamamo_zorro  jefe=tamamo_zorro
 OK     Al caer la zorra de nueve colas llega el final  fase=cierre, alcanzado=8
 OK     Tras el final se vuelve al primer escenario  
 OK     Sōjōbō enseña el paso del tengu (esquivar cuesta la mitad)  escenario=5, coste=0.50
-Resultado: 80 de 81 comprobaciones correctas
-FPS al caminar por el patio: 5.9 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)
+Resultado: 81 de 81 comprobaciones correctas
+FPS al caminar por el patio: 4.2 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)

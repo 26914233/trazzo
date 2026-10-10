@@ -87,8 +87,8 @@ func _ready() -> void:
 		[14.6, _comprobar_bloqueo_del_jefe],
 		[15.6, _comprobar_cierre],
 		[15.8, _pulsar.bind("aceptar")],
-		[15.95, _comprobar_siguiente_escenario],
 		[16.3, _capturar.bind("cierre")],
+		[16.4, _comprobar_siguiente_escenario],
 		[16.5, _pulsar.bind("pausa")],
 		[16.9, _comprobar_pausa],
 		[17.3, _comprobar_reanudar],
@@ -450,6 +450,8 @@ func _comprobar_bloqueo_del_jefe() -> void:
 # Desde la 0.16, el cierre del castillo lleva a la planicie. La prueba vuelve al castillo (con su
 # historia) para seguir con lo de siempre.
 func _comprobar_siguiente_escenario() -> void:
+	principal.hud.completar_texto()
+	principal.aceptar()
 	_registrar("Tras el cierre del castillo se sigue en la planicie", _juego().indice_escenario == 1
 		and _juego().fase == "intro" and Partida.alcanzado >= 1,
 		"escenario=%d, fase=%s" % [_juego().indice_escenario, _juego().fase])

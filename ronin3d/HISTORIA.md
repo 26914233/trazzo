@@ -1,7 +1,7 @@
 # RONIN — Sinopsis
 
-**Estado:** **aprobada el 1-10-2026**. Los textos de los capítulos 2 a 4, escritos el 10-10-2026 a
-partir de la sinopsis y ya en el juego (0.16), esperan tu visto bueno: están en §10. (DECISIÓN 8A: tal cual, con los textos nuevos del capítulo 1;
+**Estado:** **aprobada el 1-10-2026**. Los textos de los capítulos 2 a 4 (§10), escritos el 10-10-2026 a
+partir de la sinopsis y ya en el juego (0.16), **los aprobó el usuario el mismo día** («vamos con eso»). (DECISIÓN 8A: tal cual, con los textos nuevos del capítulo 1;
 DECISIÓN 9A: el gran yōkai es Tamamo-no-Mae). Los textos del capítulo 1 ya están cambiados en
 `godot/scripts/datos.gd`; llegarán al APK con la próxima versión. Lo marcado como **[propuesta]**
 sigue sin decidir; hoy es la capa del Silencio (§8, DECISIÓN 11). El origen de Shiro y de la
@@ -223,7 +223,7 @@ explicarla.
   solo de aspecto.
 
 
-## 10. Textos de los capítulos 1 (resto) a 4, en el juego desde la 0.16 [propuesta, pendiente de tu visto bueno]
+## 10. Textos de los capítulos 1 (resto) a 4, en el juego desde la 0.16 (**aprobados el 10-10-2026**)
 
 El 10-10-2026 pediste «continuar con los demás escenarios, enemigos y lore que ya se habían
 establecido». Estos textos siguen la sinopsis aprobada (§4 y §6) y el bestiario por capítulos, y no
@@ -244,7 +244,7 @@ cambian nada de lo aprobado: el castillo conserva sus textos de §5 tal cual. Es
 | 8 | 4 · El regreso | La planicie bajo la luna roja | Gashadokuro |
 | 9 | 4 | El castillo de Hoshiyama | Genzo → Tamamo-no-Mae → la zorra de nueve colas |
 
-**Decisiones que tomé para seguir sin pararme (cámbialas si no te gustan):**
+**Decisiones que tomé para seguir sin pararme (el usuario las aprobó junto con los textos el 10-10-2026):**
 
 - Al salir del castillo, el título del cierre es «Hoshiyama queda atrás» (antes, «Fin del capítulo
   1»), porque el capítulo sigue en la planicie y la aldea. Los tres párrafos aprobados no cambian.

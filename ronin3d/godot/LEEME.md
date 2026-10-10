@@ -172,7 +172,10 @@ Sirve para ver y medir el sistema que construye criaturas con piezas (`../BESTIA
 
 ## Exportar
 
-- **APK de prueba (ya hecho):** `ronin-0.9-prueba.apk` está en Google Drive, en
+- **APK de prueba de hoy: `ronin-0.16-prueba.apk`** (10-10-2026, código 16, 39 MB, SHA-256
+  `5c83365958c4b800b46519d0ced136b6f329e5a96179be4d557f5c2e2ca4c92b`): los capítulos 1 a 4. Se mandó al
+  usuario por el chat (el conector de Drive no sube archivos de ese tamaño).
+- **APK de prueba (antiguo):** `ronin-0.9-prueba.apk` está en Google Drive, en
   `Respaldos Claude/ronin/` (tamaño y SHA-256 en `../HANDOFF_RONIN.md`). Para instalarlo, ábrelo desde
   el móvil y acepta «instalar apps de origen desconocido» si Android lo pide. Pide Android 7.0 o
   superior y un móvil de 64 bits. Se instala encima de las anteriores (misma firma); están en

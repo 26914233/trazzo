@@ -52,7 +52,7 @@ static func lista() -> Array:
 			"id": "planicie", "capitulo": 1, "titulo": "Capítulo 1 · La noche de Hoshiyama",
 			"nombre": "La planicie de Hoshiyama", "mundo": "planicie",
 			"ambiente": {"tinte_luna": Color(1.0, 0.78, 0.7), "luz_luna": Color("b8b0ff"), "niebla": Color("221c34"),
-				"cielo_horizonte": Color("3a2238"), "ambiente": Color("1e1c34"), "densidad_niebla": 0.014,
+				"cielo_horizonte": Color("3a2238"), "ambiente": Color("262440"), "energia_ambiente": 2.9, "densidad_niebla": 0.014,
 				"direccion_luna": Vector3(0.5, 0.35, -0.8)},
 			"intro": [
 				"La planicie de Hoshiyama. Por el camino del este huyen los aldeanos; detrás, el castillo arde bajo la luna.",

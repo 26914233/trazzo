@@ -358,7 +358,7 @@ func _templo() -> void:
 
 func _dojo() -> void:
 	_suelo("kakuriyo_suelo", "kakuriyo_suelo")
-	_franja(-28, 12, 0, 3.5, "losa")
+	_franja(-28, 12, 0, 3.5, "roca_oscura")
 	# El patio del dojo: tarima de madera.
 	caja(Vector3(17, 0.08, 0), Vector3(14, 0.16, 12), "tatami", false)
 	for x in [10.5, 23.5]:
