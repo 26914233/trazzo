@@ -19,7 +19,7 @@ const VisualSprite := preload("res://scripts/visual_sprite.gd")
 const Galeria := preload("res://scripts/galeria.gd")
 const Apariencias := preload("res://scripts/apariencias_akira.gd")
 const Partida := preload("res://scripts/partida.gd")
-const VERSION := "RONIN · prototipo 0.13"
+const VERSION := "RONIN · prototipo 0.14"
 
 var hud
 var juego

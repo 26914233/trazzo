@@ -1,0 +1,43 @@
+{
+ "tam": [
+  240,
+  140
+ ],
+ "pies": [
+  110,
+  132
+ ],
+ "animaciones": {
+  "reposo": {
+   "inicio": 0,
+   "cuadros": 5,
+   "fps": 6.0
+  },
+  "caminar": {
+   "inicio": 5,
+   "cuadros": 6,
+   "fps": 9.0
+  },
+  "ataque": {
+   "inicio": 11,
+   "cuadros": 4,
+   "fps": 0.0
+  },
+  "area": {
+   "inicio": 15,
+   "cuadros": 4,
+   "fps": 0.0
+  },
+  "golpe": {
+   "inicio": 19,
+   "cuadros": 5,
+   "fps": 0.0
+  },
+  "muerte": {
+   "inicio": 24,
+   "cuadros": 5,
+   "fps": 0.0
+  }
+ },
+ "columnas": 8
+}

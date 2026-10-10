@@ -421,8 +421,14 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   para el móvil (fue vertical de la 0.10 a la 0.12; el usuario pidió horizontal) y enemigos del bestiario. Referencia y tiempos: `ronin3d/ETHRA_REFERENCIA.md`. Los
   combos por arma (katana con cadena de iai, yari, nodachi), la carga, la esquiva y la postura
   están en `godot/scripts/armas.gd`. Yōkai (`enemigos.gd`, `yokai.gd`) y jefe (`jefe_oni.gd`).
-  APK de prueba **0.13** (horizontal); prueba automática 50 de 50. Análisis con la skill Replica en
+  APK de prueba **0.14** (horizontal); prueba automática 50 de 50. Análisis con la skill Replica en
   `ronin3d/replica/` (paridad con EthrA en `parity.md`) (10-10-2026).
+- **Jefe en pixel art con el estilo del usuario (10-10-2026, 0.14):** no le gustó el oni gigante de
+  piezas y mandó su hoja de estilo (`ronin3d/arte/conceptos/oni_jefe_hoja.webp`: oni rojo de pelo
+  blanco con kanabō de grietas rojas; reposo, caminar, ataque, área, golpe y muerte). Los cuadros
+  salen de esa hoja con `ronin3d/herramientas/recortar_oni_jefe.py` (`recursos/sprites/oni_jefe.png`).
+  Combate en `jefe_oni.gd`: golpes de área con salto y sombra, 3 cortes con el kanabō clavado
+  rompen la postura, a la segunda rotura entra en furia y un iai perfecto contra su barrido lo remata.
 
 - **En pausa en la 0.9 desde el 02-10-2026 (DECISIÓN 22):** antes se prueban los prototipos de
   puzles de `puzles/` (sección del final). RONIN no se abandona: todo sigue en el repositorio y en

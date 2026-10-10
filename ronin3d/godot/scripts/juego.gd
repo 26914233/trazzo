@@ -43,7 +43,7 @@ var constructor
 var akira
 var camara
 var soldados: Array = []             # todos los enemigos: soldados, yōkai y el jefe
-var jefe                             # el oni gigante del portón
+var jefe                             # el oni del portón (jefe_oni.gd)
 var aviso_porton := 0.0
 var depuracion
 var reticula: Node3D                 # anillo rojo bajo el enemigo fijado (como en EthrA)
@@ -235,26 +235,29 @@ func _crear_jefe() -> void:
 	jefe.desperto.connect(func():
 		efectos.sacudir(0.9)
 		efectos.sonar("caida", jefe.global_position, 6.0, 0.0)
-		mensaje.emit("¡El oni gigante derriba el portón y cierra la huida!")
-		jefe_cambiado.emit("Oni gigante", 1.0))
-	jefe.vida_cambiada.connect(func(fraccion): jefe_cambiado.emit("Oni gigante", fraccion))
+		mensaje.emit("¡Un oni derriba el portón y cierra la huida!")
+		jefe_cambiado.emit("Oni", 1.0))
+	jefe.vida_cambiada.connect(func(fraccion): jefe_cambiado.emit("Oni", fraccion))
 	jefe.punetazo.connect(func(punto):
 		efectos.sacudir(0.75)
 		efectos.pausa_de_impacto(0.06)
 		efectos.sonar("caida", punto, 4.0, 0.05)
 		efectos.polvo(punto)
-		efectos.polvo(punto + Vector3(1, 0, 0)))
-	jefe.brazo_roto.connect(func(_lado):
+		efectos.chispas(punto + Vector3.UP * 0.2, 40, Color(1.0, 0.15, 0.08), 7.0, 0.6, -6.0, 0.1))
+	jefe.postura_quebrada.connect(func(roturas):
 		efectos.sacudir(0.6)
-		mensaje.emit("¡Brazo inutilizado!" if jefe.brazo_vivo.has(true) else "¡El oni cae de rodillas!"))
-	jefe.aviso_iniciado.connect(func(): efectos.aviso(jefe.global_position + Vector3.UP * 4.0))
+		efectos.texto_flotante(jefe.global_position + Vector3.UP * 3.0, "¡Postura rota!", Color(1.0, 0.85, 0.3), 0.009)
+		if roturas >= JefeOni.ROTURAS_PARA_FURIA:
+			mensaje.emit("¡El oni entra en furia! Para su barrido con el iai"))
+	jefe.aviso_iniciado.connect(func(): efectos.aviso(jefe.global_position + Vector3.UP * 3.0))
+	jefe.estocada_iniciada.connect(func(): efectos.estocada(jefe.global_position + Vector3.UP * 1.2))
 	jefe.derrotado.connect(func():
 		_al_derrotar()
 		efectos.camara_lenta(0.3, 0.8)
 		efectos.sacudir(1.0)
 		efectos.polvo_de_pixeles(jefe.global_position + Vector3.UP * 1.5)
 		monedas_suelo.soltar(jefe.global_position + Vector3(-2, 1, 0), 12)
-		mensaje.emit("El oni gigante ha caído. El portón queda libre.")
+		mensaje.emit("El oni ha caído. El portón queda libre.")
 		jefe_cambiado.emit("", -1.0))
 
 
@@ -509,7 +512,7 @@ func _physics_process(delta: float) -> void:
 	if en_porton and jefe and jefe.vivo():
 		if aviso_porton <= 0.0:
 			aviso_porton = 3.0
-			mensaje.emit("El oni gigante bloquea el portón: derrótalo para salir")
+			mensaje.emit("El oni bloquea el portón: derrótalo para salir")
 	elif en_porton:
 		akira.controlable = false
 		_cambiar_fase("cierre")
