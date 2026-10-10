@@ -35,6 +35,33 @@ juego que lo use de verdad:
 - `export_presets.cfg` (sin permisos de red), `.gitignore`, `docs/PUBLICAR.md`,
   `PLAY_DATA_SAFETY.md` ("no recoge datos").
 
+## Mejoras hechas tras el análisis de competencia (octubre 2026)
+
+Método replica (copiar la función, no el código ni el arte): matriz en
+`replica/features.csv`, paridad en `replica/parity.md` (89/100).
+
+- **Palabrario:** logros, sopa al azar, comodín de racha, estadísticas, palabras extra,
+  contrarreloj opcional, diseño de alto contraste, mapa de viaje con medallas y eventos
+  de temporada.
+- **Lienzo Zen:** buscar zona sin pintar, celebración al terminar, guardar imagen,
+  lámina del día con racha, ocultar terminadas, Mis colores, música ambiental, ajustes y
+  misterio de la semana.
+
+## Para actualizaciones futuras (decisión del dueño: después del lanzamiento)
+
+No bloquean la primera versión; se suben como actualizaciones.
+
+| Juego | Qué | Qué hace falta |
+|---|---|---|
+| Lienzo Zen | Compartir la imagen y ponerla de fondo de pantalla | Plugin de Android (intent de compartir y WallpaperManager) |
+| Lienzo Zen | Repetición en vídeo (time-lapse) de la obra | Guardar el orden de pintado y codificar vídeo en el teléfono (plugin) |
+| Lienzo Zen | Láminas de eventos (Navidad, Halloween…) | Generarlas en Colab con el mismo flujo de las láminas, junto a la tanda de criaturas |
+| Lienzo Zen | Modo «por números» opcional en una selección | Numerar zonas por lámina; solo si los datos de uso lo piden |
+| Palabrario | Clasificación de la sopa del día y logros en la nube | Google Play Games (cuenta de desarrollador activa) |
+| Palabrario | Copia del progreso en la nube | Google Play Games (Saved Games) |
+| Palabrario | Compartir el resultado de la sopa del día | Intent de compartir de Android (plugin) |
+| Los dos | Validar en teléfono que la imagen guardada salga en la galería | Prueba en dispositivo; si no aparece, plugin de MediaStore |
+
 ---
 
 ## 2. Lienzo Zen — dibujo, colorear y mandalas
@@ -118,4 +145,6 @@ y escribir su GDD con `design-system` y `map-systems` antes de producir.
 
 1. Palabrario: en espera de la cuenta de Play; luego prueba en un móvil y subida a
    prueba interna (`palabrario/docs/LANZAMIENTO.md`).
-2. En curso: **Lienzo Zen**, con el mismo modelo de pago.
+2. En curso: **Lienzo Zen**, con el mismo modelo de pago: falta la tanda de criaturas de
+   Colab, los gráficos de la ficha, la auditoría de seguridad y la prueba en un teléfono.
+3. Las mejoras de la tabla «Para actualizaciones futuras», después del lanzamiento.
