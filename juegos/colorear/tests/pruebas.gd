@@ -16,6 +16,10 @@ func _ready() -> void:
 	_vaciar(Obras.carpeta)
 	DirAccess.make_dir_recursive_absolute(Obras.carpeta)
 	Ajustes.ruta = "user://prueba_ajustes.json"
+	Ajustes.datos["sonido"] = false     # un sonido aun sonando al salir aparece como fuga
+	Diario.ruta = "user://prueba_diario.json"
+	Diario.cargar()
+	Exportar.carpeta_galeria = "user://prueba_galeria/"
 
 	prueba_indice()
 	prueba_regiones_sin_perdida()
@@ -27,10 +31,19 @@ func _ready() -> void:
 	prueba_vista()
 	prueba_paletas()
 	prueba_integridad()
+	prueba_buscar_zona()
+	prueba_enfocar()
+	prueba_terminada()
+	prueba_imagen()
+	prueba_lamina_del_dia()
+	prueba_racha()
 	await prueba_pantallas()
+	await prueba_celebracion()
 
 	_vaciar(Obras.carpeta)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Ajustes.ruta))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(Diario.ruta))
+	_vaciar(Exportar.carpeta_galeria)
 	print("\n%d/%d comprobaciones correctas" % [_total - _fallos, _total])
 	if _fallos > 0:
 		print("FALLAN %d" % _fallos)
@@ -310,3 +323,162 @@ func prueba_pantallas() -> void:
 	OS.remove_logger(log)
 	comprobar(log.errores.is_empty(), "sin errores: %s" % str(log.errores.slice(0, 3)))
 	Estilo.aplicar("cielo")
+
+
+func prueba_buscar_zona() -> void:
+	caso("buscar zona sin pintar")
+	var l := Laminas.abrir("mandalas_001")
+	comprobar(l.info_zonas.size() == l.zonas * 8, "hay datos de cada zona (8 bytes por zona)")
+	var ok := true
+	for z in range(1, l.zonas + 1):
+		if l.zona_en(l.punto(z)) != z:
+			ok = false
+	comprobar(ok, "el punto de cada zona cae dentro de ella")
+	var c := l.caja(1)
+	comprobar(c.x > 0 and c.y > 0 and c.x <= Laminas.lado and c.y <= Laminas.lado, "caja con tamano valido")
+	var centro := Vector2(640, 640)
+	var z := l.vacia_mas_cercana(centro)
+	comprobar(z > 0 and l.colores[z] == Color.WHITE, "devuelve una zona en blanco")
+	var mejor := INF
+	for k in range(1, l.zonas + 1):
+		mejor = minf(mejor, centro.distance_to(Vector2(l.punto(k))))
+	comprobar(is_equal_approx(centro.distance_to(Vector2(l.punto(z))), mejor), "la mas cercana al punto dado")
+	l.pintar(z, Color.RED)
+	comprobar(l.vacia_mas_cercana(centro) != z, "una zona pintada ya no se propone")
+	var z2 := l.vacia_mas_cercana(centro)
+	comprobar(l.vacia_mas_cercana(centro, {z2: true}) not in [z, z2, 0], "se pueden saltar las ya propuestas")
+	for k in range(1, l.zonas + 1):
+		l.pintar(k, Color.RED)
+	comprobar(l.vacia_mas_cercana(centro) == 0, "todo pintado: ninguna")
+	var sin_datos := Lamina.new("x", 3, null, null)
+	comprobar(sin_datos.vacia_mas_cercana(centro) == 0 and sin_datos.punto(1) == Vector2i(-1, -1), "sin datos de zonas no falla")
+	var faltan := 0
+	for cat in Laminas.categorias:
+		for lam in cat["laminas"]:
+			if not FileAccess.file_exists(Laminas.ruta_zonas(lam["id"])):
+				faltan += 1
+	comprobar(faltan == 0, "todas las laminas tienen datos de zonas (faltan %d)" % faltan)
+
+
+func prueba_enfocar() -> void:
+	caso("la camara va a la zona")
+	var v := VistaLamina.new()
+	add_child(v)
+	v.size = Vector2(1000, 1200)
+	var l := Laminas.abrir("mandalas_001")
+	v.mostrar(l)
+	var z := 0
+	for k in range(1, l.zonas + 1):       # una zona pequena y lejos del centro
+		if maxi(l.caja(k).x, l.caja(k).y) < 120 and l.punto(k).x < 400:
+			z = k
+			break
+	comprobar(z > 0, "hay una zona pequena para probar")
+	v.enfocar(z, false)
+	var p := Vector2(l.punto(z))
+	var en_vista := v.desplazamiento + p / Laminas.lado * minf(v.size.x, v.size.y) * v.zoom
+	comprobar(Rect2(Vector2.ZERO, v.size).has_point(en_vista), "la zona queda dentro de la vista")
+	comprobar(v.zoom > 1.0, "acerca el zoom para verla")
+	comprobar(v.resaltada == z, "la zona queda resaltada")
+	v.quitar_resalte()
+	comprobar(v.resaltada == 0, "el resalte se quita")
+	v.enfocar(1, false)
+	comprobar(v.zoom >= 1.0 and v.zoom <= VistaLamina.ZOOM_MAX, "zona enorme: zoom dentro de limites")
+	v.queue_free()
+
+
+func prueba_terminada() -> void:
+	caso("lamina terminada")
+	var l := Laminas.abrir("mandalas_001")
+	comprobar(not l.terminada(), "recien abierta no esta terminada")
+	for k in range(1, l.zonas):
+		l.pintar(k, Color.RED)
+	comprobar(not l.terminada(), "falta una zona")
+	l.pintar(l.zonas, Color.BLUE)
+	comprobar(l.terminada(), "todas pintadas = terminada")
+	l.pintar(3, Color.WHITE)
+	comprobar(not l.terminada(), "borrar con la goma la deja sin terminar")
+
+
+func prueba_imagen() -> void:
+	caso("guardar imagen")
+	var l := Laminas.abrir("mandalas_001")
+	var z := l.zona_en(Vector2i(640, 640))
+	l.pintar(z, Color.html("#F94144"))
+	var img := l.imagen()
+	comprobar(img.get_width() == Laminas.lado and img.get_height() == Laminas.lado, "a resolucion completa")
+	var p := l.punto(z)
+	comprobar(img.get_pixelv(p).is_equal_approx(Color.html("#F94144")), "la zona sale con su color")
+	var p2 := l.punto(l.vacia_mas_cercana(Vector2(640, 640)))
+	comprobar(img.get_pixelv(p2).is_equal_approx(Color.WHITE), "lo no pintado sale blanco")
+	var hay_linea := false
+	for x in range(0, Laminas.lado, 7):
+		if img.get_pixel(x, 640).v < 0.2:
+			hay_linea = true
+			break
+	comprobar(hay_linea, "las lineas salen oscuras")
+	var r := Exportar.guardar(l)
+	comprobar(r["ok"] and FileAccess.file_exists(r["ruta"]), "se guarda el PNG: %s" % str(r))
+	var leida := Image.load_from_file(r["ruta"]) if r["ok"] else null
+	comprobar(leida != null and leida.get_pixelv(p).is_equal_approx(Color.html("#F94144")), "el PNG guardado se lee igual")
+	comprobar(str(r["ruta"]).get_file().begins_with("lienzo-zen-mandalas_001"), "nombre con la lamina")
+
+
+func prueba_lamina_del_dia() -> void:
+	caso("lamina del dia")
+	var a := Laminas.del_dia("2026-10-10")
+	comprobar(Laminas.existe(a), "es una lamina que existe")
+	comprobar(Laminas.del_dia("2026-10-10") == a, "el mismo dia, la misma")
+	var vistas := {}
+	for d in 60:
+		vistas[Laminas.del_dia(Time.get_date_string_from_unix_time(1790000000 + d * 86400))] = true
+	comprobar(vistas.size() == 60, "60 dias seguidos sin repetir (%d distintas)" % vistas.size())
+	var cats := {}
+	for d in 7:
+		cats[Laminas.categoria_de(Laminas.del_dia(Time.get_date_string_from_unix_time(1790000000 + d * 86400)))] = true
+	comprobar(cats.size() >= 4, "una semana pasa por varias categorias (%d)" % cats.size())
+	comprobar(Laminas.del_dia("basura") == "" , "fecha invalida: ninguna")
+
+
+func prueba_racha() -> void:
+	caso("racha de laminas del dia")
+	Diario.datos = {}
+	comprobar(Diario.racha("2026-10-10") == 0, "sin nada: 0")
+	Diario.marcar("2026-10-10")
+	comprobar(Diario.racha("2026-10-10") == 1, "pintar la del dia: 1")
+	Diario.marcar("2026-10-10")
+	comprobar(Diario.racha("2026-10-10") == 1, "dos veces el mismo dia no suma")
+	Diario.marcar("2026-10-11")
+	comprobar(Diario.racha("2026-10-11") == 2, "dia siguiente: 2")
+	comprobar(Diario.racha("2026-10-12") == 2, "el dia siguiente sin pintar aun se mantiene")
+	Diario.marcar("2026-10-13")
+	comprobar(Diario.racha("2026-10-13") == 3, "racha suave: faltar un dia no la rompe")
+	comprobar(Diario.racha("2026-10-16") == 0, "faltar dos dias si la rompe")
+	Diario.marcar("2026-10-16")
+	comprobar(Diario.racha("2026-10-16") == 1 and Diario.mejor() == 3, "empieza de nuevo y guarda la mejor")
+	Diario.marcar("2026-09-01")
+	comprobar(Diario.racha("2026-10-16") == 1, "una fecha anterior no la altera")
+	Diario.cargar()
+	comprobar(Diario.racha("2026-10-16") == 1 and Diario.mejor() == 3, "se guarda en disco")
+	var f := FileAccess.open(Diario.ruta, FileAccess.WRITE)
+	f.store_string("{\"ultimo\": \"no-fecha\", \"racha\": -5, \"mejor\": \"x\"}")
+	f.close()
+	Diario.cargar()
+	comprobar(Diario.racha("2026-10-16") == 0 and Diario.mejor() == 0, "datos rotos: empieza de cero")
+
+
+func prueba_celebracion() -> void:
+	caso("celebracion al terminar")
+	var escena_script = load("res://escenas/colorear.gd")
+	escena_script.lamina_id = "mandalas_001"
+	var e: Control = load("res://escenas/colorear.tscn").instantiate()
+	add_child(e)
+	await get_tree().process_frame
+	for k in range(1, e.lamina.zonas):
+		e.lamina.pintar(k, Color.RED)
+	comprobar(not e.celebrando(), "sin terminar no celebra")
+	e._pintar(e.lamina.zonas)
+	comprobar(e.celebrando(), "al pintar la ultima zona celebra")
+	e._pintar(e.lamina.zonas)
+	e.queue_free()
+	await get_tree().process_frame
+	Obras.borrar("mandalas_001")

@@ -16,6 +16,20 @@ Las obras se guardan solas y se ven en «Mis obras».
 - **Tocar:** solo se rellena la zona tocada; arrastrar mueve el dibujo.
 En las dos, dos dedos hacen zoom. Un trazo se deshace de una vez.
 
+**Ayudas y recompensas** (copiadas como función, no como código ni arte, de las apps
+revisadas en `juegos/ANALISIS_COMPETENCIA.md`; matriz en `juegos/replica/features.csv`):
+- **Buscar zona sin pintar** (◎): la cámara va a la zona en blanco más cercana al centro
+  de lo que se ve, con zoom, y la zona late con rayas magenta unos segundos. Pulsar
+  otra vez lleva a otra. Gratis e ilimitado. Datos por zona precalculados
+  (`herramientas/zonas.py` → `<id>_zonas.bin`: punto interior y caja).
+- **Lámina terminada:** la lámina vuelve a verse entera, las líneas se apagan un
+  momento para ver solo el color, confeti con la paleta y opciones (guardar imagen,
+  seguir, otra lámina).
+- **Guardar imagen** (⤓): PNG 1280x1280 en Imágenes/Lienzo Zen; si el sistema no deja,
+  en la carpeta de la app. Pendiente de validar en un teléfono que salga en la galería.
+- **Lámina del día** en el menú, la misma para todos, sin repetir hasta recorrer todas.
+  **Racha suave:** pintar la del día suma; faltar un solo día no la rompe.
+
 ## Público y tono
 Adultos que colorean para relajarse (búsquedas «colorear para adultos», «mandalas»), y
 familias. Sin anuncios, sin compras, sin datos: encaja con la política de Familias si

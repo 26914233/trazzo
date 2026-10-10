@@ -15,6 +15,8 @@ func _ready() -> void:
 	DirAccess.make_dir_recursive_absolute(_salida)
 	Obras.carpeta = "user://capturas_obras/"
 	DirAccess.make_dir_recursive_absolute(Obras.carpeta)
+	for f in DirAccess.get_files_at(Obras.carpeta):     # cada corrida empieza sin obras
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(Obras.carpeta.path_join(f)))
 	await _captura("menu", "res://escenas/menu.tscn")
 	var C = preload("res://escenas/colorear.gd")
 	C.lamina_id = "animales_i010"
@@ -28,6 +30,18 @@ func _ready() -> void:
 	e.vista.ampliar(3.0, e.vista.size / 2)
 	await _esperar(4)
 	_guardar("colorear_zoom")
+	e.vista.reiniciar_zoom()
+	e.buscar_zona()
+	await _esperar(40)                   # animacion de camara + latido
+	_guardar("colorear_buscar")
+	for z in range(1, e.lamina.zonas):
+		e.lamina.pintar(z, cols[z % cols.size()])
+	e._pintar(e.lamina.zonas)
+	await _esperar(30)
+	_guardar("colorear_celebra")
+	await get_tree().create_timer(1.6).timeout
+	_guardar("colorear_terminada")
+	e.lamina.imagen().save_png(_salida.path_join("imagen_exportada.png"))
 	Obras.guardar(e.lamina)
 	await _captura("menu_obras", "res://escenas/menu.tscn")
 	get_tree().quit()

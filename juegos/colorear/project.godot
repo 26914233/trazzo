@@ -22,6 +22,8 @@ Laminas="*res://autoload/laminas.gd"
 Obras="*res://autoload/obras.gd"
 Integridad="*res://autoload/integridad.gd"
 Sonido="*res://autoload/sonido.gd"
+Diario="*res://autoload/diario.gd"
+Exportar="*res://autoload/exportar.gd"
 
 [display]
 

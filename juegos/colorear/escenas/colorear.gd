@@ -14,6 +14,10 @@ var _deshacer: Button
 var _rehacer: Button
 var _goma: Button
 var _modo: Button
+var _evitar := {}               # zonas ya propuestas por "buscar zona sin pintar"
+var _estaba_terminada := false
+var _celebrando := false
+var _guardando := false
 
 
 func _ready() -> void:
@@ -27,17 +31,19 @@ func _ready() -> void:
 	var botones := HBoxContainer.new()
 	# Modo de pintar: pincel (arrastrar pinta) o tocar (solo la zona tocada).
 	_modo = Estilo.boton("", "suave", 112)
-	_modo.custom_minimum_size.x = 210
-	_modo.add_theme_font_size_override("font_size", 34)
+	_modo.custom_minimum_size.x = 112
+	_modo.add_theme_font_size_override("font_size", 52)
 	_modo.pressed.connect(func():
 		Ajustes.fijar("pincel", not bool(Ajustes.valor("pincel")))
-		_poner_modo())
+		_poner_modo()
+		Estilo.aviso(self, "Pincel: arrastra el dedo para pintar" if vista.arrastrar_pinta else "Tocar: se rellena la zona que tocas"))
 	botones.add_child(_modo)
 	_deshacer = _boton_icono("↶", func(): if lamina.deshacer(): _al_cambiar())
 	_rehacer = _boton_icono("↷", func(): if lamina.rehacer(): _al_cambiar())
 	botones.add_child(_deshacer)
 	botones.add_child(_rehacer)
-	Estilo.barra(col, Laminas.nombre(lamina_id), _salir, botones)
+	botones.add_child(_boton_icono("⤓", guardar_imagen))
+	Estilo.barra(col, Laminas.nombre(lamina_id), _salir, botones, 48)
 
 	vista.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	vista.zona_tocada.connect(_pintar)
@@ -62,8 +68,9 @@ func _ready() -> void:
 	_goma = Estilo.boton("Goma", "normal", 112)
 	_goma.custom_minimum_size.x = 200
 	_goma.pressed.connect(func(): _elegir(Color.WHITE))
+	var buscar := _boton_icono("◎", buscar_zona)
 	var ver := _boton_icono("⤢", vista.reiniciar_zoom)
-	for n in [antes, _nombre_paleta, despues, _goma, ver]:
+	for n in [antes, _nombre_paleta, despues, _goma, buscar, ver]:
 		fila.add_child(n)
 	col.add_child(fila)
 
@@ -73,6 +80,7 @@ func _ready() -> void:
 	col.add_child(_rejilla)
 	_poner_paleta(int(Ajustes.valor("paleta")))
 	_al_cambiar()
+	_estaba_terminada = lamina.terminada()
 
 
 func _boton_icono(texto: String, al_tocar: Callable) -> Button:
@@ -85,7 +93,7 @@ func _boton_icono(texto: String, al_tocar: Callable) -> Button:
 
 func _poner_modo() -> void:
 	vista.arrastrar_pinta = bool(Ajustes.valor("pincel"))
-	_modo.text = "✎ Pincel" if vista.arrastrar_pinta else "☝ Tocar"
+	_modo.text = "✎" if vista.arrastrar_pinta else "☝"
 
 
 func _cambiar_paleta(paso: int) -> void:
@@ -141,11 +149,118 @@ func _pintar(zona: int) -> void:
 func _al_cambiar() -> void:
 	_deshacer.disabled = not lamina.puede_deshacer()
 	_rehacer.disabled = not lamina.puede_rehacer()
+	var terminada := lamina.terminada()
+	if terminada and not _estaba_terminada:
+		_celebrar()
+	_estaba_terminada = terminada
+
+
+## Lleva la camara a la zona en blanco mas cercana al centro de lo que se ve.
+## Pulsar otra vez sin pintarla lleva a la siguiente.
+func buscar_zona() -> void:
+	var centro := Vector2(vista.a_lamina(vista.size / 2.0))
+	var z := lamina.vacia_mas_cercana(centro, _evitar)
+	if z == 0 and not _evitar.is_empty():
+		_evitar.clear()                 # ya se propusieron todas: se vuelve a empezar
+		z = lamina.vacia_mas_cercana(centro)
+	if z == 0:
+		Estilo.aviso(self, "¡No quedan zonas sin pintar!" if lamina.info_zonas.size() > 0 else "Esta lámina no tiene ayuda de zonas")
+		return
+	_evitar[z] = true
+	vista.enfocar(z)
+
+
+func celebrando() -> bool:
+	return _celebrando
+
+
+## Recompensa al terminar: la lamina vuelve entera, las lineas se apagan un
+## momento para ver solo el color, confeti y luego las opciones.
+func _celebrar() -> void:
+	_celebrando = true
+	lamina.terminar_trazo()
+	Obras.guardar(lamina)
+	Sonido.tocar("victoria")
+	Sonido.vibrar(60)
+	vista.celebrar()
+	_confeti()
+	await get_tree().create_timer(1.3).timeout
+	if not is_inside_tree():
+		return
+	var i := await Estilo.dialogo(self, "¡Lámina terminada!", "Quedó guardada en Mis obras.",
+		["Guardar imagen", "Seguir pintando", "Elegir otra lámina"])
+	_celebrando = false
+	if not is_inside_tree():
+		return
+	if i == 0:
+		guardar_imagen()
+	elif i == 2:
+		_salir()
+
+
+func _confeti() -> void:
+	var p := CPUParticles2D.new()
+	p.position = Vector2(size.x / 2.0, -40)
+	p.emitting = false
+	p.one_shot = true
+	p.amount = 140
+	p.lifetime = 2.6
+	p.explosiveness = 0.85
+	p.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	p.emission_rect_extents = Vector2(size.x / 2.0, 10)
+	p.direction = Vector2(0, 1)
+	p.spread = 25
+	p.gravity = Vector2(0, 900)
+	p.initial_velocity_min = 200
+	p.initial_velocity_max = 700
+	p.angular_velocity_min = -360
+	p.angular_velocity_max = 360
+	p.scale_amount_min = 10
+	p.scale_amount_max = 22
+	var g := Gradient.new()
+	var colores := Paletas.colores(int(Ajustes.valor("paleta")))
+	g.offsets = PackedFloat32Array(range(colores.size()).map(func(k): return float(k) / maxf(colores.size() - 1, 1)))
+	g.colors = PackedColorArray(colores)
+	p.color_initial_ramp = g
+	add_child(p)
+	p.emitting = true
+	get_tree().create_timer(p.lifetime + 0.5).timeout.connect(p.queue_free)
+
+
+## Guarda la obra como imagen en la galeria (Imagenes/Lienzo Zen).
+func guardar_imagen() -> void:
+	if _guardando:
+		return
+	_guardando = true
+	lamina.terminar_trazo()
+	_guardar()
+	Estilo.aviso(self, "Guardando imagen…")
+	# deja pintar el aviso antes del calculo (bloquea un momento)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var r := Exportar.guardar(lamina)
+	_guardando = false
+	if not is_inside_tree():
+		return
+	if not r["ok"]:
+		Estilo.aviso(self, "No se pudo guardar la imagen")
+	elif r["en_galeria"]:
+		Estilo.aviso(self, "Guardada en Imágenes › Lienzo Zen")
+	else:
+		Estilo.aviso(self, "No se pudo usar la galería: quedó en la carpeta de la app")
+
+
+## Guarda la obra y, si es la lamina del dia, cuenta para la racha.
+func _guardar() -> void:
+	Obras.guardar(lamina)
+	var hoy := Diario.hoy()
+	if lamina_id == Laminas.del_dia(hoy) and not lamina.a_datos()["colores"].is_empty():
+		Diario.marcar(hoy)
 
 
 func _salir() -> void:
 	lamina.terminar_trazo()
-	Obras.guardar(lamina)
+	_guardar()
 	Estilo.ir(self, "menu")
 
 
@@ -154,4 +269,4 @@ func _notification(que: int) -> void:
 		_salir()
 	elif que == NOTIFICATION_APPLICATION_PAUSED or que == NOTIFICATION_WM_CLOSE_REQUEST:
 		if lamina:
-			Obras.guardar(lamina)
+			_guardar()

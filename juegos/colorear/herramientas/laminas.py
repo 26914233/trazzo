@@ -612,6 +612,8 @@ def main():
             base = os.path.join(args.salida, cid, lid)
             lineas.save(base + "_lineas.png", optimize=True)
             reg.save(base + "_regiones.png", optimize=True)
+            import zonas                       # aquí: zonas.py importa este módulo
+            zonas.guardar(base + "_regiones.png", k)
             mini.save(base + "_mini.png", optimize=True)
             cat["laminas"].append({"id": lid, "zonas": k})
             print("%s: %d zonas" % (lid, k), file=sys.stderr)

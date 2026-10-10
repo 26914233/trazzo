@@ -21,6 +21,8 @@ var textura_paleta: ImageTexture
 var _hechos: Array = []        # cada paso: [[zona, antes, despues], ...]
 var _deshechos: Array = []
 var _trazo = null              # paso en curso al pintar arrastrando el dedo
+## Por zona, 4 uint16: punto interior (x, y) y caja (ancho, alto). Ver herramientas/zonas.py.
+var info_zonas := PackedByteArray()
 
 
 func _init(id_: String, zonas_: int, reg: Texture2D, lin: Texture2D) -> void:
@@ -114,6 +116,81 @@ func _poner(zona: int, color: Color) -> void:
 	colores[zona] = color
 	paleta.set_pixel(zona % LADO_PALETA, zona / LADO_PALETA, color)
 	textura_paleta.update(paleta)
+
+
+## Punto de la lamina dentro de la zona (el mas alejado de su borde).
+func punto(zona: int) -> Vector2i:
+	var i := (zona - 1) * 8
+	if zona < 1 or i + 8 > info_zonas.size():
+		return Vector2i(-1, -1)
+	return Vector2i(info_zonas.decode_u16(i), info_zonas.decode_u16(i + 2))
+
+
+## Ancho y alto de la caja que contiene la zona.
+func caja(zona: int) -> Vector2i:
+	var i := (zona - 1) * 8
+	if zona < 1 or i + 8 > info_zonas.size():
+		return Vector2i.ZERO
+	return Vector2i(info_zonas.decode_u16(i + 4), info_zonas.decode_u16(i + 6))
+
+
+## Zona en blanco mas cercana a un punto de la lamina (0 si no queda ninguna).
+## evitar: zonas ya propuestas, para que pulsar otra vez lleve a otra.
+func vacia_mas_cercana(desde: Vector2, evitar: Dictionary = {}) -> int:
+	if info_zonas.size() < zonas * 8:
+		return 0
+	var mejor := 0
+	var dist := INF
+	for z in range(1, zonas + 1):
+		if colores[z] != BLANCO or evitar.has(z):
+			continue
+		var d := desde.distance_squared_to(Vector2(punto(z)))
+		if d < dist:
+			dist = d
+			mejor = z
+	return mejor
+
+
+func terminada() -> bool:
+	for z in range(1, zonas + 1):
+		if colores[z] == BLANCO:
+			return false
+	return zonas > 0
+
+
+## La obra a tamano completo: color de cada zona con las lineas encima.
+## En CPU (unos 0,4 s en escritorio): no depende de la pantalla y se puede probar.
+func imagen() -> Image:
+	var lin := textura_lineas.get_image()
+	if lin.is_compressed():
+		lin.decompress()
+	lin.convert(Image.FORMAT_LA8)
+	var reg := regiones
+	if reg.get_format() != Image.FORMAT_RGB8:
+		reg = regiones.duplicate()
+		reg.convert(Image.FORMAT_RGB8)
+	var r := reg.get_data()
+	var l := lin.get_data()
+	var pal := PackedByteArray()
+	pal.resize((zonas + 1) * 3)
+	for z in zonas + 1:
+		var c := colores[z]
+		pal[z * 3] = c.r8
+		pal[z * 3 + 1] = c.g8
+		pal[z * 3 + 2] = c.b8
+	var n := reg.get_width() * reg.get_height()
+	var out := PackedByteArray()
+	out.resize(n * 3)
+	for i in n:
+		var z := r[i * 3] + r[i * 3 + 1] * 256
+		if z > zonas:
+			z = 0
+		var luz := 255 - l[i * 2 + 1]       # la linea es negra con alfa
+		var o := i * 3
+		out[o] = pal[z * 3] * luz / 255
+		out[o + 1] = pal[z * 3 + 1] * luz / 255
+		out[o + 2] = pal[z * 3 + 2] * luz / 255
+	return Image.create_from_data(reg.get_width(), reg.get_height(), false, Image.FORMAT_RGB8, out)
 
 
 ## Zonas ya coloreadas (no blancas), de 0 a 1.

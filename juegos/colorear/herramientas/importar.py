@@ -17,6 +17,7 @@ from PIL import Image
 
 from convertir import tinta_de
 from laminas import RAIZ, procesar_tinta
+import zonas
 
 NOMBRES = {
     "animales": "Animales", "aves": "Aves", "oceano": "Océano", "insectos": "Insectos",
@@ -36,6 +37,7 @@ def _convertir(trabajo):
     base = os.path.join(DESTINO, cat, lid)
     lin.save(base + "_lineas.png", optimize=True)
     reg.save(base + "_regiones.png", optimize=True)
+    zonas.guardar(base + "_regiones.png", k)
     mini.save(base + "_mini.png", optimize=True)
     return cat, lid, k
 

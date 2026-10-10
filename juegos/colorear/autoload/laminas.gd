@@ -53,6 +53,43 @@ func total() -> int:
 	return _por_id.size()
 
 
+func categoria_de(id: String) -> String:
+	return _por_id[id]["categoria"] if existe(id) else ""
+
+
+func ruta_zonas(id: String) -> String:
+	return "%s%s/%s_zonas.bin" % [RAIZ, _por_id[id]["categoria"], id]
+
+
+## Lamina del dia para una fecha "AAAA-MM-DD": la misma para todos ese dia y sin
+## repetir hasta recorrer todas. El paso salta entre categorias (el indice va por
+## categorias) y es coprimo con el total, asi que pasa por todas las laminas.
+func del_dia(fecha: String) -> String:
+	if not _es_fecha(fecha) or _por_id.is_empty():
+		return ""
+	var dia := int(Time.get_unix_time_from_datetime_string(fecha + "T12:00:00") / 86400)
+	var ids := _por_id.keys()
+	var n := ids.size()
+	var paso := 7919
+	while _mcd(paso, n) != 1:
+		paso += 1
+	return ids[posmod(dia * paso, n)]
+
+
+static func _es_fecha(s: String) -> bool:
+	var p := s.split("-")
+	return p.size() == 3 and p[0].length() == 4 and p[0].is_valid_int() and p[1].is_valid_int() and p[2].is_valid_int() \
+		and int(p[1]) >= 1 and int(p[1]) <= 12 and int(p[2]) >= 1 and int(p[2]) <= 31
+
+
+static func _mcd(a: int, b: int) -> int:
+	while b != 0:
+		var t := b
+		b = a % b
+		a = t
+	return a
+
+
 func ruta(id: String, parte: String) -> String:
 	return "%s%s/%s_%s.png" % [RAIZ, _por_id[id]["categoria"], id, parte]
 
@@ -66,4 +103,9 @@ func abrir(id: String) -> Lamina:
 	if reg == null or lin == null:
 		push_error("Faltan las imagenes de la lamina %s" % id)
 		return null
-	return Lamina.new(id, _por_id[id]["zonas"], reg, lin)
+	var l := Lamina.new(id, _por_id[id]["zonas"], reg, lin)
+	if FileAccess.file_exists(ruta_zonas(id)):
+		l.info_zonas = FileAccess.get_file_as_bytes(ruta_zonas(id))
+	else:
+		push_warning("Sin datos de zonas para %s: no se podra buscar zona sin pintar" % id)
+	return l

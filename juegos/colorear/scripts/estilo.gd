@@ -244,14 +244,14 @@ static func colorear(b: Button, fondo: Color, tinta: Color, con_sombra: bool = t
 
 
 ## Fila superior: boton atras, titulo y un hueco opcional a la derecha.
-static func barra(col: VBoxContainer, texto: String, al_volver: Callable, derecha: Control = null) -> void:
+static func barra(col: VBoxContainer, texto: String, al_volver: Callable, derecha: Control = null, tam: int = 58) -> void:
 	var fila := HBoxContainer.new()
 	var atras := boton("‹", "suave", 112)
 	atras.custom_minimum_size.x = 112
 	atras.add_theme_font_size_override("font_size", 60)
 	atras.pressed.connect(al_volver)
 	fila.add_child(atras)
-	var t := titulo(texto, 58)
+	var t := titulo(texto, tam)
 	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	t.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	t.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
