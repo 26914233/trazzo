@@ -20,6 +20,8 @@ func _ready() -> void:
 	prueba_indice()
 	prueba_regiones_sin_perdida()
 	prueba_pintar_y_deshacer()
+	prueba_trazos()
+	prueba_arrastrar_pinta()
 	prueba_datos_de_obra()
 	prueba_obras()
 	prueba_vista()
@@ -118,6 +120,74 @@ func prueba_pintar_y_deshacer() -> void:
 	l.pintar(1, azul)
 	comprobar(not l.puede_rehacer(), "pintar algo nuevo borra el rehacer")
 	comprobar(is_equal_approx(l.avance(), 2.0 / l.zonas), "avance = zonas pintadas / total")
+
+
+func prueba_trazos() -> void:
+	caso("pintar arrastrando: un trazo = un paso de deshacer")
+	var l := Laminas.abrir("mandalas_001")
+	var rojo := Color.html("#F94144")
+	l.empezar_trazo()
+	for z in [3, 4, 5, 6]:
+		l.pintar(z, rojo)
+	l.terminar_trazo()
+	comprobar(l.colores[3] == rojo and l.colores[6] == rojo, "el trazo pinta todas sus zonas")
+	comprobar(l.deshacer(), "se deshace")
+	comprobar(l.colores[3] == Color.WHITE and l.colores[6] == Color.WHITE, "un solo deshacer quita el trazo entero")
+	comprobar(l.rehacer() and l.colores[5] == rojo, "y se rehace entero")
+	l.empezar_trazo()
+	l.pintar(10, rojo)
+	l.pintar(3, Color.html("#277DA1"))
+	l.cancelar_trazo()
+	comprobar(l.colores[10] == Color.WHITE and l.colores[3] == rojo, "cancelar (segundo dedo) devuelve los colores de antes")
+	l.empezar_trazo()
+	l.terminar_trazo()
+	comprobar(l.deshacer() and l.colores[3] == Color.WHITE, "un trazo vacío no ocupa un paso")
+
+
+func _tocar(v: Control, idx: int, p: Vector2, pulsado: bool) -> void:
+	var e := InputEventScreenTouch.new()
+	e.index = idx
+	e.position = p
+	e.pressed = pulsado
+	v._gui_input(e)
+
+
+func _arrastrar(v: Control, idx: int, p: Vector2) -> void:
+	var e := InputEventScreenDrag.new()
+	e.index = idx
+	e.position = p
+	v._gui_input(e)
+
+
+func prueba_arrastrar_pinta() -> void:
+	caso("vista: el dedo pinta lo que recorre; dos dedos no pintan")
+	var v := VistaLamina.new()
+	add_child(v)
+	v.size = Vector2(1000, 1000)
+	var l := Laminas.abrir("mandalas_001")
+	v.mostrar(l)
+	var color := Color.html("#43AA8B")
+	v.zona_tocada.connect(func(z): l.pintar(z, color))
+	v.trazo_empezado.connect(l.empezar_trazo)
+	v.trazo_terminado.connect(l.terminar_trazo)
+	v.trazo_cancelado.connect(l.cancelar_trazo)
+	_tocar(v, 0, Vector2(100, 500), true)
+	_arrastrar(v, 0, Vector2(900, 500))
+	_tocar(v, 0, Vector2(900, 500), false)
+	var pintadas := 0
+	for z in range(1, l.zonas + 1):
+		if l.colores[z] == color:
+			pintadas += 1
+	comprobar(pintadas >= 8, "un arrastre de lado a lado pinta muchas zonas (%d)" % pintadas)
+	comprobar(l.deshacer() and l.avance() == 0.0, "y se deshace de una vez")
+	_tocar(v, 0, Vector2(200, 200), true)
+	_tocar(v, 1, Vector2(600, 600), true)
+	_arrastrar(v, 1, Vector2(800, 800))
+	_tocar(v, 1, Vector2(800, 800), false)
+	_tocar(v, 0, Vector2(200, 200), false)
+	comprobar(l.avance() == 0.0, "al poner el segundo dedo no queda nada pintado")
+	comprobar(v.zoom > 1.0, "y los dos dedos hacen zoom")
+	v.queue_free()
 
 
 func prueba_datos_de_obra() -> void:

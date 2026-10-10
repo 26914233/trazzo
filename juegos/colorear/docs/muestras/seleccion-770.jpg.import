@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://djngsb3afwvdo"
-path="res://.godot/imported/comida_i009_regiones.png-8bc83c9dd6bcb02c6ff88893c2c43763.ctex"
+uid="uid://d2tk6th3e0x36"
+path="res://.godot/imported/seleccion-770.jpg-bab94f93886fe55961cdb622dd87f14a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://datos/laminas/comida/comida_i009_regiones.png"
-dest_files=["res://.godot/imported/comida_i009_regiones.png-8bc83c9dd6bcb02c6ff88893c2c43763.ctex"]
+source_file="res://docs/muestras/seleccion-770.jpg"
+dest_files=["res://.godot/imported/seleccion-770.jpg-bab94f93886fe55961cdb622dd87f14a.ctex"]
 
 [params]
 

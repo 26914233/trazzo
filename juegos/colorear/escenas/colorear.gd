@@ -32,6 +32,13 @@ func _ready() -> void:
 
 	vista.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	vista.zona_tocada.connect(_pintar)
+	vista.trazo_empezado.connect(func(): lamina.empezar_trazo())
+	vista.trazo_terminado.connect(func():
+		lamina.terminar_trazo()
+		_al_cambiar())
+	vista.trazo_cancelado.connect(func():
+		lamina.cancelar_trazo()
+		_al_cambiar())
 	col.add_child(vista)
 	vista.mostrar(lamina)
 
@@ -122,6 +129,7 @@ func _al_cambiar() -> void:
 
 
 func _salir() -> void:
+	lamina.terminar_trazo()
 	Obras.guardar(lamina)
 	Estilo.ir(self, "menu")
 

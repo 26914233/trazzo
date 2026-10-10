@@ -18,8 +18,9 @@ var regiones: Image
 var colores := PackedColorArray()
 var paleta: Image
 var textura_paleta: ImageTexture
-var _hechos: Array = []        # [zona, antes, despues]
+var _hechos: Array = []        # cada paso: [[zona, antes, despues], ...]
 var _deshechos: Array = []
+var _trazo = null              # paso en curso al pintar arrastrando el dedo
 
 
 func _init(id_: String, zonas_: int, reg: Texture2D, lin: Texture2D) -> void:
@@ -49,10 +50,35 @@ func zona_en(p: Vector2i) -> int:
 func pintar(zona: int, color: Color) -> bool:
 	if zona <= 0 or zona > zonas or colores[zona] == color:
 		return false
-	_hechos.append([zona, colores[zona], color])
+	var cambio := [zona, colores[zona], color]
+	if _trazo != null:
+		_trazo.append(cambio)
+	else:
+		_hechos.append([cambio])
 	_deshechos.clear()
 	_poner(zona, color)
 	return true
+
+
+## Un trazo con el dedo cuenta como un solo paso para deshacer.
+func empezar_trazo() -> void:
+	terminar_trazo()
+	_trazo = []
+
+
+func terminar_trazo() -> void:
+	if _trazo != null and not _trazo.is_empty():
+		_hechos.append(_trazo)
+	_trazo = null
+
+
+## Se puso un segundo dedo (zoom): lo pintado en este trazo no cuenta.
+func cancelar_trazo() -> void:
+	if _trazo == null:
+		return
+	for i in range(_trazo.size() - 1, -1, -1):
+		_poner(_trazo[i][0], _trazo[i][1])
+	_trazo = null
 
 
 func puede_deshacer() -> bool:
@@ -64,20 +90,23 @@ func puede_rehacer() -> bool:
 
 
 func deshacer() -> bool:
+	terminar_trazo()
 	if _hechos.is_empty():
 		return false
-	var h: Array = _hechos.pop_back()
-	_deshechos.append(h)
-	_poner(h[0], h[1])
+	var paso: Array = _hechos.pop_back()
+	_deshechos.append(paso)
+	for i in range(paso.size() - 1, -1, -1):
+		_poner(paso[i][0], paso[i][1])
 	return true
 
 
 func rehacer() -> bool:
 	if _deshechos.is_empty():
 		return false
-	var h: Array = _deshechos.pop_back()
-	_hechos.append(h)
-	_poner(h[0], h[2])
+	var paso: Array = _deshechos.pop_back()
+	_hechos.append(paso)
+	for c in paso:
+		_poner(c[0], c[2])
 	return true
 
 
@@ -118,3 +147,4 @@ func desde_datos(d: Dictionary) -> void:
 	textura_paleta.update(paleta)
 	_hechos.clear()
 	_deshechos.clear()
+	_trazo = null

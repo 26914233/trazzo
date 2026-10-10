@@ -22,9 +22,10 @@ NOMBRES = {
     "animales": "Animales", "aves": "Aves", "oceano": "Océano", "insectos": "Insectos",
     "fantasia": "Fantasía", "flores": "Flores", "comida": "Comida", "objetos": "Objetos",
     "vehiculos": "Vehículos", "lugares": "Lugares", "mandalas": "Mandalas",
+    "criaturas": "Criaturas",
 }
 # Orden en el menú: primero lo ilustrado, luego lo hecho por código.
-ORDEN = ["animales", "aves", "fantasia", "oceano", "insectos", "flores", "mandalas", "comida",
+ORDEN = ["animales", "criaturas", "aves", "fantasia", "oceano", "insectos", "flores", "mandalas",
          "objetos", "vehiculos", "lugares", "vitrales", "geometria", "fachadas"]
 DESTINO = os.path.join(RAIZ, "datos", "laminas")
 
@@ -52,8 +53,8 @@ def main():
         # las ilustradas llevan prefijo "i": no chocan con las hechas por código
         cuenta[cat] = cuenta.get(cat, 0) + 1
         trabajos.append((ruta, cat, "%s_i%03d" % (cat, cuenta[cat])))
-    for c in cats.values():   # vuelve a importar sin duplicar
-        c["laminas"] = [l for l in c["laminas"] if "_i" not in l["id"]]
+    for cat in cuenta:        # vuelve a importar solo las categorías de esta lista, sin duplicar
+        cats[cat]["laminas"] = [l for l in cats[cat]["laminas"] if "_i" not in l["id"]]
     with Pool() as pool:
         for cat, lid, k in pool.imap(_convertir, trabajos, chunksize=2):
             cats[cat]["laminas"].append({"id": lid, "zonas": k})

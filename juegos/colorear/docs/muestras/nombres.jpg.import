@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://fvhi78wx72et"
-path="res://.godot/imported/comida_i016_lineas.png-782b3b3f0a962c6ca4256b2e4967d146.ctex"
+uid="uid://bidluchbd6ies"
+path="res://.godot/imported/nombres.jpg-a5c0f848f7dff32f64cd8f630ff643f3.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://datos/laminas/comida/comida_i016_lineas.png"
-dest_files=["res://.godot/imported/comida_i016_lineas.png-782b3b3f0a962c6ca4256b2e4967d146.ctex"]
+source_file="res://docs/muestras/nombres.jpg"
+dest_files=["res://.godot/imported/nombres.jpg-a5c0f848f7dff32f64cd8f630ff643f3.ctex"]
 
 [params]
 

@@ -1,12 +1,17 @@
-# Muestra una lamina y la deja colorear: toque = rellenar zona, dos dedos =
-# zoom y desplazar, un dedo con zoom = desplazar. Rueda del raton en escritorio.
+# Muestra una lamina y la deja colorear: un dedo pinta cada zona por la que
+# pasa (tocar = una zona, arrastrar = todas las del recorrido); dos dedos =
+# zoom y desplazar. Rueda del raton en escritorio.
 class_name VistaLamina
 extends Control
 
 signal zona_tocada(zona: int)
+signal trazo_empezado
+signal trazo_terminado
+signal trazo_cancelado     # entro un segundo dedo: lo pintado no vale
+
+const PASO_TRAZO := 4.0    # px de pantalla entre muestras del recorrido
 
 const ZOOM_MAX := 8.0
-const MOVER_TOQUE := 24.0      # px que puede moverse un dedo y seguir siendo toque
 
 var lamina: Lamina
 var zoom := 1.0
@@ -16,9 +21,8 @@ var _contenido := Control.new()
 var _zonas := TextureRect.new()
 var _lineas := TextureRect.new()
 var _dedos := {}                     # indice -> posicion
-var _inicio_toque := Vector2.ZERO
-var _es_toque := false
 var _pellizco := 0.0
+var _pintando := false
 
 
 func _ready() -> void:
@@ -89,16 +93,22 @@ func _gui_input(e: InputEvent) -> void:
 	if e is InputEventScreenTouch:
 		if e.pressed:
 			_dedos[e.index] = e.position
-			_es_toque = _dedos.size() == 1
-			_inicio_toque = e.position
+			if _dedos.size() == 1:
+				_pintando = true
+				_ultima_zona = 0
+				trazo_empezado.emit()
+				_pintar_en(e.position)
+			elif _pintando:
+				_pintando = false
+				trazo_cancelado.emit()
 			if _dedos.size() == 2:
 				_pellizco = _distancia_dedos()
 		else:
 			_dedos.erase(e.index)
-			if _es_toque and _dedos.is_empty():
-				_tocar(e.position)
-			_es_toque = false
-			if _dedos.size() == 1:
+			if _pintando and _dedos.is_empty():
+				_pintando = false
+				trazo_terminado.emit()
+			if _dedos.size() < 2:
 				_pellizco = 0.0
 		accept_event()
 	elif e is InputEventScreenDrag:
@@ -106,8 +116,6 @@ func _gui_input(e: InputEvent) -> void:
 			return
 		var antes: Vector2 = _dedos[e.index]
 		_dedos[e.index] = e.position
-		if _es_toque and e.position.distance_to(_inicio_toque) > MOVER_TOQUE:
-			_es_toque = false
 		if _dedos.size() == 2:
 			var d := _distancia_dedos()
 			var centro := _centro_dedos()
@@ -116,9 +124,11 @@ func _gui_input(e: InputEvent) -> void:
 			_pellizco = d
 			desplazamiento += (e.position - antes) / 2.0
 			_colocar()
-		elif not _es_toque and zoom > 1.0:
-			desplazamiento += e.position - antes
-			_colocar()
+		elif _pintando:
+			# todas las zonas del recorrido, aunque el dedo vaya rapido
+			var n := maxi(1, ceili(antes.distance_to(e.position) / PASO_TRAZO))
+			for k in range(1, n + 1):
+				_pintar_en(antes.lerp(e.position, float(k) / n))
 		accept_event()
 	elif e is InputEventMouseButton and e.pressed:
 		if e.button_index == MOUSE_BUTTON_WHEEL_UP:
@@ -137,9 +147,13 @@ func _centro_dedos() -> Vector2:
 	return ((v[0] as Vector2) + (v[1] as Vector2)) / 2.0
 
 
-func _tocar(p: Vector2) -> void:
+var _ultima_zona := 0
+
+
+func _pintar_en(p: Vector2) -> void:
 	if lamina == null:
 		return
 	var z := lamina.zona_en(a_lamina(p))
-	if z > 0:
+	if z > 0 and z != _ultima_zona:
+		_ultima_zona = z
 		zona_tocada.emit(z)

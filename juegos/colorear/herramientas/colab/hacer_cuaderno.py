@@ -24,6 +24,7 @@ ap.add_argument("--modo", default="rapido")
 ap.add_argument("--semillas", type=int, default=2)
 ap.add_argument("--prueba", type=int, default=0)
 ap.add_argument("--carpeta", default="/content/drive/MyDrive/colorear_lotes")
+ap.add_argument("--tanda", default="")
 a = ap.parse_args()
 
 try:
@@ -57,7 +58,7 @@ negativo = ("color, colored, gray, grey, shading, shadow, gradient, hatching, cr
             "photo, 3d render, blurry, noisy, text, letters, watermark, signature, frame border, cropped")
 print("Modelo listo:", a.modo, pasos, "pasos,", torch.cuda.get_device_name(0), flush=True)
 
-trabajos = [(pid, cat, p, s) for pid, cat, p in lista() for s in range(a.semillas)]
+trabajos = [(pid, cat, p, s) for pid, cat, p in lista(a.tanda) for s in range(a.semillas)]
 if a.prueba:
     trabajos = trabajos[::max(1, len(trabajos) // a.prueba)][:a.prueba]
 hechas, t0 = 0, time.time()
@@ -93,7 +94,8 @@ Modelos: SDXL base 1.0 (Stability AI) + SDXL-Lightning 8 pasos (ByteDance), ambo
 licencia `openrail++`, que permite uso comercial respetando sus restricciones de uso."""),
     code("""# Ajustes
 MODO = "rapido"      # "rapido" (Lightning) o "calidad" (SDXL normal, 30 pasos, usa el prompt negativo)
-SEMILLAS = 2         # imágenes por prompt (855 prompts x 2 = 1710)
+TANDA = "criaturas"  # "criaturas" = animales fantásticos (180 prompts); "" = la tanda original
+SEMILLAS = 3         # imágenes por prompt (180 x 3 = 540)
 SOLO_PRUEBA = 0      # 0 = todas; un número (p. ej. 20) para hacer solo una prueba
 CARPETA = "/content/drive/MyDrive/colorear_lotes"
 CARPETA_ZIP = "/content/drive/MyDrive/colorear_zip\""""),
@@ -104,13 +106,15 @@ CARPETA_ZIP = "/content/drive/MyDrive/colorear_zip\""""),
 drive.mount('/content/drive')"""),
     code("%%writefile /content/prompts.py\n" + prompts_src),
     code("%%writefile /content/generar.py\n" + GENERAR.lstrip("\n")),
-    code("!python /content/generar.py --modo {MODO} --semillas {SEMILLAS} --prueba {SOLO_PRUEBA} --carpeta {CARPETA}"),
+    code('!python /content/generar.py --modo {MODO} --semillas {SEMILLAS} --prueba {SOLO_PRUEBA} --carpeta {CARPETA} --tanda "{TANDA}"'),
     code("""# Un .zip por categoría para que Claude las recoja de tu Drive
 import os, shutil
 if not os.path.isdir(CARPETA) or not os.listdir(CARPETA):
     raise SystemExit("Todavía no hay imágenes: revisa el error de la celda anterior y mándaselo a Claude.")
 os.makedirs(CARPETA_ZIP, exist_ok=True)
 for cat in sorted(os.listdir(CARPETA)):
+    if TANDA and cat != TANDA:
+        continue
     shutil.make_archive(f"{CARPETA_ZIP}/{cat}", "zip", f"{CARPETA}/{cat}")
     print(cat, len(os.listdir(f"{CARPETA}/{cat}")), "imágenes")"""),
 ]

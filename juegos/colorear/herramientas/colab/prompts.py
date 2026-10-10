@@ -58,6 +58,34 @@ MANDALAS = ["flower", "sun", "moon and stars", "ocean waves", "feathers", "leave
             "snowflakes", "fire", "peacock feathers", "seashells", "birds", "cats", "owls", "paisley", "celtic knots", "art deco",
             "fruits", "musical notes", "coffee", "cosmic planets", "roses", "mushrooms", "elephants", "fish", "dragons", "autumn"]
 
+# Animales fantásticos: animales reales con algo imposible (alas, cristales,
+# fuego, estrellas, engranajes...). Sustituyen a la comida.
+CRIATURAS = [
+    "winged lion with feathered wings", "crystal stag with glowing antlers made of quartz", "fox with nine flowing tails and flames",
+    "celestial whale swimming among stars and moons", "owl with a crescent moon on its chest and starry wings",
+    "wolf howling made of smoke and galaxies", "tiger with butterfly wings", "cat with a cosmic nebula inside its body",
+    "turtle carrying a tiny island with a castle on its shell", "koi fish with dragon horns and long whiskers",
+    "horse with a mane of ocean waves", "elephant with flowers growing on its back and a waterfall",
+    "bear made of forest leaves and mushrooms", "hummingbird with peacock feathers and jewels",
+    "rabbit with deer antlers (jackalope) in a flower meadow", "snake with feathered wings (quetzalcoatl)",
+    "octopus with tentacles turning into vines and flowers", "raven with clockwork gears and keys",
+    "lion with a mane of sun rays", "deer with a forest growing from its antlers",
+    "jellyfish shaped like a lantern with tiny houses inside", "butterfly with wings made of stained glass cathedral windows",
+    "frog wearing a crown sitting on a giant mushroom", "hedgehog with crystal spikes", "sea turtle with a coral reef city on its shell",
+    "dolphin made of water swirls", "griffin perched on a cliff", "baby dragon hatching from an egg among flowers",
+    "phoenix rising from flames with long tail feathers", "unicorn with a flowing mane of flowers",
+    "pegasus flying over clouds", "kirin (chinese unicorn) with scales and flames", "mermaid cat with a fish tail",
+    "flying fish with bird wings over waves", "steampunk mechanical owl", "steampunk mechanical elephant",
+    "lion with a crown and royal ornaments", "wolf with tribal moon symbols", "fox spirit with masks and lanterns",
+    "tortoise carrying a pagoda", "sloth hanging from a crescent moon", "panda floating with bamboo and lanterns in the sky",
+    "seahorse knight with armor", "beetle with a jeweled shell like a brooch", "moth with moon phases on its wings",
+    "chameleon wrapped around a magic staff with crystals", "giant snail with a house shell", "bee queen with a crown and honeycomb",
+    "squirrel with acorn armor", "hare jumping over the moon", "white tiger with yin yang symbols",
+    "dragon coiled around a crystal tower", "sea serpent around a lighthouse", "owl librarian with books and candles",
+    "cat wizard with a hat and potions", "fox with flower crown in an enchanted forest", "bear guardian with runes",
+    "whale carrying a ship on its back", "octopus playing instruments", "flying turtle with wings among clouds",
+]
+
 TANDAS = [
     ("animales", ANIMALES, ["tatuaje", "etnico", "realista", "mandala"]),
     ("aves", AVES, ["tatuaje", "etnico", "realista"]),
@@ -65,14 +93,27 @@ TANDAS = [
     ("insectos", INSECTOS, ["tatuaje", "etnico", "geometrico"]),
     ("fantasia", FANTASIA, ["tatuaje", "etnico", "nouveau"]),
     ("flores", FLORES, ["botanico", "mandala", "nouveau"]),
-    ("comida", COMIDA, ["botanico", "etnico"]),
     ("objetos", OBJETOS, ["grabado", "steampunk"]),
     ("vehiculos", VEHICULOS, ["grabado", "paisaje"]),
     ("lugares", LUGARES, ["paisaje", "grabado"]),
 ]
 
 
-def lista():
+TANDAS_EXTRA = [
+    ("criaturas", CRIATURAS, ["tatuaje", "etnico", "nouveau"]),
+]
+
+
+def lista(solo=""):
+    """Prompts de una tanda ("" = la tanda original completa)."""
+    if solo:
+        salida = []
+        for cat, temas, estilos in TANDAS + TANDAS_EXTRA:
+            if cat == solo:
+                for i, tema in enumerate(temas):
+                    for e in estilos:
+                        salida.append(("%s_%03d_%s" % (cat, i + 1, e), cat, ESTILOS[e].format(s=tema) + FINAL))
+        return salida
     salida = []
     for cat, temas, estilos in TANDAS:
         for i, tema in enumerate(temas):
@@ -84,5 +125,6 @@ def lista():
 
 
 if __name__ == "__main__":
-    l = lista()
+    import sys
+    l = lista(sys.argv[1] if len(sys.argv) > 1 else "")
     print(len(l), "prompts")
