@@ -97,7 +97,9 @@ SEMILLAS = 2         # imágenes por prompt (855 prompts x 2 = 1710)
 SOLO_PRUEBA = 0      # 0 = todas; un número (p. ej. 20) para hacer solo una prueba
 CARPETA = "/content/drive/MyDrive/colorear_lotes"
 CARPETA_ZIP = "/content/drive/MyDrive/colorear_zip\""""),
-    code("!pip -q install -U diffusers transformers accelerate safetensors peft"),
+    code("""# torchao viene preinstalado en Colab en una versión vieja que choca con diffusers; no se usa.
+!pip -q uninstall -y torchao
+!pip -q install -U diffusers transformers accelerate safetensors peft"""),
     code("""from google.colab import drive
 drive.mount('/content/drive')"""),
     code("%%writefile /content/prompts.py\n" + prompts_src),
@@ -105,6 +107,8 @@ drive.mount('/content/drive')"""),
     code("!python /content/generar.py --modo {MODO} --semillas {SEMILLAS} --prueba {SOLO_PRUEBA} --carpeta {CARPETA}"),
     code("""# Un .zip por categoría para que Claude las recoja de tu Drive
 import os, shutil
+if not os.path.isdir(CARPETA) or not os.listdir(CARPETA):
+    raise SystemExit("Todavía no hay imágenes: revisa el error de la celda anterior y mándaselo a Claude.")
 os.makedirs(CARPETA_ZIP, exist_ok=True)
 for cat in sorted(os.listdir(CARPETA)):
     shutil.make_archive(f"{CARPETA_ZIP}/{cat}", "zip", f"{CARPETA}/{cat}")
