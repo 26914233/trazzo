@@ -30,6 +30,8 @@ var cadera_der: Node3D
 var hombro_izq: Node3D
 var hombro_der: Node3D
 var espada_mano: Node3D
+var yari_mano: Node3D                 # armas de Akira además de la katana (armas.gd)
+var nodachi_mano: Node3D
 var empunadura_cinto: Node3D
 var estela: MeshInstance3D
 var material_estela: StandardMaterial3D
@@ -263,6 +265,15 @@ func _construir_akira() -> void:
 	_caja(espada_mano, Vector3(0.04, 0.04, 0.22), Datos.TSUKA, Vector3(0, 0, 0.05))
 	_caja(espada_mano, Vector3(0.025, 0.05, 0.85), Datos.ACERO, Vector3(0, 0, 0.58))
 	espada_mano.visible = false
+	# yari: asta larga con la hoja delante; nodachi: hoja de casi 1,4 m y empuñadura larga
+	yari_mano = _pivote(hombro_der, Vector3(0, -0.47, 0))
+	_caja(yari_mano, Vector3(0.035, 0.035, 2.0), Datos.MADERA_LANZA, Vector3(0, 0, 0.3))
+	_caja(yari_mano, Vector3(0.025, 0.07, 0.32), Datos.ACERO, Vector3(0, 0, 1.45))
+	yari_mano.visible = false
+	nodachi_mano = _pivote(hombro_der, Vector3(0, -0.47, 0))
+	_caja(nodachi_mano, Vector3(0.045, 0.045, 0.38), Datos.TSUKA, Vector3(0, 0, 0.02))
+	_caja(nodachi_mano, Vector3(0.03, 0.065, 1.35), Datos.ACERO, Vector3(0, 0, 0.88))
+	nodachi_mano.visible = false
 	estela = crear_estela(cuerpo, Vector3(-0.15, 1.25, 0.05), false)
 	material_estela = estela.material_override
 	estela_iai = crear_estela(cuerpo, Vector3(-0.1, 1.2, 0.0), true)
@@ -570,9 +581,17 @@ func _aplicar(delta: float, info: Dictionary) -> void:
 
 func _animar_espada(info: Dictionary) -> void:
 	var pose: String = info.pose
-	var en_mano: bool = pose in ["ataque", "desenvaine", "remate"]
+	var en_mano: bool = pose in ["ataque", "desenvaine", "remate", "kesa", "gyaku", "giro"]
+	var con_yari: bool = pose == "tsuki"
+	var con_nodachi: bool = pose in ["barrido", "barrido_giro"]
 	espada_mano.visible = en_mano
 	empunadura_cinto.visible = not en_mano
+	if yari_mano:
+		yari_mano.visible = con_yari
+		nodachi_mano.visible = con_nodachi
+		yari_mano.rotation = Vector3.ZERO
+		yari_mano.position = Vector3(0, -0.47, 0)
+		nodachi_mano.rotation = Vector3.ZERO
 	espada_mano.rotation = Vector3.ZERO
 	hombro_der.rotation = Vector3(hombro_der.rotation.x, 0.0, 0.0)
 	hombro_izq.rotation = Vector3(hombro_izq.rotation.x, 0.0, 0.0)
@@ -605,6 +624,67 @@ func _animar_espada(info: Dictionary) -> void:
 			cadera_izq.rotation.x = -0.5
 			cadera_der.rotation.x = 0.4
 			brillo_iai = brillo_estela(info.progreso, 0.45, 0.32)
+		"kesa":
+			# Kesa-giri: diagonal de arriba a la derecha hacia abajo a la izquierda.
+			var t := clampf((info.progreso - 0.15) / 0.55, 0.0, 1.0)
+			hombro_der.rotation = Vector3(lerpf(-2.7, -0.6, ease(t, 0.4)), lerpf(0.7, -0.7, t), 0.0)
+			hombro_izq.rotation = Vector3(lerpf(-2.4, -0.8, ease(t, 0.4)), lerpf(0.5, -0.5, t), 0.0)
+			torso.rotation = Vector3(lerpf(-0.1, 0.22, t), lerpf(0.35, -0.4, t), 0.0)
+			cadera_izq.rotation.x = -0.45
+			cadera_der.rotation.x = 0.35
+			brillo = brillo_estela(info.progreso, 0.35, 0.35)
+		"gyaku":
+			# Gyaku-kesa: la diagonal de vuelta, de abajo a la izquierda hacia arriba a la derecha.
+			var t := clampf((info.progreso - 0.15) / 0.55, 0.0, 1.0)
+			hombro_der.rotation = Vector3(lerpf(-0.5, -2.5, ease(t, 0.4)), lerpf(-0.8, 0.75, t), 0.0)
+			hombro_izq.rotation = Vector3(lerpf(-0.7, -2.2, ease(t, 0.4)), lerpf(-0.6, 0.5, t), 0.0)
+			torso.rotation = Vector3(lerpf(0.2, -0.1, t), lerpf(-0.45, 0.4, t), 0.0)
+			cadera_izq.rotation.x = 0.35
+			cadera_der.rotation.x = -0.45
+			brillo = brillo_estela(info.progreso, 0.35, 0.35)
+		"giro":
+			# Iai de luna creciente: una vuelta entera con la hoja extendida.
+			var t := clampf((info.progreso - 0.2) / 0.55, 0.0, 1.0)
+			hombro_der.rotation = Vector3(-PI / 2.0 + 0.15, -1.25, 0.0)
+			espada_mano.rotation = Vector3(PI / 2.0, 0.0, 0.0)
+			hombro_izq.rotation = Vector3(-0.3, 0.0, -0.6)
+			torso.rotation = Vector3(0.15, -TAU * ease(t, 0.6), 0.0)
+			cadera_izq.rotation.x = -0.55
+			cadera_der.rotation.x = 0.45
+			cuerpo.position.y = -0.06
+			brillo_iai = brillo_estela(info.progreso, 0.45, 0.4)
+		"tsuki":
+			# Estocada de yari: se recoge (anticipación) y extiende los brazos con el cuerpo detrás.
+			var t := clampf((info.progreso - 0.25) / 0.2, 0.0, 1.0)
+			hombro_der.rotation = Vector3(-PI / 2.0 + 0.25, 0.15, 0.0)
+			hombro_izq.rotation = Vector3(-PI / 2.0 + 0.35, -0.2, 0.0)
+			yari_mano.rotation = Vector3(PI / 2.0 - 0.25, 0.0, 0.0)
+			yari_mano.position = Vector3(0, -0.47, 0) + Vector3(0, 0.0, lerpf(-0.45, 0.35, ease(t, 0.3)))
+			torso.rotation = Vector3(lerpf(-0.15, 0.3, t), lerpf(0.3, -0.1, t), 0.0)
+			cadera_izq.rotation.x = lerpf(-0.2, -0.65, t)
+			cadera_der.rotation.x = lerpf(0.2, 0.5, t)
+			brillo = brillo_estela(info.progreso, 0.35, 0.3) * 0.6
+		"barrido", "barrido_giro":
+			# Nodachi: barrido ancho a dos manos, lento y pesado (el giro da la vuelta entera).
+			var t := clampf((info.progreso - 0.3) / 0.45, 0.0, 1.0)
+			var giro := TAU * ease(t, 0.6) if pose == "barrido_giro" else 0.0
+			hombro_der.rotation = Vector3(-PI / 2.0 + 0.2, lerpf(1.45, -1.5, ease(t, 0.35)), 0.0)
+			hombro_izq.rotation = Vector3(-PI / 2.0 + 0.3, lerpf(1.25, -1.3, ease(t, 0.35)), 0.0)
+			nodachi_mano.rotation = Vector3(PI / 2.0, 0.0, 0.0)
+			torso.rotation = Vector3(0.18, lerpf(0.65, -0.7, t) - giro, 0.0)
+			cadera_izq.rotation.x = -0.6
+			cadera_der.rotation.x = 0.5
+			cuerpo.position.y = -0.07
+			brillo = brillo_estela(info.progreso, 0.5, 0.35)
+		"esquiva":
+			# Paso rápido agachado: el cuerpo bajo y adelantado, los brazos atrás.
+			var t := sin(clampf(info.progreso, 0.0, 1.0) * PI)
+			cuerpo.position.y = -0.22 * t
+			torso.rotation = Vector3(0.55 * t, 0.0, 0.0)
+			cadera_izq.rotation.x = -0.9 * t
+			cadera_der.rotation.x = 0.6 * t
+			hombro_der.rotation = Vector3(0.6 * t, 0.0, 0.2)
+			hombro_izq.rotation = Vector3(0.6 * t, 0.0, -0.2)
 		"remate":
 			# Zanshin tras el iai perfecto: brazo extendido a la derecha, hoja en línea.
 			hombro_der.rotation = Vector3(-PI / 2.0 + 0.3, -1.3, 0.0)

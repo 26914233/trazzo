@@ -460,6 +460,8 @@ func info() -> Dictionary:
 	var progreso := progreso_ataque()
 	if tiempo_desenvaine > 0.0:
 		progreso = 1.0 - tiempo_desenvaine / Datos.DURACION_DESENVAINE
+	elif esquivando():
+		progreso = 1.0 - esquiva / Armas.ESQUIVA_DURACION
 	return {
 		"mirando": mirando,
 		"moviendose": moviendose,

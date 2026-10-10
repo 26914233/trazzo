@@ -36,6 +36,8 @@ var fase := 0.0
 var tiempo := 0.0
 var acumulado := 0.0
 var ultima_pose := ""
+# Poses con cuadros según el progreso del corte (armas.gd) o de la esquiva.
+const CORTES := ["ataque", "desenvaine", "kesa", "gyaku", "giro", "tsuki", "barrido", "barrido_giro", "esquiva"]
 var ultima_muerte := -1.0
 var ultimo_destello := 0.0
 var actualizaciones := 0              # cuadros aplicados (lo usa la prueba automática)
@@ -143,13 +145,13 @@ func _aplicar(delta: float, info: Dictionary) -> void:
 	if info.muerte >= 0.0:
 		_poner("muerte", int(minf(1.0, info.muerte * 2.5) * 3.999))
 		visible = info.muerte < 0.85
-	elif pose in ["ataque", "desenvaine"]:
+	elif hoja.animaciones.has(pose) and pose in CORTES:
 		var cuadros: int = hoja.animaciones[pose].cuadros
 		_poner(pose, clampi(int(info.progreso * cuadros), 0, cuadros - 1))
-		if pose == "ataque":
-			brillo = VisualModelo.brillo_estela(info.progreso, 0.35, 0.35)
-		else:
+		if pose in ["desenvaine", "giro"]:
 			brillo_iai = VisualModelo.brillo_estela(info.progreso, 0.45, 0.32)
+		elif pose != "esquiva":
+			brillo = VisualModelo.brillo_estela(info.progreso, 0.35, 0.35)
 	elif pose in ["postura", "remate", "preparando", "estocada"]:
 		_poner(pose, 0)
 	elif info.en_aire:

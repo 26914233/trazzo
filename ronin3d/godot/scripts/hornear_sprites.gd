@@ -82,6 +82,14 @@ func _animaciones(tipo: String) -> Array:
 		["postura", 1, 0.0, func(_k): return [_info("postura"), 0.0, 0.0]],
 		["desenvaine", 4, 0.0, func(k): return [_info("desenvaine", false, false, false, (k + 0.5) / 4.0), 0.0, 0.0]],
 		["remate", 1, 0.0, func(_k): return [_info("remate"), 0.0, 0.0]],
+		# Cortes de la cadena por arma (armas.gd) y la esquiva, desde la 0.10
+		["kesa", 4, 0.0, func(k): return [_info("kesa", false, false, false, (k + 0.5) / 4.0), 0.0, 0.0]],
+		["gyaku", 4, 0.0, func(k): return [_info("gyaku", false, false, false, (k + 0.5) / 4.0), 0.0, 0.0]],
+		["giro", 4, 0.0, func(k): return [_info("giro", false, false, false, (k + 0.5) / 4.0), 0.0, 0.0]],
+		["tsuki", 4, 0.0, func(k): return [_info("tsuki", false, false, false, (k + 0.5) / 4.0), 0.0, 0.0]],
+		["barrido", 4, 0.0, func(k): return [_info("barrido", false, false, false, (k + 0.5) / 4.0), 0.0, 0.0]],
+		["barrido_giro", 4, 0.0, func(k): return [_info("barrido_giro", false, false, false, (k + 0.5) / 4.0), 0.0, 0.0]],
+		["esquiva", 2, 0.0, func(k): return [_info("esquiva", false, false, false, (k + 0.5) / 2.0), 0.0, 0.0]],
 	]
 
 

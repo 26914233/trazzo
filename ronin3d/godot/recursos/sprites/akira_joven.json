@@ -10,6 +10,16 @@
 			"fps": 0.0,
 			"inicio": 23
 		},
+		"barrido": {
+			"cuadros": 4,
+			"fps": 0.0,
+			"inicio": 49
+		},
+		"barrido_giro": {
+			"cuadros": 4,
+			"fps": 0.0,
+			"inicio": 53
+		},
 		"correr": {
 			"cuadros": 6,
 			"fps": 0.0,
@@ -19,6 +29,26 @@
 			"cuadros": 4,
 			"fps": 0.0,
 			"inicio": 28
+		},
+		"esquiva": {
+			"cuadros": 2,
+			"fps": 0.0,
+			"inicio": 57
+		},
+		"giro": {
+			"cuadros": 4,
+			"fps": 0.0,
+			"inicio": 41
+		},
+		"gyaku": {
+			"cuadros": 4,
+			"fps": 0.0,
+			"inicio": 37
+		},
+		"kesa": {
+			"cuadros": 4,
+			"fps": 0.0,
+			"inicio": 33
 		},
 		"muerte": {
 			"cuadros": 4,
@@ -44,10 +74,15 @@
 			"cuadros": 1,
 			"fps": 0.0,
 			"inicio": 18
+		},
+		"tsuki": {
+			"cuadros": 4,
+			"fps": 0.0,
+			"inicio": 45
 		}
 	},
 	"columnas": 24,
-	"cuadros_por_direccion": 33,
+	"cuadros_por_direccion": 59,
 	"direcciones": 8,
 	"elevacion": 20.0,
 	"id": "akira_joven",

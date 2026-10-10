@@ -804,7 +804,8 @@ func _comprobar_apariencias() -> void:
 # media vuelta alrededor de Akira, lo ve desde el otro lado.
 func _comprobar_sprites() -> void:
 	var necesarias := {
-		"akira": ["normal", "andar", "correr", "salto", "muerte", "ataque", "postura", "desenvaine", "remate"],
+		"akira": ["normal", "andar", "correr", "salto", "muerte", "ataque", "postura", "desenvaine", "remate",
+			"kesa", "gyaku", "giro", "tsuki", "barrido", "barrido_giro", "esquiva"],
 		"soldado": ["normal", "andar", "correr", "salto", "muerte", "preparando", "estocada"],
 		"shiro": ["quieto", "sentado", "andar", "correr", "olfatear", "escarbar", "alerta", "salto"],
 	}

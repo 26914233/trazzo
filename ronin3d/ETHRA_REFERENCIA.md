@@ -70,11 +70,23 @@ Segundos: preparación / corte / recuperación.
 - Tras un iai perfecto, atacar en los 0,6 s siguientes sigue desde el 2.º corte.
 - Con la postura rota, el enemigo queda vendido 1,2 s y el siguiente golpe lo remata.
 
-## 4. Lo que falta por verificar o hacer
+## 4. Hecho después (0.10 y 0.11)
+
+- **Animaciones propias** de cada corte, horneadas en los sprites de las 4 apariencias de Akira:
+  - katana: desenvaine, kesa, gyaku, corte vertical y giro;
+  - yari: estocada, con la yari en la mano;
+  - nodachi: barrido y barrido giratorio, con el nodachi en la mano;
+  - esquiva.
+- **Fijado de objetivo** automático con retícula: anillo rojo y rombo.
+- **Vista de depuración** con F3: conos de los cortes, zonas de golpe y franjas de los ataques.
+- **Juego en vertical** (720×1280).
+- **Enemigos del bestiario** (kappa, Aka-oni, onibi) y el **oni gigante** como jefe con dos
+  fases, según las fichas de `BESTIARIO.md` §3.
+
+## 5. Lo que falta por verificar o hacer
 
 - Medir los cuadros exactos con el video en local: ahora son estimaciones del análisis de vidIQ.
-- Animaciones propias de cada corte y arma. Por ahora la cadena alterna los cuadros de «ataque» y
-  de «desenvaine» del sprite: hay que hornear poses nuevas.
-- Jefe con fases y enemigos del bestiario en combate.
-- Retícula del objetivo fijado.
-- Juego en vertical.
+- Probar en un móvil de verdad: respuesta de los toques, ventana del iai y fluidez.
+- Ataque a la carrera (EthrA 02:46).
+- Los yōkai se ven con sus modelos 3D del bestiario, no en pixel art: los sprites solo existen
+  para Akira, Shiro y los soldados.
