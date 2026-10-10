@@ -23,6 +23,9 @@ const LISTA := [
 	["palabras_1000", "Mil palabras", "Encuentra 1000 palabras.", "palabras", 1000],
 	["extras_25", "Cazapalabras", "Encuentra 25 palabras extra escondidas.", "extras", 25],
 	["reloj_10", "Contra el reloj", "Gana 10 sopas en contrarreloj.", "reloj_ganadas", 10],
+	["evento_1", "De fiesta", "Completa un evento de temporada.", "eventos_hechos", 1],
+	["evento_10", "Siempre presente", "Completa 10 eventos.", "eventos_hechos", 10],
+	["oro_5", "Medallista", "Consigue la medalla de oro en 5 temas del viaje.", "temas_completos", 5],
 ]
 
 
@@ -92,4 +95,5 @@ static func _medidas(d: Dictionary) -> Dictionary:
 		"palabras": int(d.get("palabras", 0)),
 		"extras": int(d.get("extras", 0)),
 		"reloj_ganadas": int(d.get("reloj_ganadas", 0)),
+		"eventos_hechos": int(d.get("eventos_hechos", 0)),
 	}

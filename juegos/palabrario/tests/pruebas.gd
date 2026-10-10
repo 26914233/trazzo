@@ -40,6 +40,9 @@ func _ready() -> void:
 	prueba_palabras_extra()
 	prueba_premio_extras()
 	prueba_contrarreloj()
+	prueba_medallas()
+	prueba_eventos()
+	prueba_progreso_evento()
 	await prueba_guardado_y_firma()
 	prueba_esquema_guardado()
 	prueba_reloj_no_retrocede()
@@ -410,6 +413,78 @@ func prueba_contrarreloj() -> void:
 	comprobar(int(Progreso.datos["reloj_ganadas"]) == 1, "sin contrarreloj no suma")
 
 
+func prueba_medallas() -> void:
+	caso("medallas del viaje")
+	_reiniciar_progreso()
+	var c: Dictionary = Temas.categoria("clima")          # 7 sopas
+	comprobar(Progreso.medalla("clima") == 0, "sin nada: sin medalla")
+	Progreso.registrar_victoria("clima", c["subtemas"][0]["id"], 0, 1, false, HOY)
+	comprobar(Progreso.medalla("clima") == 0, "1 de 7: aun no")
+	Progreso.registrar_victoria("clima", c["subtemas"][1]["id"], 3, 1, false, HOY)
+	Progreso.registrar_victoria("clima", c["subtemas"][2]["id"], 1, 1, false, HOY)
+	comprobar(Progreso.medalla("clima") == 1, "3 de 7 (en cualquier dificultad): bronce")
+	for i in range(3, 5):
+		Progreso.registrar_victoria("clima", c["subtemas"][i]["id"], 0, 1, false, HOY)
+	comprobar(Progreso.medalla("clima") == 2, "5 de 7: plata")
+	for i in range(5, 7):
+		Progreso.registrar_victoria("clima", c["subtemas"][i]["id"], 0, 1, false, HOY)
+	comprobar(Progreso.medalla("clima") == 3, "todas: oro")
+	comprobar(Progreso.resueltas_cualquier("clima") == 7, "cuenta sopas distintas")
+	comprobar(Progreso.siguiente_parada() == Temas.lista[0]["id"], "la siguiente parada es el primer tema sin oro")
+	comprobar(Progreso.medallas() == [1, 0, 0], "recuento oro, plata, bronce: %s" % str(Progreso.medallas()))
+
+
+func prueba_eventos() -> void:
+	caso("eventos de temporada")
+	var nav := Eventos.activo("2026-12-24")
+	comprobar(nav["id"] == "navidad" and nav["clave"] == "navidad-2026", "Navidad en diciembre")
+	comprobar(Eventos.activo("2027-01-03")["clave"] == "navidad-2026", "Navidad cruza el año con la misma clave")
+	comprobar(Eventos.activo("2026-10-31")["id"] == "halloween", "Halloween")
+	var finde := Eventos.activo("2026-10-09")       # viernes sin fiesta
+	comprobar(finde.get("id", "") == "finde", "fin de semana tematico un viernes")
+	comprobar(Eventos.activo("2026-10-11")["clave"] == finde["clave"], "mismo evento todo el fin de semana")
+	comprobar(Eventos.activo("2026-10-12").is_empty(), "un lunes sin fiesta: ninguno")
+	comprobar(Eventos.activo("2026-10-16")["clave"] != finde["clave"], "el fin de semana siguiente es otro")
+	for e in Eventos.FIJOS:
+		comprobar(e["sopas"].size() == Eventos.SOPAS_POR_EVENTO, "%s tiene %d sopas" % [e["id"], Eventos.SOPAS_POR_EVENTO])
+		for par in e["sopas"]:
+			comprobar(not Temas.subtema(par[0], par[1]).is_empty(), "%s: existe %s/%s" % [e["id"], par[0], par[1]])
+	comprobar(finde["sopas"].size() == Eventos.SOPAS_POR_EVENTO, "el fin de semana tambien trae %d" % Eventos.SOPAS_POR_EVENTO)
+	comprobar(Eventos.dias_restantes(nav, "2026-12-24") == 14, "cuantos dias quedan contando hoy (24-dic a 6-ene)")
+	var fechas := {}
+	for e in Eventos.FIJOS:
+		for d in Eventos.dias_de(e, 2026):
+			comprobar(not fechas.has(d), "eventos sin solaparse (%s)" % d)
+			fechas[d] = true
+
+
+func prueba_progreso_evento() -> void:
+	caso("progreso de un evento")
+	_reiniciar_progreso()
+	var hoy := "2026-10-30"
+	var ev := Eventos.activo(hoy)
+	var s0: Array = ev["sopas"][0]
+	comprobar(Progreso.avance_evento(ev) == 0, "empieza en 0")
+	comprobar(not Progreso.registrar_evento(s0[0], s0[1], hoy), "una sopa: no completa")
+	comprobar(Progreso.avance_evento(ev) == 1, "1 de 5")
+	Progreso.registrar_evento(s0[0], s0[1], hoy)
+	comprobar(Progreso.avance_evento(ev) == 1, "repetir la misma no suma")
+	Progreso.registrar_evento("comida", "frutas", hoy)
+	comprobar(Progreso.avance_evento(ev) == 1, "una sopa de fuera del evento no suma")
+	var completo := false
+	for par in ev["sopas"].slice(1):
+		completo = Progreso.registrar_evento(par[0], par[1], hoy)
+	comprobar(completo and Progreso.evento_hecho(ev), "las 5: evento completado")
+	comprobar(int(Progreso.datos["eventos_hechos"]) == 1, "cuenta eventos completados")
+	comprobar(Logros.hechos(Progreso.datos).has("evento_1"), "logro de evento")
+	comprobar(not Progreso.registrar_evento(s0[0], s0[1], "2026-11-20"), "fuera de la ventana no hace nada")
+	var raro := Progreso.por_defecto()
+	raro["eventos"] = {"halloween-2026": ["a/b", 5, "c/d"], 7: "x", "otro": "no-lista"}
+	_escribir_firmado(raro)
+	Progreso.cargar()
+	comprobar(Progreso.datos["eventos"] == {"halloween-2026": ["a/b", "c/d"]}, "eventos saneados al leer: %s" % str(Progreso.datos["eventos"]))
+
+
 func prueba_economia() -> void:
 	caso("estrellas")
 	comprobar(Economia.estrellas(30, 5, 0) == 3, "rapido y sin pistas: 3")
@@ -772,13 +847,13 @@ class ContadorErrores extends Logger:
 
 
 func prueba_pantallas() -> void:
-	caso("las 7 pantallas cargan sin errores en los 3 diseños")
+	caso("las pantallas cargan sin errores en todos los diseños")
 	var log := ContadorErrores.new()
 	OS.add_logger(log)
 	Temas.seleccion = {"categoria": "comida", "subtema": "frutas", "dificultad": 0, "diario": false}
 	for id in Estilo.VARIANTES:
 		Estilo.aplicar(id)
-		for nombre in ["menu", "categorias", "sopas", "juego", "ajustes", "logros", "copia_no_valida"]:
+		for nombre in ["menu", "categorias", "mapa", "evento", "sopas", "juego", "ajustes", "logros", "copia_no_valida"]:
 			var escena: Node = load("res://escenas/%s.tscn" % nombre).instantiate()
 			add_child(escena)
 			for f in 4:

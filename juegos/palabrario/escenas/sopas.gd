@@ -10,7 +10,7 @@ func _ready() -> void:
 		_cat = Temas.lista[0]
 	var dif := int(Progreso.ajuste("dificultad"))
 	var col := Estilo.pantalla(self)
-	Estilo.barra(col, _cat["nombre"], func(): Estilo.ir(self, "categorias"))
+	Estilo.barra(col, _cat["nombre"], func(): Estilo.ir(self, Temas.volver_a))
 	col.add_child(Estilo.etiqueta("%s · %d de %d resueltas" % [Economia.DIFICULTADES[dif]["nombre"], Progreso.resueltas_en(_cat["id"], dif), _cat["subtemas"].size()], 36, Estilo.TEXTO_SUAVE, false))
 
 	var scroll := ScrollContainer.new()
@@ -56,4 +56,4 @@ func _abrir(s: Dictionary, dif: int) -> void:
 
 func _notification(que: int) -> void:
 	if que == NOTIFICATION_WM_GO_BACK_REQUEST:
-		Estilo.ir(self, "categorias")
+		Estilo.ir(self, Temas.volver_a)

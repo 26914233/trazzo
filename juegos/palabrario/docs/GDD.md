@@ -104,3 +104,15 @@ Copiados como función (no como código, textos ni arte) de las apps revisadas e
   dificultad. Si se acaba: seguir sin reloj (sin perder nada), reintentar o salir. Solo
   cuenta como ganada a contrarreloj si se termina dentro del tiempo.
 - **Diseño Contraste** (accesibilidad): negro, blanco y amarillo; texto a más de 15:1.
+
+## Viaje y eventos (octubre 2026)
+- **Viaje** («Jugar» abre el mapa; «Lista» lleva a la rejilla de temas): los 44 temas como
+  paradas de un camino. Medalla por tema según las sopas distintas resueltas en cualquier
+  dificultad: bronce 1/3, plata 2/3, oro todas. La siguiente parada sin oro late. No se
+  bloquea nada (app de pago: todo incluido).
+- **Eventos de temporada** (`scripts/eventos.gd`, sin servidor): San Valentín, Día del
+  Idioma, Medio Ambiente, Vacaciones, Independencia de Colombia, Halloween y Muertos,
+  Navidad y Año Nuevo. Cuando no hay ninguno, fin de semana temático (viernes a domingo,
+  un tema distinto cada semana). Cada evento son 5 sopas existentes; resolverlas todas
+  dentro de la ventana completa el evento (logros «De fiesta» y «Siempre presente»).
+  Tarjeta en el menú con los días que quedan.

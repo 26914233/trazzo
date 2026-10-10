@@ -47,7 +47,7 @@ func _serie(id: String) -> void:
 	var dir := _salida.path_join(id)
 	DirAccess.make_dir_recursive_absolute(dir)
 	Temas.seleccion = {"categoria": "comida", "subtema": "", "dificultad": 1, "diario": false}
-	for nombre in ["menu", "categorias", "sopas", "ajustes", "logros"]:
+	for nombre in ["menu", "categorias", "mapa", "evento", "sopas", "ajustes", "logros"]:
 		await _capturar(nombre, dir)
 
 	# Partida a medias: 4 palabras encontradas, una seleccion en curso y una pista.

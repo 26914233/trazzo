@@ -28,6 +28,9 @@ func _ready() -> void:
 	col.add_child(hueco2)
 
 	col.add_child(_tarjeta_del_dia(hoy))
+	var ev := Eventos.activo(hoy)
+	if not ev.is_empty():
+		col.add_child(_tarjeta_evento(ev, hoy))
 
 	var u := Progreso.ultima()
 	if not u.is_empty() and not Temas.subtema(u["categoria"], u["subtema"]).is_empty():
@@ -41,7 +44,7 @@ func _ready() -> void:
 
 	var jugar := Estilo.boton("Jugar", "primario", 170)
 	jugar.add_theme_font_size_override("font_size", 60)
-	jugar.pressed.connect(func(): Estilo.ir(self, "categorias"))
+	jugar.pressed.connect(func(): Estilo.ir(self, "mapa"))
 	col.add_child(jugar)
 
 	var fila := HBoxContainer.new()
@@ -88,6 +91,24 @@ func _tarjeta_del_dia(hoy: String) -> Button:
 		v.add_child(Estilo.titulo(sub["nombre"], 56))
 		var estado := "Resuelta. Vuelve mañana" if hecha else "%s · una nueva cada día" % cat["nombre"]
 		v.add_child(Estilo.etiqueta(estado, 36, Estilo.TEXTO_SUAVE, false))
+	for h in v.get_children():
+		h.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return t[0]
+
+
+func _tarjeta_evento(ev: Dictionary, hoy: String) -> Button:
+	var t := Estilo.tarjeta(150, Estilo.SUPERFICIE, func(): Estilo.ir(self, "evento"))
+	var v: VBoxContainer = t[1]
+	v.alignment = BoxContainer.ALIGNMENT_CENTER
+	var dias := Eventos.dias_restantes(ev, hoy)
+	var cabecera := "EVENTO · " + ("último día" if dias <= 1 else "quedan %d días" % dias)
+	v.add_child(Estilo.etiqueta(cabecera, 30, Estilo.TEXTO_SUAVE, false))
+	var hecho := Progreso.evento_hecho(ev)
+	var linea := "%s  ·  %s" % [ev["nombre"], "completado ✓" if hecho else "%d de %d" % [Progreso.avance_evento(ev), ev["sopas"].size()]]
+	var titulo := Estilo.titulo(linea, 44)
+	titulo.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	titulo.clip_text = true
+	v.add_child(titulo)
 	for h in v.get_children():
 		h.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return t[0]

@@ -9,6 +9,8 @@ var por_id: Dictionary = {}
 
 ## La sopa elegida para la proxima partida.
 var seleccion: Dictionary = {"categoria": "", "subtema": "", "dificultad": 0, "diario": false}
+## Pantalla a la que vuelve la lista de sopas: "mapa" (viaje) o "categorias" (lista).
+var volver_a := "mapa"
 
 
 func _ready() -> void:

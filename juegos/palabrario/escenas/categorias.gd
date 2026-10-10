@@ -7,7 +7,11 @@ var _botones_dif: Array[Button] = []
 
 func _ready() -> void:
 	var col := Estilo.pantalla(self)
-	Estilo.barra(col, "Temas", func(): Estilo.ir(self, "menu"))
+	var mapa := Estilo.boton("Viaje", "suave", 104)
+	mapa.custom_minimum_size.x = 180
+	mapa.add_theme_font_size_override("font_size", 36)
+	mapa.pressed.connect(func(): Estilo.ir(self, "mapa"))
+	Estilo.barra(col, "Temas", func(): Estilo.ir(self, "menu"), mapa)
 
 	var difs := HBoxContainer.new()
 	difs.add_theme_constant_override("separation", 12)
@@ -51,6 +55,7 @@ func _tarjeta(c: Dictionary, dif: int) -> Button:
 	var color := Color(c["color"])
 	var t := Estilo.tarjeta(232, Estilo.SUPERFICIE, func():
 		Temas.seleccion["categoria"] = c["id"]
+		Temas.volver_a = "categorias"
 		Estilo.ir(self, "sopas"))
 	var b: Button = t[0]
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL

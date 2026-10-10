@@ -265,14 +265,18 @@ func _victoria() -> void:
 	var estrellas := Economia.estrellas(_segundos, _sopa.colocadas.size(), _pistas_usadas)
 	var antes := Logros.hechos(Progreso.datos)
 	Progreso.registrar_partida(_sel["dificultad"], _segundos, _sopa.colocadas.size(), _pistas_usadas, _aleatoria, _contrarreloj)
+	var evento := ""
 	if not _aleatoria:
 		Progreso.registrar_victoria(_sel["categoria"], _sel["subtema"], _sel["dificultad"], estrellas, _sel["diario"], _hoy)
+		var ev := Eventos.activo(_hoy)
+		if Progreso.registrar_evento(_sel["categoria"], _sel["subtema"], _hoy):
+			evento = ev["nombre"]
 	var logros := Logros.nuevos(antes, Progreso.datos)
 	await get_tree().create_timer(0.6).timeout
-	_panel_victoria(estrellas, logros)
+	_panel_victoria(estrellas, logros, evento)
 
 
-func _panel_victoria(estrellas: int, logros: Array = []) -> void:
+func _panel_victoria(estrellas: int, logros: Array = [], evento: String = "") -> void:
 	var m := Estilo.modal(self)
 	var col: VBoxContainer = m[1]
 	col.add_child(Estilo.titulo("¡Sopa resuelta!", 68, true))
@@ -283,6 +287,8 @@ func _panel_victoria(estrellas: int, logros: Array = []) -> void:
 		col.add_child(Estilo.etiqueta("Contrarreloj: te sobraron %d s" % maxi(_limite - int(_segundos), 0), 40, Estilo.TEXTO))
 	if not _extras.is_empty():
 		col.add_child(Estilo.etiqueta("Palabras extra: %d de %d" % [_extras.size(), _sopa.extras.size()], 40, Estilo.TEXTO))
+	if evento != "":
+		col.add_child(Estilo.etiqueta("¡Evento completado: %s!" % evento, 40, Estilo.ACENTO))
 	for id in logros:
 		col.add_child(Estilo.etiqueta("Nuevo logro: %s" % Logros.nombre(id), 40, Estilo.ACENTO))
 	if _aleatoria:

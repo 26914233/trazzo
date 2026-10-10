@@ -26,7 +26,8 @@ const COMPLETADAS_MAX := 10_000_000
 const DIAS_RELOJ_ROTO := 30
 const FECHAS := ["ultimo_dia", "max_dia", "diario_hecho", "pistas_dia", "comodin_usado", "extras_dia"]
 const TIEMPO_MAX := 86_400         # segundos: un dia
-const CONTADORES := ["racha_max", "diarias", "aleatorias", "palabras", "pistas_usadas", "extras", "reloj_ganadas"]
+const CONTADORES := ["racha_max", "diarias", "aleatorias", "palabras", "pistas_usadas", "extras", "reloj_ganadas", "eventos_hechos"]
+const EVENTOS_GUARDADOS := 40       # ediciones de eventos que se recuerdan
 
 var ruta := "user://progreso.save"
 var datos: Dictionary = {}
@@ -72,6 +73,8 @@ static func por_defecto() -> Dictionary:
 		"extras_premio_hoy": 0,    # pistas ganadas ese dia con extras
 		"reloj_ganadas": 0,        # sopas ganadas dentro del contrarreloj
 		"contrarreloj": false,     # ajuste
+		"eventos": {},             # clave del evento -> ["cat/sub", ...] resueltas en su ventana
+		"eventos_hechos": 0,       # eventos completados
 	}
 
 
@@ -148,6 +151,12 @@ func _sanear() -> void:
 		if typeof(k) == TYPE_STRING and typeof(v) in [TYPE_INT, TYPE_FLOAT]:
 			estrellas[k] = clampi(int(v), 0, 3)
 	datos["estrellas"] = estrellas
+	var eventos := {}
+	for k in datos["eventos"]:
+		var v = datos["eventos"][k]
+		if typeof(k) == TYPE_STRING and typeof(v) == TYPE_ARRAY and eventos.size() < EVENTOS_GUARDADOS:
+			eventos[k] = v.filter(func(x): return typeof(x) == TYPE_STRING).slice(0, Eventos.SOPAS_POR_EVENTO)
+	datos["eventos"] = eventos
 	var u: Dictionary = datos["ultima"]
 	if typeof(u.get("categoria")) != TYPE_STRING or typeof(u.get("subtema")) != TYPE_STRING:
 		datos["ultima"] = {}
@@ -226,6 +235,78 @@ func resueltas_total() -> int:
 		if partes.size() == 3:
 			sopas[partes[0] + "/" + partes[1]] = true
 	return sopas.size()
+
+
+## Sopas distintas resueltas de una categoria, en cualquier dificultad.
+func resueltas_cualquier(cat: String) -> int:
+	var n := 0
+	for s in Temas.categoria(cat).get("subtemas", []):
+		for d in Economia.DIFICULTADES.size():
+			if estrellas_de(cat, s["id"], d) > 0:
+				n += 1
+				break
+	return n
+
+
+## Medalla del viaje: 0 ninguna, 1 bronce (1/3), 2 plata (2/3), 3 oro (todas).
+func medalla(cat: String) -> int:
+	var total: int = Temas.categoria(cat).get("subtemas", []).size()
+	if total == 0:
+		return 0
+	var n := resueltas_cualquier(cat)
+	if n >= total:
+		return 3
+	if n * 3 >= total * 2:
+		return 2
+	if n * 3 >= total:
+		return 1
+	return 0
+
+
+## [oros, platas, bronces]
+func medallas() -> Array:
+	var r := [0, 0, 0]
+	for c in Temas.lista:
+		var m := medalla(c["id"])
+		if m > 0:
+			r[3 - m] += 1
+	return r
+
+
+## Primer tema del viaje que aun no tiene oro ("" si todos).
+func siguiente_parada() -> String:
+	for c in Temas.lista:
+		if medalla(c["id"]) < 3:
+			return c["id"]
+	return ""
+
+
+## Sopa ganada en `hoy`: si es del evento activo, cuenta. true si lo completa.
+func registrar_evento(cat: String, sub: String, hoy: String) -> bool:
+	var ev := Eventos.activo(hoy)
+	if ev.is_empty() or not Eventos.incluye(ev, cat, sub):
+		return false
+	var hechas: Array = datos["eventos"].get(ev["clave"], [])
+	var k := cat + "/" + sub
+	if k in hechas:
+		return false
+	hechas.append(k)
+	if not datos["eventos"].has(ev["clave"]) and datos["eventos"].size() >= EVENTOS_GUARDADOS:
+		datos["eventos"].erase(datos["eventos"].keys()[0])     # el mas antiguo
+	datos["eventos"][ev["clave"]] = hechas
+	var completo: bool = hechas.size() == ev["sopas"].size()
+	if completo:
+		datos["eventos_hechos"] = int(datos["eventos_hechos"]) + 1
+	guardar()
+	return completo
+
+
+func avance_evento(ev: Dictionary) -> int:
+	return datos["eventos"].get(ev.get("clave", ""), []).size()
+
+
+func evento_hecho(ev: Dictionary) -> bool:
+	return not ev.is_empty() and avance_evento(ev) >= ev["sopas"].size()
 
 
 func registrar_victoria(cat: String, sub: String, dificultad: int, estrellas: int, diario: bool, hoy: String) -> void:
