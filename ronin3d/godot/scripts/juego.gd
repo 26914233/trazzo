@@ -18,6 +18,9 @@ const Monedas := preload("res://scripts/monedas.gd")
 const Apariencias := preload("res://scripts/apariencias_akira.gd")
 const Partida := preload("res://scripts/partida.gd")
 const Jizo := preload("res://scripts/jizo.gd")
+const Yokai := preload("res://scripts/yokai.gd")
+const JefeOni := preload("res://scripts/jefe_oni.gd")
+const Enemigos := preload("res://scripts/enemigos.gd")
 const SHADER_PROFUNDIDAD := preload("res://shaders/profundidad.gdshader")
 
 signal fase_cambiada(fase: String)
@@ -29,6 +32,7 @@ signal monedas_cambiadas(total: int)
 signal vida_maxima_cambiada(maxima: int)
 signal aviso_interaccion(texto: String)     # vacío: no hay nada con lo que interactuar
 signal aguante_cambiado(valor: float)
+signal jefe_cambiado(nombre: String, fraccion: float)   # fraccion < 0: ocultar la barra
 signal arma_cambiada(arma: String)
 
 var aspecto
@@ -36,7 +40,9 @@ var efectos
 var constructor
 var akira
 var camara
-var soldados: Array = []
+var soldados: Array = []             # todos los enemigos: soldados, yōkai y el jefe
+var jefe                             # el oni gigante del portón
+var aviso_porton := 0.0
 var shiro
 var monedas_suelo                    # las monedas que hay por el suelo (monedas.gd)
 var monedas := 0                     # las que lleva Akira (las guarda partida.gd)
@@ -108,12 +114,65 @@ func iniciar(con_intro := true) -> void:
 		soldado.aviso_iniciado.connect(func(): efectos.aviso(soldado.global_position + Vector3.UP * 2.0))
 		soldado.estocada_iniciada.connect(func(): efectos.estocada(soldado.global_position + Vector3.UP * 1.1))
 		soldados.append(soldado)
+	_crear_yokai()
+	_crear_jefe()
 
 	if con_intro:
 		camara.modo_presentacion = true
 		_cambiar_fase("intro")
 	else:
 		comenzar()
+
+
+# Yōkai del bestiario (kappa, oni, onibi), con las fichas del capítulo 1.
+func _crear_yokai() -> void:
+	for entrada in Enemigos.OLEADA_CAPITULO_1:
+		crear_yokai(entrada[0], entrada[1])
+
+
+func crear_yokai(tipo: String, lugar: Vector3):
+		var yokai = Yokai.new()
+		yokai.configurar(tipo, lugar, akira, aspecto)
+		add_child(yokai)
+		yokai.derrotado.connect(_al_derrotar)
+		yokai.derrotado.connect(func():
+			akira.ganar_espiritu(float(yokai.perfil.get("espiritu_al_morir", 0.0)))
+			monedas_suelo.soltar(yokai.global_position + Vector3.UP * 0.7, azar.randi_range(1, 2)))
+		yokai.aviso_iniciado.connect(func(): efectos.aviso(yokai.global_position + Vector3.UP * 1.8))
+		yokai.estocada_iniciada.connect(func(): efectos.estocada(yokai.global_position + Vector3.UP * 1.0))
+		soldados.append(yokai)
+		return yokai
+
+
+func _crear_jefe() -> void:
+	jefe = JefeOni.new()
+	jefe.configurar(Datos.JEFE_POSICION, akira, aspecto)
+	add_child(jefe)
+	soldados.append(jefe)
+	jefe.desperto.connect(func():
+		efectos.sacudir(0.9)
+		efectos.sonar("caida", jefe.global_position, 6.0, 0.0)
+		mensaje.emit("¡El oni gigante derriba el portón y cierra la huida!")
+		jefe_cambiado.emit("Oni gigante", 1.0))
+	jefe.vida_cambiada.connect(func(fraccion): jefe_cambiado.emit("Oni gigante", fraccion))
+	jefe.punetazo.connect(func(punto):
+		efectos.sacudir(0.75)
+		efectos.pausa_de_impacto(0.06)
+		efectos.sonar("caida", punto, 4.0, 0.05)
+		efectos.polvo(punto)
+		efectos.polvo(punto + Vector3(1, 0, 0)))
+	jefe.brazo_roto.connect(func(_lado):
+		efectos.sacudir(0.6)
+		mensaje.emit("¡Brazo inutilizado!" if jefe.brazo_vivo.has(true) else "¡El oni cae de rodillas!"))
+	jefe.aviso_iniciado.connect(func(): efectos.aviso(jefe.global_position + Vector3.UP * 4.0))
+	jefe.derrotado.connect(func():
+		_al_derrotar()
+		efectos.camara_lenta(0.3, 0.8)
+		efectos.sacudir(1.0)
+		efectos.polvo_de_pixeles(jefe.global_position + Vector3.UP * 1.5)
+		monedas_suelo.soltar(jefe.global_position + Vector3(-2, 1, 0), 12)
+		mensaje.emit("El oni gigante ha caído. El portón queda libre.")
+		jefe_cambiado.emit("", -1.0))
 
 
 # Los personajes son sprites pixel art (DECISIÓN 20E); con --modelos3d, los modelos de piezas de
@@ -254,21 +313,35 @@ func _cambiar_fase(nueva: String) -> void:
 
 func _al_derrotar() -> void:
 	derrotados += 1
-	derrotados_cambiados.emit(derrotados, Datos.PATRULLAS.size())
+	derrotados_cambiados.emit(derrotados, soldados.size())
 
 
 # Alcance y cono del corte en curso (cada corte de armas.gd tiene los suyos).
-func _en_alcance_espada(soldado) -> bool:
-	var hacia: Vector3 = soldado.global_position - akira.global_position
-	if absf(hacia.y) > 1.2:
+func _en_alcance(punto: Vector3, radio: float) -> bool:
+	var hacia: Vector3 = punto - akira.global_position
+	if absf(hacia.y) > 1.2 + radio:
 		return false
 	hacia.y = 0.0
 	var distancia := hacia.length()
-	if distancia > float(akira.ataque.alcance) + Datos.RADIO_PERSONAJE:
+	if distancia > float(akira.ataque.alcance) + radio:
 		return false
-	if distancia < 0.5:
+	if distancia < 0.5 + radio:
 		return true
 	return akira.mirando.angle_to(hacia) <= deg_to_rad(float(akira.ataque.cono) / 2.0)
+
+
+# Dónde se puede cortar a cada enemigo: el centro, o sus partes (los puños y la cabeza del jefe).
+func puntos_de_golpe(enemigo) -> Array:
+	if enemigo.has_method("puntos_de_golpe"):
+		return enemigo.puntos_de_golpe()
+	return [{"posicion": enemigo.global_position, "radio": Datos.RADIO_PERSONAJE, "parte": ""}]
+
+
+func _parte_alcanzada(enemigo):
+	for punto in puntos_de_golpe(enemigo):
+		if _en_alcance(punto.posicion, float(punto.radio)):
+			return punto
+	return null
 
 
 func soldados_vivos() -> Array:
@@ -293,7 +366,10 @@ func _punto_entre(a: Node3D, b: Node3D) -> Vector3:
 # Iai perfecto: Akira desvía la estocada y derriba al soldado de un solo corte.
 func _al_iai_perfecto(atacante) -> void:
 	efectos.iai_perfecto(_punto_entre(akira, atacante))
-	atacante.recibir_golpe(akira.global_position, true)
+	if atacante.has_method("recibir_iai"):
+		atacante.recibir_iai(akira.global_position)
+	else:
+		atacante.recibir_golpe(akira.global_position, true)
 
 
 # Corte de luna: solo se gasta la barra si hay alguien a quien cortar.
@@ -323,16 +399,30 @@ func _physics_process(delta: float) -> void:
 		return
 	if akira.corte_activo():
 		for soldado in soldados_vivos():
-			if not akira.golpeados.has(soldado) and _en_alcance_espada(soldado):
+			if akira.golpeados.has(soldado):
+				continue
+			var parte = _parte_alcanzada(soldado)
+			if parte != null:
 				akira.golpeados.append(soldado)
 				var corte: Dictionary = akira.ataque
 				var vida_antes: int = soldado.vida
-				var mortal: bool = soldado.recibir_golpe(akira.global_position, false, corte.danio,
-					corte.postura, corte.empuje)
-				var punto := _punto_entre(akira, soldado)
+				var mortal: bool
+				if soldado.has_method("recibir_golpe_en"):
+					mortal = soldado.recibir_golpe_en(String(parte.parte), akira.global_position, corte.danio)
+				else:
+					mortal = soldado.recibir_golpe(akira.global_position, false, corte.danio,
+						corte.postura, corte.empuje)
+				var punto: Vector3 = (akira.global_position + Vector3.UP * 1.15 + Vector3(parte.posicion)) / 2.0
 				efectos.golpe_de(punto, mortal, corte, vida_antes - maxi(soldado.vida, 0), soldado.postura_rota())
 				akira.ganar_espiritu(Datos.ESPIRITU_POR_GOLPE)
-	if akira.vivo() and akira.global_position.x > Datos.LIMITE_PORTON_X and absf(akira.global_position.z) < 3.0:
+	aviso_porton = maxf(0.0, aviso_porton - delta)
+	var en_porton: bool = akira.vivo() and akira.global_position.x > Datos.LIMITE_PORTON_X \
+		and absf(akira.global_position.z) < 3.0
+	if en_porton and jefe and jefe.vivo():
+		if aviso_porton <= 0.0:
+			aviso_porton = 3.0
+			mensaje.emit("El oni gigante bloquea el portón: derrótalo para salir")
+	elif en_porton:
 		akira.controlable = false
 		_cambiar_fase("cierre")
 	elif not akira.vivo():

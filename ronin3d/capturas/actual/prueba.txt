@@ -9,6 +9,7 @@ OK     La espada daña al soldado  derrotados=1
 OK     El soldado se defiende (resta vida o Akira gana antes)  vida de Akira 5 → 5
 OK     Los soldados derrotados sueltan monedas  1 derrotados, 4 monedas soltadas
 OK     El muro oeste detiene a Akira  x=-23.65 (el muro empieza en −24)
+OK     El oni gigante bloquea el portón mientras vive  fase=jugando, x=24.1
 OK     Llegar al portón cierra el capítulo  fase=cierre
 OK     ESC pausa el juego de verdad (soldados y Shiro quietos) y lo reanuda  pausado=true, el juego seguía=false, después=false
 OK     Tocar la pantalla sigue los textos  fase=jugando
@@ -21,11 +22,11 @@ OK     Animación anime: 12 poses por segundo; T cambia a suave (cada paso)  ani
 OK     La galería de criaturas se abre desde la pausa y reparte páginas  10 páginas; la tercera tiene 7 criaturas y 125 piezas
 OK     Al cerrar la galería se vuelve a la pausa y el juego sigue entero  en pausa=true, juego en el árbol=true
 OK     El catálogo del bestiario se carga y todos sus datos son válidos  929 criaturas (123 con modelo propio), 0 con datos no válidos
-OK     Todas las criaturas del catálogo se construyen dentro del presupuesto de piezas  929 criaturas (1163 construcciones con los rangos 2 y 3 de 1 de cada 8) en 883 ms; rango 1: media 20.5 piezas, máximo 42; máximo con rangos: 42
+OK     Todas las criaturas del catálogo se construyen dentro del presupuesto de piezas  929 criaturas (1163 construcciones con los rangos 2 y 3 de 1 de cada 8) en 845 ms; rango 1: media 20.5 piezas, máximo 42; máximo con rangos: 42
 OK     Los modelos detallados se cargan con textura y cel-shading (el Aka-oni, con sus tres rangos)  rango 1: 14024 triángulos, 1.91 m; rango 2: 14024 triángulos, 2.29 m; rango 3: 14024 triángulos, 1.91 m; modelo 353: 41471 triángulos; modelo 680: 2588 triángulos
 OK     Los cuatro aspectos de Akira llevan la cicatriz y el sastre los enseña en la pausa  triángulos: { "joven": 3546, "curtido": 3594, "veterano": 3623, "mujer": 3421 }
 OK     Los personajes son sprites pixel art: 6 hojas con todas sus poses y 8 direcciones  hojas bien: 6 de 6 · dirección 7 → 3 al girar la cámara 180°
-OK     Shiro olfatea, escarba y desentierra monedas  3 monedas desenterradas
+OK     Shiro olfatea, escarba y desentierra monedas  4 monedas desenterradas
 OK     Akira recoge las monedas al pasar y el HUD las cuenta  7 → 8
 OK     Shiro trae las monedas que Akira deja atrás  entregó 3 · monedas 9 → 12
 OK     Las skins están bloqueadas y se compran al sastre con monedas  bloqueada=true, comprada=true (quedan 70 mon), al salir=true
@@ -38,5 +39,12 @@ OK     La esquiva cancela el corte, gasta aguante y da invulnerabilidad  esquiva
 OK     «Arma» cambia de katana a yari, con su propia cadena  arma=yari, cortes=3, HUD=Yari
 OK     El nodachi es lento y rompe la postura en dos barridos  postura rota=true, preparación 0.36 s frente a 0.05 s
 OK     Tras un iai perfecto, atacar sigue la cadena desde el 2.º corte  paso=1
-Resultado: 39 de 39 comprobaciones correctas
-FPS al caminar por el patio: 9.9 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)
+OK     El kappa, esperado en postura de iai 2 s, hace la reverencia y derrama el agua  sin agua=true, vida de Akira=6
+OK     Sin agua, el kappa cae de un golpe  vivo=false
+OK     El oni aguanta el iai (3 menos y aturdido 1,5 s) y su kanabō («!!») no se para  vida 6 → 3, aturdido=true, kanabō parable=false
+OK     Cada onibi cae de un golpe y llena el espíritu  espíritu 0.50 → 0.70
+OK     El oni gigante despierta y su puñetazo cae donde marca la sombra  despierto=true, vida de Akira 6 → 5
+OK     Tres cortes a cada puño inutilizan los brazos y el oni cae de rodillas  brazos=[false, false], fase de rodillas=true
+OK     Un iai perfecto en la embestida remata al oni gigante  vivo=false, vida de Akira 6 → 6
+Resultado: 47 de 47 comprobaciones correctas
+FPS al caminar por el patio: 9.1 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)

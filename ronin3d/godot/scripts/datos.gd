@@ -139,6 +139,7 @@ const ANTORCHAS := [
 const LINTERNAS := [Vector2(-12, -8), Vector2(-12, 8), Vector2(12, -8), Vector2(12, 8)]
 const DIRECCION_LUNA := Vector3(-0.3, 0.32, -0.9)
 const LIMITE_PORTON_X := 23.0
+const JEFE_POSICION := Vector3(18.5, 0, 0)   # el oni gigante, delante del portón
 
 # --- Colores (DISENO_3D.md, sección 10) -----------------------------------------
 const KIMONO := Color("344276")

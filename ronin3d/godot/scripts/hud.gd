@@ -12,6 +12,7 @@ var fuente: SystemFont
 var fuente_negrita: SystemFont
 var marcador: Control
 var etiqueta_soldados: Label
+var barra_jefe: BarraJefe
 var etiqueta_ayuda: Label
 var etiqueta_version: Label
 var texto_version := ""
@@ -38,6 +39,23 @@ var tiempo := 0.0
 var tiempo_ayuda := -1.0
 var letras := 0.0
 var escribiendo := false
+
+
+# Barra del jefe, arriba en el centro (como la vida del objetivo fijado en EthrA).
+class BarraJefe extends Control:
+	var nombre := ""
+	var fraccion := 1.0
+	var mostrada := 1.0
+	var fuente: Font
+
+	func _draw() -> void:
+		var barra := Rect2(0, 22, size.x, 12)
+		draw_rect(barra.grow(3.0), Color(0, 0, 0, 0.75))
+		draw_rect(barra, Color(0.18, 0.08, 0.07))
+		draw_rect(Rect2(barra.position, Vector2(barra.size.x * mostrada, barra.size.y)), Color(0.95, 0.85, 0.6))
+		draw_rect(Rect2(barra.position, Vector2(barra.size.x * fraccion, barra.size.y)), Color(0.78, 0.16, 0.12))
+		draw_string_outline(fuente, Vector2(0, 16), nombre, HORIZONTAL_ALIGNMENT_CENTER, size.x, 20, 5, Color(0, 0, 0, 0.85))
+		draw_string(fuente, Vector2(0, 16), nombre, HORIZONTAL_ALIGNMENT_CENTER, size.x, 20, Color(0.95, 0.9, 0.8))
 
 
 class MarcadorVida extends Control:
@@ -154,6 +172,13 @@ func _ready() -> void:
 	_colocar(etiqueta_mensaje, Control.PRESET_CENTER_TOP, Rect2(-ANCHO_UTIL / 2.0, 176, ANCHO_UTIL, 32))
 	etiqueta_mensaje.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	etiqueta_mensaje.modulate.a = 0.0
+
+	barra_jefe = BarraJefe.new()
+	barra_jefe.fuente = fuente
+	barra_jefe.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(barra_jefe)
+	_colocar(barra_jefe, Control.PRESET_CENTER_TOP, Rect2(-ANCHO_UTIL / 2.0 + 30, 206, ANCHO_UTIL - 60, 40))
+	barra_jefe.visible = false
 
 	_crear_capa_texto()
 	_crear_capa_pausa()
@@ -287,7 +312,7 @@ func poner_vida(valor: int) -> void:
 
 
 func poner_derrotados(cantidad: int, total: int) -> void:
-	etiqueta_soldados.text = "Soldados derrotados: %d/%d" % [cantidad, total]
+	etiqueta_soldados.text = "Enemigos: %d/%d" % [cantidad, total]
 
 
 func poner_monedas(total: int, con_destello := true) -> void:
@@ -331,6 +356,15 @@ func poner_apariencia() -> void:
 func poner_version(texto: String) -> void:
 	texto_version = texto
 	etiqueta_version.text = texto
+
+
+func poner_jefe(nombre: String, fraccion: float) -> void:
+	barra_jefe.visible = fraccion >= 0.0
+	if fraccion < 0.0:
+		return
+	barra_jefe.nombre = nombre
+	barra_jefe.fraccion = fraccion
+	barra_jefe.queue_redraw()
 
 
 func poner_aguante(valor: float) -> void:
@@ -424,6 +458,10 @@ func poner_pausa(activa: bool, tactil := false) -> void:
 
 
 func _process(delta: float) -> void:
+	if barra_jefe.visible and barra_jefe.mostrada > barra_jefe.fraccion:
+		# El daño reciente se ve en claro y baja despacio, como en los juegos de acción.
+		barra_jefe.mostrada = maxf(barra_jefe.fraccion, barra_jefe.mostrada - delta * 0.6)
+		barra_jefe.queue_redraw()
 	if capa_pausa.visible:
 		return
 	tiempo += delta

@@ -79,6 +79,7 @@ func _ready() -> void:
 		[12.2, _preparar_vista_torreon],
 		[13.2, _capturar.bind("torreon")],
 		[13.4, _ir_al_porton],
+		[14.6, _comprobar_bloqueo_del_jefe],
 		[15.6, _comprobar_cierre],
 		[15.8, _pulsar.bind("aceptar")],
 		[16.3, _capturar.bind("cierre")],
@@ -152,7 +153,21 @@ func _ready() -> void:
 		[49.8, _preparar_tras_iai],
 		[49.85, _pulsar.bind("atacar")],
 		[50.0, _comprobar_tras_iai],
-		[50.2, _terminar],
+		[50.2, _preparar_kappa],
+		[50.3, _enviar_accion.bind("parar", true)],
+		[50.4, _despertar_kappa],
+		[52.9, _comprobar_reverencia],
+		[53.0, _enviar_accion.bind("parar", false)],
+		[53.4, _acercarse_al_kappa],
+		[53.5, _pulsar.bind("atacar")],
+		[54.2, _comprobar_kappa],
+		[54.3, _comprobar_oni_y_onibi],
+		[54.5, _preparar_jefe],
+		[57.6, _comprobar_punetazo],
+		[57.7, _romper_brazos],
+		[58.0, _preparar_embestida],
+		[61.5, _comprobar_remate_jefe],
+		[61.7, _terminar],
 	])
 
 
@@ -171,6 +186,8 @@ func _process(delta: float) -> void:
 	if luna_lanzada and not luna_capturada and _juego().efectos.luna_progreso() > 0.5:
 		luna_capturada = true
 		_capturar("corte_luna")
+	if embestida_activa:
+		_paso_embestida()
 	if combate_activo:
 		_paso_combate()
 	elif direccion_caminar != Vector3.ZERO:
@@ -223,8 +240,10 @@ func _proteger(activo: bool) -> void:
 	akira.muerte = -1.0
 	akira.invulnerable = 999.0 if activo else 0.0
 	principal.hud.poner_vida(akira.vida)
+	# Los yōkai y el jefe se quedan quietos siempre: sus propias pruebas los despiertan.
 	for soldado in _juego().soldados_vivos():
-		soldado.process_mode = Node.PROCESS_MODE_DISABLED if activo else Node.PROCESS_MODE_INHERIT
+		var es_soldado: bool = soldado is Soldado
+		soldado.process_mode = Node.PROCESS_MODE_DISABLED if activo or not es_soldado else Node.PROCESS_MODE_INHERIT
 
 
 func _teletransportar(posicion: Vector3, mirando: Vector3) -> void:
@@ -374,6 +393,17 @@ func _ir_al_porton() -> void:
 	camara.inclinacion = 38.0
 	_teletransportar(Vector3(20.5, 0, 0.3), Vector3.RIGHT)
 	direccion_caminar = Vector3.RIGHT
+
+
+# Con el oni gigante vivo, el portón no deja salir. Su combate tiene sus propias pruebas: aquí
+# se le da por vencido para seguir con el cierre.
+func _comprobar_bloqueo_del_jefe() -> void:
+	var juego = _juego()
+	_registrar("El oni gigante bloquea el portón mientras vive", juego.fase == "jugando"
+		and juego.akira.global_position.x > Datos.LIMITE_PORTON_X - 1.0,
+		"fase=%s, x=%.1f" % [juego.fase, juego.akira.global_position.x])
+	juego.jefe.process_mode = Node.PROCESS_MODE_INHERIT     # que haga su caída
+	juego.jefe._morir()
 
 
 func _comprobar_cierre() -> void:
@@ -790,7 +820,8 @@ func _comprobar_sprites() -> void:
 		hojas_bien += 1 if bien else 0
 	var juego = _juego()
 	var son_sprites: bool = juego.akira.visual is VisualSprite and juego.shiro.visual is VisualSprite \
-		and juego.soldados.all(func(soldado): return not is_instance_valid(soldado) or soldado.visual is VisualSprite)
+		and juego.soldados.all(func(soldado): return not is_instance_valid(soldado) or not soldado is Soldado \
+			or soldado.visual is VisualSprite)
 	var antes: int = juego.akira.visual._direccion()
 	juego.camara.giro += 180.0
 	juego.camara.colocar_de_golpe()
@@ -1049,6 +1080,153 @@ func _comprobar_tras_iai() -> void:
 	var akira = _juego().akira
 	_registrar("Tras un iai perfecto, atacar sigue la cadena desde el 2.º corte", akira.paso_combo == 1,
 		"paso=%d" % akira.paso_combo)
+	_proteger(true)
+
+
+# --- Yōkai del bestiario y el oni gigante --------------------------------------------------
+
+const Yokai := preload("res://scripts/yokai.gd")
+const JefeOni := preload("res://scripts/jefe_oni.gd")
+var kappa = null
+var jefe_prueba = null
+var vida_antes_jefe := 0
+var embestida_activa := false
+var embestida_pulsada := false
+var embestida_soltada := false
+
+
+# Un yōkai nuevo y quieto en un sitio despejado del patio (los de la oleada pueden haber
+# caído en las pruebas anteriores: el corte de luna también los alcanza).
+func _yokai(tipo: String, lugar := Vector3(0, 0, 0)):
+	var yokai = _juego().crear_yokai(tipo, lugar)
+	yokai.process_mode = Node.PROCESS_MODE_DISABLED
+	return yokai
+
+
+func _preparar_kappa() -> void:
+	var akira = _juego().akira
+	_proteger(true)
+	kappa = _yokai("kappa", Vector3(2.6, 0, 0))
+	akira.invulnerable = 0.0
+	akira.vida = akira.vida_maxima
+	akira.enfriamiento_parada = 0.0
+	_teletransportar(Vector3(0, 0, 0), Vector3.RIGHT)
+
+
+func _despertar_kappa() -> void:
+	kappa.estado = Yokai.Estado.ALERTA
+	kappa.process_mode = Node.PROCESS_MODE_INHERIT
+
+
+func _comprobar_reverencia() -> void:
+	var akira = _juego().akira
+	_capturar("kappa_reverencia")
+	_registrar("El kappa, esperado en postura de iai 2 s, hace la reverencia y derrama el agua",
+		kappa.sin_agua and akira.vida == akira.vida_maxima,
+		"sin agua=%s, vida de Akira=%d" % [kappa.sin_agua, akira.vida])
+
+
+func _acercarse_al_kappa() -> void:
+	var hacia: Vector3 = kappa.global_position - _juego().akira.global_position
+	hacia.y = 0.0
+	_teletransportar(kappa.global_position - hacia.normalized() * 1.2, hacia)
+
+
+func _comprobar_kappa() -> void:
+	_registrar("Sin agua, el kappa cae de un golpe", not kappa.vivo(), "vivo=%s" % kappa.vivo())
+	_proteger(true)
+
+
+func _comprobar_oni_y_onibi() -> void:
+	var akira = _juego().akira
+	var oni = _yokai("oni", akira.global_position + Vector3(2.0, 0, 2.0))
+	oni.process_mode = Node.PROCESS_MODE_INHERIT
+	var murio: bool = oni.recibir_iai(akira.global_position)
+	var kanabo: Dictionary = oni.perfil.ataques[1]
+	_registrar("El oni aguanta el iai (3 menos y aturdido 1,5 s) y su kanabō («!!») no se para",
+		not murio and oni.vida == 3 and oni.estado == Yokai.Estado.ATURDIDO and not kanabo.parable and kanabo.rojo,
+		"vida 6 → %d, aturdido=%s, kanabō parable=%s" % [oni.vida, oni.estado == Yokai.Estado.ATURDIDO, kanabo.parable])
+	oni.process_mode = Node.PROCESS_MODE_DISABLED
+	var onibi = _yokai("onibi", akira.global_position + Vector3(-2.0, 0, 2.0))
+	var antes: float = akira.espiritu
+	akira.espiritu = minf(antes, 0.5)
+	antes = akira.espiritu
+	onibi.recibir_golpe(akira.global_position, false, 1)
+	_registrar("Cada onibi cae de un golpe y llena el espíritu", not onibi.vivo() and akira.espiritu >= antes + 0.19,
+		"espíritu %.2f → %.2f" % [antes, akira.espiritu])
+
+
+# Un oni gigante nuevo (el del portón se dio por vencido antes): Akira, quieto a 7 m, recibe el
+# puñetazo donde marca la sombra.
+func _preparar_jefe() -> void:
+	var juego = _juego()
+	var akira = juego.akira
+	jefe_prueba = JefeOni.new()
+	jefe_prueba.configurar(Datos.JEFE_POSICION, akira, juego.aspecto)
+	juego.add_child(jefe_prueba)
+	juego.soldados.append(jefe_prueba)
+	juego.jefe = jefe_prueba
+	jefe_prueba.vida_cambiada.connect(func(f): principal.hud.poner_jefe("Oni gigante", f))
+	principal.hud.poner_jefe("Oni gigante", 1.0)
+	akira.invulnerable = 0.0
+	akira.vida = akira.vida_maxima
+	principal.hud.poner_vida(akira.vida)
+	vida_antes_jefe = akira.vida
+	juego.camara.distancia = 13.0
+	_teletransportar(Datos.JEFE_POSICION + Vector3(-7.0, 0, 0), Vector3.RIGHT)
+	_grabar("jefe", 70)
+
+
+func _comprobar_punetazo() -> void:
+	var akira = _juego().akira
+	_registrar("El oni gigante despierta y su puñetazo cae donde marca la sombra",
+		jefe_prueba.despierto() and akira.vida < vida_antes_jefe and jefe_prueba.paso == JefeOni.Paso.EN_SUELO,
+		"despierto=%s, vida de Akira %d → %d" % [jefe_prueba.despierto(), vida_antes_jefe, akira.vida])
+	akira.invulnerable = 999.0
+
+
+# Cortar cada puño en el suelo 3 veces inutiliza el brazo; sin brazos, cae de rodillas.
+func _romper_brazos() -> void:
+	for lado in 2:
+		jefe_prueba.lado = lado
+		jefe_prueba.paso = JefeOni.Paso.EN_SUELO
+		for i in JefeOni.GOLPES_POR_BRAZO:
+			jefe_prueba.recibir_golpe_en("puno", Vector3.ZERO)
+	_registrar("Tres cortes a cada puño inutilizan los brazos y el oni cae de rodillas",
+		jefe_prueba.brazo_vivo == [false, false] and jefe_prueba.fase == JefeOni.Fase.RODILLAS,
+		"brazos=%s, fase de rodillas=%s" % [str(jefe_prueba.brazo_vivo), jefe_prueba.fase == JefeOni.Fase.RODILLAS])
+
+
+func _preparar_embestida() -> void:
+	var akira = _juego().akira
+	akira.invulnerable = 0.0
+	akira.vida = akira.vida_maxima
+	akira.enfriamiento_parada = 0.0
+	vida_antes_jefe = akira.vida
+	_teletransportar(Datos.JEFE_POSICION + Vector3(-4.2, 0, 0), Vector3.RIGHT)
+	embestida_activa = true
+
+
+# Postura al ver el «!»; desenvaine justo cuando arranca la embestida.
+func _paso_embestida() -> void:
+	if not is_instance_valid(jefe_prueba) or not jefe_prueba.vivo():
+		return
+	if not embestida_pulsada and jefe_prueba.paso == JefeOni.Paso.AVISO_EMBESTIDA:
+		_enviar_accion("parar", true)
+		embestida_pulsada = true
+	if embestida_pulsada and not embestida_soltada and jefe_prueba.paso == JefeOni.Paso.AVISO_EMBESTIDA \
+			and jefe_prueba.temporizador <= 0.12:
+		_enviar_accion("parar", false)
+		embestida_soltada = true
+
+
+func _comprobar_remate_jefe() -> void:
+	embestida_activa = false
+	var akira = _juego().akira
+	_capturar("jefe_remate")
+	_registrar("Un iai perfecto en la embestida remata al oni gigante",
+		not jefe_prueba.vivo() and akira.vida == vida_antes_jefe,
+		"vivo=%s, vida de Akira %d → %d" % [jefe_prueba.vivo(), vida_antes_jefe, akira.vida])
 	_proteger(true)
 
 

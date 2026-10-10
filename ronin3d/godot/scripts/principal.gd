@@ -146,6 +146,7 @@ func _iniciar_juego(con_intro: bool) -> void:
 	juego.derrotados_cambiados.connect(hud.poner_derrotados)
 	juego.espiritu_cambiado.connect(hud.poner_espiritu)
 	juego.aguante_cambiado.connect(hud.poner_aguante)
+	juego.jefe_cambiado.connect(hud.poner_jefe)
 	juego.arma_cambiada.connect(func(arma):
 		hud.poner_arma(Armas.datos(arma).nombre)
 		hud.mostrar_mensaje("Arma: %s" % Armas.datos(arma).nombre, 1.2))
@@ -161,7 +162,8 @@ func _iniciar_juego(con_intro: bool) -> void:
 	hud.poner_monedas(Partida.monedas, false)
 	hud.poner_vida_maxima(juego.akira.vida_maxima)
 	hud.poner_vida(juego.akira.vida)
-	hud.poner_derrotados(0, Datos.PATRULLAS.size())
+	hud.poner_derrotados(0, juego.soldados.size())
+	hud.poner_jefe("", -1.0)
 	_al_cambiar_fase(juego.fase)
 
 
