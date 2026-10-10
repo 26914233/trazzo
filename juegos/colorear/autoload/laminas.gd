@@ -76,6 +76,31 @@ func del_dia(fecha: String) -> String:
 	return ids[posmod(dia * paso, n)]
 
 
+## Lamina misterio de la semana (lunes a domingo): una ilustrada, la misma para
+## todos, que nunca coincide con la lamina del dia de esa semana.
+func misterio(fecha: String) -> String:
+	if not _es_fecha(fecha):
+		return ""
+	var dia := int(Time.get_unix_time_from_datetime_string(fecha + "T12:00:00") / 86400)
+	var lunes := dia - posmod(dia + 3, 7)          # el 1-1-1970 fue jueves
+	var ilustradas := _por_id.keys().filter(func(id): return "_i" in id)
+	var n := ilustradas.size()
+	if n == 0:
+		return ""
+	var paso := 4999
+	while _mcd(paso, n) != 1:
+		paso += 1
+	var del_dia_semana := {}
+	for d in 7:
+		del_dia_semana[del_dia(Time.get_date_string_from_unix_time((lunes + d) * 86400 + 43200))] = true
+	var i := posmod((lunes / 7) * paso, n)
+	for intento in n:
+		var id: String = ilustradas[posmod(i + intento, n)]
+		if not del_dia_semana.has(id):
+			return id
+	return ilustradas[i]
+
+
 static func _es_fecha(s: String) -> bool:
 	var p := s.split("-")
 	return p.size() == 3 and p[0].length() == 4 and p[0].is_valid_int() and p[1].is_valid_int() and p[2].is_valid_int() \

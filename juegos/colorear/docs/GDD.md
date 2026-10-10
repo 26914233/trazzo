@@ -33,6 +33,11 @@ revisadas en `juegos/ANALISIS_COMPETENCIA.md`; matriz en `juegos/replica/feature
   con barra de luz y muestra; el color elegido se guarda (hasta 12, sale el más antiguo).
 - **Ajustes** (⚙ en el menú): sonido, música ambiental, vibración y ocultar láminas
   terminadas. Las terminadas llevan una marca ✓ en las miniaturas.
+- **Misterio de la semana** (tarjeta en el menú): una lámina ilustrada distinta cada
+  semana (lunes a domingo), nunca la misma que la del día. Sale con «?» y no aparece en
+  su categoría hasta revelarla. Al colorearla, las líneas se ven tenues (22 %) y cada
+  zona pintada recupera su línea nítida (`shaders/lineas_misterio.gdshader`); al
+  terminarla se dice cuál era y queda revelada.
 - **Música ambiental:** bucle de 64 s sintetizado con `herramientas/musica.py` (licencia
   propia). Apagada por defecto; entra y sale con fundido.
 

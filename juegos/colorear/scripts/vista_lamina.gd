@@ -64,6 +64,22 @@ func mostrar(l: Lamina) -> void:
 	reiniciar_zoom()
 
 
+## Lamina misterio: las lineas se ven tenues hasta pintar cada zona.
+func modo_misterio(activo: bool) -> void:
+	if not activo or lamina == null:
+		_lineas.material = null
+		return
+	var m := ShaderMaterial.new()
+	m.shader = preload("res://shaders/lineas_misterio.gdshader")
+	m.set_shader_parameter("regiones", lamina.textura_regiones)
+	m.set_shader_parameter("paleta", lamina.textura_paleta)
+	_lineas.material = m
+
+
+func en_misterio() -> bool:
+	return _lineas.material != null
+
+
 func reiniciar_zoom() -> void:
 	_parar_animacion()
 	zoom = 1.0

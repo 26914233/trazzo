@@ -40,9 +40,11 @@ func _ready() -> void:
 	prueba_terminadas()
 	prueba_mis_colores()
 	prueba_musica()
+	prueba_misterio()
 	await prueba_pantallas()
 	await prueba_ajustes_menu()
 	await prueba_celebracion()
+	await prueba_misterio_en_pantalla()
 
 	_vaciar(Obras.carpeta)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Ajustes.ruta))
@@ -566,3 +568,73 @@ func prueba_ajustes_menu() -> void:
 	await get_tree().process_frame
 	OS.remove_logger(log)
 	comprobar(log.errores.is_empty(), "sin errores: %s" % str(log.errores.slice(0, 3)))
+
+
+func prueba_misterio() -> void:
+	caso("lamina misterio de la semana")
+	var lunes := "2026-10-12"
+	var m := Laminas.misterio(lunes)
+	comprobar(Laminas.existe(m) and "_i" in m, "es una lamina ilustrada")
+	var igual := true
+	for d in 7:
+		if Laminas.misterio(Time.get_date_string_from_unix_time(Time.get_unix_time_from_datetime_string(lunes + "T12:00:00") + d * 86400)) != m:
+			igual = false
+	comprobar(igual, "la misma de lunes a domingo")
+	comprobar(Laminas.misterio("2026-10-19") != m, "la semana siguiente es otra")
+	var distintas := {}
+	var choca := false
+	for w in 30:
+		var f := Time.get_date_string_from_unix_time(1790000000 + w * 7 * 86400)
+		distintas[Laminas.misterio(f)] = true
+		for d in 7:
+			var dia := Time.get_date_string_from_unix_time(1790000000 + (w * 7 + d) * 86400)
+			if Laminas.misterio(dia) == Laminas.del_dia(dia):
+				choca = true
+	comprobar(distintas.size() == 30, "30 semanas sin repetir")
+	comprobar(not choca, "nunca coincide con la lamina del dia")
+	Diario.datos = {}
+	Diario.misterios = []
+	comprobar(not Diario.revelado(m), "sin revelar")
+	Diario.marcar_misterio(m)
+	Diario.marcar_misterio(m)
+	comprobar(Diario.revelado(m) and Diario.misterios.size() == 1, "revelada una vez")
+	Diario.cargar()
+	comprobar(Diario.revelado(m), "se guarda")
+	var f := FileAccess.open(Diario.ruta, FileAccess.WRITE)
+	f.store_string('{"misterios": ["animales_i001", 5, "no_existe"]}')
+	f.close()
+	Diario.cargar()
+	comprobar(Diario.misterios == ["animales_i001"], "al leer solo quedan ids validos")
+	Diario.misterios = []
+
+
+func prueba_misterio_en_pantalla() -> void:
+	caso("misterio en el menu y al colorear")
+	var hoy := Diario.hoy()
+	var m := Laminas.misterio(hoy)
+	Diario.misterios = []
+	Obras.borrar(m)
+	load("res://escenas/menu.gd").categoria_actual = Laminas.categoria_de(m)
+	var menu: Control = load("res://escenas/menu.tscn").instantiate()
+	add_child(menu)
+	await get_tree().process_frame
+	comprobar(not m in menu.ids_en_rejilla(), "sin revelar no sale en su categoria")
+	menu.queue_free()
+	await get_tree().process_frame
+	var escena_script = load("res://escenas/colorear.gd")
+	escena_script.lamina_id = m
+	var e: Control = load("res://escenas/colorear.tscn").instantiate()
+	add_child(e)
+	await get_tree().process_frame
+	comprobar(e.titulo_visible() == "Misterio", "al colorear no se dice cual es")
+	comprobar(e.vista.en_misterio(), "las lineas se descubren al pintar")
+	for k in range(1, e.lamina.zonas):
+		e.lamina.pintar(k, Color.RED)
+	e._pintar(e.lamina.zonas)
+	comprobar(Diario.revelado(m), "al terminarla queda revelada")
+	comprobar(e.titulo_visible() == Laminas.nombre(m), "y se ve su nombre")
+	comprobar(not e.vista.en_misterio(), "y el dibujo completo")
+	e.queue_free()
+	await get_tree().process_frame
+	Obras.borrar(m)
+	Diario.misterios = []

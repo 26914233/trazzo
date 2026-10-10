@@ -244,7 +244,7 @@ static func colorear(b: Button, fondo: Color, tinta: Color, con_sombra: bool = t
 
 
 ## Fila superior: boton atras, titulo y un hueco opcional a la derecha.
-static func barra(col: VBoxContainer, texto: String, al_volver: Callable, derecha: Control = null, tam: int = 58) -> void:
+static func barra(col: VBoxContainer, texto: String, al_volver: Callable, derecha: Control = null, tam: int = 58) -> Label:
 	var fila := HBoxContainer.new()
 	var atras := boton("‹", "suave", 112)
 	atras.custom_minimum_size.x = 112
@@ -260,6 +260,7 @@ static func barra(col: VBoxContainer, texto: String, al_volver: Callable, derech
 	if derecha:
 		fila.add_child(derecha)
 	col.add_child(fila)
+	return t
 
 
 ## Tarjeta tocable con contenido libre (Button plano con hijos que no capturan).

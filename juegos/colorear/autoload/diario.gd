@@ -5,6 +5,7 @@ extends Node
 
 var ruta := "user://diario.json"
 var datos: Dictionary = {}       # {ultimo: "AAAA-MM-DD", racha: int, mejor: int}
+var misterios: Array = []        # laminas misterio ya reveladas (terminadas)
 
 
 func _ready() -> void:
@@ -13,11 +14,15 @@ func _ready() -> void:
 
 func cargar() -> void:
 	datos = {}
+	misterios = []
 	if not FileAccess.file_exists(ruta):
 		return
 	var d = JSON.parse_string(FileAccess.get_file_as_string(ruta))
 	if typeof(d) != TYPE_DICTIONARY:
 		return
+	for id in d.get("misterios", []):
+		if typeof(id) == TYPE_STRING and Laminas.existe(id) and not id in misterios:
+			misterios.append(id)
 	var ultimo := str(d.get("ultimo", ""))
 	var racha_ = d.get("racha", 0)
 	var mejor_ = d.get("mejor", 0)
@@ -59,4 +64,21 @@ func marcar(fecha: String) -> void:
 		datos["racha"] = datos["racha"] + 1 if d <= 2 else 1
 		datos["ultimo"] = fecha
 		datos["mejor"] = maxi(datos["mejor"], datos["racha"])
-	Archivo.escribir(ruta, JSON.stringify(datos))
+	_guardar()
+
+
+func revelado(id: String) -> bool:
+	return id in misterios
+
+
+func marcar_misterio(id: String) -> void:
+	if id in misterios or not Laminas.existe(id):
+		return
+	misterios.append(id)
+	_guardar()
+
+
+func _guardar() -> void:
+	var d := datos.duplicate()
+	d["misterios"] = misterios
+	Archivo.escribir(ruta, JSON.stringify(d))

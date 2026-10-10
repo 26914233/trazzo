@@ -4,6 +4,7 @@ extends Control
 static var categoria_actual := ""
 
 var _rejilla := GridContainer.new()
+var _ids: Array = []
 var _chips := HBoxContainer.new()
 
 
@@ -25,6 +26,7 @@ func _ready() -> void:
 	col.add_child(cabecera)
 	col.add_child(Estilo.etiqueta("%d láminas para colorear" % Laminas.total(), 40, Estilo.TEXTO_SUAVE))
 	col.add_child(_lamina_del_dia())
+	col.add_child(_misterio())
 
 	var desliza := ScrollContainer.new()
 	desliza.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -66,13 +68,61 @@ func _llenar() -> void:
 		ids = Obras.lista()
 	else:
 		var todas: Array = Laminas.categoria(categoria_actual)["laminas"].map(func(l): return l["id"])
+		var oculta := Laminas.misterio(Diario.hoy())
+		if not Diario.revelado(oculta):
+			todas.erase(oculta)        # el misterio de la semana no se destapa en su categoria
 		ids = Obras.filtrar(todas, bool(Ajustes.valor("ocultar_terminadas")))
 		if ids.is_empty() and not todas.is_empty():
 			var aviso := Estilo.etiqueta("¡Terminaste todas las láminas de esta categoría!", 40, Estilo.TEXTO_SUAVE)
 			aviso.custom_minimum_size.x = 900
 			_rejilla.add_child(aviso)
+	_ids = ids
 	for id in ids:
 		_rejilla.add_child(_miniatura(id))
+
+
+func ids_en_rejilla() -> Array:
+	return _ids
+
+
+## Tarjeta del misterio de la semana: "?" hasta empezarla; el nombre, al terminarla.
+func _misterio() -> Control:
+	var id := Laminas.misterio(Diario.hoy())
+	var t := Estilo.tarjeta(150, Estilo.SUPERFICIE, func():
+		preload("res://escenas/colorear.gd").lamina_id = id
+		Estilo.ir(self, "colorear"))
+	var fila := HBoxContainer.new()
+	fila.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fila.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	(t[1] as VBoxContainer).add_child(fila)
+	var revelada := Diario.revelado(id)
+	if Obras.tiene(id):
+		var img := TextureRect.new()
+		img.texture = Obras.textura_mini(id)
+		img.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		img.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		img.custom_minimum_size = Vector2(110, 90)
+		img.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		fila.add_child(img)
+	else:
+		var signo := Estilo.titulo("?", 80, true)
+		signo.custom_minimum_size.x = 110
+		signo.add_theme_color_override("font_color", Estilo.PRIMARIO)
+		signo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		fila.add_child(signo)
+	var textos := VBoxContainer.new()
+	textos.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	textos.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	textos.alignment = BoxContainer.ALIGNMENT_CENTER
+	textos.add_theme_constant_override("separation", 2)
+	var cabecera := Estilo.etiqueta("MISTERIO DE LA SEMANA", 30, Estilo.PRIMARIO, false, false)
+	var texto := "Revelada: %s" % Laminas.nombre(id) if revelada else ("Sigue pintando para descubrirla" if Obras.tiene(id) else "No sabrás qué es hasta terminarla")
+	var pie := Estilo.etiqueta(texto, 36, Estilo.TEXTO, false, false)
+	for n in [cabecera, pie]:
+		n.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		textos.add_child(n)
+	fila.add_child(textos)
+	return t[0]
 
 
 ## Ajustes en un panel: sonido, musica, vibracion y ocultar terminadas.

@@ -54,6 +54,18 @@ func _ready() -> void:
 	mn.abrir_ajustes()
 	await _esperar(20)
 	_guardar("menu_ajustes")
+	# misterio de la semana: menu y pantalla sin revelar
+	Diario.misterios = []
+	var mid := Laminas.misterio(Diario.hoy())
+	Obras.borrar(mid)
+	await _captura("menu_misterio", "res://escenas/menu.tscn")
+	C.lamina_id = mid
+	var em := await _captura("colorear_misterio", "res://escenas/colorear.tscn")
+	var cm := Paletas.colores(3)
+	for z in range(1, em.lamina.zonas / 3):
+		em.lamina.pintar(z, cm[z % cm.size()])
+	await _esperar(4)
+	_guardar("colorear_misterio_pintando")
 	get_tree().quit()
 
 

@@ -18,7 +18,7 @@ Lienzo: compartir la imagen,compartir,should,yes,no,necesita plugin Android
 Lienzo: repetición time-lapse,compartir,could,yes,no,Pixel Art / Candy Mobile
 Lienzo: colecciones y logros por categoría,progreso,could,yes,no,Happy Color / Zen Color
 Lienzo: modo por números,colorear,could,yes,skip,hay que numerar 749 láminas; se decide con datos de uso
-Lienzo: láminas misterio y eventos,eventos,could,yes,no,
+Lienzo: láminas misterio y eventos,eventos,could,yes,partial,misterio semanal hecho; eventos de temporada sin láminas temáticas aún
 Palabrario: sopa del día,juego,must,yes,yes,
 Palabrario: racha diaria,progreso,must,yes,yes,
 Palabrario: pistas,juego,must,yes,yes,

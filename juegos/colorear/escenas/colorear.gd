@@ -15,6 +15,8 @@ var _rehacer: Button
 var _goma: Button
 var _modo: Button
 var _mas: Button                # "+" de Mis colores
+var _titulo: Label
+var _misterio := false          # lamina misterio sin revelar: no se dice cual es
 var _evitar := {}               # zonas ya propuestas por "buscar zona sin pintar"
 var _estaba_terminada := false
 var _celebrando := false
@@ -44,7 +46,8 @@ func _ready() -> void:
 	botones.add_child(_deshacer)
 	botones.add_child(_rehacer)
 	botones.add_child(_boton_icono("⤓", guardar_imagen))
-	Estilo.barra(col, Laminas.nombre(lamina_id), _salir, botones, 48)
+	_misterio = lamina_id == Laminas.misterio(Diario.hoy()) and not Diario.revelado(lamina_id)
+	_titulo = Estilo.barra(col, "Misterio" if _misterio else Laminas.nombre(lamina_id), _salir, botones, 48)
 
 	vista.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	vista.zona_tocada.connect(_pintar)
@@ -57,6 +60,7 @@ func _ready() -> void:
 		_al_cambiar())
 	col.add_child(vista)
 	vista.mostrar(lamina)
+	vista.modo_misterio(_misterio)
 	_poner_modo()
 
 	var fila := HBoxContainer.new()
@@ -236,6 +240,10 @@ func buscar_zona() -> void:
 	vista.enfocar(z)
 
 
+func titulo_visible() -> String:
+	return _titulo.text
+
+
 func celebrando() -> bool:
 	return _celebrando
 
@@ -246,6 +254,12 @@ func _celebrar() -> void:
 	_celebrando = true
 	lamina.terminar_trazo()
 	Obras.guardar(lamina)
+	var revelada := _misterio
+	if _misterio:
+		_misterio = false
+		Diario.marcar_misterio(lamina_id)
+		_titulo.text = Laminas.nombre(lamina_id)
+		vista.modo_misterio(false)
 	Sonido.tocar("victoria")
 	Sonido.vibrar(60)
 	vista.celebrar()
@@ -253,7 +267,9 @@ func _celebrar() -> void:
 	await get_tree().create_timer(1.3).timeout
 	if not is_inside_tree():
 		return
-	var i := await Estilo.dialogo(self, "¡Lámina terminada!", "Quedó guardada en Mis obras.",
+	var encabezado := "¡Misterio revelado!" if revelada else "¡Lámina terminada!"
+	var texto := ("Era %s. " % Laminas.nombre(lamina_id) if revelada else "") + "Quedó guardada en Mis obras."
+	var i := await Estilo.dialogo(self, encabezado, texto,
 		["Guardar imagen", "Seguir pintando", "Elegir otra lámina"])
 	_celebrando = false
 	if not is_inside_tree():
