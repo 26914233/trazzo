@@ -1,0 +1,118 @@
+{
+ "cajones": {
+  "t1": [
+   714,
+   234,
+   784,
+   295
+  ],
+  "t2": [
+   794,
+   241,
+   899,
+   309
+  ],
+  "t3": [
+   909,
+   250,
+   990,
+   319
+  ],
+  "m1": [
+   715,
+   302,
+   785,
+   368
+  ],
+  "m2": [
+   715,
+   369,
+   785,
+   471
+  ],
+  "c": [
+   795,
+   428,
+   899,
+   482
+  ],
+  "r1": [
+   909,
+   322,
+   990,
+   386
+  ],
+  "r2": [
+   909,
+   388,
+   989,
+   440
+  ],
+  "r3": [
+   910,
+   443,
+   989,
+   502
+  ]
+ },
+ "panel": [
+  794,
+  311,
+  899,
+  426
+ ],
+ "hueco_ficha": [
+  816,
+  334,
+  876,
+  404
+ ],
+ "borla": {
+  "corte": 418,
+  "hebras": [
+   [
+    566,
+    418
+   ],
+   [
+    604,
+    418
+   ]
+  ],
+  "nudo": [
+   600,
+   486
+  ],
+  "lazo_izq": {
+   "centro": [
+    432,
+    484
+   ],
+   "rx": 120,
+   "ry": 54
+  },
+  "lazo_der": {
+   "centro": [
+    704,
+    470
+   ],
+   "rx": 88,
+   "ry": 52
+  },
+  "cabeza": {
+   "centro": [
+    616,
+    712
+   ],
+   "rx": 92,
+   "ry": 50
+  },
+  "flecos": {
+   "arriba": 748,
+   "abajo": 1024,
+   "ancho_arriba": 216,
+   "ancho_abajo": 280
+  }
+ },
+ "nota": "Cajones y panel: píxeles del boceto de espaldas, [x0, y0, x1, y1] (esquina de arriba a la izquierda y de abajo a la derecha). Borla: píxeles del repintado del costado izquierdo (capas/cara_izquierda.webp, 1024 × 1024); de «corte» abajo la dibuja juego.js."
+}
