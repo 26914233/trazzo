@@ -488,6 +488,13 @@ func prueba_celebracion() -> void:
 	e._pintar(e.lamina.zonas)
 	e.queue_free()
 	await get_tree().process_frame
+	# reabrir una obra ya terminada no debe celebrar otra vez
+	var otra: Control = load("res://escenas/colorear.tscn").instantiate()
+	add_child(otra)
+	await get_tree().process_frame
+	comprobar(otra.lamina.terminada() and not otra.celebrando(), "reabrir una terminada no vuelve a celebrar")
+	otra.queue_free()
+	await get_tree().process_frame
 	Obras.borrar("mandalas_001")
 
 

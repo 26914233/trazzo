@@ -84,8 +84,8 @@ func _ready() -> void:
 	_rejilla.add_theme_constant_override("v_separation", 20)
 	col.add_child(_rejilla)
 	_poner_paleta(int(Ajustes.valor("paleta")))
+	_estaba_terminada = lamina.terminada()   # antes de _al_cambiar: abrir una terminada no celebra
 	_al_cambiar()
-	_estaba_terminada = lamina.terminada()
 
 
 func _boton_icono(texto: String, al_tocar: Callable) -> Button:
