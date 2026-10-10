@@ -18,6 +18,10 @@ dentro** (Palabrario y Lienzo Zen). Ver `palabrario/docs/MONETIZACION.md`. El c�
 anuncios y compras que se escribió y probó para Palabrario está en el historial de git
 (hasta el commit `e0ed81a`) si algún juego necesitara un modelo gratis.
 
+**Revisado el 2026-10-10 tras el análisis de competencia** (`ANALISIS_COMPETENCIA.md`): el
+dueño mantiene **app de pago a 4,99 US$** para Palabrario y Lienzo Zen, sin anuncios, aun
+sabiendo que 32 de 33 competidores son gratis y que en Play no hay prueba para apps de pago.
+
 ## Lo que se reutiliza de Palabrario (el molde)
 
 Se copia y se adapta, sin convertirlo en un framework hasta que haya un segundo
