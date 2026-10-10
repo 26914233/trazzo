@@ -1,0 +1,38 @@
+feature,area,priority,original,clone,notes
+Lienzo: pintar zona tocando,colorear,must,yes,yes,Happy Color / Pixel Art / Zen Color
+Lienzo: pintar arrastrando el dedo,colorear,must,yes,yes,modo Pincel (Pigment / Lake)
+Lienzo: zoom y desplazamiento con dos dedos,colorear,must,yes,yes,
+Lienzo: deshacer y rehacer,colorear,must,yes,yes,
+Lienzo: varias paletas,colorear,must,yes,yes,8 paletas
+Lienzo: biblioteca por categorías,biblioteca,must,yes,yes,749 láminas
+Lienzo: Mis obras con progreso guardado,biblioteca,must,yes,yes,
+Lienzo: buscar zona sin pintar,colorear,must,yes,no,Happy Color (bombilla) / Colorscapes (pistas)
+Lienzo: animación al terminar la lámina,colorear,must,yes,no,Happy Color / Zen Color
+Lienzo: guardar imagen en la galería,compartir,must,yes,no,Abovegames / casi todos
+Lienzo: lámina del día,biblioteca,should,yes,no,Recolor / Quarzo / ColorTime / Pixel Art
+Lienzo: racha de láminas del día,biblioteca,should,yes,no,
+Lienzo: ocultar láminas terminadas,biblioteca,should,yes,no,Colorscapes / Lake (reseñas)
+Lienzo: selector libre de color,colorear,should,yes,no,Recolor / ColorMe
+Lienzo: sonido ambiental opcional,ajustes,should,yes,no,Zen Color / Abovegames
+Lienzo: compartir la imagen,compartir,should,yes,no,necesita plugin Android
+Lienzo: repetición time-lapse,compartir,could,yes,no,Pixel Art / Candy Mobile
+Lienzo: colecciones y logros por categoría,progreso,could,yes,no,Happy Color / Zen Color
+Lienzo: modo por números,colorear,could,yes,skip,hay que numerar 749 láminas; se decide con datos de uso
+Lienzo: láminas misterio y eventos,eventos,could,yes,no,
+Palabrario: sopa del día,juego,must,yes,yes,
+Palabrario: racha diaria,progreso,must,yes,yes,
+Palabrario: pistas,juego,must,yes,yes,
+Palabrario: varias dificultades,juego,must,yes,yes,4
+Palabrario: temas,biblioteca,must,yes,yes,44 temas / 545 sopas
+Palabrario: logros,progreso,must,yes,no,AsgardSoft / Infinite WS (locales; Play Games aparte)
+Palabrario: modo infinito con sopas al azar,juego,must,yes,no,Word Search Quest / AsgardSoft
+Palabrario: estadísticas,progreso,should,yes,no,
+Palabrario: comodín de racha,progreso,should,yes,no,
+Palabrario: palabras extra ocultas,juego,should,yes,no,Wordscapes Search / Explorer
+Palabrario: tamaño de letra y alto contraste,ajustes,should,yes,no,RV AppStudios / Vita
+Palabrario: contrarreloj opcional,juego,should,yes,no,Italic / AsgardSoft
+Palabrario: mapa o viaje de progresión,biblioteca,should,yes,no,Explorer / Words of Wonders
+Palabrario: compartir resultado de la sopa del día,compartir,could,yes,no,
+Palabrario: tabla de clasificación,progreso,could,yes,no,necesita Play Games
+Palabrario: copia en la nube,progreso,could,yes,no,necesita cuenta o Play Games
+Palabrario: eventos temporales,eventos,could,yes,no,
