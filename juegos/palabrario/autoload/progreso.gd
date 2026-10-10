@@ -24,12 +24,16 @@ const COMPLETADAS_MAX := 10_000_000
 # estuvo mal (p. ej. en otro año) y se vuelve a la fecha real para no dejar la
 # sopa del dia congelada. Atrasos cortos siguen sin devolver nada (SEC-002).
 const DIAS_RELOJ_ROTO := 30
-const FECHAS := ["ultimo_dia", "max_dia", "diario_hecho", "pistas_dia"]
+const FECHAS := ["ultimo_dia", "max_dia", "diario_hecho", "pistas_dia", "comodin_usado"]
+const TIEMPO_MAX := 86_400         # segundos: un dia
+const CONTADORES := ["racha_max", "diarias", "aleatorias", "palabras", "pistas_usadas"]
 
 var ruta := "user://progreso.save"
 var datos: Dictionary = {}
 ## Por que se descarto el ultimo archivo leido ("" si se leyo bien o no existia).
 var ultimo_rechazo := ""
+## El ultimo registrar_dia salvo la racha con el comodin (el menu lo avisa).
+var comodin_recien_usado := false
 
 
 func _ready() -> void:
@@ -55,6 +59,14 @@ static func por_defecto() -> Dictionary:
 		"escala_texto": 1.0,
 		"diseno": "cielo",
 		"dificultad": 0,
+		# estadisticas (pantalla Logros); los logros se calculan de aqui y de "estrellas"
+		"comodin_usado": "",       # fecha del ultimo comodin de racha
+		"racha_max": 0,
+		"diarias": 0,              # sopas del dia resueltas
+		"aleatorias": 0,           # sopas al azar resueltas
+		"palabras": 0,             # palabras encontradas en partidas ganadas
+		"pistas_usadas": 0,
+		"mejor_tiempo": [0, 0, 0, 0],   # segundos por dificultad (0 = sin marca)
 	}
 
 
@@ -106,6 +118,14 @@ func _sanear() -> void:
 	datos["version"] = VERSION
 	datos["completadas"] = clampi(int(datos["completadas"]), 0, COMPLETADAS_MAX)
 	datos["racha"] = clampi(int(datos["racha"]), 0, RACHA_MAX)
+	for k in CONTADORES:
+		datos[k] = clampi(int(datos[k]), 0, RACHA_MAX if k == "racha_max" else COMPLETADAS_MAX)
+	var tiempos := [0, 0, 0, 0]
+	var leidos: Array = datos["mejor_tiempo"]
+	for i in mini(leidos.size(), 4):
+		if typeof(leidos[i]) in [TYPE_INT, TYPE_FLOAT]:
+			tiempos[i] = clampi(int(leidos[i]), 0, TIEMPO_MAX)
+	datos["mejor_tiempo"] = tiempos
 	for k in FECHAS:
 		if not es_fecha(str(datos[k])):
 			datos[k] = ""
@@ -207,7 +227,25 @@ func registrar_victoria(cat: String, sub: String, dificultad: int, estrellas: in
 	datos["estrellas"][k] = maxi(int(datos["estrellas"].get(k, 0)), clampi(estrellas, 1, 3))
 	datos["completadas"] = completadas() + 1
 	if diario:
+		if datos["diario_hecho"] != hoy:
+			datos["diarias"] = int(datos["diarias"]) + 1
 		datos["diario_hecho"] = hoy
+	guardar()
+
+
+## Estadisticas de una partida ganada. Las sopas al azar no tienen estrellas
+## ni pasan por registrar_victoria: aqui cuentan como partida completada.
+func registrar_partida(dificultad: int, segundos: float, palabras: int, pistas: int, aleatoria: bool) -> void:
+	datos["palabras"] = mini(int(datos["palabras"]) + maxi(palabras, 0), COMPLETADAS_MAX)
+	datos["pistas_usadas"] = mini(int(datos["pistas_usadas"]) + maxi(pistas, 0), COMPLETADAS_MAX)
+	if dificultad >= 0 and dificultad < 4:
+		var t := clampi(roundi(segundos), 1, TIEMPO_MAX)
+		var antes := int(datos["mejor_tiempo"][dificultad])
+		if antes == 0 or t < antes:
+			datos["mejor_tiempo"][dificultad] = t
+	if aleatoria:
+		datos["aleatorias"] = int(datos["aleatorias"]) + 1
+		datos["completadas"] = mini(completadas() + 1, COMPLETADAS_MAX)
 	guardar()
 
 
@@ -263,10 +301,17 @@ func sumar_pistas(n: int) -> void:
 # ---------------------------------------------------------------- racha y fecha
 
 ## Al abrir la app: avanza la racha. Devuelve la racha actual.
+## Si falto un solo dia y queda comodin esta semana, la racha sigue.
 func registrar_dia(hoy: String) -> int:
+	comodin_recien_usado = false
 	var r := Economia.avanzar_racha(int(datos["racha"]), datos["ultimo_dia"], hoy)
 	if r[1]:
-		datos["racha"] = r[0]
+		if int(datos["racha"]) > 0 and Economia.comodin_salva(datos["ultimo_dia"], hoy, Economia.comodin_disponible(datos["comodin_usado"], hoy)):
+			r[0] = int(datos["racha"]) + 1
+			datos["comodin_usado"] = hoy
+			comodin_recien_usado = true
+		datos["racha"] = mini(r[0], RACHA_MAX)
+		datos["racha_max"] = maxi(int(datos["racha_max"]), int(datos["racha"]))
 		datos["ultimo_dia"] = hoy
 		guardar()
 	return int(datos["racha"])
@@ -296,6 +341,8 @@ func _volver_a(sistema: String) -> void:
 		datos["pistas_dia"] = sistema
 	if str(datos["diario_hecho"]) > sistema:
 		datos["diario_hecho"] = ""
+	if str(datos["comodin_usado"]) > sistema:
+		datos["comodin_usado"] = sistema     # no se regala un comodin al volver
 	guardar()
 
 

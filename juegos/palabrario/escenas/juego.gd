@@ -11,6 +11,7 @@ var _segundos := 0.0
 var _pistas_usadas := 0
 var _terminado := false
 var _hoy := Progreso.hoy()
+var _aleatoria := false
 
 var _tablero: Tablero
 var _lista: RichTextLabel
@@ -21,12 +22,17 @@ var _boton_pista: Button
 
 func _ready() -> void:
 	_sel = Temas.seleccion
+	_aleatoria = bool(_sel.get("aleatoria", false))
 	_cat = Temas.categoria(_sel["categoria"])
-	_sub = Temas.subtema(_sel["categoria"], _sel["subtema"])
 	_color = Color(_cat.get("color", "#A16207"))
-	_sopa = Temas.generar(_sel["categoria"], _sel["subtema"], _sel["dificultad"])
-	if not _sel["diario"]:
-		Progreso.fijar_ultima(_sel["categoria"], _sel["subtema"])
+	if _aleatoria:
+		_sub = {"nombre": "Sopa al azar"}
+		_sopa = Temas.generar_aleatoria(_sel["categoria"], _sel["dificultad"], int(_sel.get("semilla", 0)))
+	else:
+		_sub = Temas.subtema(_sel["categoria"], _sel["subtema"])
+		_sopa = Temas.generar(_sel["categoria"], _sel["subtema"], _sel["dificultad"])
+		if not _sel["diario"]:
+			Progreso.fijar_ultima(_sel["categoria"], _sel["subtema"])
 	_construir()
 
 
@@ -35,6 +41,8 @@ func _construir() -> void:
 	_reloj = Estilo.etiqueta("0:00", 40, Estilo.TEXTO_SUAVE, false, false)
 	Estilo.barra(col, _sub.get("nombre", ""), _salir, _reloj)
 	var detalle: String = "Sopa del día" if _sel["diario"] else _cat.get("nombre", "")
+	if _aleatoria:
+		detalle = "Al azar: " + _cat.get("nombre", "")
 	col.add_child(Estilo.etiqueta("%s · %s" % [detalle, Economia.DIFICULTADES[_sel["dificultad"]]["nombre"]], 34, Estilo.TEXTO_SUAVE, false))
 
 	_tablero = Tablero.new()
@@ -173,14 +181,17 @@ func _tienda_pistas() -> bool:
 	return res["ok"]
 
 
+func _destino_al_salir() -> String:
+	return "menu" if _sel["diario"] or _aleatoria else "sopas"
+
+
 func _salir() -> void:
 	if _terminado:
-		_ir_tras_sopa("menu" if _sel["diario"] else "sopas")
+		_ir_tras_sopa(_destino_al_salir())
 		return
 	var elegido := await Estilo.dialogo(self, "¿Salir de la sopa?", "Perderás lo que llevas.", ["Seguir jugando", "Salir"])
 	if elegido == 1:
-		# Nunca intersticial tras abandonar: castigar al que se frustra es perderlo.
-		Estilo.ir(self, "menu" if _sel["diario"] else "sopas")
+		Estilo.ir(self, _destino_al_salir())
 
 
 # ---------------------------------------------------------------- victoria
@@ -191,18 +202,31 @@ func _victoria() -> void:
 	Sonido.tocar("victoria")
 	Sonido.vibrar(60)
 	var estrellas := Economia.estrellas(_segundos, _sopa.colocadas.size(), _pistas_usadas)
-	Progreso.registrar_victoria(_sel["categoria"], _sel["subtema"], _sel["dificultad"], estrellas, _sel["diario"], _hoy)
+	var antes := Logros.hechos(Progreso.datos)
+	Progreso.registrar_partida(_sel["dificultad"], _segundos, _sopa.colocadas.size(), _pistas_usadas, _aleatoria)
+	if not _aleatoria:
+		Progreso.registrar_victoria(_sel["categoria"], _sel["subtema"], _sel["dificultad"], estrellas, _sel["diario"], _hoy)
+	var logros := Logros.nuevos(antes, Progreso.datos)
 	await get_tree().create_timer(0.6).timeout
-	_panel_victoria(estrellas)
+	_panel_victoria(estrellas, logros)
 
 
-func _panel_victoria(estrellas: int) -> void:
+func _panel_victoria(estrellas: int, logros: Array = []) -> void:
 	var m := Estilo.modal(self)
 	var col: VBoxContainer = m[1]
 	col.add_child(Estilo.titulo("¡Sopa resuelta!", 68, true))
-	col.add_child(Estilo.etiqueta(Estilo.estrellas_texto(estrellas), 120, Estilo.ACENTO))
+	if not _aleatoria:
+		col.add_child(Estilo.etiqueta(Estilo.estrellas_texto(estrellas), 120, Estilo.ACENTO))
 	col.add_child(Estilo.etiqueta("%d:%02d  ·  %d %s" % [int(_segundos) / 60, int(_segundos) % 60, _pistas_usadas, "pista" if _pistas_usadas == 1 else "pistas"], 40, Estilo.TEXTO_SUAVE))
-	if not _sel["diario"]:
+	for id in logros:
+		col.add_child(Estilo.etiqueta("Nuevo logro: %s" % Logros.nombre(id), 40, Estilo.ACENTO))
+	if _aleatoria:
+		var otra := Estilo.boton("Otra al azar", "primario", 150)
+		otra.pressed.connect(func():
+			Temas.seleccion = Temas.nueva_aleatoria(_sel["dificultad"])
+			_ir_tras_sopa("juego"))
+		col.add_child(otra)
+	elif not _sel["diario"]:
 		var sig := Temas.siguiente(_sel["categoria"], _sel["subtema"])
 		if not sig.is_empty():
 			var boton_sig := Estilo.boton("Siguiente sopa", "primario", 150)
@@ -210,8 +234,8 @@ func _panel_victoria(estrellas: int) -> void:
 				Temas.seleccion = {"categoria": sig["categoria"], "subtema": sig["subtema"], "dificultad": _sel["dificultad"], "diario": false}
 				_ir_tras_sopa("juego"))
 			col.add_child(boton_sig)
-	var volver := Estilo.boton("Volver al menú" if _sel["diario"] else "Volver al tema", "suave", 130)
-	volver.pressed.connect(func(): _ir_tras_sopa("menu" if _sel["diario"] else "sopas"))
+	var volver := Estilo.boton("Volver al tema" if _destino_al_salir() == "sopas" else "Volver al menú", "suave", 130)
+	volver.pressed.connect(func(): _ir_tras_sopa(_destino_al_salir()))
 	col.add_child(volver)
 
 

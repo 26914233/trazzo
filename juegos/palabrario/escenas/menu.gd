@@ -44,10 +44,21 @@ func _ready() -> void:
 	jugar.pressed.connect(func(): Estilo.ir(self, "categorias"))
 	col.add_child(jugar)
 
+	var fila := HBoxContainer.new()
+	fila.add_theme_constant_override("separation", 20)
+	var azar := Estilo.boton("Al azar", "normal", 130)
+	azar.pressed.connect(func():
+		Temas.seleccion = Temas.nueva_aleatoria(int(Progreso.ajuste("dificultad")))
+		Estilo.ir(self, "juego"))
+	var logros := Estilo.boton("Logros", "normal", 130)
+	logros.pressed.connect(func(): Estilo.ir(self, "logros"))
 	var ajustes := Estilo.boton("Ajustes", "normal", 130)
-	ajustes.add_theme_font_size_override("font_size", 40)
 	ajustes.pressed.connect(func(): Estilo.ir(self, "ajustes"))
-	col.add_child(ajustes)
+	for b in [azar, logros, ajustes]:
+		b.add_theme_font_size_override("font_size", 40)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		fila.add_child(b)
+	col.add_child(fila)
 	col.add_child(Estilo.etiqueta("%d de %d sopas resueltas" % [Progreso.resueltas_total(), Temas.total_sopas()], 34, Estilo.TEXTO_SUAVE))
 
 	# Si el guardado se descarto al abrir, se dice una vez en vez de borrar
@@ -55,6 +66,9 @@ func _ready() -> void:
 	if Progreso.ultimo_rechazo != "":
 		Progreso.ultimo_rechazo = ""
 		Estilo.aviso(self, "No se pudo leer tu progreso guardado. Empiezas de cero.")
+	elif Progreso.comodin_recien_usado:
+		Progreso.comodin_recien_usado = false
+		Estilo.aviso(self, "Ayer no jugaste: usaste el comodín de la semana y tu racha sigue.")
 
 
 func _tarjeta_del_dia(hoy: String) -> Button:

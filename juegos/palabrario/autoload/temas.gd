@@ -116,6 +116,46 @@ func generar(cat: String, sub: String, dificultad: int) -> GeneradorSopa.Sopa:
 	return sopa
 
 
+## Sopa al azar (modo sin fin): palabras de todos los temas de una categoria,
+## mezcladas con la semilla. Misma semilla = misma sopa.
+func generar_aleatoria(cat: String, dificultad: int, semilla_: int) -> GeneradorSopa.Sopa:
+	var vistas := {}
+	var pool: Array = []
+	for s in categoria(cat).get("subtemas", []):
+		for p in s["palabras"]:
+			var n := GeneradorSopa.normalizar(p)
+			if not vistas.has(n):
+				vistas[n] = true
+				pool.append(p)
+	pool.sort()                          # orden fijo antes de barajar
+	var rng := RandomNumberGenerator.new()
+	rng.seed = semilla_
+	for i in range(pool.size() - 1, 0, -1):
+		var j := rng.randi_range(0, i)
+		var t = pool[i]
+		pool[i] = pool[j]
+		pool[j] = t
+	var n: int = Economia.DIFICULTADES[dificultad]["palabras"]
+	var palabras := PackedStringArray(pool.slice(0, n))
+	var lado := lado_para(palabras, dificultad)
+	var sopa: GeneradorSopa.Sopa
+	for intento in 40:
+		if intento > 0 and intento % 10 == 0:
+			lado += 1
+		sopa = GeneradorSopa.generar(palabras, lado, dificultad, semilla_ + intento)
+		if sopa.descartadas.is_empty():
+			return sopa
+	push_error("Sopa al azar incompleta: %s dificultad %d" % [cat, dificultad])
+	return sopa
+
+
+## Seleccion para una sopa al azar de cualquier categoria.
+func nueva_aleatoria(dificultad: int) -> Dictionary:
+	var c: Dictionary = lista[randi() % lista.size()]
+	return {"categoria": c["id"], "subtema": "", "dificultad": dificultad, "diario": false,
+		"aleatoria": true, "semilla": randi()}
+
+
 ## Sopa del dia: la misma para todo el mundo cada fecha, elegida entre todas.
 func sopa_del_dia(fecha: String) -> Dictionary:
 	var total := total_sopas()

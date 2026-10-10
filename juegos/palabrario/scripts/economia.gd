@@ -41,6 +41,20 @@ static func avanzar_racha(racha: int, ultimo_dia: String, hoy: String) -> Array:
 	return [1, true]
 
 
+## Un comodin por semana: si faltas un solo dia, la racha sigue (las reseñas
+## castigan perder una racha larga por un despiste).
+const DIAS_COMODIN := 7
+
+
+static func comodin_disponible(usado: String, hoy: String) -> bool:
+	return usado == "" or dias_entre(usado, hoy) >= DIAS_COMODIN
+
+
+## true si entre el ultimo dia y hoy falto exactamente un dia y hay comodin.
+static func comodin_salva(ultimo_dia: String, hoy: String, disponible: bool) -> bool:
+	return disponible and ultimo_dia != "" and dias_entre(ultimo_dia, hoy) == 2
+
+
 static func dias_entre(a: String, b: String) -> int:
 	var ua := Time.get_unix_time_from_datetime_string(a + "T00:00:00")
 	var ub := Time.get_unix_time_from_datetime_string(b + "T00:00:00")

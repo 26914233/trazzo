@@ -33,6 +33,10 @@ func _ready() -> void:
 	prueba_sopa_del_dia_y_siguiente()
 	prueba_economia()
 	prueba_racha()
+	prueba_comodin()
+	prueba_estadisticas()
+	prueba_logros()
+	prueba_sopa_aleatoria()
 	await prueba_guardado_y_firma()
 	prueba_esquema_guardado()
 	prueba_reloj_no_retrocede()
@@ -46,6 +50,7 @@ func _ready() -> void:
 	prueba_escapar_bbcode()
 	prueba_disenos()
 	await prueba_partida_completa()
+	await prueba_partida_aleatoria()
 	await prueba_pantallas()
 
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Progreso.ruta))
@@ -228,6 +233,109 @@ func prueba_sopa_del_dia_y_siguiente() -> void:
 
 
 # ---------------------------------------------------------------- reglas
+
+func prueba_comodin() -> void:
+	caso("comodin de racha")
+	comprobar(Economia.comodin_disponible("", HOY), "sin usar: disponible")
+	comprobar(not Economia.comodin_disponible("2026-10-05", HOY), "usado hace 4 dias: no")
+	comprobar(Economia.comodin_disponible("2026-10-02", HOY), "usado hace 7 dias: otra vez disponible")
+	comprobar(Economia.comodin_salva("2026-10-07", HOY, true), "falto un dia y hay comodin: salva")
+	comprobar(not Economia.comodin_salva("2026-10-07", HOY, false), "sin comodin no salva")
+	comprobar(not Economia.comodin_salva("2026-10-06", HOY, true), "faltaron dos dias: no salva")
+	comprobar(not Economia.comodin_salva("2026-10-08", HOY, true), "dia seguido: no hace falta")
+	_reiniciar_progreso()
+	Progreso.registrar_dia("2026-10-07")
+	Progreso.registrar_dia("2026-10-08")
+	comprobar(Progreso.registrar_dia(HOY) == 3 and Progreso.comodin_recien_usado == false, "seguidos sin comodin")
+	comprobar(Progreso.registrar_dia("2026-10-11") == 4, "faltar el 10: el comodin la salva")
+	comprobar(Progreso.comodin_recien_usado and Progreso.datos["comodin_usado"] == "2026-10-11", "queda marcado como usado")
+	comprobar(Progreso.registrar_dia("2026-10-13") == 1, "otra falta en la misma semana: se reinicia")
+	comprobar(int(Progreso.datos["racha_max"]) == 4, "se recuerda la mejor racha")
+
+
+func prueba_estadisticas() -> void:
+	caso("estadisticas")
+	_reiniciar_progreso()
+	Progreso.registrar_partida(1, 95.4, 9, 2, false)
+	Progreso.registrar_partida(1, 61.0, 9, 0, false)
+	Progreso.registrar_partida(1, 120.0, 9, 1, false)
+	Progreso.registrar_partida(3, 300.0, 12, 0, true)
+	var d := Progreso.datos
+	comprobar(int(d["palabras"]) == 39, "palabras encontradas sumadas")
+	comprobar(int(d["pistas_usadas"]) == 3, "pistas usadas sumadas")
+	comprobar(int(d["mejor_tiempo"][1]) == 61 and int(d["mejor_tiempo"][3]) == 300 and int(d["mejor_tiempo"][0]) == 0, "mejor tiempo por dificultad")
+	comprobar(int(d["aleatorias"]) == 1 and Progreso.completadas() == 1, "la aleatoria cuenta como partida y como aleatoria")
+	Progreso.registrar_victoria("comida", "frutas", 1, 3, true, HOY)
+	Progreso.registrar_victoria("comida", "frutas", 1, 3, true, HOY)
+	comprobar(int(d["diarias"]) == 1, "la sopa del dia cuenta una vez por dia")
+	var raro := Progreso.por_defecto()
+	raro["mejor_tiempo"] = [-5, "x", 1e9]
+	raro["palabras"] = -1
+	raro["racha_max"] = 1e9
+	raro["comodin_usado"] = "ayer"
+	_escribir_firmado(raro)
+	Progreso.cargar()
+	d = Progreso.datos
+	comprobar(d["mejor_tiempo"] == [0, 0, Progreso.TIEMPO_MAX, 0], "tiempos saneados a 4 valores validos: %s" % str(d["mejor_tiempo"]))
+	comprobar(int(d["palabras"]) == 0 and int(d["racha_max"]) == Progreso.RACHA_MAX and d["comodin_usado"] == "", "contadores y fecha del comodin saneados")
+
+
+func prueba_logros() -> void:
+	caso("logros")
+	_reiniciar_progreso()
+	var l := Logros.lista(Progreso.datos)
+	comprobar(l.size() >= 12, "al menos 12 logros (%d)" % l.size())
+	comprobar(l.all(func(x): return not x["hecho"]), "partida nueva: ninguno")
+	var ids := {}
+	for x in l:
+		ids[x["id"]] = true
+		comprobar(x["nombre"] != "" and x["detalle"] != "" and x["meta"] > 0, "logro completo: %s" % x["id"])
+	comprobar(ids.size() == l.size(), "ids unicos")
+	Progreso.registrar_victoria("comida", "frutas", 3, 3, false, HOY)
+	Progreso.registrar_partida(3, 50.0, 12, 0, false)
+	var hechos := Logros.hechos(Progreso.datos)
+	comprobar(hechos.has("primera") and hechos.has("experto"), "primera sopa y experto: %s" % str(hechos))
+	comprobar(not hechos.has("sopas_10"), "10 sopas aun no")
+	var cat: Dictionary = Temas.lista[0]
+	for sub in cat["subtemas"]:
+		Progreso.registrar_victoria(cat["id"], sub["id"], 0, 1, false, HOY)
+	comprobar(Logros.hechos(Progreso.datos).has("tema_completo"), "resolver todo un tema")
+	var antes := Logros.hechos(Progreso.datos)
+	Progreso.datos["racha_max"] = 7
+	comprobar(Logros.nuevos(antes, Progreso.datos).has("racha_7"), "detecta los logros recien conseguidos")
+	var r10: Dictionary = l.filter(func(x): return x["id"] == "sopas_10")[0]
+	comprobar(r10["meta"] == 10, "progreso con meta")
+
+
+func prueba_sopa_aleatoria() -> void:
+	caso("sopa al azar")
+	var a := Temas.generar_aleatoria("animales", 1, 12345)
+	var b := Temas.generar_aleatoria("animales", 1, 12345)
+	comprobar(a.colocadas.size() == 9 and a.descartadas.is_empty(), "Normal: 9 palabras colocadas")
+	var pa := a.colocadas.map(func(c): return c.palabra)
+	comprobar(pa == b.colocadas.map(func(c): return c.palabra), "misma semilla, misma sopa")
+	var distintas := {}
+	for semilla in 20:
+		var s := Temas.generar_aleatoria("animales", 1, semilla)
+		distintas[",".join(PackedStringArray(s.colocadas.map(func(c): return c.palabra)))] = true
+	comprobar(distintas.size() >= 18, "semillas distintas dan sopas distintas (%d de 20)" % distintas.size())
+	var unicas := {}
+	for p in pa:
+		unicas[p] = true
+	comprobar(unicas.size() == pa.size(), "sin palabras repetidas")
+	var todas := {}
+	for sub in Temas.categoria("animales")["subtemas"]:
+		for p in sub["palabras"]:
+			todas[GeneradorSopa.normalizar(p)] = true
+	comprobar(pa.all(func(p): return todas.has(p)), "las palabras salen de esa categoria")
+	var sel := Temas.nueva_aleatoria(2)
+	comprobar(sel["aleatoria"] and not Temas.categoria(sel["categoria"]).is_empty() and sel["dificultad"] == 2 and not sel["diario"], "seleccion al azar valida")
+	for d in 4:
+		for c in Temas.lista:
+			var s := Temas.generar_aleatoria(c["id"], d, 7)
+			if not s.descartadas.is_empty():
+				comprobar(false, "cabe en %s dificultad %d" % [c["id"], d])
+
 
 func prueba_economia() -> void:
 	caso("estrellas")
@@ -523,6 +631,27 @@ func prueba_partida_completa() -> void:
 	await get_tree().process_frame
 
 
+func prueba_partida_aleatoria() -> void:
+	caso("partida al azar sobre la escena real")
+	_reiniciar_progreso()
+	Temas.seleccion = {"categoria": "animales", "subtema": "", "dificultad": 0, "diario": false, "aleatoria": true, "semilla": 99}
+	var juego: Control = load("res://escenas/juego.tscn").instantiate()
+	add_child(juego)
+	await get_tree().process_frame
+	var sopa: GeneradorSopa.Sopa = juego._sopa
+	comprobar(sopa.colocadas.size() == 6, "Facil: 6 palabras")
+	for c in sopa.colocadas:
+		juego._al_seleccionar(c.celdas.duplicate())
+	comprobar(juego._terminado, "victoria")
+	comprobar(int(Progreso.datos["aleatorias"]) == 1 and Progreso.datos["estrellas"].is_empty(), "cuenta como aleatoria y no toca las estrellas de las sopas")
+	comprobar(Progreso.ultima().is_empty(), "no cambia Continuar")
+	await get_tree().create_timer(1.2).timeout
+	var botones := juego.find_children("*", "Button", true, false).filter(func(b): return b.text == "Otra al azar")
+	comprobar(botones.size() == 1, "el panel ofrece otra al azar")
+	juego.queue_free()
+	await get_tree().process_frame
+
+
 class ContadorErrores extends Logger:
 	var errores: Array[String] = []
 	func _log_error(_f: String, file: String, line: int, code: String, rationale: String, _n: bool, tipo: int, _bt: Array[ScriptBacktrace]) -> void:
@@ -533,13 +662,13 @@ class ContadorErrores extends Logger:
 
 
 func prueba_pantallas() -> void:
-	caso("las 6 pantallas cargan sin errores en los 3 diseños")
+	caso("las 7 pantallas cargan sin errores en los 3 diseños")
 	var log := ContadorErrores.new()
 	OS.add_logger(log)
 	Temas.seleccion = {"categoria": "comida", "subtema": "frutas", "dificultad": 0, "diario": false}
 	for id in Estilo.VARIANTES:
 		Estilo.aplicar(id)
-		for nombre in ["menu", "categorias", "sopas", "juego", "ajustes", "copia_no_valida"]:
+		for nombre in ["menu", "categorias", "sopas", "juego", "ajustes", "logros", "copia_no_valida"]:
 			var escena: Node = load("res://escenas/%s.tscn" % nombre).instantiate()
 			add_child(escena)
 			for f in 4:

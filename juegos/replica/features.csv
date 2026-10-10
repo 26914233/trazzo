@@ -24,12 +24,12 @@ Palabrario: racha diaria,progreso,must,yes,yes,
 Palabrario: pistas,juego,must,yes,yes,
 Palabrario: varias dificultades,juego,must,yes,yes,4
 Palabrario: temas,biblioteca,must,yes,yes,44 temas / 545 sopas
-Palabrario: logros,progreso,must,yes,no,AsgardSoft / Infinite WS (locales; Play Games aparte)
-Palabrario: modo infinito con sopas al azar,juego,must,yes,no,Word Search Quest / AsgardSoft
-Palabrario: estadísticas,progreso,should,yes,no,
-Palabrario: comodín de racha,progreso,should,yes,no,
+Palabrario: logros,progreso,must,yes,yes,15 logros locales; Play Games aparte
+Palabrario: modo infinito con sopas al azar,juego,must,yes,yes,Word Search Quest / AsgardSoft
+Palabrario: estadísticas,progreso,should,yes,yes,
+Palabrario: comodín de racha,progreso,should,yes,yes,
 Palabrario: palabras extra ocultas,juego,should,yes,no,Wordscapes Search / Explorer
-Palabrario: tamaño de letra y alto contraste,ajustes,should,yes,no,RV AppStudios / Vita
+Palabrario: tamaño de letra y alto contraste,ajustes,should,yes,partial,RV AppStudios / Vita; ya tenía 4 tamaños de letra y diseño Noche; falta alto contraste
 Palabrario: contrarreloj opcional,juego,should,yes,no,Italic / AsgardSoft
 Palabrario: mapa o viaje de progresión,biblioteca,should,yes,no,Explorer / Words of Wonders
 Palabrario: compartir resultado de la sopa del día,compartir,could,yes,no,

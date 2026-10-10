@@ -81,3 +81,18 @@ para todo el mundo. Las 2.180 combinaciones sopa/dificultad están probadas.
 - Multijugador, tablas online, cuentas y nube.
 - Otros idiomas.
 - Generación de palabras con IA: el banco curado no produce errores embarazosos.
+
+## Logros, sopa al azar y comodín (octubre 2026)
+Copiados como función (no como código, textos ni arte) de las apps revisadas en
+`juegos/ANALISIS_COMPETENCIA.md`; matriz en `juegos/replica/features.csv`.
+- **Sopa al azar** (menú → «Al azar»): palabras de todos los temas de una categoría al
+  azar, mezcladas con una semilla; no se acaban nunca. No dan estrellas ni cambian
+  «Continuar»; cuentan como partida y para su logro. Al ganar: «Otra al azar».
+- **Comodín de racha:** uno por semana. Si faltas un solo día, la racha sigue y el menú
+  lo avisa. Faltar dos días la reinicia.
+- **Logros** (15, locales): se calculan del progreso guardado, no se guardan aparte. Al
+  ganar una sopa se anuncian los nuevos. Google Play Games (nube y clasificación) queda
+  para más adelante.
+- **Estadísticas** (pantalla Logros): sopas resueltas, partidas, racha y mejor racha,
+  comodín, sopas del día, al azar, palabras encontradas, pistas usadas y mejor tiempo
+  por dificultad. Van en el guardado firmado y se acotan al leer.
