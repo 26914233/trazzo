@@ -59,6 +59,7 @@ func _ready() -> void:
 			categoria_actual = id
 			Estilo.ir(self, "menu"))
 		_chips.add_child(chip)
+	Estilo.permitir_arrastre(_chips)
 	_llenar()
 
 
@@ -79,6 +80,7 @@ func _llenar() -> void:
 	_ids = ids
 	for id in ids:
 		_rejilla.add_child(_miniatura(id))
+	Estilo.permitir_arrastre(_rejilla)
 
 
 func ids_en_rejilla() -> Array:

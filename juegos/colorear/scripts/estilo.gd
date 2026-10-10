@@ -294,6 +294,15 @@ static func escapar_bbcode(texto: String) -> String:
 	return texto.replace("[", "[lb]")
 
 
+## Dentro de una lista desplazable, botones y tarjetas deben dejar pasar el toque:
+## con MOUSE_FILTER_STOP se lo quedan y en el movil la lista no baja al arrastrar.
+## (Godot cancela la pulsacion del boton cuando empieza el desplazamiento.)
+static func permitir_arrastre(raiz: Node) -> void:
+	for c in raiz.find_children("*", "Control", true, false):
+		if (c as Control).mouse_filter == Control.MOUSE_FILTER_STOP:
+			(c as Control).mouse_filter = Control.MOUSE_FILTER_PASS
+
+
 static func ir(desde: Node, escena: String) -> void:
 	desde.get_tree().change_scene_to_file("res://escenas/%s.tscn" % escena)
 

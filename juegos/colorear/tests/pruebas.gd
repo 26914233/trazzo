@@ -46,6 +46,7 @@ func _ready() -> void:
 	await prueba_ajustes_menu()
 	await prueba_celebracion()
 	await prueba_misterio_en_pantalla()
+	await prueba_arrastrar_listas()
 
 	_vaciar(Obras.carpeta)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Ajustes.ruta))
@@ -668,3 +669,59 @@ func prueba_fondo_cerrado() -> void:
 			mayor = maxi(mayor, a)
 		var parte := float(mayor) / (d.size() / 3)
 		comprobar(parte < 0.6, "%s: la zona mas grande ocupa %d %%" % [id, roundi(parte * 100)])
+
+
+## En el movil la cuadricula y las categorias se bajan/deslizan arrastrando el dedo;
+## con botones en MOUSE_FILTER_STOP no se movian.
+func prueba_arrastrar_listas() -> void:
+	caso("la cuadricula y las categorias se mueven arrastrando")
+	load("res://escenas/menu.gd").categoria_actual = "animales"
+	var menu: Control = load("res://escenas/menu.tscn").instantiate()
+	add_child(menu)
+	for i in 4:
+		await get_tree().process_frame
+	var scrolls := menu.find_children("*", "ScrollContainer", true, false)
+	var lista: ScrollContainer = null
+	var chips: ScrollContainer = null
+	for s in scrolls:
+		if s.vertical_scroll_mode == ScrollContainer.SCROLL_MODE_DISABLED:
+			chips = s
+		else:
+			lista = s
+	var c := lista.get_global_rect().get_center()
+	await _arrastrar_lista(c + Vector2(0, 300), c - Vector2(0, 300))
+	comprobar(lista.scroll_vertical > 100, "la cuadricula baja (%d px)" % lista.scroll_vertical)
+	var cc := chips.get_global_rect().get_center()
+	await _arrastrar_lista(cc + Vector2(300, 0), cc - Vector2(300, 0))
+	comprobar(chips.scroll_horizontal > 100, "las categorias se deslizan (%d px)" % chips.scroll_horizontal)
+	menu.queue_free()
+	await get_tree().process_frame
+
+
+## Arrastre como en un movil (Godot solo desplaza al arrastrar si hay pantalla tactil).
+func _arrastrar_lista(desde: Vector2, hasta: Vector2) -> void:
+	var antes := Input.emulate_touch_from_mouse
+	Input.emulate_touch_from_mouse = true
+	var p := InputEventMouseButton.new()
+	p.button_index = MOUSE_BUTTON_LEFT
+	p.position = desde
+	p.global_position = desde
+	p.pressed = true
+	get_viewport().push_input(p, true)
+	await get_tree().process_frame
+	for k in range(1, 13):
+		var m := InputEventMouseMotion.new()
+		m.position = desde.lerp(hasta, k / 12.0)
+		m.global_position = m.position
+		m.relative = (hasta - desde) / 12.0
+		m.button_mask = MOUSE_BUTTON_MASK_LEFT
+		get_viewport().push_input(m, true)
+		await get_tree().process_frame
+	var f := InputEventMouseButton.new()
+	f.button_index = MOUSE_BUTTON_LEFT
+	f.position = hasta
+	f.global_position = hasta
+	f.pressed = false
+	get_viewport().push_input(f, true)
+	await get_tree().process_frame
+	Input.emulate_touch_from_mouse = antes
