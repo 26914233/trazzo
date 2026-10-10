@@ -13,6 +13,7 @@ boot_splash/show_image=false
 boot_splash/bg_color=Color(0.98, 0.97, 0.95, 1)
 config/quit_on_go_back=false
 config/version="0.1.0"
+config/icon="res://arte/icono.png"
 
 [autoload]
 
