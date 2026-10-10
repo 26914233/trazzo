@@ -21,6 +21,7 @@ Ajustes="*res://autoload/ajustes.gd"
 Sonido="*res://autoload/sonido.gd"
 Niveles="*res://autoload/niveles.gd"
 Progreso="*res://autoload/progreso.gd"
+Monetizacion="*res://autoload/monetizacion.gd"
 
 [display]
 

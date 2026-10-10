@@ -6,7 +6,9 @@ que se rompen. Que no caiga la bola. Referencia del dueño: «Estrella de Brick 
 Se copia la función del género (método replica, `RECON.md`), no su arte ni sus niveles.
 
 ## Lo que lo diferencia (de las reseñas de la competencia)
-- **Sin anuncios y sin vidas de pago** (147 de 253 quejas son por anuncios).
+- **Gratis, con anuncios que no castigan** (147 de 253 quejas son por anuncios): nada en
+  los 10 primeros niveles, nunca tras perder, como mucho 1 cada 3 niveles ganados.
+  Sin vidas de pago ni esperas: perder nunca bloquea.
 - **Nunca se atasca:** si la bola entra en un bucle sin tocar ladrillos, se corrige sola.
 - **Sonido y vibración que se apagan de verdad.**
 - **Curva de dificultad que reta desde pronto** (quejas de «se juega solo»).
@@ -66,5 +68,6 @@ Godot 4.7, GL Compatibility, vertical 1080×1920, mismo molde que Palabrario y L
 `_draw` y texturas generadas en código. Sonidos sintetizados (licencia propia).
 
 ## Negocio
-Pendiente de que lo confirme el dueño. Propuesta: el mismo modelo que los otros dos (pago
-único, sin anuncios ni compras), que es justo lo que piden las reseñas del género.
+Decidido por el dueño (10-oct-2026): **gratis con anuncios**, personalización (paletas,
+bolas, estelas) y microtransacciones (gemas y quitar anuncios). Detalle, reglas y precios
+en `MONETIZACION.md`; integración real en `INTEGRACION_ANDROID.md`.

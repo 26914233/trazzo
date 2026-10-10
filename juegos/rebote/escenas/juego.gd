@@ -26,6 +26,14 @@ var _pausado := false
 var _terminado := false
 var _t := 0.0
 var _dedo_inicio := Vector2.ZERO
+var _aspecto_paleta: Dictionary = Progreso.equipado("paleta")
+var _aspecto_bola: Dictionary = Progreso.equipado("bola")
+var _aspecto_estela: Dictionary = Progreso.equipado("estela")
+var _estelas: Array = []         # por bola: posiciones recientes
+var _arranques: HBoxContainer      # potenciadores a la venta antes del primer lanzamiento
+var _ya_siguio := false          # "Seguir" solo una vez por intento
+
+const NIVEL_ARRANQUES := 3       ## desde el nivel 4 (los 3 primeros son de aprender)
 
 
 func _ready() -> void:
@@ -55,6 +63,8 @@ func _ready() -> void:
 		_campo.add_child(p)
 		_particulas.append(p)
 	_hud()
+	if nivel_idx >= NIVEL_ARRANQUES:
+		_crear_arranques()
 	resized.connect(_colocar)
 	_colocar()
 
@@ -92,6 +102,59 @@ func _colocar() -> void:
 	_campo.scale = Vector2(_escala, _escala)
 	_campo.size = Partida.CAMPO
 	_campo.position = Vector2((size.x - Partida.CAMPO.x * _escala) / 2.0, HUD)
+	if _arranques:
+		_arranques.position = Vector2(40, _campo.position.y + (Partida.PALETA_Y - 420) * _escala)
+		_arranques.size = Vector2(size.x - 80, 150)
+
+
+# ---------------------------------------------------------------- potenciadores al empezar
+
+func _crear_arranques() -> void:
+	_arranques = HBoxContainer.new()
+	_arranques.alignment = BoxContainer.ALIGNMENT_CENTER
+	_arranques.add_theme_constant_override("separation", 18)
+	for id in Economia.ARRANQUES:
+		var a: Dictionary = Economia.ARRANQUES[id]
+		var b := Estilo.boton("", "normal", 150)
+		b.name = "Arranque_" + id
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var v := VBoxContainer.new()
+		v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		v.alignment = BoxContainer.ALIGNMENT_CENTER
+		v.add_theme_constant_override("separation", 4)
+		v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var nombre := Estilo.etiqueta(a["nombre"], 32, Estilo.TEXTO, true, false)
+		nombre.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		v.add_child(nombre)
+		var precio := HBoxContainer.new()
+		precio.alignment = BoxContainer.ALIGNMENT_CENTER
+		precio.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		precio.add_child(Estilo.gema(34))
+		var num := Estilo.etiqueta(str(a["precio"]), 34, Estilo.ACENTO, false, false)
+		num.name = "Precio"
+		num.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		precio.add_child(num)
+		v.add_child(precio)
+		b.add_child(v)
+		b.pressed.connect(comprar_arranque.bind(id, b))
+		_arranques.add_child(b)
+	add_child(_arranques)
+
+
+func comprar_arranque(id: String, boton: Button = null) -> bool:
+	var a: Dictionary = Economia.ARRANQUES[id]
+	if not partida.esperando() or Progreso.gemas() < int(a["precio"]):
+		Estilo.aviso(self, "Necesitas %d gemas. Se ganan jugando o en la Tienda." % a["precio"])
+		return false
+	if not partida.preparar_arranque(a["potenciador"]) or not Progreso.gastar_gemas(int(a["precio"])):
+		return false
+	Sonido.tocar("potenciador")
+	if boton:
+		boton.disabled = true
+		var num := boton.find_child("Precio", true, false) as Label
+		if num:
+			num.text = "✓"
+	return true
 
 
 # ---------------------------------------------------------------- entrada
@@ -140,6 +203,9 @@ func _process(delta: float) -> void:
 		t["t"] += delta
 		if t["t"] > 0.9:
 			_textos.erase(t)
+	_actualizar_estelas()
+	if _arranques and _arranques.visible and partida._lanzada:
+		_arranques.visible = false
 	_puntos.text = str(partida.puntos)
 	_vidas.text = "♥ %d" % partida.vidas
 	_campo.queue_redraw()
@@ -173,6 +239,27 @@ func _al_evento(ev: Dictionary) -> void:
 		"pierde":
 			Sonido.tocar("pierde")
 			Sonido.vibrar(80)
+		"revive":
+			Sonido.tocar("potenciador")
+			_texto("potenciador", Vector2(partida.paleta_x, Partida.PALETA_Y - 60), "¡Sigue!")
+
+
+func _actualizar_estelas() -> void:
+	if str(_aspecto_estela.get("color", "")) == "":
+		return
+	if _estelas.size() != partida.bolas.size():
+		_estelas = []
+		for b in partida.bolas:
+			_estelas.append([])
+	for k in partida.bolas.size():
+		var b: Dictionary = partida.bolas[k]
+		var e: Array = _estelas[k]
+		if not b["libre"]:
+			e.clear()
+			continue
+		e.append(b["pos"])
+		if e.size() > Dibujo.LARGO_ESTELA:
+			e.pop_front()
 
 
 ## Un texto flotante por tipo: el nuevo reemplaza al anterior (no se amontonan).
@@ -224,8 +311,11 @@ func _dibujar() -> void:
 		c.draw_line(p, p + Vector2(0, 30), Color("#FF4D6D"), 6)
 		c.draw_line(p, p + Vector2(0, 30), Color(1, 1, 1, 0.8), 2)
 	_paleta(c)
-	for b in partida.bolas:
-		_bola(c, b["pos"])
+	var fuego := partida.efecto_activo(Partida.FUEGO)
+	for k in partida.bolas.size():
+		if k < _estelas.size():
+			Dibujo.estela(c, _estelas[k], Partida.RADIO, _aspecto_estela, _t)
+		Dibujo.bola(c, partida.bolas[k]["pos"], Partida.RADIO, _aspecto_bola, fuego)
 	if partida.esperando():
 		c.draw_string(fuente, Vector2(0, Partida.PALETA_Y - 140), "Toca para lanzar", HORIZONTAL_ALIGNMENT_CENTER, Partida.CAMPO.x, 46, Color(1, 1, 1, 0.55 + 0.35 * sin(_t * 4)))
 	for t in _textos:
@@ -236,36 +326,7 @@ func _dibujar() -> void:
 func _paleta(c: Control) -> void:
 	var ancho := partida.ancho_paleta()
 	var r := Rect2(partida.paleta_x - ancho / 2.0, Partida.PALETA_Y, ancho, Partida.PALETA_ALTO)
-	var cuerpo := StyleBoxFlat.new()
-	cuerpo.bg_color = Color("#22D3EE")
-	cuerpo.set_corner_radius_all(17)
-	cuerpo.border_color = Color("#0E7490")
-	cuerpo.set_border_width_all(3)
-	cuerpo.shadow_color = Color(0.13, 0.83, 0.93, 0.35)
-	cuerpo.shadow_size = 14
-	c.draw_style_box(cuerpo, r)
-	c.draw_rect(Rect2(r.position + Vector2(18, 6), Vector2(r.size.x - 36, 7)), Color(1, 1, 1, 0.55))
-	for lado in [r.position.x + 8, r.end.x - 34]:
-		var punta := StyleBoxFlat.new()
-		punta.bg_color = Color("#EC4899")
-		punta.set_corner_radius_all(13)
-		c.draw_style_box(punta, Rect2(lado, r.position.y + 4, 26, r.size.y - 8))
-	if partida.efecto_activo(Partida.LASER):
-		for x in [r.position.x + 14, r.end.x - 14]:
-			c.draw_rect(Rect2(x - 5, r.position.y - 16, 10, 18), Color("#FF4D6D"))
-
-
-func _bola(c: Control, pos: Vector2) -> void:
-	var r := Partida.RADIO
-	if partida.efecto_activo(Partida.FUEGO):
-		for k in 4:
-			c.draw_circle(pos, r + 14 - k * 3, Color(1, 0.55, 0.1, 0.12 + k * 0.05))
-		c.draw_circle(pos, r, Color("#FFB347"))
-	else:
-		c.draw_circle(pos + Vector2(3, 5), r, Color(0, 0, 0, 0.35))
-		c.draw_circle(pos, r, Color("#C9D2E3"))
-		c.draw_circle(pos + Vector2(2, 3), r * 0.8, Color("#8E9BB5"))
-		c.draw_circle(pos - Vector2(5, 5), r * 0.45, Color(1, 1, 1, 0.9))
+	Dibujo.paleta(c, r, _aspecto_paleta, partida.efecto_activo(Partida.LASER))
 
 
 func _capsula(c: Control, cap: Dictionary) -> void:
@@ -327,30 +388,94 @@ func pausar() -> void:
 
 func _fin(gano: bool) -> void:
 	_terminado = true
+	if not gano and not _ya_siguio:
+		await get_tree().create_timer(0.5).timeout
+		if not is_inside_tree():
+			return
+		if await ofrecer_seguir():
+			return
 	var estrellas := 0
+	var gemas := 0
 	if gano:
 		estrellas = Partida.estrellas_por(partida.vidas_iniciales, partida.vidas)
-		Progreso.registrar(nivel_idx, estrellas, partida.puntos)
+		gemas = Progreso.registrar(nivel_idx, estrellas, partida.puntos)
+		Monetizacion.nivel_superado()
 		Sonido.tocar("gana")
-	await get_tree().create_timer(0.7).timeout
+		await get_tree().create_timer(0.7).timeout
 	if not is_inside_tree():
 		return
-	var opciones := ["Siguiente nivel", "Repetir", "Mundos"] if gano and nivel_idx + 1 < Niveles.total() else ["Reintentar", "Mundos"]
-	if gano and nivel_idx + 1 >= Niveles.total():
-		opciones = ["Repetir", "Mundos"]
-	var texto := "%s   ·   %d puntos" % ["★".repeat(estrellas) + "☆".repeat(3 - estrellas), partida.puntos] if gano else "Te quedaste sin vidas. Sin esperas: vuelve a intentarlo."
-	var i := await Estilo.dialogo(self, "¡Nivel superado!" if gano else "Fin de la partida", texto, opciones)
-	if not is_inside_tree():
+	var hay_siguiente := nivel_idx + 1 < Niveles.total()
+	var puede_doblar := gano and gemas > 0 and Monetizacion.hay_anuncios()
+	while true:
+		var opciones: Array = []
+		if gano:
+			opciones = (["Siguiente nivel"] if hay_siguiente else []) + (["Doblar gemas (anuncio)"] if puede_doblar else []) + ["Repetir", "Mundos"]
+		else:
+			opciones = ["Reintentar", "Mundos"]
+		var texto := "%s   ·   %d puntos\n+%d gemas" % [Estilo.estrellas_texto(estrellas), partida.puntos, gemas] if gano else "Te quedaste sin vidas. Sin esperas: vuelve a intentarlo."
+		var i := await Estilo.dialogo(self, "¡Nivel superado!" if gano else "Fin de la partida", texto, opciones)
+		if not is_inside_tree():
+			return
+		var elegido: String = opciones[i] if i >= 0 else "Mundos"
+		if elegido == "Doblar gemas (anuncio)":
+			puede_doblar = false
+			if await Monetizacion.mostrar_premiado("doble"):
+				Progreso.sumar_gemas(gemas)
+				gemas *= 2
+				Sonido.tocar("potenciador")
+			elif is_inside_tree():
+				Estilo.aviso(self, "El anuncio no está listo. Tus gemas ya están guardadas.")
+			continue
+		# Intersticial solo al salir de un nivel GANADO (nunca tras perder ni al abandonar);
+		# las reglas deciden si toca (ReglasAnuncios).
+		if gano:
+			await Monetizacion.intentar_intersticial()
+			if not is_inside_tree():
+				return
+		match elegido:
+			"Siguiente nivel":
+				nivel_idx += 1
+				Estilo.ir(self, "juego")
+			"Repetir", "Reintentar":
+				Estilo.ir(self, "juego")
+			_:
+				Estilo.ir(self, "mundos")
 		return
-	var elegido: String = opciones[i] if i >= 0 else "Mundos"
-	match elegido:
-		"Siguiente nivel":
-			nivel_idx += 1
-			Estilo.ir(self, "juego")
-		"Repetir", "Reintentar":
-			Estilo.ir(self, "juego")
-		_:
-			Estilo.ir(self, "mundos")
+
+
+## Tras perder la ultima vida: seguir con una vida (anuncio, gemas o gratis con
+## "quitar anuncios"). Una vez por intento. Devuelve true si la partida sigue.
+func ofrecer_seguir() -> bool:
+	var opciones: Array = []
+	if Progreso.sin_anuncios():
+		opciones.append("Seguir gratis")
+	else:
+		if Monetizacion.hay_anuncios():
+			opciones.append("Seguir (anuncio)")
+		if Progreso.gemas() >= Economia.PRECIO_SEGUIR:
+			opciones.append("Seguir por %d gemas" % Economia.PRECIO_SEGUIR)
+	if opciones.is_empty():
+		return false
+	opciones.append("No, gracias")
+	var i := await Estilo.dialogo(self, "¡Casi!", "Sigue con una vida y los ladrillos como están.", opciones)
+	if not is_inside_tree() or i < 0:
+		return false
+	var elegido: String = opciones[i]
+	var ok := false
+	if elegido == "Seguir gratis":
+		ok = true
+	elif elegido == "Seguir (anuncio)":
+		ok = await Monetizacion.mostrar_premiado("seguir")
+		if not ok and is_inside_tree():
+			Estilo.aviso(self, "El anuncio no está listo.")
+	elif elegido.begins_with("Seguir por"):
+		ok = Progreso.gastar_gemas(Economia.PRECIO_SEGUIR)
+	if not ok or not is_inside_tree():
+		return false
+	_ya_siguio = true
+	partida.revivir()
+	_terminado = false
+	return true
 
 
 func _notification(que: int) -> void:

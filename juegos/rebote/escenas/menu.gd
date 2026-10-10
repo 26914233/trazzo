@@ -1,5 +1,8 @@
-# Menu: titulo con una bola que rebota, jugar, ajustes.
+# Menu: titulo con una bola que rebota, gemas, jugar, tienda, personalizar, ajustes.
 extends Control
+
+## Pagina publica de privacidad (la web de Curtzz, GitHub Pages).
+const URL_PRIVACIDAD := "https://26914233.github.io/trazzo/rebotazz-privacidad.html"
 
 var _bola := Control.new()
 var _t := 0.0
@@ -10,14 +13,27 @@ func _ready() -> void:
 	add_child(fondo)
 	var col := Estilo.pantalla(self)
 	move_child(fondo, 0)
+	var arriba := HBoxContainer.new()
+	var vacio := Control.new()
+	vacio.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	arriba.add_child(vacio)
+	var gemas := Estilo.boton("", "suave", 100)
+	gemas.custom_minimum_size.x = 220
+	var contador := Estilo.contador_gemas(44)
+	contador.alignment = BoxContainer.ALIGNMENT_CENTER
+	contador.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	gemas.add_child(contador)
+	gemas.pressed.connect(func(): Estilo.ir(self, "tienda"))
+	arriba.add_child(gemas)
+	col.add_child(arriba)
 	var hueco := Control.new()
 	hueco.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	col.add_child(hueco)
-	_bola.custom_minimum_size = Vector2(0, 260)
+	_bola.custom_minimum_size = Vector2(0, 240)
 	_bola.draw.connect(_dibujar_logo)
 	col.add_child(_bola)
 	col.add_child(Estilo.titulo(str(ProjectSettings.get_setting("application/config/name")), 150, true))
-	col.add_child(Estilo.etiqueta("%d niveles · sin anuncios" % Niveles.total(), 42, Estilo.TEXTO_SUAVE))
+	col.add_child(Estilo.etiqueta("%d niveles · gratis" % Niveles.total(), 42, Estilo.TEXTO_SUAVE))
 	var hueco2 := Control.new()
 	hueco2.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	col.add_child(hueco2)
@@ -31,7 +47,17 @@ func _ready() -> void:
 	var mundos := Estilo.boton("Mundos", "normal", 140)
 	mundos.pressed.connect(func(): Estilo.ir(self, "mundos"))
 	col.add_child(mundos)
-	var ajustes := Estilo.boton("Ajustes", "suave", 130)
+	var fila := HBoxContainer.new()
+	var tienda := Estilo.boton("Tienda", "acento", 130)
+	tienda.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tienda.pressed.connect(func(): Estilo.ir(self, "tienda"))
+	fila.add_child(tienda)
+	var personalizar := Estilo.boton("Personalizar", "normal", 130)
+	personalizar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	personalizar.pressed.connect(func(): Estilo.ir(self, "personalizar"))
+	fila.add_child(personalizar)
+	col.add_child(fila)
+	var ajustes := Estilo.boton("Ajustes", "suave", 120)
 	ajustes.pressed.connect(abrir_ajustes)
 	col.add_child(ajustes)
 	col.add_child(Estilo.etiqueta("★ %d de %d" % [Progreso.total_estrellas(), Niveles.total() * 3], 36, Estilo.ACENTO))
@@ -75,6 +101,14 @@ func abrir_ajustes() -> void:
 	col.add_child(Estilo.titulo("Ajustes", 60, true))
 	for a in [["Sonido", "sonido"], ["Vibración", "vibracion"]]:
 		col.add_child(_interruptor(a[0], a[1]))
+	var restaurar := Estilo.boton("Restaurar compras", "normal", 124)
+	restaurar.pressed.connect(func():
+		Monetizacion.restaurar_compras()
+		Estilo.aviso(self, "Buscando tus compras en Google Play…"))
+	col.add_child(restaurar)
+	var privacidad := Estilo.boton("Política de privacidad", "normal", 124)
+	privacidad.pressed.connect(func(): OS.shell_open(URL_PRIVACIDAD))
+	col.add_child(privacidad)
 	var listo := Estilo.boton("Listo", "primario", 130)
 	listo.pressed.connect(velo.queue_free)
 	col.add_child(listo)

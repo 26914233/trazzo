@@ -370,3 +370,46 @@ static func dialogo(raiz: Control, encabezado: String, texto: String, opciones: 
 	if is_instance_valid(velo):
 		velo.queue_free()
 	return res["i"]
+
+
+## Gema dibujada (no depende de que la fuente tenga el simbolo).
+static func gema(tam: float = 48.0) -> Control:
+	var c := Control.new()
+	c.custom_minimum_size = Vector2(tam, tam)
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	c.draw.connect(func(): dibujar_gema(c, c.size / 2.0, minf(c.size.x, c.size.y) * 0.46))
+	return c
+
+
+static func dibujar_gema(lienzo: CanvasItem, centro: Vector2, r: float) -> void:
+	var arriba := centro + Vector2(0, -r)
+	var izq := centro + Vector2(-r * 0.9, -r * 0.25)
+	var der := centro + Vector2(r * 0.9, -r * 0.25)
+	var abajo := centro + Vector2(0, r)
+	var ci := centro + Vector2(-r * 0.35, -r * 0.25)
+	var cd := centro + Vector2(r * 0.35, -r * 0.25)
+	lienzo.draw_colored_polygon(PackedVector2Array([arriba, der, abajo, izq]), Color("#22D3EE"))
+	lienzo.draw_colored_polygon(PackedVector2Array([arriba, cd, ci]), Color("#A5F3FC"))
+	lienzo.draw_colored_polygon(PackedVector2Array([ci, cd, abajo]), Color("#67E8F9"))
+	lienzo.draw_colored_polygon(PackedVector2Array([cd, der, abajo]), Color("#0891B2"))
+	lienzo.draw_polyline(PackedVector2Array([arriba, der, abajo, izq, arriba]), Color("#0E7490"), maxf(2.0, r * 0.08), true)
+
+
+## Contador de gemas (icono + numero). Se refresca con refrescar_gemas().
+static func contador_gemas(tam: int = 46) -> HBoxContainer:
+	var h := HBoxContainer.new()
+	h.name = "Gemas"
+	h.add_theme_constant_override("separation", 10)
+	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	h.add_child(gema(tam * 1.05))
+	var l := etiqueta(str(Progreso.gemas()), tam, TEXTO, false, false)
+	l.name = "Numero"
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	h.add_child(l)
+	return h
+
+
+static func refrescar_gemas(contador: HBoxContainer) -> void:
+	var l := contador.get_node_or_null("Numero") as Label
+	if l:
+		l.text = str(Progreso.gemas())

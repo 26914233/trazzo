@@ -42,6 +42,8 @@ var combo := 0
 var rapidez := RAPIDEZ_BASE
 var ganada := false
 var perdida := false
+var _lanzada := false            # ya se lanzo la bola al menos una vez
+var _arranques: Array[int] = []   # potenciadores comprados para el primer lanzamiento
 var mundo := 0
 
 var _rapidez_inicial := RAPIDEZ_BASE
@@ -162,8 +164,22 @@ func mover_paleta(x: float) -> void:
 	paleta_x = clampf(x, m, CAMPO.x - m)
 
 
+## Potenciador comprado antes de empezar: se activa al primer lanzamiento (asi
+## no se gasta su tiempo mientras la bola espera). La vida se da al momento.
+## Devuelve false si ya se lanzo o si ese ya estaba preparado.
+func preparar_arranque(tipo: int) -> bool:
+	if _lanzada or tipo in _arranques:
+		return false
+	_arranques.append(tipo)
+	if tipo == VIDA:
+		aplicar(VIDA)
+	return true
+
+
 ## Suelta las bolas pegadas a la paleta.
 func lanzar() -> void:
+	var primera := not _lanzada
+	_lanzada = true
 	for b in bolas:
 		if not b["libre"]:
 			b["libre"] = true
@@ -172,6 +188,10 @@ func lanzar() -> void:
 			if b["v"].x == 0.0:
 				b["v"] = Vector2(0.18, -1).normalized() * velocidad_actual()   # nunca perfectamente recto al empezar
 			_evento("lanza")
+	if primera:
+		for t in _arranques:
+			if t != VIDA:
+				aplicar(t)
 
 
 func aplicar(tipo: int) -> void:
@@ -199,6 +219,16 @@ func aplicar(tipo: int) -> void:
 			_efectos[tipo] = DURACION[tipo]
 	mover_paleta(paleta_x)
 	_evento("potenciador", {"potenciador": tipo})
+
+
+## Seguir tras perder (anuncio, gemas o compra): una vida y la bola en la paleta.
+func revivir() -> void:
+	if not perdida:
+		return
+	perdida = false
+	vidas = 1
+	_reiniciar_bola()
+	_evento("revive")
 
 
 func soltar_capsula(tipo: int, pos: Vector2) -> void:

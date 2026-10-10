@@ -12,13 +12,25 @@ func _ready() -> void:
 		if a.begins_with("--salida="):
 			_salida = a.trim_prefix("--salida=")
 	DirAccess.make_dir_recursive_absolute(_salida)
-	Progreso.ruta = "user://capturas_progreso.json"
-	Progreso.datos = {"niveles": {}}
+	Progreso.ruta = "user://capturas_progreso.save"
+	Progreso.datos = Progreso.por_defecto()
+	Progreso.datos["gemas"] = 640
+	Progreso.datos["comprados"] = ["bola:sol", "estela:arcoiris", "paleta:lava"]
+	Progreso.datos["equipados"] = {"paleta": "lava", "bola": "sol", "estela": "arcoiris"}
 	for i in 13:
 		Progreso.datos["niveles"][str(i)] = {"estrellas": 1 + i % 3, "record": 1000}
 	Ajustes.datos["sonido"] = false
 	await _captura("menu", "res://escenas/menu.tscn")
 	await _captura("mundos", "res://escenas/mundos.tscn")
+	await _captura("tienda", "res://escenas/tienda.tscn")
+	var pers: Node = await _captura("personalizar_paletas", "res://escenas/personalizar.tscn")
+	for t in ["bola", "estela"]:
+		pers.tipo = t
+		pers.construir()
+		await _esperar(6)
+		_guardar("personalizar_%s" % t)
+	preload("res://escenas/juego.gd").nivel_idx = 12
+	await _captura("juego_13_potenciadores", "res://escenas/juego.tscn")
 	for nivel in [0, 41, 97]:
 		preload("res://escenas/juego.gd").nivel_idx = nivel
 		var j: Node = await _captura("juego_%d_inicio" % (nivel + 1), "res://escenas/juego.tscn")
@@ -57,3 +69,7 @@ func _esperar(n: int) -> void:
 
 func _guardar(nombre: String) -> void:
 	get_viewport().get_texture().get_image().save_png(_salida.path_join(nombre + ".png"))
+
+
+func _exit_tree() -> void:
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(Progreso.ruta))
