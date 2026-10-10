@@ -1,0 +1,40 @@
+{
+ "id": "omukade_hoja",
+ "tam": [
+  373,
+  215
+ ],
+ "pies": [
+  176,
+  212
+ ],
+ "columnas": 5,
+ "alto_px": 191,
+ "animaciones": {
+  "reposo": {
+   "inicio": 0,
+   "cuadros": 4,
+   "fps": 6.0
+  },
+  "caminar": {
+   "inicio": 4,
+   "cuadros": 3,
+   "fps": 9.0
+  },
+  "ataque": {
+   "inicio": 7,
+   "cuadros": 4,
+   "fps": 0.0
+  },
+  "golpe": {
+   "inicio": 11,
+   "cuadros": 3,
+   "fps": 0.0
+  },
+  "muerte": {
+   "inicio": 14,
+   "cuadros": 4,
+   "fps": 0.0
+  }
+ }
+}

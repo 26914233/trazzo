@@ -6,6 +6,9 @@
 #   --tactil   muestra los controles táctiles en el PC (el ratón hace de dedo)
 #   --modelos3d  los personajes con los modelos de piezas en vez de los sprites pixel art
 #   --galeria  abre la galería de criaturas del bestiario (con --capturas guarda imágenes y sale)
+#   --escenario N  empieza en el escenario N (escenarios.gd: 0 castillo … 8 regreso a Hoshiyama)
+#   --sin-intro    empieza a jugar sin el texto de la historia (para revisar escenarios)
+#   --captura RUTA S [X]  a los S segundos guarda una captura en RUTA y sale (con X, Akira empieza en esa x)
 extends Node
 
 const Datos := preload("res://scripts/datos.gd")
@@ -19,13 +22,15 @@ const VisualSprite := preload("res://scripts/visual_sprite.gd")
 const Galeria := preload("res://scripts/galeria.gd")
 const Apariencias := preload("res://scripts/apariencias_akira.gd")
 const Partida := preload("res://scripts/partida.gd")
-const VERSION := "RONIN · prototipo 0.15"
+const Escenarios := preload("res://scripts/escenarios.gd")
+const VERSION := "RONIN · prototipo 0.16"
 
 var hud
 var juego
 var tactil
 var galeria_abierta: Node
 var tiempo_guardado := 0.0            # la partida se guarda un poco después de cada cambio
+var escenario_elegido := 0            # en la pausa se puede elegir otro escenario ya abierto
 
 
 func _ready() -> void:
@@ -58,9 +63,21 @@ func _ready() -> void:
 	if "--tactil" in argumentos:
 		Input.emulate_touch_from_mouse = true
 		tactil.activar(true)
-	_iniciar_juego(true)
+	var posicion := argumentos.find("--escenario")
+	if posicion >= 0 and posicion + 1 < argumentos.size():
+		Partida.escenario = clampi(int(argumentos[posicion + 1]), 0, Escenarios.cantidad() - 1)
+		Partida.alcanzado = maxi(Partida.alcanzado, Partida.escenario)
+	_iniciar_juego(not "--sin-intro" in argumentos, Partida.escenario)
 	if "--depurar" in argumentos:
 		juego.depuracion.alternar()
+	var captura := argumentos.find("--captura")
+	if captura >= 0 and captura + 2 < argumentos.size():
+		if captura + 3 < argumentos.size() and argumentos[captura + 3].is_valid_float():
+			juego.akira.global_position.x = float(argumentos[captura + 3])
+			juego.shiro.global_position = juego.akira.global_position + Vector3(-1, 0, 1)
+		await get_tree().create_timer(float(argumentos[captura + 2])).timeout
+		get_viewport().get_texture().get_image().save_png(argumentos[captura + 1])
+		get_tree().quit()
 	if "--prueba" in argumentos:
 		var prueba = Prueba.new()
 		prueba.principal = self
@@ -81,6 +98,7 @@ func _registrar_acciones(clic_ataca: bool) -> void:
 		"esquivar": [KEY_C],
 		"cambiar_arma": [KEY_I],
 		"cambiar_objetivo": [KEY_TAB],
+		"elegir_escenario": [KEY_N],
 		"depurar_golpes": [KEY_F3],
 		"estilo_animacion": [KEY_T],
 		"galeria": [KEY_G],
@@ -136,7 +154,11 @@ func _registrar_acciones(clic_ataca: bool) -> void:
 		InputMap.action_add_event(accion, boton)
 
 
-func _iniciar_juego(con_intro: bool) -> void:
+func _iniciar_juego(con_intro: bool, indice := -1) -> void:
+	if indice < 0:
+		indice = juego.indice_escenario if juego else Partida.escenario
+	Partida.escenario = clampi(indice, 0, Escenarios.cantidad() - 1)
+	escenario_elegido = Partida.escenario
 	if juego:
 		juego.queue_free()
 	juego = Juego.new()
@@ -158,9 +180,12 @@ func _iniciar_juego(con_intro: bool) -> void:
 	juego.monedas_cambiadas.connect(_al_cambiar_monedas)
 	juego.vida_maxima_cambiada.connect(hud.poner_vida_maxima)
 	juego.aviso_interaccion.connect(hud.poner_aviso_interaccion)
+	juego.pedir_sastre.connect(func():
+		if not get_tree().paused:
+			alternar_pausa())
 	hud.poner_espiritu(0.0)
 	hud.poner_aviso_interaccion("")
-	juego.iniciar(con_intro)
+	juego.iniciar(con_intro, Partida.escenario)
 	hud.poner_aguante(juego.akira.aguante)
 	hud.poner_arma(Armas.datos(juego.akira.arma).nombre)
 	hud.poner_monedas(Partida.monedas, false)
@@ -189,15 +214,18 @@ func salir() -> void:
 
 
 func _al_cambiar_fase(fase: String) -> void:
+	var escenario: Dictionary = juego.escenario
 	match fase:
 		"intro":
-			hud.mostrar_texto(Datos.TITULO, Datos.SUBTITULO, Datos.TEXTO_INTRO, _pie("empezar"))
+			hud.mostrar_texto(String(escenario.titulo), String(escenario.nombre), escenario.intro, _pie("empezar"))
 		"jugando":
 			hud.ocultar_texto()
 			hud.mostrar_ayuda(tactil.activo)
 		"cierre":
-			hud.mostrar_texto(Datos.TITULO_CIERRE, "El castillo de Hoshiyama", Datos.TEXTO_CIERRE,
-				_pie("volver a empezar"))
+			var ultimo: bool = juego.indice_escenario + 1 >= Escenarios.cantidad()
+			Partida.completar(juego.indice_escenario, Escenarios.cantidad(), String(escenario.get("tecnica", "")))
+			hud.mostrar_texto(String(escenario.titulo_cierre), String(escenario.nombre), escenario.cierre,
+				_pie("volver a empezar" if ultimo else "seguir"))
 		"derrota":
 			hud.mostrar_texto(Datos.TITULO_DERROTA, "", Datos.TEXTO_DERROTA, _pie("intentarlo de nuevo"))
 
@@ -208,13 +236,26 @@ func _pie(para: String) -> String:
 
 func alternar_pausa() -> void:
 	var pausado := not get_tree().paused
+	if not pausado and juego and escenario_elegido != juego.indice_escenario:
+		# Se eligió otro escenario en la pausa: se empieza allí, con su historia.
+		get_tree().paused = false
+		hud.poner_pausa(false, tactil.activo)
+		_iniciar_juego(true, escenario_elegido)
+		return
 	get_tree().paused = pausado
 	# Al salir del sastre, Akira vuelve a llevar lo que tiene puesto (lo que no se compró no se queda).
 	if not pausado and Apariencias.mostrada != Apariencias.elegida:
 		Apariencias.cerrar_sastre()
 		if juego:
 			juego.cambiar_apariencia_akira(Apariencias.elegida)
+	hud.poner_escenario(Escenarios.datos(escenario_elegido), escenario_elegido, Partida.alcanzado, tactil.activo)
 	hud.poner_pausa(pausado, tactil.activo)
+
+
+# En la pausa: el siguiente escenario de los ya abiertos (se juega al continuar).
+func elegir_escenario() -> void:
+	escenario_elegido = (escenario_elegido + 1) % (Partida.alcanzado + 1)
+	hud.poner_escenario(Escenarios.datos(escenario_elegido), escenario_elegido, Partida.alcanzado, tactil.activo)
 
 
 # En el móvil, el botón o gesto «atrás» pausa (y en pausa, cierra), y el juego se pausa
@@ -302,6 +343,10 @@ func _input(evento: InputEvent) -> void:
 		comprar_apariencia()
 		get_viewport().set_input_as_handled()
 		return
+	if get_tree().paused and evento.is_action_pressed("elegir_escenario"):
+		elegir_escenario()
+		get_viewport().set_input_as_handled()
+		return
 	if evento.is_action_pressed("estilo_animacion"):
 		alternar_estilo_animacion()
 		get_viewport().set_input_as_handled()
@@ -335,6 +380,8 @@ func aceptar() -> void:
 		"intro":
 			juego.comenzar()
 		"cierre":
-			_iniciar_juego(true)
+			# Al siguiente escenario; tras el último, de vuelta al primero (con todo abierto).
+			var siguiente: int = juego.indice_escenario + 1
+			_iniciar_juego(true, siguiente if siguiente < Escenarios.cantidad() else 0)
 		"derrota":
 			_iniciar_juego(false)

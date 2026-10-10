@@ -1,0 +1,40 @@
+{
+ "id": "ifrit_hoja",
+ "tam": [
+  211,
+  194
+ ],
+ "pies": [
+  104,
+  191
+ ],
+ "columnas": 9,
+ "alto_px": 177,
+ "animaciones": {
+  "reposo": {
+   "inicio": 0,
+   "cuadros": 4,
+   "fps": 6.0
+  },
+  "caminar": {
+   "inicio": 4,
+   "cuadros": 6,
+   "fps": 9.0
+  },
+  "ataque": {
+   "inicio": 10,
+   "cuadros": 5,
+   "fps": 0.0
+  },
+  "golpe": {
+   "inicio": 15,
+   "cuadros": 3,
+   "fps": 0.0
+  },
+  "muerte": {
+   "inicio": 18,
+   "cuadros": 4,
+   "fps": 0.0
+  }
+ }
+}

@@ -1,0 +1,40 @@
+{
+ "id": "noppera_bo_hoja",
+ "tam": [
+  301,
+  192
+ ],
+ "pies": [
+  113,
+  189
+ ],
+ "columnas": 6,
+ "alto_px": 162,
+ "animaciones": {
+  "reposo": {
+   "inicio": 0,
+   "cuadros": 4,
+   "fps": 6.0
+  },
+  "caminar": {
+   "inicio": 4,
+   "cuadros": 7,
+   "fps": 9.0
+  },
+  "ataque": {
+   "inicio": 11,
+   "cuadros": 4,
+   "fps": 0.0
+  },
+  "golpe": {
+   "inicio": 15,
+   "cuadros": 3,
+   "fps": 0.0
+  },
+  "muerte": {
+   "inicio": 18,
+   "cuadros": 4,
+   "fps": 0.0
+  }
+ }
+}

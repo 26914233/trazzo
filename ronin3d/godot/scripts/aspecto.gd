@@ -22,9 +22,31 @@ const COLORES := {
 	"piedra_clara": Color("9c9c96"),
 	"agua": Color("16243a"),
 	"porton": Color("744a2a"),
+	# Escenarios de los capítulos siguientes (escenarios.gd, constructor_escenarios.gd)
+	"hierba": Color("26301e"),
+	"hierba_roja": Color("3a1e1a"),
+	"camino": Color("4a3e2c"),
+	"roca": Color("5a5852"),
+	"roca_oscura": Color("3a3a3c"),
+	"corteza": Color("3a2a20"),
+	"hojas_pino": Color("1e3426"),
+	"hojas_cedro": Color("1a2c24"),
+	"paja": Color("8a7444"),
+	"papel": Color("e6dcc0"),
+	"bermellon": Color("b8402a"),
+	"piedra_musgo": Color("56604c"),
+	"barro": Color("8a5a3a"),
+	"ruina": Color("7a7266"),
+	"glifo": Color("6ad8e0"),
+	"nacar": Color("cfd6e6"),
+	"cadena": Color("8a7a52"),
+	"kakuriyo_suelo": Color("221c32"),
+	"kakuriyo_hojas": Color("3a2a5a"),
+	"tatami": Color("a89a64"),
+	"hueso": Color("c8bc96"),
 }
 # Superficies grandes y planas: sin contorno (se vería como una raya en el suelo)
-const SIN_CONTORNO := ["losa", "tierra", "agua"]
+const SIN_CONTORNO := ["losa", "tierra", "agua", "hierba", "hierba_roja", "camino", "kakuriyo_suelo", "tatami"]
 # Con los personajes en pixel art (DECISIÓN 20E), el escenario va sin la línea negra del cel-shading,
 # como los decorados HD-2D: así destacan los sprites, que llevan su propio contorno de un píxel.
 static var contorno_escenario := false
@@ -95,23 +117,31 @@ func poner_destello(material: Material, cantidad: float) -> void:
 
 # --- Ambiente: cielo, luz, niebla y brillo ------------------------------------------------------
 
-func configurar_entorno(entorno: Environment) -> void:
+# «ambiente» cambia el de cada escenario (escenarios.gd); sin él, la noche del castillo.
+func configurar_entorno(entorno: Environment, ambiente := {}) -> void:
 	entorno.background_mode = Environment.BG_SKY
 	var cielo := Sky.new()
 	var material_cielo := ShaderMaterial.new()
 	material_cielo.shader = SHADER_CIELO
-	material_cielo.set_shader_parameter("direccion_luna", Datos.DIRECCION_LUNA)
+	material_cielo.set_shader_parameter("direccion_luna", ambiente.get("direccion_luna", Datos.DIRECCION_LUNA))
+	for clave in ["cielo_arriba", "cielo_horizonte", "cielo_suelo"]:
+		if ambiente.has(clave):
+			var parametro: String = {"cielo_arriba": "color_arriba", "cielo_horizonte": "color_horizonte",
+				"cielo_suelo": "color_suelo"}[clave]
+			material_cielo.set_shader_parameter(parametro, ambiente[clave])
+	if ambiente.has("tinte_luna"):
+		material_cielo.set_shader_parameter("tinte_luna", ambiente.tinte_luna)
 	cielo.sky_material = material_cielo
 	entorno.sky = cielo
 	entorno.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	entorno.ambient_light_color = Datos.AMBIENTE
-	entorno.ambient_light_energy = 2.4    # sombras de noche, pero con personajes legibles
+	entorno.ambient_light_color = ambiente.get("ambiente", Datos.AMBIENTE)
+	entorno.ambient_light_energy = ambiente.get("energia_ambiente", 2.4)   # noche, pero personajes legibles
 	entorno.fog_enabled = true
-	entorno.fog_light_color = Color("1a1f3c")
-	entorno.fog_density = 0.011
+	entorno.fog_light_color = ambiente.get("niebla", Color("1a1f3c"))
+	entorno.fog_density = ambiente.get("densidad_niebla", 0.011)
 	entorno.fog_sky_affect = 0.0
 	entorno.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	entorno.tonemap_exposure = 1.1
+	entorno.tonemap_exposure = ambiente.get("exposicion", 1.1)
 	entorno.glow_enabled = true
 	entorno.glow_intensity = 0.9
 	entorno.glow_bloom = 0.06

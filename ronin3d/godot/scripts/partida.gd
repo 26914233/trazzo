@@ -1,5 +1,6 @@
 # Lo que se guarda entre partidas (user://partida.cfg): las monedas, las skins compradas al
-# sastre y las bendiciones del jizō (DECISIÓN 16, A + C). Se guarda sola, poco después de cada
+# sastre, las bendiciones del jizō (DECISIÓN 16, A + C) y, desde la 0.16, el escenario en el que se
+# va, el más lejano alcanzado y las técnicas aprendidas (el paso del tengu de Sōjōbō). Se guarda sola, poco después de cada
 # cambio y al cerrar o mandar el juego a segundo plano.
 # Los precios son un supuesto de partida: hay que medir cuántas monedas junta un jugador.
 extends RefCounted
@@ -11,6 +12,9 @@ const PRECIOS_BENDICION := [40, 80]           # cada una, +1 de vida máxima; do
 static var monedas := 0
 static var compradas: Array = ["joven"]
 static var bendiciones := 0
+static var escenario := 0                     # el que se juega (escenarios.gd)
+static var alcanzado := 0                     # el más lejano abierto: se puede volver a cualquiera anterior
+static var tecnicas: Array = []
 static var cargada := false
 static var pendiente := false                 # hay cambios sin guardar
 static var modo_prueba := false               # la prueba automática no toca la partida de verdad
@@ -27,6 +31,11 @@ static func cargar(ruta := ARCHIVO) -> void:
 		if PRECIOS_SKINS.has(id) and not id in compradas:
 			compradas.append(id)
 	bendiciones = clampi(int(archivo.get_value("partida", "bendiciones", 0)), 0, PRECIOS_BENDICION.size())
+	alcanzado = maxi(0, int(archivo.get_value("partida", "alcanzado", 0)))
+	escenario = clampi(int(archivo.get_value("partida", "escenario", 0)), 0, alcanzado)
+	tecnicas = []
+	for id in archivo.get_value("partida", "tecnicas", []):
+		tecnicas.append(String(id))
 
 
 static func guardar(ruta := ARCHIVO) -> void:
@@ -37,6 +46,9 @@ static func guardar(ruta := ARCHIVO) -> void:
 	archivo.set_value("partida", "monedas", monedas)
 	archivo.set_value("partida", "compradas", compradas)
 	archivo.set_value("partida", "bendiciones", bendiciones)
+	archivo.set_value("partida", "escenario", escenario)
+	archivo.set_value("partida", "alcanzado", alcanzado)
+	archivo.set_value("partida", "tecnicas", tecnicas)
 	archivo.save(ruta)
 
 
@@ -45,6 +57,9 @@ static func reiniciar() -> void:
 	monedas = 0
 	compradas = ["joven"]
 	bendiciones = 0
+	escenario = 0
+	alcanzado = 0
+	tecnicas = []
 	cargada = true
 	pendiente = false
 
@@ -87,3 +102,15 @@ static func bendecir() -> bool:
 	bendiciones += 1
 	guardar()
 	return true
+
+
+# Al terminar un escenario se abre el siguiente (y se aprende su técnica, si la tiene).
+static func completar(indice: int, cantidad: int, tecnica := "") -> void:
+	alcanzado = clampi(maxi(alcanzado, indice + 1), 0, cantidad - 1)
+	if tecnica != "" and not tecnica in tecnicas:
+		tecnicas.append(tecnica)
+	guardar()
+
+
+static func tiene_tecnica(id: String) -> bool:
+	return id in tecnicas

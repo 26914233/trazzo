@@ -11,6 +11,7 @@ OK     Los soldados derrotados sueltan monedas  1 derrotados, 4 monedas soltadas
 OK     El muro oeste detiene a Akira  x=-23.65 (el muro empieza en −24)
 OK     El oni bloquea el portón mientras vive  fase=jugando, x=24.1
 OK     Llegar al portón cierra el capítulo  fase=cierre
+FALLO  Tras el cierre del castillo se sigue en la planicie  escenario=0, fase=cierre
 OK     ESC pausa el juego de verdad (soldados y Shiro quietos) y lo reanuda  pausado=true, el juego seguía=false, después=false
 OK     Tocar la pantalla sigue los textos  fase=jugando
 OK     El joystick táctil mueve a Akira  recorrió 7.2 m
@@ -22,7 +23,7 @@ OK     Animación anime: 12 poses por segundo; T cambia a suave (cada paso)  ani
 OK     La galería de criaturas se abre desde la pausa y reparte páginas  10 páginas; la tercera tiene 7 criaturas y 125 piezas
 OK     Al cerrar la galería se vuelve a la pausa y el juego sigue entero  en pausa=true, juego en el árbol=true
 OK     El catálogo del bestiario se carga y todos sus datos son válidos  929 criaturas (123 con modelo propio), 0 con datos no válidos
-OK     Todas las criaturas del catálogo se construyen dentro del presupuesto de piezas  929 criaturas (1163 construcciones con los rangos 2 y 3 de 1 de cada 8) en 987 ms; rango 1: media 20.5 piezas, máximo 42; máximo con rangos: 42
+OK     Todas las criaturas del catálogo se construyen dentro del presupuesto de piezas  929 criaturas (1163 construcciones con los rangos 2 y 3 de 1 de cada 8) en 1081 ms; rango 1: media 20.5 piezas, máximo 42; máximo con rangos: 42
 OK     Los modelos detallados se cargan con textura y cel-shading (el Aka-oni, con sus tres rangos)  rango 1: 14024 triángulos, 1.91 m; rango 2: 14024 triángulos, 2.29 m; rango 3: 14024 triángulos, 1.91 m; modelo 353: 41471 triángulos; modelo 680: 2588 triángulos
 OK     Los cuatro aspectos de Akira llevan la cicatriz y el sastre los enseña en la pausa  triángulos: { "joven": 3594, "curtido": 3642, "veterano": 3671, "mujer": 3469 }
 OK     Personajes en pixel art: Akira y Shiro en 8 direcciones; los enemigos, en hojas del estilo del oni  hojas bien: 6 de 6 · hojas de enemigos: 4 de 4 · dirección 7 → 3 al girar la cámara 180°
@@ -49,5 +50,35 @@ OK     Cada onibi cae de un golpe y llena el espíritu  espíritu 0.50 → 0.70
 OK     El oni despierta, salta y su golpe de área cae donde marca la sombra  despierto=true, vida de Akira 6 → 5
 OK     Tres cortes con el kanabō clavado rompen la postura; a la segunda rotura, furia  roturas=2, furia=true
 OK     En furia, un iai perfecto contra su barrido de kanabō lo remata  vivo=false, vida de Akira 6 → 6
-Resultado: 50 de 50 comprobaciones correctas
-FPS al caminar por el patio: 5.5 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)
+OK     Las 49 criaturas del bestiario tienen ficha y hoja de sprites  mal: 
+OK     Escenario 1 (planicie): mundo, 11 enemigos y jefe  enemigos=12, jefe=Aka-oni del puente, hojas=true
+OK     Escenario 2 (aldea): mundo, 9 enemigos y jefe  enemigos=10, jefe=Ao-oni, hojas=true
+OK     Escenario 3 (templo): mundo, 14 enemigos y jefe  enemigos=15, jefe=Ilusión de Tamamo-no-Mae, hojas=true
+OK     Escenario 4 (dojo): mundo, 9 enemigos y jefe  enemigos=10, jefe=Sōjōbō, rey de los tengu, hojas=true
+OK     Escenario 5 (ruinas): mundo, 14 enemigos y jefe  enemigos=15, jefe=Tsuchigumo, hojas=true
+OK     Escenario 6 (santuario): mundo, 5 enemigos y jefe  enemigos=9, jefe=Bahamut, hojas=true
+OK     Escenario 7 (planicie_roja): mundo, 8 enemigos y jefe  enemigos=9, jefe=Gashadokuro, hojas=true
+OK     Escenario 8 (hoshiyama): mundo, 5 enemigos y jefe  enemigos=6, jefe=General Genzo, hojas=true
+OK     Komainu: de frente el golpe rebota y por la espalda entra  vida 4 → 3
+OK     Gólem: la coraza para la espada hasta que un iai le rompe la guardia  vida 8 → 5 → 0
+OK     El limo se divide en dos al morir  pequeños=2
+OK     La kitsune crea dos copias que no hacen daño ni dan sombra  copias=2, sin daño=true
+OK     Komainu: duerme si se camina con respeto y despierta si se corre cerca  
+OK     El tanuki empieza disfrazado de jizō  
+OK     El tanuki se descubre al acercarse Akira  estado=3
+OK     La gárgola es de piedra mientras Akira la mira  piedra=true, vida 3 → 3
+OK     El gashadokuro se desarma al caer la primera vez  estado=10
+OK     El vampiro se vuelve niebla cada dos golpes  estado=9
+OK     El gashadokuro se vuelve a montar si no se rompen sus huesos  vida=8
+OK     La tela de araña daña y atrapa a Akira  vida 6 → 5
+OK     Un iai devuelve la flecha contra el arquero  vida del elfo 1
+OK     Bahamut: los tres dogū lo protegen; rotos, la espada le entra  sellos=3, vida 26 → 24
+OK     Templo: una barrera y tres sellos protegen a la guardiana  barrera=true, objetivos=3
+OK     Al cortar los sellos cae la barrera  
+OK     Hoshiyama: tras caer el jefe aparece tamamo  jefe=tamamo
+OK     Hoshiyama: tras caer el jefe aparece tamamo_zorro  jefe=tamamo_zorro
+OK     Al caer la zorra de nueve colas llega el final  fase=cierre, alcanzado=8
+OK     Tras el final se vuelve al primer escenario  
+OK     Sōjōbō enseña el paso del tengu (esquivar cuesta la mitad)  escenario=5, coste=0.50
+Resultado: 80 de 81 comprobaciones correctas
+FPS al caminar por el patio: 5.9 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)

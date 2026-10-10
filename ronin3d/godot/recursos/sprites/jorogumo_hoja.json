@@ -1,0 +1,40 @@
+{
+ "id": "jorogumo_hoja",
+ "tam": [
+  381,
+  179
+ ],
+ "pies": [
+  131,
+  176
+ ],
+ "columnas": 5,
+ "alto_px": 162,
+ "animaciones": {
+  "reposo": {
+   "inicio": 0,
+   "cuadros": 4,
+   "fps": 6.0
+  },
+  "caminar": {
+   "inicio": 4,
+   "cuadros": 6,
+   "fps": 9.0
+  },
+  "ataque": {
+   "inicio": 10,
+   "cuadros": 4,
+   "fps": 0.0
+  },
+  "golpe": {
+   "inicio": 14,
+   "cuadros": 3,
+   "fps": 0.0
+  },
+  "muerte": {
+   "inicio": 17,
+   "cuadros": 4,
+   "fps": 0.0
+  }
+ }
+}

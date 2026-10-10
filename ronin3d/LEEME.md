@@ -5,8 +5,11 @@ ronin tras la traición del general Genzo, que pactó con el gran yōkai creyend
 Busca justicia por fuera y recuperar su honor por dentro. Empieza y termina en el castillo de
 Hoshiyama.
 
-**Estado:** prototipo 0.9 del capítulo 1 en **Godot 4.7, con los personajes en pixel art** dentro de
-un mundo 3D (desde la 0.9; antes, cel-shading). Jugable con teclado, mando y pantalla táctil.
+**Estado:** prototipo **0.16 con los capítulos 1 a 4 jugables** (nueve escenarios, del castillo de
+Hoshiyama al regreso; `godot/scripts/escenarios.gd`) en **Godot 4.7, con los personajes en pixel art**
+dentro de un mundo 3D. Combate al estilo de EthrA (`ETHRA_REFERENCIA.md`) y enemigos y jefes del
+bestiario en el estilo del oni del usuario (`BESTIARIO.md` §10). Los textos de los capítulos 2 a 4
+esperan su visto bueno (`HISTORIA.md` §10). Jugable con teclado, mando y pantalla táctil.
 - Incluye una **galería de criaturas** (pausa → botón, o tecla G) para ver el sistema que permitiría
   construir cientos de monstruos.
 - Desde la 0.5 trae los **tres primeros enemigos con modelo detallado** (Aka-oni, kappa y

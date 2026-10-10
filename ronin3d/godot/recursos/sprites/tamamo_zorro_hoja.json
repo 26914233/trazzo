@@ -1,0 +1,45 @@
+{
+ "id": "tamamo_zorro_hoja",
+ "tam": [
+  334,
+  186
+ ],
+ "pies": [
+  205,
+  183
+ ],
+ "columnas": 6,
+ "alto_px": 162,
+ "animaciones": {
+  "reposo": {
+   "inicio": 0,
+   "cuadros": 4,
+   "fps": 6.0
+  },
+  "caminar": {
+   "inicio": 4,
+   "cuadros": 4,
+   "fps": 9.0
+  },
+  "ataque": {
+   "inicio": 8,
+   "cuadros": 4,
+   "fps": 0.0
+  },
+  "area": {
+   "inicio": 12,
+   "cuadros": 4,
+   "fps": 0.0
+  },
+  "golpe": {
+   "inicio": 16,
+   "cuadros": 3,
+   "fps": 0.0
+  },
+  "muerte": {
+   "inicio": 19,
+   "cuadros": 4,
+   "fps": 0.0
+  }
+ }
+}

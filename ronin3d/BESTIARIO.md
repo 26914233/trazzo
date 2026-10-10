@@ -1,5 +1,9 @@
 # RONIN — Bestiario
 
+**En el juego desde la 0.16 (10-10-2026):** las criaturas de los capítulos 1 a 4 de §8 (salvo las de
+«después del lanzamiento»), con sus jefes, en el estilo del oni del usuario. Cómo se juega cada una:
+§9 al final; números en `godot/scripts/enemigos.gd`.
+
 **Fecha:** 1 de octubre de 2026 · **Estado:** DECISIÓN 4 y **DECISIÓN 10 (B) cerradas el 1-10-2026**:
 los yōkai japoneses son el núcleo, con sus variantes; las criaturas de otras tierras llegan a partir
 del capítulo 3 y **Bahamut es el dragón**. Del bestiario, en el juego solo están los soldados de
@@ -253,3 +257,50 @@ capítulos.
 - **Cómo quedó:** nada que no sea japonés aparece antes del capítulo 3. En el catálogo grande, el
   capítulo 3 abre el continente y Oriente Próximo; el 4, Europa; el resto, tras el lanzamiento
   (`BESTIARIO_UNIVERSAL.md` §7).
+
+
+## 10. Lo que está en el juego (0.16, 10-10-2026)
+
+Cada criatura tiene su hoja de sprites en el estilo del oni del usuario (`arte/conceptos/LEEME_ENEMIGOS.md`)
+y su ficha en `godot/scripts/enemigos.gd`. Las ideas de combate de §4 a §6 se hicieron así:
+
+| Capítulo | Criatura | Cómo se juega |
+| --- | --- | --- |
+| 1 | Aka-oni del puente (guardián) | Barridos, kanabō rojo y un salto con sombra roja |
+| 1 | Ao-oni (guardián de la aldea) | La variante azul de §3: tres barridos seguidos, hay que parar cada uno |
+| 2 | Chōchin-obake (tsukumogami) | Parece un farolillo más hasta que Akira pasa cerca |
+| 2 | Hitodama | Variante pálida del onibi, más rápida |
+| 2 | Tanuki | Disfrazado de estatua jizō junto al camino |
+| 2 | Kitsune | Crea dos copias; las copias no hacen daño ni dan sombra |
+| 2 | Noppera-bō | Responde a cada corte de Akira con su iai: hay que pararlo, no atacarlo |
+| 2 | Karasu-tengu | Vuela alto y baja en picado |
+| 2 | Kamaitachi | En trío; la curandera (más verde) cura a las otras |
+| 2 | Okuri-inu | Rodean sin atacar; si Akira recibe un golpe, se lanzan |
+| 2 | Kodama | Aliados en el Kakuriyo: señalan la salida |
+| 2 | Ilusión de Tamamo-no-Mae (guardiana) | Tras la barrera de tres sellos de papel; con copias |
+| 2 | Sōjōbō (jefe) | Cadenas de tres tajos, abanico de viento (rojo) y vendaval; a media vida llama a sus cuervos. Al vencerlo, el paso del tengu |
+| 3 | Haniwa y dogū | El dogū dispara un rayo en línea desde los ojos |
+| 3 | Komainu | Duermen como estatuas si se camina; despiertan si se corre cerca. De frente, de piedra |
+| 3 | Goblin, limo | El limo se divide en dos al morir |
+| 3 | Gaki | Lentos; si agarran, Akira queda atrapado un momento |
+| 3 | Gárgola | De piedra mientras Akira la mira |
+| 3 | Jorōgumo | Telas que atrapan (y que el iai devuelve) y crías de araña |
+| 3 | Tsuchigumo (guardiana) | Salta sobre Akira, lanza telas y abre su nido a media vida |
+| 3 | Ōmukade | Coraza: solo le entra la espada tras un iai o con la postura rota |
+| 3 | Hombre lagarto | Escudo de frente y cimitarra en cadena |
+| 3 | Gólem | Coraza hasta que un iai le rompe la guardia |
+| 3 | Bahamut (jefe) | Encadenado a tres dogū gigantes que lo protegen; libre, su aliento se parte con un iai; herido, recibe más daño |
+| 4 | Kasha | Rueda de fuego (roja) que deja el suelo ardiendo |
+| 4 | Nue | Zarpa de tigre, cola de serpiente y rayo de su nube |
+| 4 | Gashadokuro (guardián) | Se desarma al caer; si no se rompen sus huesos a tiempo, vuelve a montarse |
+| 4 | Vampiro | Bebe vida al golpear; cada dos golpes se vuelve niebla y reaparece a la espalda |
+| 4 | Hombre lobo, ogro | Zarpazos en cadena; garrote y mazazo de área |
+| 4 | Elfo oscuro, ifrit | Guardan la distancia; sus flechas y bolas de fuego se devuelven con el iai |
+| 4 | Doble de Akira | Los sprites de Akira, oscurecidos; responde a cada corte |
+| 4 | Genzo (jefe) | Tajos en cadena, estocada y hendidura violeta; a media vida, soldados poseídos |
+| 4 | Tamamo-no-Mae (jefe) | Abanico, llamas violeta, fuego de zorro y copias; al caer se transforma |
+| 4 | La zorra de nueve colas (jefe final) | Zarpa, látigo de colas (rojo), fuegos de zorro que la rodean |
+
+**Pendiente:** los aldeanos de la aldea son provisionales (salen del noppera-bō, con la ropa teñida y
+una cara pintada), porque el crédito de Gemini se acabó a mitad del trabajo. Se rehacen en cuanto haya
+crédito. Lo de «después del lanzamiento» (mar, cielo, nieve y luna) sigue sin hacer.

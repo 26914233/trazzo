@@ -421,7 +421,7 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   para el móvil (fue vertical de la 0.10 a la 0.12; el usuario pidió horizontal) y enemigos del bestiario. Referencia y tiempos: `ronin3d/ETHRA_REFERENCIA.md`. Los
   combos por arma (katana con cadena de iai, yari, nodachi), la carga, la esquiva y la postura
   están en `godot/scripts/armas.gd`. Yōkai (`enemigos.gd`, `yokai.gd`) y jefe (`jefe_oni.gd`).
-  APK de prueba **0.15** (horizontal); prueba automática 50 de 50. Análisis con la skill Replica en
+  APK de prueba **0.16** (horizontal, capítulos 1 a 4). Análisis con la skill Replica en
   `ronin3d/replica/` (paridad con EthrA en `parity.md`) (10-10-2026).
 - **Jefe en pixel art con el estilo del usuario (10-10-2026, 0.14):** no le gustó el oni gigante de
   piezas y mandó su hoja de estilo (`ronin3d/arte/conceptos/oni_jefe_hoja.webp`: oni rojo de pelo
@@ -429,6 +429,19 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   salen de esa hoja con `ronin3d/herramientas/recortar_oni_jefe.py` (`recursos/sprites/oni_jefe.png`).
   Combate en `jefe_oni.gd`: golpes de área con salto y sombra, 3 cortes con el kanabō clavado
   rompen la postura, a la segunda rotura entra en furia y un iai perfecto contra su barrido lo remata.
+- **Capítulos 2 a 4 jugables (10-10-2026, 0.16):** el usuario pidió «continuar con los demás escenarios,
+  enemigos y lore» y el APK con todo. Nueve escenarios en orden (`godot/scripts/escenarios.gd`): castillo,
+  planicie y aldea (cap. 1); templo y dojo en el Kakuriyo (cap. 2); ruinas y sello de Bahamut (cap. 3);
+  planicie roja y regreso a Hoshiyama (cap. 4), con su mundo en `constructor_escenarios.gd`. Unas 40
+  criaturas y jefes nuevos en `enemigos.gd`, con sus conductas en `yokai.gd` (proyectiles en
+  `proyectil.gd`, golpes de área en `zona_peligro.gd`). Sōjōbō enseña el paso del tengu (esquivar cuesta la
+  mitad). La partida guarda el escenario alcanzado; en la pausa se elige cualquiera ya abierto (N).
+  - **Textos de los capítulos 2 a 4 pendientes de su visto bueno:** `HISTORIA.md` §10 (Genzo, Bahamut y
+    Tamamo quedan sin morir del todo; el Silencio, DECISIÓN 11, no está).
+  - **Gemini sin saldo** (402 de AI Studio) desde la hoja de los aldeanos: los aldeanos son provisionales
+    (`herramientas/aldeanos_provisionales.py`). No recargar sin que lo pida el usuario.
+  - Recorte de todas las hojas: `sh ronin3d/herramientas/recortar_hojas_enemigos.sh`; revisión con
+    `vista_hoja.py`; para ver un escenario: `-- --escenario N --sin-intro --captura ruta.png 5`.
 - **Todos los enemigos en ese estilo (10-10-2026, 0.15):** el usuario pidió el mismo estilo para los
   demás. Kappa, onibi y soldados tienen hojas generadas con Gemini usando su oni como referencia; el
   Aka-oni usa su propio oni a 2,2 m. Receta en `ronin3d/arte/conceptos/LEEME_ENEMIGOS.md`;

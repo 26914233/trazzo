@@ -15,11 +15,13 @@ var raiz: Node3D
 var antorchas: Array = []     # {"luz", "fuego", "fase", "base"}
 var tiempo := 0.0
 var sin_sombra := false       # las piezas que se crean mientras es true no dan sombra
+var ambiente: Dictionary = {}  # el del escenario (escenarios.gd); vacío: la noche del capítulo 1
 
 
-func construir(destino: Node3D, aspecto_del_juego) -> void:
+func construir(destino: Node3D, aspecto_del_juego, ambiente_del_escenario := {}) -> void:
 	raiz = destino
 	aspecto = aspecto_del_juego
+	ambiente = ambiente_del_escenario
 	_luna_y_ambiente()
 	_suelos()
 	_muros()
@@ -125,16 +127,17 @@ func tronco_piramide(base: Vector3, ancho_abajo: float, fondo_abajo: float, anch
 func _luna_y_ambiente() -> void:
 	var mundo := WorldEnvironment.new()
 	var entorno := Environment.new()
-	aspecto.configurar_entorno(entorno)
+	aspecto.configurar_entorno(entorno, ambiente)
 	mundo.environment = entorno
 	raiz.add_child(mundo)
 	var luna := DirectionalLight3D.new()
-	luna.light_color = Datos.LUZ_LUNA
-	luna.light_energy = 0.95
+	luna.light_color = ambiente.get("luz_luna", Datos.LUZ_LUNA)
+	luna.light_energy = ambiente.get("energia_luna", 0.95)
 	luna.shadow_enabled = true
 	luna.shadow_opacity = 0.75    # la sombra deja pasar algo de luna: se lee mejor el patio
 	luna.directional_shadow_max_distance = 35.0
-	luna.transform.basis = Basis.looking_at(-Datos.DIRECCION_LUNA.normalized(), Vector3.UP)
+	var direccion: Vector3 = ambiente.get("direccion_luna", Datos.DIRECCION_LUNA)
+	luna.transform.basis = Basis.looking_at(-direccion.normalized(), Vector3.UP)
 	raiz.add_child(luna)
 
 
@@ -252,27 +255,33 @@ func _pasarela_y_obstaculos() -> void:
 
 
 func _linternas() -> void:
-	var luz_interior: Material = aspecto.material_emisivo(Color("ffcf8a"), 2.5)
 	for punto in Datos.LINTERNAS:
-		var base := Vector3(punto.x, 0, punto.y)
-		cilindro(base, 0.42, 0.22, "piedra_clara", false, 0.36, 8)
-		cilindro(base + Vector3(0, 0.22, 0), 0.12, 0.66, "piedra_clara", false, 0.12, 8)
-		caja(base + Vector3(0, 1.08, 0), Vector3(0.52, 0.36, 0.52), "piedra_clara", false)
-		caja(base + Vector3(0, 1.08, 0), Vector3(0.56, 0.16, 0.3), luz_interior, false)
-		caja(base + Vector3(0, 1.08, 0), Vector3(0.3, 0.16, 0.56), luz_interior, false)
-		tronco_piramide(base + Vector3(0, 1.26, 0), 0.86, 0.86, 0.14, 0.14, 0.3, "piedra_clara")
-		caja(base + Vector3(0, 1.6, 0), Vector3(0.12, 0.12, 0.12), "piedra_clara", false)
-		var forma := CylinderShape3D.new()
-		forma.radius = 0.4
-		forma.height = 1.6
-		_cuerpo(forma, base + Vector3(0, 0.8, 0))
-		var luz := OmniLight3D.new()
-		luz.light_color = Color("ffc278")
-		luz.light_energy = 0.45
-		luz.omni_range = 3.5
-		luz.light_cull_mask = ~CAPA_SOLO_LUNA & 0xFFFFF
-		luz.position = base + Vector3(0, 1.1, 0)
-		raiz.add_child(luz)
+		linterna(Vector3(punto.x, 0, punto.y))
+
+
+# Linterna de piedra (tōrō) con su luz; la usan también los escenarios de los capítulos siguientes.
+func linterna(base: Vector3, con_luz := true) -> void:
+	var luz_interior: Material = aspecto.material_emisivo(Color("ffcf8a"), 2.5)
+	cilindro(base, 0.42, 0.22, "piedra_clara", false, 0.36, 8)
+	cilindro(base + Vector3(0, 0.22, 0), 0.12, 0.66, "piedra_clara", false, 0.12, 8)
+	caja(base + Vector3(0, 1.08, 0), Vector3(0.52, 0.36, 0.52), "piedra_clara", false)
+	caja(base + Vector3(0, 1.08, 0), Vector3(0.56, 0.16, 0.3), luz_interior, false)
+	caja(base + Vector3(0, 1.08, 0), Vector3(0.3, 0.16, 0.56), luz_interior, false)
+	tronco_piramide(base + Vector3(0, 1.26, 0), 0.86, 0.86, 0.14, 0.14, 0.3, "piedra_clara")
+	caja(base + Vector3(0, 1.6, 0), Vector3(0.12, 0.12, 0.12), "piedra_clara", false)
+	var forma := CylinderShape3D.new()
+	forma.radius = 0.4
+	forma.height = 1.6
+	_cuerpo(forma, base + Vector3(0, 0.8, 0))
+	if not con_luz:
+		return
+	var luz := OmniLight3D.new()
+	luz.light_color = Color("ffc278")
+	luz.light_energy = 0.45
+	luz.omni_range = 3.5
+	luz.light_cull_mask = ~CAPA_SOLO_LUNA & 0xFFFFF
+	luz.position = base + Vector3(0, 1.1, 0)
+	raiz.add_child(luz)
 
 
 func _pozo() -> void:
@@ -303,33 +312,39 @@ func _antorchas() -> void:
 	var azar := RandomNumberGenerator.new()
 	azar.seed = 11
 	for punto in Datos.ANTORCHAS:
-		var base := Vector3(punto.x, 0, punto.y)
-		cilindro(base, 0.07, 2.6, "madera_oscura", true, 0.06, 8)
-		cilindro(base + Vector3(0, 2.55, 0), 0.08, 0.16, "hierro", false, 0.21, 10)
-		var fuego := Node3D.new()
-		fuego.position = base + Vector3(0, 2.7, 0)
-		for capa in [[0.17, 0.62, Color("ff6a1e")], [0.1, 0.4, Color("ffd66a")]]:
-			var cono := CylinderMesh.new()
-			cono.bottom_radius = capa[0]
-			cono.top_radius = 0.0
-			cono.height = capa[1]
-			cono.radial_segments = 8
-			var llama := MeshInstance3D.new()
-			llama.mesh = cono
-			llama.material_override = aspecto.material_emisivo(capa[2], 3.0)
-			llama.position.y = capa[1] / 2.0
-			llama.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-			fuego.add_child(llama)
-		raiz.add_child(fuego)
-		var luz := OmniLight3D.new()
-		luz.light_color = Datos.LUZ_ANTORCHA
-		luz.light_energy = 1.7
-		luz.omni_range = 9.0
-		luz.light_cull_mask = ~CAPA_SOLO_LUNA & 0xFFFFF
-		luz.position = base + Vector3(0, 3.0, 0)
-		raiz.add_child(luz)
-		raiz.add_child(_chispas(base + Vector3(0, 3.0, 0)))
-		antorchas.append({"luz": luz, "fuego": fuego, "fase": azar.randf() * 10.0, "base": 1.7})
+		antorcha(Vector3(punto.x, 0, punto.y), azar.randf() * 10.0)
+
+
+# Antorcha: poste, fuego, luz que parpadea y chispas. «alto» 0 deja solo el fuego en el suelo (hoguera).
+func antorcha(base: Vector3, fase: float, alto := 2.6, energia := 1.7, alcance := 9.0) -> void:
+	if alto > 0.0:
+		cilindro(base, 0.07, alto, "madera_oscura", true, 0.06, 8)
+		cilindro(base + Vector3(0, alto - 0.05, 0), 0.08, 0.16, "hierro", false, 0.21, 10)
+	var fuego := Node3D.new()
+	fuego.position = base + Vector3(0, alto + 0.1, 0)
+	var tamano := 1.0 if alto > 0.0 else 2.2
+	for capa in [[0.17, 0.62, Color("ff6a1e")], [0.1, 0.4, Color("ffd66a")]]:
+		var cono := CylinderMesh.new()
+		cono.bottom_radius = capa[0] * tamano
+		cono.top_radius = 0.0
+		cono.height = capa[1] * tamano
+		cono.radial_segments = 8
+		var llama := MeshInstance3D.new()
+		llama.mesh = cono
+		llama.material_override = aspecto.material_emisivo(capa[2], 3.0)
+		llama.position.y = capa[1] * tamano / 2.0
+		llama.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		fuego.add_child(llama)
+	raiz.add_child(fuego)
+	var luz := OmniLight3D.new()
+	luz.light_color = Datos.LUZ_ANTORCHA
+	luz.light_energy = energia
+	luz.omni_range = alcance
+	luz.light_cull_mask = ~CAPA_SOLO_LUNA & 0xFFFFF
+	luz.position = base + Vector3(0, alto + 0.4, 0)
+	raiz.add_child(luz)
+	raiz.add_child(_chispas(base + Vector3(0, alto + 0.4, 0)))
+	antorchas.append({"luz": luz, "fuego": fuego, "fase": fase, "base": energia})
 
 
 func _chispas(posicion: Vector3) -> CPUParticles3D:

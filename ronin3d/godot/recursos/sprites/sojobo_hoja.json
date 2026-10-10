@@ -1,0 +1,45 @@
+{
+ "id": "sojobo_hoja",
+ "tam": [
+  325,
+  169
+ ],
+ "pies": [
+  170,
+  166
+ ],
+ "columnas": 6,
+ "alto_px": 163,
+ "animaciones": {
+  "reposo": {
+   "inicio": 0,
+   "cuadros": 4,
+   "fps": 6.0
+  },
+  "caminar": {
+   "inicio": 4,
+   "cuadros": 6,
+   "fps": 9.0
+  },
+  "ataque": {
+   "inicio": 10,
+   "cuadros": 4,
+   "fps": 0.0
+  },
+  "area": {
+   "inicio": 14,
+   "cuadros": 4,
+   "fps": 0.0
+  },
+  "golpe": {
+   "inicio": 18,
+   "cuadros": 3,
+   "fps": 0.0
+  },
+  "muerte": {
+   "inicio": 21,
+   "cuadros": 4,
+   "fps": 0.0
+  }
+ }
+}

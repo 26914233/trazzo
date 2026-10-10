@@ -1,0 +1,40 @@
+{
+ "id": "gargola_hoja",
+ "tam": [
+  305,
+  193
+ ],
+ "pies": [
+  142,
+  190
+ ],
+ "columnas": 6,
+ "alto_px": 159,
+ "animaciones": {
+  "reposo": {
+   "inicio": 0,
+   "cuadros": 4,
+   "fps": 6.0
+  },
+  "caminar": {
+   "inicio": 4,
+   "cuadros": 6,
+   "fps": 9.0
+  },
+  "ataque": {
+   "inicio": 10,
+   "cuadros": 4,
+   "fps": 0.0
+  },
+  "golpe": {
+   "inicio": 14,
+   "cuadros": 3,
+   "fps": 0.0
+  },
+  "muerte": {
+   "inicio": 17,
+   "cuadros": 4,
+   "fps": 0.0
+  }
+ }
+}

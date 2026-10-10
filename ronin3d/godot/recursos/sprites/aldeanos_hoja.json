@@ -1,0 +1,60 @@
+{
+ "id": "aldeanos_hoja",
+ "tam": [
+  301,
+  192
+ ],
+ "pies": [
+  113,
+  189
+ ],
+ "columnas": 4,
+ "alto_px": 162,
+ "animaciones": {
+  "anciano": {
+   "inicio": 0,
+   "cuadros": 4,
+   "fps": 4.0
+  },
+  "aldeana": {
+   "inicio": 4,
+   "cuadros": 4,
+   "fps": 4.0
+  },
+  "sastre": {
+   "inicio": 8,
+   "cuadros": 4,
+   "fps": 4.0
+  },
+  "monje": {
+   "inicio": 12,
+   "cuadros": 4,
+   "fps": 4.0
+  },
+  "reposo": {
+   "inicio": 0,
+   "cuadros": 4,
+   "fps": 4.0
+  },
+  "caminar": {
+   "inicio": 0,
+   "cuadros": 4,
+   "fps": 4.0
+  },
+  "ataque": {
+   "inicio": 0,
+   "cuadros": 4,
+   "fps": 4.0
+  },
+  "golpe": {
+   "inicio": 0,
+   "cuadros": 4,
+   "fps": 4.0
+  },
+  "muerte": {
+   "inicio": 0,
+   "cuadros": 4,
+   "fps": 4.0
+  }
+ }
+}

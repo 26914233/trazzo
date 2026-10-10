@@ -1,0 +1,40 @@
+{
+ "id": "kitsunebi_hoja",
+ "tam": [
+  256,
+  144
+ ],
+ "pies": [
+  179,
+  141
+ ],
+ "columnas": 8,
+ "alto_px": 120,
+ "animaciones": {
+  "reposo": {
+   "inicio": 0,
+   "cuadros": 4,
+   "fps": 6.0
+  },
+  "caminar": {
+   "inicio": 4,
+   "cuadros": 5,
+   "fps": 9.0
+  },
+  "ataque": {
+   "inicio": 9,
+   "cuadros": 4,
+   "fps": 0.0
+  },
+  "golpe": {
+   "inicio": 13,
+   "cuadros": 3,
+   "fps": 0.0
+  },
+  "muerte": {
+   "inicio": 16,
+   "cuadros": 3,
+   "fps": 0.0
+  }
+ }
+}

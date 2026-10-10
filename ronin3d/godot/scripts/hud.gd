@@ -22,6 +22,7 @@ var boton_animacion: Label            # en la pausa: cambia la animación anime 
 var boton_galeria: Label              # en la pausa: abre la galería de criaturas (prueba de rendimiento)
 var boton_apariencia: Label           # en la pausa: el sastre enseña el siguiente aspecto de Akira
 var boton_comprar: Label              # en la pausa: compra el aspecto que enseña el sastre
+var boton_escenario: Label            # en la pausa: elegir otro escenario ya abierto
 var aviso_interaccion: Label          # junto al jizō: qué hacer (en el móvil, se toca)
 var texto_interaccion := ""
 var etiqueta_mensaje: Label
@@ -300,6 +301,13 @@ func _crear_capa_pausa() -> void:
 	boton_comprar.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	boton_comprar.add_theme_stylebox_override("normal", marco)
 	boton_comprar.visible = false
+	boton_escenario = _etiqueta(20, Datos.CREMA)
+	remove_child(boton_escenario)
+	capa_pausa.add_child(boton_escenario)
+	_colocar(boton_escenario, Control.PRESET_CENTER, Rect2(-330, -200, 660, 46))
+	boton_escenario.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	boton_escenario.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	boton_escenario.add_theme_stylebox_override("normal", marco)
 	capa_pausa.visible = false
 
 
@@ -438,6 +446,14 @@ func mostrar_ayuda(tactil := false) -> void:
 	etiqueta_ayuda.add_theme_font_size_override("font_size", 20 if tactil else 16)
 	etiqueta_ayuda.text = AYUDA_TACTIL if tactil else AYUDA_TECLADO
 	tiempo_ayuda = 0.0
+
+
+func poner_escenario(datos: Dictionary, indice: int, alcanzado: int, tactil := false) -> void:
+	var nombre := String(datos.nombre)
+	if nombre.length() > 34:
+		nombre = nombre.substr(0, 33) + "…"
+	boton_escenario.text = "Escenario %d/%d · %s · %s" % [indice + 1, alcanzado + 1, nombre,
+		"toca para cambiar" if tactil else "N"]
 
 
 # En pausa se oculta el texto de la historia (si lo había) para que no se mezcle con el

@@ -1,0 +1,40 @@
+{
+ "id": "golem_hoja",
+ "tam": [
+  248,
+  210
+ ],
+ "pies": [
+  122,
+  207
+ ],
+ "columnas": 8,
+ "alto_px": 172,
+ "animaciones": {
+  "reposo": {
+   "inicio": 0,
+   "cuadros": 3,
+   "fps": 6.0
+  },
+  "caminar": {
+   "inicio": 3,
+   "cuadros": 6,
+   "fps": 9.0
+  },
+  "ataque": {
+   "inicio": 9,
+   "cuadros": 4,
+   "fps": 0.0
+  },
+  "golpe": {
+   "inicio": 13,
+   "cuadros": 3,
+   "fps": 0.0
+  },
+  "muerte": {
+   "inicio": 16,
+   "cuadros": 4,
+   "fps": 0.0
+  }
+ }
+}

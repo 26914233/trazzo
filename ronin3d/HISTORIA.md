@@ -1,6 +1,7 @@
 # RONIN — Sinopsis
 
-**Estado:** **aprobada el 1-10-2026** (DECISIÓN 8A: tal cual, con los textos nuevos del capítulo 1;
+**Estado:** **aprobada el 1-10-2026**. Los textos de los capítulos 2 a 4, escritos el 10-10-2026 a
+partir de la sinopsis y ya en el juego (0.16), esperan tu visto bueno: están en §10. (DECISIÓN 8A: tal cual, con los textos nuevos del capítulo 1;
 DECISIÓN 9A: el gran yōkai es Tamamo-no-Mae). Los textos del capítulo 1 ya están cambiados en
 `godot/scripts/datos.gd`; llegarán al APK con la próxima versión. Lo marcado como **[propuesta]**
 sigue sin decidir; hoy es la capa del Silencio (§8, DECISIÓN 11). El origen de Shiro y de la
@@ -220,3 +221,71 @@ explicarla.
   Textos en §5 y en `datos.gd`.
 - **Nota:** los textos llaman «él» a Akira. Con la skin de Akira mujer no cambian: las skins son
   solo de aspecto.
+
+
+## 10. Textos de los capítulos 1 (resto) a 4, en el juego desde la 0.16 [propuesta, pendiente de tu visto bueno]
+
+El 10-10-2026 pediste «continuar con los demás escenarios, enemigos y lore que ya se habían
+establecido». Estos textos siguen la sinopsis aprobada (§4 y §6) y el bestiario por capítulos, y no
+cambian nada de lo aprobado: el castillo conserva sus textos de §5 tal cual. Están en
+`godot/scripts/escenarios.gd`; si quieres cambiar una frase, se cambia allí.
+
+**Cómo quedan los capítulos (9 escenarios jugables):**
+
+| # | Capítulo | Escenario | Guardián o jefe |
+| --- | --- | --- | --- |
+| 1 | 1 · La noche de Hoshiyama | El castillo de Hoshiyama | Oni (tu hoja de estilo) |
+| 2 | 1 | La planicie de Hoshiyama | Aka-oni del puente |
+| 3 | 1 | La aldea del río | Ao-oni (la variante azul de la ficha del oni) |
+| 4 | 2 · El velo | El templo de la montaña | Ilusión de Tamamo-no-Mae (§7: «capítulo 2: una ilusión») |
+| 5 | 2 | El dojo del monte Kurama, al otro lado del velo (Kakuriyo) | Sōjōbō, rey de los tengu |
+| 6 | 3 · Lo que dormía | Las ruinas del oeste | Tsuchigumo |
+| 7 | 3 | El sello de Bahamut | Bahamut |
+| 8 | 4 · El regreso | La planicie bajo la luna roja | Gashadokuro |
+| 9 | 4 | El castillo de Hoshiyama | Genzo → Tamamo-no-Mae → la zorra de nueve colas |
+
+**Decisiones que tomé para seguir sin pararme (cámbialas si no te gustan):**
+
+- Al salir del castillo, el título del cierre es «Hoshiyama queda atrás» (antes, «Fin del capítulo
+  1»), porque el capítulo sigue en la planicie y la aldea. Los tres párrafos aprobados no cambian.
+- **El destino de Genzo queda abierto:** cae de rodillas, herido, y ve a Tamamo quitarse la máscara.
+  No muere en pantalla.
+- **Bahamut no muere:** «duerme, o finge dormir» (el bestiario dejaba abierto si moría, dormía o se
+  unía a Akira).
+- **Tamamo-no-Mae no muere del todo:** «se deshace en fuego violeta». El final dice que la barrera
+  sigue rota y hay que rehacerla (la sinopsis: «con la barrera por rehacer»).
+- **El Silencio (DECISIÓN 11) no está:** sigue abierta. Si eliges la B, el gancho iría después del
+  cierre del último escenario.
+- **Sōjōbō enseña el paso del tengu:** desde ese momento, esquivar cuesta la mitad de aguante (la
+  «técnica nueva» del dojo, `PLAN_PRODUCCION.md` §3).
+
+**Textos nuevos** (intro y cierre de cada escenario; los de la planicie y la aldea completan el
+capítulo 1):
+
+- **La planicie:** «La planicie de Hoshiyama. Por el camino del este huyen los aldeanos; detrás, el
+  castillo arde bajo la luna.» · «Los soldados de Genzo cierran los caminos y, entre la hierba alta,
+  los fuegos fatuos buscan a los vivos. La barrera ya no los contiene.» · «La aldea del río es el
+  único refugio antes del amanecer. Un oni rojo vigila el puente.» Cierre: «Akira cruza el puente.
+  Shiro se adelanta, olfateando el humo de los hogares.» · «Al otro lado, las campanas de la aldea
+  tocan a rebato.»
+- **La aldea:** «La aldea del río. Los kappa han salido del agua y un oni azul ha bajado del monte.» ·
+  «Los soldados de Genzo dicen que vienen a proteger al pueblo, pero se cobran en arroz. Algunos
+  aldeanos les dan la razón: con Genzo, dicen, al menos hay orden.» · «Akira no puede salvar a todo
+  Japón esta noche. Pero puede salvar esta aldea.» Cierre (fin del capítulo 1): «El oni azul cae al
+  río…» · «Un anciano le cuenta que, en el templo de la montaña, los monjes sabían cruzar el velo…» ·
+  «Al amanecer, Akira y Shiro toman el sendero del monte.»
+- **El templo:** los farolillos de cien años, los jizō que no son de piedra y los tres sellos de papel.
+  Cierre: la dama era una ilusión de Tamamo-no-Mae: «Corre, guardia sin señor. Cada grieta que
+  abres es una puerta para mí».
+- **El dojo (Kakuriyo):** los kodama guían; Sōjōbō solo enseña a quien lo vence. Cierre: «Tu iai es
+  bueno. Tus pies, no» y la pista de las ruinas del oeste.
+- **Las ruinas:** el pueblo que hacía guardianes de barro; los komainu no perdonan a quien corre en
+  suelo sagrado; llegan los primeros de otras tierras. Cierre: la escalera de nácar y los hombres
+  lagarto que vienen a liberar a su rey.
+- **El sello de Bahamut:** el pez que sostenía el mundo y se hizo dragón (BESTIARIO §6). Cierre: la
+  grieta ya no se cierra y todas las criaturas de otras tierras caminan hacia Hoshiyama.
+- **La planicie roja:** en las tierras de Genzo los yōkai no atacaban, «era parte del trato», pero
+  las criaturas de otras tierras no saben de tratos.
+- **Hoshiyama:** el doble de Akira; Genzo «todavía cree que salvó Japón»; Tamamo se quita la máscara
+  («Gracias por el castillo, Genzo»). Final: «Akira envaina. Fuera ha hecho justicia. Dentro, por
+  primera vez desde aquella noche, siente algo parecido al honor.»

@@ -1,0 +1,40 @@
+{
+ "id": "kamaitachi_hoja",
+ "tam": [
+  385,
+  189
+ ],
+ "pies": [
+  169,
+  186
+ ],
+ "columnas": 5,
+ "alto_px": 119,
+ "animaciones": {
+  "reposo": {
+   "inicio": 0,
+   "cuadros": 4,
+   "fps": 6.0
+  },
+  "caminar": {
+   "inicio": 4,
+   "cuadros": 5,
+   "fps": 9.0
+  },
+  "ataque": {
+   "inicio": 9,
+   "cuadros": 4,
+   "fps": 0.0
+  },
+  "golpe": {
+   "inicio": 13,
+   "cuadros": 3,
+   "fps": 0.0
+  },
+  "muerte": {
+   "inicio": 16,
+   "cuadros": 4,
+   "fps": 0.0
+  }
+ }
+}

@@ -1,0 +1,45 @@
+{
+ "id": "genzo_hoja",
+ "tam": [
+  371,
+  221
+ ],
+ "pies": [
+  180,
+  218
+ ],
+ "columnas": 5,
+ "alto_px": 156,
+ "animaciones": {
+  "reposo": {
+   "inicio": 0,
+   "cuadros": 4,
+   "fps": 6.0
+  },
+  "caminar": {
+   "inicio": 4,
+   "cuadros": 6,
+   "fps": 9.0
+  },
+  "ataque": {
+   "inicio": 10,
+   "cuadros": 4,
+   "fps": 0.0
+  },
+  "area": {
+   "inicio": 14,
+   "cuadros": 4,
+   "fps": 0.0
+  },
+  "golpe": {
+   "inicio": 18,
+   "cuadros": 3,
+   "fps": 0.0
+  },
+  "muerte": {
+   "inicio": 21,
+   "cuadros": 3,
+   "fps": 0.0
+  }
+ }
+}

@@ -1,0 +1,40 @@
+{
+ "id": "okuri_inu_hoja",
+ "tam": [
+  373,
+  154
+ ],
+ "pies": [
+  167,
+  151
+ ],
+ "columnas": 5,
+ "alto_px": 132,
+ "animaciones": {
+  "reposo": {
+   "inicio": 0,
+   "cuadros": 4,
+   "fps": 6.0
+  },
+  "caminar": {
+   "inicio": 4,
+   "cuadros": 4,
+   "fps": 9.0
+  },
+  "ataque": {
+   "inicio": 8,
+   "cuadros": 4,
+   "fps": 0.0
+  },
+  "golpe": {
+   "inicio": 12,
+   "cuadros": 3,
+   "fps": 0.0
+  },
+  "muerte": {
+   "inicio": 15,
+   "cuadros": 3,
+   "fps": 0.0
+  }
+ }
+}

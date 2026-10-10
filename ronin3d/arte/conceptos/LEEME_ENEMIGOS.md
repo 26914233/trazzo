@@ -11,6 +11,9 @@ derecha, con cinco filas: **reposo, caminar, ataque, golpe y muerte**.
 | Kappa | `hoja_kappa.png` (Gemini) | `kappa_hoja.png` | 1,3 m |
 | Onibi | `hoja_onibi.png` (Gemini) | `onibi_hoja.png` | 0,9 m, flotando |
 | Soldado de Genzo | `hoja_soldado.png` (Gemini) | `soldado_hoja.png` | 2,2 m con la yari |
+| Capítulos 2 a 4 (33 hojas, 10-10-2026) | `hoja_<id>.jpg` (Gemini) | `<id>_hoja.png` | en `enemigos.gd` |
+| Oni azul, hitodama, fuegos de zorro | variantes de color (`herramientas/variantes_color.py`) | `oni_azul_hoja`, `hitodama_hoja`, `kitsunebi_hoja` | |
+| Aldeanos (provisionales) | del noppera-bō (`herramientas/aldeanos_provisionales.py`) | `aldeanos_hoja.png` | 1,8 m |
 
 ## Cómo se hacen
 
@@ -23,8 +26,17 @@ derecha, con cinco filas: **reposo, caminar, ataque, golpe y muerte**.
      texto ni paneles.
 2. Se recorta:
    `python3 ronin3d/herramientas/recortar_hoja.py ronin3d/arte/conceptos/hoja_<id>.png <id>_hoja reposo,caminar,ataque,golpe,muerte`
-   Encuentra las filas y los cuadros solo, quita el fondo y alinea por los pies. El oni del usuario
-   tiene su propio recorte (`recortar_oni_jefe.py`), porque su hoja trae textos y paneles.
+   Encuentra las filas y los cuadros solo, quita el fondo, los rótulos que a veces escribe Gemini
+   («IDLE», «WALK CYCLE»…) y las líneas de suelo, y alinea por los pies. Los jefes tienen una fila
+   más, «area» (su golpe de área). Todas las hojas se rehacen con
+   `sh ronin3d/herramientas/recortar_hojas_enemigos.sh`, que también lleva los arreglos de cada una
+   (cuadros pegados que hay que partir, una fila con dos animaciones). Para revisar un recorte:
+   `python3 ronin3d/herramientas/vista_hoja.py salida.png <id>_hoja`. El oni del usuario tiene su
+   propio recorte (`recortar_oni_jefe.py`), porque su hoja trae textos y paneles.
 3. En `godot/scripts/enemigos.gd`, el perfil lleva `hoja` y `alto`. Para los soldados está en
    `juego.gd`, con `Datos.ALTO_SOLDADO_HOJA`. Las muestra `visual_hoja.gd`.
 4. Al reimportar: `detect_3d/compress_to=0` y sin mipmaps en su `.import`.
+
+**Crédito de Gemini (10-10-2026):** se gastaron 36 imágenes en total (3 + 33, unos 1,6 USD) y la cuenta
+de AI Studio se quedó sin saldo prepagado al pedir la hoja de los aldeanos (error 402). Hasta que el
+usuario recargue, los aldeanos son provisionales.

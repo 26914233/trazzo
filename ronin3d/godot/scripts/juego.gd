@@ -1,6 +1,7 @@
-# El capítulo 1 en 3D: construye el patio, crea a Akira, a Shiro (su perro), los soldados y
-# la cámara, resuelve los golpes de espada, lleva la cuenta de las monedas y decide cuándo se
-# gana o se pierde.
+# Un escenario del juego en 3D (escenarios.gd: del castillo de Hoshiyama del capítulo 1 al regreso
+# del capítulo 4): construye su mundo, crea a Akira, a Shiro (su perro), los soldados, los yōkai y los
+# jefes, resuelve los golpes de espada, lleva la cuenta de las monedas y decide cuándo se gana o se
+# pierde. También los aldeanos, los kodama que guían, la hoguera del descanso y la barrera de sellos.
 extends Node3D
 
 const Datos := preload("res://scripts/datos.gd")
@@ -23,6 +24,8 @@ const JefeOni := preload("res://scripts/jefe_oni.gd")
 const Enemigos := preload("res://scripts/enemigos.gd")
 const Depuracion := preload("res://scripts/depuracion.gd")
 const VisualHoja := preload("res://scripts/visual_hoja.gd")
+const Escenarios := preload("res://scripts/escenarios.gd")
+const ConstructorEscenarios := preload("res://scripts/constructor_escenarios.gd")
 const ALCANCE_FIJADO := 7.0          # el enemigo más cercano a esta distancia queda fijado
 const SHADER_PROFUNDIDAD := preload("res://shaders/profundidad.gdshader")
 
@@ -37,6 +40,7 @@ signal aviso_interaccion(texto: String)     # vacío: no hay nada con lo que int
 signal aguante_cambiado(valor: float)
 signal jefe_cambiado(nombre: String, fraccion: float)   # fraccion < 0: ocultar la barra
 signal arma_cambiada(arma: String)
+signal pedir_sastre                  # el sastre de la aldea: el juego abre su género (en la pausa)
 
 var aspecto
 var efectos
@@ -44,7 +48,20 @@ var constructor
 var akira
 var camara
 var soldados: Array = []             # todos los enemigos: soldados, yōkai y el jefe
-var jefe                             # el oni del portón (jefe_oni.gd)
+var jefe                             # el jefe que está en pie (jefe_oni.gd o un yōkai jefe)
+var escenario: Dictionary = {}
+var indice_escenario := 0
+var jefes_pendientes: Array = []     # los que aparecen cuando cae el anterior (Genzo → Tamamo)
+var espera_jefe := -1.0
+var tiempo_final := -1.0             # último escenario: tras el último jefe, el cierre
+var fraccion_jefe := -2.0
+var objetivos: Array = []            # sellos que abren la barrera del santuario
+var barrera: Node3D
+var aviso_barrera := 0.0
+var kodamas: Array = []
+var aldeanos: Array = []             # {nodo, visual, nombre, frases, indice}
+var descanso := Vector3.INF
+var interaccion: Dictionary = {}
 var aviso_porton := 0.0
 var depuracion
 var reticula: Node3D                 # anillo rojo bajo el enemigo fijado (como en EthrA)
@@ -61,16 +78,23 @@ var fase := "intro"          # intro, jugando, cierre, derrota
 var tiempo_derrota := 0.0
 
 
-func iniciar(con_intro := true) -> void:
+func iniciar(con_intro := true, indice := 0) -> void:
+	indice_escenario = clampi(indice, 0, Escenarios.cantidad() - 1)
+	escenario = Escenarios.datos(indice_escenario)
 	monedas = Partida.monedas
-	azar.seed = 5
+	azar.seed = 5 + indice_escenario
 	aspecto = Aspecto.new()
-	constructor = ConstructorMundo.new()
-	constructor.construir(self, aspecto)
+	if String(escenario.mundo) == "castillo":
+		constructor = ConstructorMundo.new()
+		constructor.construir(self, aspecto, escenario.ambiente)
+	else:
+		constructor = ConstructorEscenarios.new()
+		constructor.construir_escenario(self, aspecto, escenario)
 
 	akira = Akira.new()
 	add_child(akira)
-	akira.position = Datos.INICIO_AKIRA
+	akira.position = escenario.inicio
+	akira.coste_esquiva = 0.5 if Partida.tiene_tecnica("paso_del_tengu") else 1.0
 	akira.vida_maxima = Datos.VIDA_MAXIMA + Partida.bendiciones
 	akira.vida = akira.vida_maxima
 	akira.visual = _crear_visual(false)
@@ -97,11 +121,13 @@ func iniciar(con_intro := true) -> void:
 	akira.esquivo.connect(func(): efectos.esquiva(akira.global_position + Vector3.UP * 0.4))
 	akira.vida_cambiada.connect(func(_vida): efectos.herido(akira.global_position + Vector3.UP * 1.1))
 
-	jizo = Jizo.new()
-	add_child(jizo)
-	jizo.configurar(aspecto)
-	jizo.position = Datos.JIZO_POSICION
-	jizo.rotation.y = PI / 2.0              # mira al patio (al este)
+	if escenario.has("jizo"):
+		jizo = Jizo.new()
+		add_child(jizo)
+		jizo.configurar(aspecto)
+		jizo.position = escenario.jizo
+		jizo.rotation.y = PI / 2.0              # mira al patio (al este)
+	descanso = escenario.get("descanso", Vector3.INF)
 
 	monedas_suelo = Monedas.new()
 	add_child(monedas_suelo)
@@ -109,19 +135,17 @@ func iniciar(con_intro := true) -> void:
 	monedas_suelo.recogidas.connect(_al_recoger_monedas)
 	_crear_shiro()
 
-	for patrulla in Datos.PATRULLAS:
-		var soldado = Soldado.new()
-		add_child(soldado)
-		soldado.configurar(patrulla[0], patrulla[1], akira)
-		soldado.visual = _crear_visual(true)
-		soldado.add_child(soldado.visual)
-		soldado.derrotado.connect(_al_derrotar)
-		soldado.derrotado.connect(func(): _soltar_monedas(soldado))
-		soldado.aviso_iniciado.connect(func(): efectos.aviso(soldado.global_position + Vector3.UP * 2.0))
-		soldado.estocada_iniciada.connect(func(): efectos.estocada(soldado.global_position + Vector3.UP * 1.1))
-		soldados.append(soldado)
+	for patrulla in escenario.patrullas:
+		crear_soldado(patrulla[0], patrulla[1])
 	_crear_yokai()
-	_crear_jefe()
+	for entrada in escenario.get("objetivos", []):
+		objetivos.append(crear_yokai(entrada[0], entrada[1]))
+	jefes_pendientes = escenario.jefes.duplicate()
+	_siguiente_jefe()
+	if not objetivos.is_empty():
+		_crear_barrera()
+	_crear_kodamas()
+	_crear_aldeanos()
 	_crear_reticula()
 	depuracion = Depuracion.new()
 	depuracion.juego = self
@@ -208,29 +232,185 @@ func rival_para_akira(desde: Vector3, alcance: float):
 	return soldado_mas_cercano(desde, alcance)
 
 
-# Yōkai del bestiario (kappa, oni, onibi), con las fichas del capítulo 1.
+func crear_soldado(desde: Vector3, hasta: Vector3):
+	var soldado = Soldado.new()
+	add_child(soldado)
+	soldado.configurar(desde, hasta, akira)
+	soldado.visual = _crear_visual(true)
+	soldado.add_child(soldado.visual)
+	soldado.derrotado.connect(_al_derrotar)
+	soldado.derrotado.connect(func(): _soltar_monedas(soldado))
+	soldado.aviso_iniciado.connect(func(): efectos.aviso(soldado.global_position + Vector3.UP * 2.0))
+	soldado.estocada_iniciada.connect(func(): efectos.estocada(soldado.global_position + Vector3.UP * 1.1))
+	soldados.append(soldado)
+	return soldado
+
+
+# Yōkai del bestiario: los del escenario (escenarios.gd), con sus fichas de enemigos.gd.
 func _crear_yokai() -> void:
-	for entrada in Enemigos.OLEADA_CAPITULO_1:
+	for entrada in escenario.yokai:
 		crear_yokai(entrada[0], entrada[1])
 
 
 func crear_yokai(tipo: String, lugar: Vector3):
-		var yokai = Yokai.new()
-		yokai.configurar(tipo, lugar, akira, aspecto)
-		add_child(yokai)
-		yokai.derrotado.connect(_al_derrotar)
-		yokai.derrotado.connect(func():
-			akira.ganar_espiritu(float(yokai.perfil.get("espiritu_al_morir", 0.0)))
-			monedas_suelo.soltar(yokai.global_position + Vector3.UP * 0.7, azar.randi_range(1, 2)))
-		yokai.aviso_iniciado.connect(func(): efectos.aviso(yokai.global_position + Vector3.UP * 1.8))
-		yokai.estocada_iniciada.connect(func(): efectos.estocada(yokai.global_position + Vector3.UP * 1.0))
-		soldados.append(yokai)
-		return yokai
+	var yokai = Yokai.new()
+	yokai.configurar(tipo, lugar, akira, aspecto)
+	yokai.efectos = efectos
+	yokai.invocador = _invocar
+	add_child(yokai)
+	yokai.derrotado.connect(_al_derrotar)
+	yokai.derrotado.connect(func():
+		akira.ganar_espiritu(float(yokai.perfil.get("espiritu_al_morir", 0.0)))
+		if Enemigos.da_monedas(yokai.perfil) and not yokai.es_jefe() and not yokai.perfil.get("objetivo", false):
+			monedas_suelo.soltar(yokai.global_position + Vector3.UP * 0.7, azar.randi_range(1, 2))
+		if yokai.perfil.get("falsa", false) or yokai.perfil.get("objetivo", false):
+			efectos.polvo_de_pixeles(yokai.global_position + Vector3.UP * 1.0))
+	yokai.aviso_iniciado.connect(func(): efectos.aviso(yokai.global_position + Vector3.UP * (float(yokai.perfil.get("alto", 1.8)) + 0.2)))
+	yokai.estocada_iniciada.connect(func(): efectos.estocada(yokai.global_position + Vector3.UP * 1.0))
+	yokai.mensaje.connect(func(texto): mensaje.emit(texto))
+	yokai.impacto_area.connect(func(punto):
+		efectos.sacudir(0.5)
+		efectos.sonar("caida", punto, 2.0, 0.05)
+		efectos.polvo(punto))
+	soldados.append(yokai)
+	return yokai
 
 
-func _crear_jefe() -> void:
+# Lo que invoca un enemigo (crías, copias, cuervos, soldados poseídos…), dentro del área de juego.
+func _invocar(tipo: String, lugar: Vector3):
+	var dentro := Vector3(clampf(lugar.x, -24.0, 24.0), lugar.y, clampf(lugar.z, -15.5, 15.5))
+	efectos.polvo(dentro)
+	return crear_yokai(tipo, dentro)
+
+
+# Los jefes del escenario, de uno en uno: el siguiente aparece cuando cae el anterior.
+func _siguiente_jefe() -> void:
+	fraccion_jefe = -2.0
+	if jefes_pendientes.is_empty():
+		jefe = null
+		return
+	var datos: Dictionary = jefes_pendientes.pop_front()
+	if String(datos.tipo) == "oni_porton":
+		_crear_jefe_oni(datos.posicion)
+		return
+	jefe = crear_yokai(String(datos.tipo), datos.posicion)
+	var este = jefe
+	if datos.has("mensaje"):
+		mensaje.emit(String(datos.mensaje))
+		efectos.polvo_de_pixeles(este.global_position + Vector3.UP * 1.5)
+	if not objetivos.is_empty():
+		este.protegido = true
+	for desplazamiento in este.perfil.get("sellos", []):
+		este.sellos.append(crear_yokai("sello_dogu", este.position + desplazamiento))
+	este.desperto.connect(func():
+		efectos.sacudir(0.6)
+		jefe_cambiado.emit(String(este.perfil.nombre), este.fraccion_vida()))
+	este.derrotado.connect(func(): _al_caer_jefe(este))
+
+
+func _al_caer_jefe(caido) -> void:
+	efectos.camara_lenta(0.3, 0.8)
+	efectos.sacudir(1.0)
+	efectos.polvo_de_pixeles(caido.global_position + Vector3.UP * 1.5)
+	monedas_suelo.soltar(caido.global_position + Vector3(-1.5, 1, 0), 10)
+	jefe_cambiado.emit("", -1.0)
+	if not jefes_pendientes.is_empty():
+		espera_jefe = 2.6
+	elif is_inf(float(escenario.salida_x)):
+		tiempo_final = 3.5
+	else:
+		mensaje.emit("%s ha caído. El camino queda libre." % String(caido.perfil.nombre))
+
+
+# La barrera del santuario del templo: cierra el paso al jefe hasta cortar todos los sellos.
+func _crear_barrera() -> void:
+	barrera = Node3D.new()
+	var x: float = jefe.position.x - 4.5 if jefe else 14.0
+	var muro := StaticBody3D.new()
+	var forma := CollisionShape3D.new()
+	var caja := BoxShape3D.new()
+	caja.size = Vector3(0.6, 6, 34)
+	forma.shape = caja
+	muro.add_child(forma)
+	barrera.add_child(muro)
+	var velo := MeshInstance3D.new()
+	var plano := BoxMesh.new()
+	plano.size = Vector3(0.1, 5, 34)
+	velo.mesh = plano
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.albedo_color = Color(0.75, 0.45, 1.0, 0.28)
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	velo.material_override = material
+	velo.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	velo.position.y = 2.5
+	barrera.add_child(velo)
+	barrera.position = Vector3(x, 0, 0)
+	add_child(barrera)
+
+
+func objetivos_vivos() -> int:
+	return objetivos.filter(func(o): return is_instance_valid(o) and o.vivo()).size()
+
+
+func _actualizar_barrera(delta: float) -> void:
+	if barrera == null:
+		return
+	aviso_barrera = maxf(0.0, aviso_barrera - delta)
+	var quedan := objetivos_vivos()
+	if quedan == 0:
+		barrera.queue_free()
+		barrera = null
+		if jefe and is_instance_valid(jefe) and jefe.has_method("es_jefe"):
+			jefe.protegido = false
+		efectos.sacudir(0.5)
+		mensaje.emit("Los sellos se rompen y la barrera cae")
+		return
+	if akira.global_position.x > barrera.position.x - 3.0 and aviso_barrera <= 0.0:
+		aviso_barrera = 4.0
+		mensaje.emit("Una barrera cierra el santuario: corta los sellos de papel (quedan %d)" % quedan)
+
+
+# Los kodama del Kakuriyo: espíritus de los árboles que señalan el camino cuando Akira se acerca.
+func _crear_kodamas() -> void:
+	for lugar in escenario.get("kodama", []):
+		var kodama := Node3D.new()
+		kodama.position = lugar
+		add_child(kodama)
+		var visual = VisualHoja.new()
+		visual.configurar("kodama_hoja", 0.65)
+		kodama.add_child(visual)
+		kodamas.append(visual)
+
+
+# Aldeanos con los que se habla (cada vez dicen la frase siguiente).
+func _crear_aldeanos() -> void:
+	for datos in escenario.get("aldeanos", []):
+		var nodo := Node3D.new()
+		nodo.position = datos[2]
+		add_child(nodo)
+		var visual = VisualHoja.new()
+		visual.configurar(String(datos[0]), 1.8)
+		visual.fijar_bucle(String(datos[1]))
+		nodo.add_child(visual)
+		aldeanos.append({"nodo": nodo, "visual": visual, "nombre": String(datos[1]).capitalize(),
+			"frases": datos[3], "indice": 0})
+
+
+func _actualizar_guias(delta: float) -> void:
+	for visual in kodamas:
+		var cerca: bool = visual.global_position.distance_to(akira.global_position) < 5.0
+		visual.actualizar(delta, {"pose": "estocada" if cerca else "normal", "mirando": Vector3.RIGHT})
+	for aldeano in aldeanos:
+		var hacia: Vector3 = akira.global_position - aldeano.nodo.global_position
+		hacia.y = 0.0
+		aldeano.visual.actualizar(delta, {"mirando": hacia.normalized() if hacia.length() > 0.1 else Vector3.RIGHT})
+
+
+func _crear_jefe_oni(posicion: Vector3) -> void:
 	jefe = JefeOni.new()
-	jefe.configurar(Datos.JEFE_POSICION, akira, aspecto)
+	jefe.configurar(posicion, akira, aspecto)
 	add_child(jefe)
 	soldados.append(jefe)
 	jefe.desperto.connect(func():
@@ -259,7 +439,9 @@ func _crear_jefe() -> void:
 		efectos.polvo_de_pixeles(jefe.global_position + Vector3.UP * 1.5)
 		monedas_suelo.soltar(jefe.global_position + Vector3(-2, 1, 0), 12)
 		mensaje.emit("El oni ha caído. El portón queda libre.")
-		jefe_cambiado.emit("", -1.0))
+		jefe_cambiado.emit("", -1.0)
+		if not jefes_pendientes.is_empty():
+			espera_jefe = 2.6)
 
 
 # Los personajes son sprites pixel art (DECISIÓN 20E); con --modelos3d, los modelos de piezas de
@@ -368,8 +550,37 @@ func _texto_jizo() -> String:
 	return "Jizō: %d mon por +1 de vida (tienes %d)" % [precio, Partida.monedas]
 
 
-# ENTER (o B en el mando, o tocar el aviso en el móvil) junto al jizō.
+# Con qué se puede interactuar ahora: el jizō, la hoguera del descanso o un aldeano.
+func _interaccion_cercana() -> Dictionary:
+	if fase != "jugando" or not akira.vivo():
+		return {}
+	if cerca_del_jizo:
+		return {"texto": _texto_jizo(), "accion": "jizo"}
+	if descanso != Vector3.INF and akira.global_position.distance_to(descanso) < 2.2:
+		return {"texto": "Hoguera: descansar (recupera toda la vida)", "accion": "descanso"}
+	for aldeano in aldeanos:
+		if akira.global_position.distance_to(aldeano.nodo.global_position) < 2.2:
+			return {"texto": "%s: hablar" % aldeano.nombre, "accion": "aldeano", "aldeano": aldeano}
+	return {}
+
+
+# ENTER (o B en el mando, o tocar el aviso en el móvil) junto al jizō, la hoguera o un aldeano.
 func interactuar() -> void:
+	match String(interaccion.get("accion", "")):
+		"descanso":
+			akira.vida = akira.vida_maxima
+			vida_cambiada.emit(akira.vida)
+			efectos.bendicion(descanso + Vector3.UP * 0.6)
+			mensaje.emit("Akira descansa junto al fuego. Shiro se tumba a su lado.")
+			return
+		"aldeano":
+			var aldeano: Dictionary = interaccion.aldeano
+			var frases: Array = aldeano.frases
+			mensaje.emit(String(frases[aldeano.indice % frases.size()]))
+			aldeano.indice += 1
+			if aldeano.nombre == "Sastre":
+				pedir_sastre.emit()
+			return
 	if not cerca_del_jizo:
 		return
 	var precio := Partida.precio_bendicion()
@@ -482,18 +693,32 @@ func _al_pedir_corte_de_luna() -> void:
 func _physics_process(delta: float) -> void:
 	constructor.actualizar(delta)
 	_actualizar_reticula()
+	_actualizar_guias(delta)
 	if fase == "jugando" and Input.is_action_just_pressed("cambiar_objetivo"):
 		cambiar_objetivo()
 	if Input.is_action_just_pressed("depurar_golpes"):
 		depuracion.alternar()
-	cerca_del_jizo = fase == "jugando" and akira.vivo() \
+	cerca_del_jizo = fase == "jugando" and akira.vivo() and jizo != null \
 		and akira.global_position.distance_to(jizo.global_position) < Datos.RADIO_JIZO
-	var aviso := _texto_jizo() if cerca_del_jizo else ""
+	interaccion = _interaccion_cercana()
+	var aviso: String = interaccion.get("texto", "")
 	if aviso != aviso_actual:
 		aviso_actual = aviso
 		aviso_interaccion.emit(aviso)
 	if fase != "jugando":
 		return
+	_actualizar_barrera(delta)
+	_actualizar_barra_jefe()
+	if espera_jefe >= 0.0:
+		espera_jefe -= delta
+		if espera_jefe < 0.0:
+			_siguiente_jefe()
+	if tiempo_final >= 0.0:
+		tiempo_final -= delta
+		if tiempo_final < 0.0:
+			akira.controlable = false
+			_cambiar_fase("cierre")
+			return
 	if akira.corte_activo():
 		for soldado in soldados_vivos():
 			if akira.golpeados.has(soldado):
@@ -510,15 +735,25 @@ func _physics_process(delta: float) -> void:
 					mortal = soldado.recibir_golpe(akira.global_position, false, corte.danio,
 						corte.postura, corte.empuje)
 				var punto: Vector3 = (akira.global_position + Vector3.UP * 1.15 + Vector3(parte.posicion)) / 2.0
+				if soldado.has_method("consumir_bloqueo") and soldado.consumir_bloqueo():
+					efectos.bloqueo(punto)
+					continue
 				efectos.golpe_de(punto, mortal, corte, vida_antes - maxi(soldado.vida, 0), soldado.postura_rota())
 				akira.ganar_espiritu(Datos.ESPIRITU_POR_GOLPE)
 	aviso_porton = maxf(0.0, aviso_porton - delta)
-	var en_porton: bool = akira.vivo() and akira.global_position.x > Datos.LIMITE_PORTON_X \
-		and absf(akira.global_position.z) < 3.0
-	if en_porton and jefe and jefe.vivo():
+	var en_porton: bool = akira.vivo() and akira.global_position.x > float(escenario.salida_x) \
+		and absf(akira.global_position.z) < float(escenario.salida_ancho)
+	var cerrado: bool = (jefe != null and is_instance_valid(jefe) and jefe.vivo()) or not jefes_pendientes.is_empty() \
+		or objetivos_vivos() > 0
+	if en_porton and cerrado:
 		if aviso_porton <= 0.0:
 			aviso_porton = 3.0
-			mensaje.emit("El oni bloquea el portón: derrótalo para salir")
+			if jefe is JefeOni:
+				mensaje.emit("El oni bloquea el portón: derrótalo para salir")
+			elif jefe != null and is_instance_valid(jefe):
+				mensaje.emit("%s cierra el paso: derrótalo para seguir" % String(jefe.perfil.nombre))
+			else:
+				mensaje.emit("Todavía no se puede pasar")
 	elif en_porton:
 		akira.controlable = false
 		_cambiar_fase("cierre")
@@ -526,3 +761,19 @@ func _physics_process(delta: float) -> void:
 		tiempo_derrota += delta
 		if tiempo_derrota > 1.4:
 			_cambiar_fase("derrota")
+
+
+func _exit_tree() -> void:
+	Yokai.lanzandose.clear()
+
+
+# La barra del jefe (yōkai jefes): se enseña al despertar y baja con su vida.
+func _actualizar_barra_jefe() -> void:
+	if jefe == null or not is_instance_valid(jefe) or not jefe.has_method("es_jefe"):
+		return
+	if not jefe.despierto() or not jefe.vivo():
+		return
+	var fraccion: float = jefe.fraccion_vida()
+	if absf(fraccion - fraccion_jefe) > 0.001:
+		fraccion_jefe = fraccion
+		jefe_cambiado.emit(String(jefe.perfil.nombre), fraccion)

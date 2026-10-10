@@ -15,6 +15,10 @@ const Apariencias := preload("res://scripts/apariencias_akira.gd")
 const Partida := preload("res://scripts/partida.gd")
 const VisualSprite := preload("res://scripts/visual_sprite.gd")
 const VisualHoja := preload("res://scripts/visual_hoja.gd")
+const Escenarios := preload("res://scripts/escenarios.gd")
+const Enemigos := preload("res://scripts/enemigos.gd")
+const Proyectil := preload("res://scripts/proyectil.gd")
+const ZonaPeligro := preload("res://scripts/zona_peligro.gd")
 const MOVIMIENTOS := ["mover_adelante", "mover_atras", "mover_izquierda", "mover_derecha"]
 
 var principal
@@ -83,6 +87,7 @@ func _ready() -> void:
 		[14.6, _comprobar_bloqueo_del_jefe],
 		[15.6, _comprobar_cierre],
 		[15.8, _pulsar.bind("aceptar")],
+		[15.95, _comprobar_siguiente_escenario],
 		[16.3, _capturar.bind("cierre")],
 		[16.5, _pulsar.bind("pausa")],
 		[16.9, _comprobar_pausa],
@@ -169,7 +174,41 @@ func _ready() -> void:
 		[57.7, _romper_postura],
 		[58.0, _preparar_embestida],
 		[62.6, _comprobar_remate_jefe],
-		[62.8, _terminar],
+	])
+	# Capítulos 2 a 4 (0.16): cada escenario carga con su mundo, sus enemigos y su jefe, y las
+	# conductas nuevas del bestiario funcionan.
+	pasos.append([62.9, _comprobar_hojas_del_bestiario])
+	var t := 63.0
+	for n in range(1, Escenarios.cantidad()):
+		pasos.append([t, _cargar_escenario.bind(n)])
+		pasos.append([t + 0.5, _comprobar_escenario.bind(n)])
+		t += 0.9
+	pasos.append_array([
+		[t, _probar_escudo_y_coraza],
+		[t + 0.2, _probar_division_y_copias],
+		[t + 0.6, _comprobar_division_y_copias],
+		[t + 0.8, _probar_disfraces_y_piedra],
+		[t + 1.4, _comprobar_disfraces],
+		[t + 1.6, _probar_gashadokuro_y_vampiro],
+		[t + 5.6, _comprobar_gashadokuro],
+		[t + 5.8, _probar_proyectil_y_zona],
+		[t + 7.4, _comprobar_proyectil_y_zona],
+		[t + 7.6, _cargar_escenario.bind(6)],
+		[t + 8.0, _probar_sellos_de_bahamut],
+		[t + 8.4, _cargar_escenario.bind(3)],
+		[t + 8.8, _probar_barrera_del_templo],
+		[t + 9.2, _comprobar_barrera_del_templo],
+		[t + 9.4, _cargar_escenario.bind(8)],
+		[t + 9.8, _vencer_jefe_actual],
+		[t + 12.8, _comprobar_jefe_siguiente.bind("tamamo")],
+		[t + 12.9, _vencer_jefe_actual],
+		[t + 15.9, _comprobar_jefe_siguiente.bind("tamamo_zorro")],
+		[t + 16.0, _vencer_jefe_actual],
+		[t + 20.0, _comprobar_final],
+		[t + 20.4, _cargar_escenario.bind(4)],
+		[t + 20.8, _terminar_escenario_con_tecnica],
+		[t + 21.4, _comprobar_tecnica],
+		[t + 21.8, _terminar],
 	])
 
 
@@ -406,6 +445,15 @@ func _comprobar_bloqueo_del_jefe() -> void:
 		"fase=%s, x=%.1f" % [juego.fase, juego.akira.global_position.x])
 	juego.jefe.process_mode = Node.PROCESS_MODE_INHERIT     # que haga su caída
 	juego.jefe._morir()
+
+
+# Desde la 0.16, el cierre del castillo lleva a la planicie. La prueba vuelve al castillo (con su
+# historia) para seguir con lo de siempre.
+func _comprobar_siguiente_escenario() -> void:
+	_registrar("Tras el cierre del castillo se sigue en la planicie", _juego().indice_escenario == 1
+		and _juego().fase == "intro" and Partida.alcanzado >= 1,
+		"escenario=%d, fase=%s" % [_juego().indice_escenario, _juego().fase])
+	principal._iniciar_juego(true, 0)
 
 
 func _comprobar_cierre() -> void:
@@ -1280,6 +1328,304 @@ func _comprobar_remate_jefe() -> void:
 		not jefe_prueba.vivo() and akira.vida == vida_antes_jefe,
 		"vivo=%s, vida de Akira %d → %d" % [jefe_prueba.vivo(), vida_antes_jefe, akira.vida])
 	_proteger(true)
+
+
+# --- Capítulos 2 a 4 (0.16) ---------------------------------------------------------------------
+
+var prueba_a = null
+var prueba_b = null
+var prueba_c = null
+var cuenta_antes := 0
+var vida_prueba := 0
+
+
+func _cargar_escenario(n: int) -> void:
+	_soltar_movimiento()
+	direccion_caminar = Vector3.ZERO
+	combate_activo = false
+	principal._iniciar_juego(false, n)
+
+
+# Todos los enemigos quietos salvo los de la prueba, y Akira a salvo.
+func _quietos(salvo: Array = []) -> void:
+	var juego = _juego()
+	juego.akira.invulnerable = 999.0
+	for enemigo in juego.soldados:
+		if is_instance_valid(enemigo) and not enemigo in salvo:
+			enemigo.process_mode = Node.PROCESS_MODE_DISABLED
+
+
+func _comprobar_escenario(n: int) -> void:
+	var juego = _juego()
+	var datos: Dictionary = Escenarios.datos(n)
+	var esperados: int = datos.patrullas.size() + datos.yokai.size() + datos.get("objetivos", []).size()
+	var con_hoja := true
+	for enemigo in juego.soldados:
+		if enemigo.has_method("es_jefe") and enemigo.perfil.has("hoja") and not enemigo.perfil.get("visual_akira", false) \
+				and not enemigo.visual is VisualHoja:
+			con_hoja = false
+	var jefe_bien: bool = juego.jefe != null and is_instance_valid(juego.jefe) \
+		and (not juego.jefe.has_method("es_jefe") or juego.jefe.perfil.nombre != "")
+	_registrar("Escenario %d (%s): mundo, %d enemigos y jefe" % [n, datos.id, esperados],
+		juego.indice_escenario == n and juego.soldados.size() >= esperados and jefe_bien and con_hoja
+		and juego.akira.global_position.distance_to(datos.inicio) < 1.5,
+		"enemigos=%d, jefe=%s, hojas=%s" % [juego.soldados.size(),
+			juego.jefe.perfil.nombre if juego.jefe and juego.jefe.has_method("es_jefe") else "oni", con_hoja])
+	_quietos()
+	_capturar("escenario_%s" % datos.id)
+
+
+# Cada criatura de enemigos.gd tiene su hoja con las filas que usa visual_hoja.gd.
+func _comprobar_hojas_del_bestiario() -> void:
+	var malas: Array = []
+	for tipo in Enemigos.TIPOS:
+		var perfil: Dictionary = Enemigos.perfil(tipo)
+		if perfil.is_empty():
+			malas.append(tipo + " (sin ficha)")
+			continue
+		if not perfil.has("hoja"):
+			continue
+		var hoja = JSON.parse_string(FileAccess.get_file_as_string("res://recursos/sprites/%s.json" % perfil.hoja))
+		var bien: bool = hoja is Dictionary and load("res://recursos/sprites/%s.png" % perfil.hoja) != null
+		if bien:
+			for nombre in ["reposo", "caminar", "ataque", "golpe", "muerte"]:
+				bien = bien and hoja.animaciones.has(nombre)
+			for ataque in perfil.ataques:
+				bien = bien and hoja.animaciones.has(String(ataque.get("anim", "ataque")))
+		if not bien:
+			malas.append(tipo)
+	_registrar("Las %d criaturas del bestiario tienen ficha y hoja de sprites" % Enemigos.TIPOS.size(),
+		malas.is_empty(), "mal: %s" % ", ".join(malas))
+
+
+func _nuevo(tipo: String, lugar: Vector3):
+	var enemigo = _juego().crear_yokai(tipo, lugar)
+	return enemigo
+
+
+func _probar_escudo_y_coraza() -> void:
+	var akira = _juego().akira
+	_teletransportar(Vector3(0, 0, 0), Vector3.RIGHT)
+	# Komainu despierto mirando a Akira: de frente rebota, por la espalda entra.
+	var komainu = _nuevo("komainu", Vector3(2, 0, 0))
+	komainu._despertar()
+	komainu.mirando = Vector3.LEFT
+	var vida: int = komainu.vida
+	komainu.recibir_golpe(akira.global_position, false, 1, 0.0)
+	var de_frente: bool = komainu.vida == vida and komainu.consumir_bloqueo()
+	komainu.recibir_golpe(komainu.global_position + Vector3.RIGHT * 2.0, false, 1, 0.0)
+	var por_detras: bool = komainu.vida == vida - 1
+	_registrar("Komainu: de frente el golpe rebota y por la espalda entra", de_frente and por_detras,
+		"vida %d → %d" % [vida, komainu.vida])
+	# Gólem: coraza; tras un iai (postura rota) ya le entra la espada.
+	var golem = _nuevo("golem", Vector3(0, 0, 4))
+	var vida_golem: int = golem.vida
+	golem.recibir_golpe(akira.global_position, false, 1, 0.0)
+	var rebota: bool = golem.vida == vida_golem
+	golem.recibir_iai(akira.global_position)
+	var tras_iai: int = golem.vida
+	golem.recibir_golpe(akira.global_position, false, 1, 0.0)
+	_registrar("Gólem: la coraza para la espada hasta que un iai le rompe la guardia",
+		rebota and tras_iai < vida_golem and golem.vida < tras_iai,
+		"vida %d → %d → %d" % [vida_golem, tras_iai, golem.vida])
+	_quietos()
+
+
+func _probar_division_y_copias() -> void:
+	var juego = _juego()
+	cuenta_antes = juego.soldados.size()
+	prueba_a = _nuevo("slime", Vector3(-4, 0, 6))
+	prueba_a.recibir_golpe(prueba_a.global_position + Vector3.LEFT, true)
+	prueba_b = _nuevo("kitsune", Vector3(-4, 0, -6))
+	prueba_b._despertar()
+
+
+func _comprobar_division_y_copias() -> void:
+	var juego = _juego()
+	var pequenos: int = juego.soldados.filter(func(e): return is_instance_valid(e) and e.has_method("es_jefe") and e.tipo == "slime_pequeno").size()
+	var copias: Array = juego.soldados.filter(func(e): return is_instance_valid(e) and e.has_method("es_jefe") and e.tipo == "kitsune_ilusion")
+	_registrar("El limo se divide en dos al morir", pequenos >= 2, "pequeños=%d" % pequenos)
+	var copia_sin_dano := false
+	if not copias.is_empty():
+		var copia = copias[0]
+		var akira = juego.akira
+		akira.invulnerable = 0.0
+		var vida: int = akira.vida
+		copia.ataque = copia.perfil.ataques[0]
+		copia.mirando = (akira.global_position - copia.global_position).normalized()
+		copia.global_position = akira.global_position - copia.mirando * 1.0
+		copia._intentar_golpe()
+		copia_sin_dano = akira.vida == vida and not copia.vivo()
+		akira.invulnerable = 999.0
+	_registrar("La kitsune crea dos copias que no hacen daño ni dan sombra", copias.size() == 2 and copia_sin_dano
+		and copias[0].visual.sprite.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF,
+		"copias=%d, sin daño=%s" % [copias.size(), copia_sin_dano])
+	_quietos()
+
+
+func _probar_disfraces_y_piedra() -> void:
+	var juego = _juego()
+	var akira = juego.akira
+	_teletransportar(Vector3(-10, 0, 0), Vector3.RIGHT)
+	prueba_a = _nuevo("tanuki", Vector3(-8, 0, 0))
+	prueba_b = _nuevo("komainu", Vector3(-10, 0, 4.5))
+	prueba_c = _nuevo("gargola", Vector3(-6, 0, 0))
+	_quietos([prueba_a, prueba_b, prueba_c])
+	var dormido: bool = prueba_a.estado == prueba_a.Estado.DORMIDO and prueba_a.disfraz.visible
+	# El komainu no despierta si Akira camina; corriendo, sí.
+	akira.corriendo = false
+	var caminando: bool = prueba_b._debe_despertar(prueba_b._hacia_objetivo())
+	akira.corriendo = true
+	var corriendo: bool = prueba_b._debe_despertar(prueba_b._hacia_objetivo())
+	akira.corriendo = false
+	_registrar("Komainu: duerme si se camina con respeto y despierta si se corre cerca", not caminando and corriendo)
+	_registrar("El tanuki empieza disfrazado de jizō", dormido)
+
+
+func _comprobar_disfraces() -> void:
+	_registrar("El tanuki se descubre al acercarse Akira", prueba_a.estado != prueba_a.Estado.DORMIDO
+		and not prueba_a.disfraz.visible, "estado=%d" % prueba_a.estado)
+	var akira = _juego().akira
+	akira.mirando = Vector3.RIGHT
+	var vida: int = prueba_c.vida
+	prueba_c.estado = prueba_c.Estado.ALERTA
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	prueba_c.recibir_golpe(akira.global_position, false, 1, 0.0)
+	_registrar("La gárgola es de piedra mientras Akira la mira", prueba_c.en_piedra and prueba_c.vida == vida,
+		"piedra=%s, vida %d → %d" % [prueba_c.en_piedra, vida, prueba_c.vida])
+	_quietos()
+
+
+func _probar_gashadokuro_y_vampiro() -> void:
+	var juego = _juego()
+	prueba_a = _nuevo("gashadokuro", Vector3(10, 0, 8))
+	prueba_a.vida = 1
+	prueba_a.recibir_golpe(prueba_a.global_position + Vector3.LEFT, false, 2)
+	_registrar("El gashadokuro se desarma al caer la primera vez", prueba_a.vivo()
+		and prueba_a.estado == prueba_a.Estado.DESARMADO, "estado=%d" % prueba_a.estado)
+	prueba_b = _nuevo("vampiro", Vector3(10, 0, -8))
+	prueba_b._despertar()
+	prueba_b.recibir_golpe(prueba_b.global_position + Vector3.LEFT, false, 1)
+	prueba_b.recibir_golpe(prueba_b.global_position + Vector3.LEFT, false, 1)
+	_registrar("El vampiro se vuelve niebla cada dos golpes", prueba_b.estado == prueba_b.Estado.NIEBLA,
+		"estado=%d" % prueba_b.estado)
+	_quietos([prueba_a])
+
+
+func _comprobar_gashadokuro() -> void:
+	_registrar("El gashadokuro se vuelve a montar si no se rompen sus huesos", prueba_a.vivo()
+		and prueba_a.estado != prueba_a.Estado.DESARMADO and prueba_a.vida > 0, "vida=%d" % prueba_a.vida)
+	_quietos()
+
+
+func _probar_proyectil_y_zona() -> void:
+	var juego = _juego()
+	var akira = juego.akira
+	_teletransportar(Vector3(0, 0, 0), Vector3.RIGHT)
+	akira.invulnerable = 0.0
+	vida_prueba = akira.vida
+	prueba_a = _nuevo("elfo_oscuro", Vector3(8, 0, 0))
+	prueba_a.process_mode = Node.PROCESS_MODE_DISABLED
+	# Una tela que da a Akira: le quita vida y lo atrapa.
+	var tela = Proyectil.new()
+	juego.add_child(tela)
+	tela.lanzar(Vector3(3, 1, 0), akira.global_position + Vector3.UP, {"danio": 1, "parable": true,
+		"efecto": "atrapa", "visual": "tela", "rapidez": 12.0}, prueba_a, akira, juego.efectos)
+	# Una flecha devuelta con el iai: vuelve contra el elfo.
+	var flecha = Proyectil.new()
+	juego.add_child(flecha)
+	flecha.lanzar(Vector3(6, 1, 0), Vector3(20, 1, 0), {"danio": 1, "parable": true, "rapidez": 15.0}, prueba_a, akira, juego.efectos)
+	flecha.recibir_iai(akira.global_position)
+	cuenta_antes = prueba_a.vida
+	# Una zona roja lejos de Akira no le hace nada.
+	var zona = ZonaPeligro.new()
+	zona.configurar({"radio": 1.5, "aviso": 0.3, "activo": 0.3}, prueba_a, akira, juego.efectos)
+	juego.add_child(zona)
+	zona.global_position = Vector3(0, 0, 8)
+
+
+func _comprobar_proyectil_y_zona() -> void:
+	var akira = _juego().akira
+	_registrar("La tela de araña daña y atrapa a Akira", akira.vida == vida_prueba - 1,
+		"vida %d → %d" % [vida_prueba, akira.vida])
+	_registrar("Un iai devuelve la flecha contra el arquero", prueba_a.vida < cuenta_antes or not prueba_a.vivo(),
+		"vida del elfo %d" % prueba_a.vida)
+	akira.vida = akira.vida_maxima
+	akira.invulnerable = 999.0
+	akira.atrapado = 0.0
+	_quietos()
+
+
+func _probar_sellos_de_bahamut() -> void:
+	var juego = _juego()
+	var bahamut = juego.jefe
+	_quietos()
+	var vida: int = bahamut.vida
+	bahamut.recibir_golpe(bahamut.global_position + Vector3.LEFT * 2.0, false, 2)
+	var protegido: bool = bahamut.vida == vida and bahamut.encadenado()
+	for sello in bahamut.sellos:
+		sello.recibir_golpe(sello.global_position + Vector3.LEFT, true)
+	bahamut.recibir_golpe(bahamut.global_position + Vector3.LEFT * 2.0, false, 2)
+	_registrar("Bahamut: los tres dogū lo protegen; rotos, la espada le entra",
+		bahamut.sellos.size() == 3 and protegido and not bahamut.encadenado() and bahamut.vida < vida,
+		"sellos=%d, vida %d → %d" % [bahamut.sellos.size(), vida, bahamut.vida])
+
+
+func _probar_barrera_del_templo() -> void:
+	var juego = _juego()
+	_quietos()
+	var bien: bool = juego.barrera != null and juego.jefe.protegido and juego.objetivos.size() == 3
+	_registrar("Templo: una barrera y tres sellos protegen a la guardiana", bien,
+		"barrera=%s, objetivos=%d" % [juego.barrera != null, juego.objetivos.size()])
+	for sello in juego.objetivos:
+		sello.recibir_golpe(sello.global_position + Vector3.LEFT, false, 1)
+
+
+func _comprobar_barrera_del_templo() -> void:
+	var juego = _juego()
+	_registrar("Al cortar los sellos cae la barrera", juego.barrera == null and not juego.jefe.protegido)
+
+
+func _vencer_jefe_actual() -> void:
+	var juego = _juego()
+	_quietos()
+	var jefe = juego.jefe
+	var vueltas := 0
+	while jefe.vivo() and vueltas < 60:
+		jefe.recibir_golpe(jefe.global_position + Vector3.LEFT * 2.0, false, 4)
+		jefe.rota = 0.0
+		vueltas += 1
+
+
+func _comprobar_jefe_siguiente(tipo: String) -> void:
+	var juego = _juego()
+	_registrar("Hoshiyama: tras caer el jefe aparece %s" % tipo, juego.jefe != null and is_instance_valid(juego.jefe)
+		and juego.jefe.tipo == tipo, "jefe=%s" % (juego.jefe.tipo if juego.jefe else "ninguno"))
+
+
+func _comprobar_final() -> void:
+	var juego = _juego()
+	_registrar("Al caer la zorra de nueve colas llega el final", juego.fase == "cierre"
+		and Partida.alcanzado == Escenarios.cantidad() - 1, "fase=%s, alcanzado=%d" % [juego.fase, Partida.alcanzado])
+	principal.hud.completar_texto()
+	principal.aceptar()
+	_registrar("Tras el final se vuelve al primer escenario", _juego().indice_escenario == 0)
+
+
+func _terminar_escenario_con_tecnica() -> void:
+	var juego = _juego()
+	juego.akira.controlable = false
+	juego._cambiar_fase("cierre")
+	principal.hud.completar_texto()
+	principal.aceptar()
+
+
+func _comprobar_tecnica() -> void:
+	var juego = _juego()
+	_registrar("Sōjōbō enseña el paso del tengu (esquivar cuesta la mitad)",
+		Partida.tiene_tecnica("paso_del_tengu") and juego.indice_escenario == 5 and is_equal_approx(juego.akira.coste_esquiva, 0.5),
+		"escenario=%d, coste=%.2f" % [juego.indice_escenario, juego.akira.coste_esquiva])
 
 
 func _terminar() -> void:

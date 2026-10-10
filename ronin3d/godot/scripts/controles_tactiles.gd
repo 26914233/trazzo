@@ -139,6 +139,8 @@ func _tocar(evento: InputEventScreenTouch) -> void:
 				elif principal.hud.boton_comprar.visible \
 						and principal.hud.boton_comprar.get_global_rect().has_point(evento.position):
 					principal.comprar_apariencia()
+				elif principal.hud.boton_escenario.get_global_rect().has_point(evento.position):
+					principal.elegir_escenario()
 				else:
 					principal.alternar_pausa()
 			else:
@@ -146,7 +148,7 @@ func _tocar(evento: InputEventScreenTouch) -> void:
 		_soltar_todo()
 		return
 	if evento.pressed:
-		# Junto al jizō, tocar el aviso es rezar.
+		# Junto al jizō, tocar el aviso es rezar (y junto a la hoguera o un aldeano, descansar o hablar).
 		var aviso: Label = principal.hud.aviso_interaccion
 		if aviso.visible and aviso.get_global_rect().has_point(evento.position):
 			principal.juego.interactuar()

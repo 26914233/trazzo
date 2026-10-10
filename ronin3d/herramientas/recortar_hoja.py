@@ -13,9 +13,17 @@ generan con Gemini usándolo de referencia (ver arte/conceptos/LEEME_ENEMIGOS.md
   personaje se quedan.
 - Todos los cuadros se alinean por los pies, igual que en recortar_oni_jefe.py.
 - En el .json va «alto_px»: lo que mide el personaje en reposo, para darle su altura en el juego.
+- Gemini a veces escribe el nombre de cada fila («IDLE», «WALK CYCLE»…) o dibuja una línea de suelo
+  bajo cada fila: las bandas bajas de píxeles grises y claros (texto) y las filas de píxeles con un
+  tramo seguido de más de un tercio del ancho (líneas) se borran antes de buscar los cuadros.
 
-Uso:  python3 ronin3d/herramientas/recortar_hoja.py <imagen> <id> <fila1,fila2,...>
+Uso:  python3 ronin3d/herramientas/recortar_hoja.py <imagen> <id> <fila1,fila2,...> [fila:cuadro,...]
       p. ej.  ... hojas/kappa.png kappa reposo,caminar,ataque,golpe,muerte
+      El cuarto argumento, opcional, arregla cuadros, contados desde 0 dentro de cada fila:
+        «ataque:0» quita ese cuadro (salió mal);
+        «caminar:1/3» parte ese cuadro en 3 (figuras pegadas que se tocan con las patas).
+      Una fila con dos animaciones se escribe «golpe+muerte@3»: los 3 primeros cuadros son «golpe»
+      y el resto, «muerte».
 """
 import json
 import os
@@ -30,6 +38,8 @@ TOLERANCIA_FONDO = 48        # suma de diferencias RGB que aún cuenta como fond
 UMBRAL_CONTENIDO = 70        # más que esto respecto al fondo es personaje (para encontrar filas y cuadros)
 HUECO_FILA = 6               # filas vacías seguidas que separan dos filas de cuadros
 HUECO_CUADRO = 5             # columnas vacías seguidas que separan dos cuadros
+ALTO_MINIMO_FILA = 60        # una banda más baja no es una fila de cuadros: es texto, una línea o un trozo
+LINEA = 0.34                 # un tramo seguido más largo que esta parte del ancho es una línea dibujada
 MARGEN = 3
 ENGROSAR = 3                 # píxeles con que se engrosa la máscara para agrupar figuras
 FPS = {"reposo": 6.0, "caminar": 9.0}
@@ -141,6 +151,108 @@ def cuadros_de_fila(original: np.ndarray) -> list:
     return [m for _x, m in resultado]
 
 
+def tramo_mas_largo(fila: np.ndarray) -> int:
+    mejor = actual = 0
+    for valor in fila:
+        actual = actual + 1 if valor else 0
+        mejor = max(mejor, actual)
+    return mejor
+
+
+def es_texto(imagen: np.ndarray, contenido: np.ndarray) -> bool:
+    """Una banda baja es texto si casi todo lo que tiene es gris claro (las letras de los rótulos)."""
+    return gris_claro(imagen[contenido])
+
+
+def gris_claro(pixeles: np.ndarray) -> bool:
+    pixeles = pixeles.astype(int)
+    if len(pixeles) == 0:
+        return True
+    gris = (pixeles.max(1) - pixeles.min(1)) < 40
+    claro = pixeles.max(1) > 110
+    return float((gris & claro).mean()) > 0.5
+
+
+def borrar_palabras(imagen: np.ndarray, contenido: np.ndarray, amplia: np.ndarray) -> None:
+    """Borra los rótulos pegados a una fila: letras sueltas (figuras pequeñas de gris claro) que
+    forman una línea, al menos tres seguidas con la misma altura y poca separación. Las partículas
+    grises de una muerte no se tocan, porque están desperdigadas."""
+    letras = []
+    for figura in figuras(contenido):
+        ys, xs = figura[:, 0], figura[:, 1]
+        alto, ancho = ys.max() - ys.min() + 1, xs.max() - xs.min() + 1
+        if 4 <= alto <= 20 and ancho <= 36 and gris_claro(imagen[ys, xs]):
+            letras.append((ys.min(), ys.max(), xs.min(), xs.max(), figura))
+    letras.sort(key=lambda l: (l[0], l[2]))
+    usadas = set()
+    for i, letra in enumerate(letras):
+        if i in usadas:
+            continue
+        palabra = [i]
+        for j in range(i + 1, len(letras)):
+            otra = letras[j]
+            ultima = letras[palabra[-1]]
+            if j not in usadas and abs(otra[1] - ultima[1]) <= 2 and 0 <= otra[2] - ultima[3] <= 10:
+                palabra.append(j)
+        if len(palabra) >= 2 and letras[palabra[-1]][3] - letras[palabra[0]][2] >= 18:
+            for k in palabra:
+                usadas.add(k)
+                figura = letras[k][4]
+                y0, y1 = letras[k][0] - 1, letras[k][1] + 2
+                x0, x1 = letras[k][2] - 1, letras[k][3] + 2
+                contenido[max(0, y0):y1, max(0, x0):x1] = False
+                amplia[max(0, y0):y1, max(0, x0):x1] = False
+
+
+def limpiar(imagen: np.ndarray, fondo: np.ndarray, contenido: np.ndarray, amplia: np.ndarray) -> list:
+    """Borra líneas y rótulos (de «contenido» y de «amplia») y devuelve las filas de cuadros."""
+    ancho = imagen.shape[1]
+    lineas = [y for y in range(imagen.shape[0]) if tramo_mas_largo(amplia[y]) > ancho * LINEA]
+    # El borde de una línea (antialias del JPEG) también se va, aunque su tramo sea más corto.
+    bordes = [y + d for y in lineas for d in (-2, -1, 1, 2)
+              if 0 <= y + d < imagen.shape[0] and tramo_mas_largo(amplia[y + d]) > ancho * LINEA / 2]
+    for y in set(lineas + bordes):
+        contenido[y] = False
+        amplia[y] = False
+    borrar_palabras(imagen, contenido, amplia)
+    bandas = tramos(contenido.sum(1) > 2, 2, 1)
+    filas = [b for b in bandas if b[1] - b[0] >= ALTO_MINIMO_FILA]
+    for y0, y1 in bandas:
+        if y1 - y0 >= ALTO_MINIMO_FILA:
+            continue
+        if not filas or es_texto(imagen[y0:y1], contenido[y0:y1]):
+            contenido[y0:y1] = False
+            amplia[y0:y1] = False
+            continue
+        # Un trozo suelto (puntas de alas, polvo) va con la fila más cercana.
+        i = min(range(len(filas)), key=lambda k: max(filas[k][0] - y1, y0 - filas[k][1], 0))
+        filas[i] = (min(filas[i][0], y0), max(filas[i][1], y1))
+    return filas
+
+
+def partir_mascara(mascara: np.ndarray, partes: int) -> list:
+    """Parte una figura en «partes» cuadros por las columnas con menos píxeles cerca de los cortes
+    iguales (para figuras que se tocan con las patas)."""
+    if partes <= 1:
+        return [mascara]
+    xs = np.where(mascara.any(0))[0]
+    x0, x1 = xs.min(), xs.max() + 1
+    perfil = mascara.sum(0)
+    cortes = [x0]
+    for i in range(1, partes):
+        ideal = x0 + (x1 - x0) * i // partes
+        margen = (x1 - x0) // (partes * 4)
+        ventana = perfil[ideal - margen:ideal + margen + 1]
+        cortes.append(ideal - margen + int(np.argmin(ventana)))
+    cortes.append(x1)
+    resultado = []
+    for a, b in zip(cortes, cortes[1:]):
+        trozo = np.zeros_like(mascara)
+        trozo[:, a:b] = mascara[:, a:b]
+        resultado.append(trozo)
+    return resultado
+
+
 def quitar_fondo(rgb: np.ndarray, fondo: np.ndarray) -> np.ndarray:
     alto, ancho, _ = rgb.shape
     parecido = np.abs(rgb.astype(int) - fondo).sum(2) <= TOLERANCIA_FONDO
@@ -164,19 +276,40 @@ def main() -> None:
         print(__doc__)
         sys.exit(1)
     ruta, ident, nombres = sys.argv[1], sys.argv[2], sys.argv[3].split(",")
+    quitar = set()
+    partir = {}
+    if len(sys.argv) > 4:
+        for par in sys.argv[4].split(","):
+            fila, cuadro = par.split(":")
+            if "/" in cuadro:
+                cuadro, partes = cuadro.split("/")
+                partir[(fila, int(cuadro))] = int(partes)
+            else:
+                quitar.add((fila, int(cuadro)))
     imagen = np.array(Image.open(ruta).convert("RGB"))
     fondo = color_de_fondo(imagen)
     contenido = np.abs(imagen.astype(int) - fondo).sum(2) > UMBRAL_CONTENIDO
-    filas = tramos(contenido.sum(1) > 2, HUECO_FILA, 20)
+    # Máscara amplia (tolerancia del fondo) para que el contorno oscuro entre en la figura.
+    amplia_hoja = np.abs(imagen.astype(int) - fondo).sum(2) > TOLERANCIA_FONDO
+    filas = limpiar(imagen, fondo, contenido, amplia_hoja)
     if len(filas) != len(nombres):
         sys.exit(f"{ident}: salen {len(filas)} filas y se esperaban {len(nombres)}: {filas}")
     recortes = []           # (nombre de la fila, rgba, base, centro)
-    for nombre, (y0, y1) in zip(nombres, filas):
+    for nombre_fila, (y0, y1) in zip(nombres, filas):
         y0, y1 = max(0, y0 - MARGEN), min(imagen.shape[0], y1 + MARGEN)
         banda = imagen[y0:y1]
-        # Máscara amplia (tolerancia del fondo) para que el contorno oscuro entre en la figura.
-        amplia = np.abs(banda.astype(int) - fondo).sum(2) > TOLERANCIA_FONDO
-        for mascara in cuadros_de_fila(amplia):
+        amplia = amplia_hoja[y0:y1]
+        mascaras = []
+        for k, mascara in enumerate(cuadros_de_fila(amplia)):
+            if (nombre_fila, k) in quitar:
+                continue
+            mascaras.extend(partir_mascara(mascara, partir.get((nombre_fila, k), 1)))
+        for k, mascara in enumerate(mascaras):
+            nombre = nombre_fila
+            if "+" in nombre_fila:
+                primera, resto = nombre_fila.split("+")
+                segunda, corte = resto.split("@")
+                nombre = primera if k < int(corte) else segunda
             ys, xs = np.nonzero(mascara)
             cy0, cy1, cx0, cx1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
             alfa = np.where(mascara[cy0:cy1, cx0:cx1], 255, 0).astype(np.uint8)

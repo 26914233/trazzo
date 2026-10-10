@@ -159,13 +159,22 @@ func golpe_de(punto: Vector3, mortal: bool, corte: Dictionary, danio: int, rota:
 	var color: Color = Color(1.0, 0.75, 0.35) if not corte.get("cargado", false) else Color(0.75, 0.85, 1.0)
 	chispas(punto, 22 if mortal else 12 + int(float(corte.sacudida) * 12.0), color)
 	sonar("golpe", punto, 0.0 if float(corte.pausa) < 0.1 else 2.0)
-	numero(punto + Vector3.UP * 0.5, str(danio) if not mortal or danio > 0 else "", mortal)
+	numero(punto + Vector3.UP * 0.5, str(danio) if danio > 0 else "", mortal)
 	if rota and not mortal:
 		texto_flotante(punto + Vector3.UP * 0.9, "¡Postura rota!", Color(1.0, 0.85, 0.3), 0.007)
 		sonar("parada", punto, -2.0)
 	if mortal:
 		sonar("caida", punto, -3.0)
 		polvo_de_pixeles(punto)
+
+
+# El golpe rebota en un escudo, una coraza o la piedra: chispas blancas y sin número de daño.
+func bloqueo(punto: Vector3) -> void:
+	pausa_de_impacto(0.05)
+	sacudir(0.15)
+	chispas(punto, 14, Color(0.85, 0.9, 1.0), 5.0, 0.3)
+	sonar("parada", punto, -3.0)
+	texto_flotante(punto + Vector3.UP * 0.7, "¡Bloqueado!", Color(0.75, 0.85, 1.0), 0.006)
 
 
 # Número de daño que sube y se desvanece sobre el enemigo.

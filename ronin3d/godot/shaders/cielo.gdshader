@@ -6,6 +6,7 @@ uniform vec3 color_horizonte : source_color = vec3(0.165, 0.141, 0.298);
 uniform vec3 color_suelo : source_color = vec3(0.03, 0.03, 0.05);
 uniform vec3 direccion_luna = vec3(-0.35, 0.5, -0.8);
 uniform float tamano_luna = 0.05;
+uniform vec3 tinte_luna : source_color = vec3(1.0, 1.0, 1.0);   // la luna roja de los capítulos siguientes
 
 float azar(vec3 p) {
 	p = fract(p * 0.3183099 + 0.1);
@@ -39,8 +40,8 @@ void sky() {
 		+ smoothstep(0.28, 0.22, length(local.xy - vec2(0.35, -0.25)))
 		+ smoothstep(0.18, 0.13, length(local.xy - vec2(0.1, 0.5)));
 	vec3 color_luna = mix(vec3(0.98, 0.95, 0.84), vec3(0.86, 0.82, 0.7), clamp(manchas, 0.0, 1.0));
-	color += vec3(0.32, 0.33, 0.42) * exp(-distancia * 9.0) * 0.55;
-	color = mix(color, color_luna * 1.6, disco);
+	color += vec3(0.32, 0.33, 0.42) * tinte_luna * exp(-distancia * 9.0) * 0.55;
+	color = mix(color, color_luna * tinte_luna * 1.6, disco);
 
 	COLOR = color;
 }

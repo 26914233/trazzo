@@ -58,6 +58,8 @@ var enfriamiento_parada := 0.0
 var tiempo_desenvaine := 0.0
 var tiempo_remate := 0.0
 var espiritu := 0.0                   # de 0 a 1
+var atrapado := 0.0                   # (tela de la jorōgumo, agarrón del gaki) ni andar ni iai
+var coste_esquiva := 1.0              # el paso del tengu (Sōjōbō, capítulo 2) lo deja en la mitad
 var buscar_rival: Callable            # lo pone el juego: devuelve el soldado más cercano
 
 
@@ -212,7 +214,7 @@ func gastar_aguante(cantidad: float) -> void:
 func empezar_esquiva() -> void:
 	if not vivo() or esquivando() or enfriamiento_esquiva > 0.0 or empujado > 0.0:
 		return
-	if aguante < Armas.AGUANTE_ESQUIVA:
+	if aguante < Armas.AGUANTE_ESQUIVA * coste_esquiva or atrapado > 0.0:
 		return
 	if atacando() and tiempo_en_ataque < ataque.esquiva_desde:
 		return
@@ -228,8 +230,14 @@ func empezar_esquiva() -> void:
 	carga_lista = false
 	en_postura = false
 	esquiva = Armas.ESQUIVA_DURACION
-	gastar_aguante(Armas.AGUANTE_ESQUIVA)
+	gastar_aguante(Armas.AGUANTE_ESQUIVA * coste_esquiva)
 	esquivo.emit()
+
+
+# Atrapado por una tela o un agarrón: no anda ni puede ponerse en postura de iai un momento.
+func atrapar(segundos: float) -> void:
+	atrapado = maxf(atrapado, segundos)
+	en_postura = false
 
 
 func _actualizar_aguante(delta: float) -> void:
@@ -249,7 +257,7 @@ func invulnerable_por_esquiva() -> bool:
 # --- Iaidō ---------------------------------------------------------------------------------
 
 func empezar_postura() -> void:
-	if not vivo() or empujado > 0.0 or atacando() or esquivando() or enfriamiento_parada > 0.0:
+	if not vivo() or empujado > 0.0 or atacando() or esquivando() or enfriamiento_parada > 0.0 or atrapado > 0.0:
 		return
 	en_postura = true
 	_mirar_al_rival()
@@ -350,6 +358,7 @@ func _physics_process(delta: float) -> void:
 	buffer_ataque = maxf(0.0, buffer_ataque - delta)
 	tras_iai = maxf(0.0, tras_iai - delta)
 	enfriamiento_esquiva = maxf(0.0, enfriamiento_esquiva - delta)
+	atrapado = maxf(0.0, atrapado - delta)
 	_actualizar_aguante(delta)
 	if atacando():
 		tiempo_en_ataque += delta
@@ -405,6 +414,10 @@ func _physics_process(delta: float) -> void:
 		muerte = minf(1.0, muerte + delta / 0.8)
 		moviendose = false
 	elif empujado > 0.0:
+		moviendose = false
+	elif atrapado > 0.0:
+		velocity.x = 0.0
+		velocity.z = 0.0
 		moviendose = false
 	elif esquivando():
 		velocity.x = direccion_esquiva.x * Armas.ESQUIVA_RAPIDEZ

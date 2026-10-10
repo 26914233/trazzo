@@ -9,6 +9,7 @@ uniform sampler2D hoja : source_color, filter_nearest;
 uniform vec4 region = vec4(0.0, 0.0, 1.0, 1.0);    // x, y, ancho y alto del cuadro, en UV de la hoja
 uniform float destello = 0.0;                        // 1 = blanco (golpe recibido)
 uniform float luz_propia = 0.22;                     // de noche, que el sprite no se pierda
+uniform vec3 tinte : source_color = vec3(1.0);       // el doble oscuro de Akira (capítulo 4)
 
 void vertex() {
 	MODELVIEW_MATRIX = VIEW_MATRIX * mat4(INV_VIEW_MATRIX[0], INV_VIEW_MATRIX[1], INV_VIEW_MATRIX[2], MODEL_MATRIX[3]);
@@ -20,7 +21,7 @@ void fragment() {
 	if (color.a < 0.5) {
 		discard;
 	}
-	vec3 base = mix(color.rgb, vec3(1.0), destello);
+	vec3 base = mix(color.rgb * tinte, vec3(1.0), destello);
 	ALBEDO = base;
 	ROUGHNESS = 1.0;
 	EMISSION = base * luz_propia;
