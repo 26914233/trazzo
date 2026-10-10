@@ -17,7 +17,7 @@ func _ready() -> void:
 	DirAccess.make_dir_recursive_absolute(Obras.carpeta)
 	await _captura("menu", "res://escenas/menu.tscn")
 	var C = preload("res://escenas/colorear.gd")
-	C.lamina_id = "mandalas_002"
+	C.lamina_id = "animales_i010"
 	var e := await _captura("colorear_vacia", "res://escenas/colorear.tscn")
 	# pinta la mitad de las zonas con la paleta para ver el resultado
 	var cols := Paletas.colores(0)

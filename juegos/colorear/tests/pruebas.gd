@@ -72,7 +72,9 @@ func prueba_indice() -> void:
 				faltan.append("zonas fuera de rango " + l["id"])
 	comprobar(faltan.is_empty(), "todas las imagenes existen y sin ids repetidos %s" % str(faltan.slice(0, 3)))
 	comprobar(Laminas.total() == ids.size(), "total coincide")
-	comprobar(Laminas.nombre("mandalas_012") == "Mandala 12", "nombre legible")
+	var primera: String = Laminas.categorias[0]["laminas"][0]["id"]
+	comprobar(Laminas.nombre(primera) == Laminas.categorias[0]["nombre"] + " 1", "nombre legible: %s" % Laminas.nombre(primera))
+	comprobar(Laminas.total() >= 500, "más de 500 láminas (%d)" % Laminas.total())
 
 
 ## Si Godot comprimiera las regiones con perdida, los ids se romperian: se

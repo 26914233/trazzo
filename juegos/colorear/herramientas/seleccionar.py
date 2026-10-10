@@ -22,58 +22,58 @@ from scipy import ndimage
 from convertir import tinta_de
 from laminas import procesar_tinta
 
-LIMITES = {"gris": 0.01, "tinta_min": 0.03, "tinta_max": 0.32, "zonas_min": 40, "zonas_max": 1500, "borde": 0.02}
+LIMITES = {"tinta_min": 0.05, "tinta_max": 0.17, "zonas_min": 80, "zonas_max": 900}
 
 
 def medir(ruta):
+    """Mide la lámina tal como quedará: con la limpieza de sombreados aplicada."""
     img = Image.open(ruta).convert("L")
-    a = np.asarray(img.resize((1024, 1024)), dtype=np.int32)
-    # gris lejos de las líneas = sombra (el suavizado del borde de una línea no cuenta)
-    cerca = ndimage.binary_dilation(a < 110, iterations=3)
-    gris = float(((a > 60) & (a < 215) & ~cerca).mean())
-    tinta = float((a <= 128).mean())
-    marco = np.concatenate([a[:6].ravel(), a[-6:].ravel(), a[:, :6].ravel(), a[:, -6:].ravel()])
-    borde = float((marco <= 128).mean())
-    _l, _r, _m, zonas = procesar_tinta(tinta_de(img, 1))
-    return {"gris": gris, "tinta": tinta, "borde": borde, "zonas": zonas}
+    tinta = tinta_de(img, 0, limpiar=True)
+    lin, _r, mini, zonas = procesar_tinta(tinta)
+    a = np.asarray(lin)[..., 1]
+    return {"tinta": float((a > 128).mean()), "zonas": zonas, "mini": mini}
 
 
 def valida(m):
-    return (m["gris"] <= LIMITES["gris"] and LIMITES["tinta_min"] <= m["tinta"] <= LIMITES["tinta_max"]
-            and LIMITES["zonas_min"] <= m["zonas"] <= LIMITES["zonas_max"] and m["borde"] <= LIMITES["borde"])
+    return LIMITES["tinta_min"] <= m["tinta"] <= LIMITES["tinta_max"] and LIMITES["zonas_min"] <= m["zonas"] <= LIMITES["zonas_max"]
+
+
+def _medir_seguro(ruta):
+    try:
+        m = medir(ruta)
+    except Exception as e:  # imagen rota: se informa y se sigue
+        print("no se pudo medir", ruta, e, file=sys.stderr)
+        return None
+    m["ruta"] = ruta
+    m["valida"] = valida(m)
+    return m
 
 
 def main():
+    from multiprocessing import Pool
     origen, salida = sys.argv[1], sys.argv[2]
-    os.makedirs(salida, exist_ok=True)
-    filas = []
-    for raiz, _d, archivos in os.walk(origen):
-        for f in sorted(archivos):
-            if f.lower().endswith(".png"):
-                ruta = os.path.join(raiz, f)
-                try:
-                    m = medir(ruta)
-                except Exception as e:  # imagen rota: se informa y se sigue
-                    print("no se pudo medir", ruta, e, file=sys.stderr)
-                    continue
-                m["ruta"] = ruta
-                m["valida"] = valida(m)
-                filas.append(m)
-    filas.sort(key=lambda m: (not m["valida"], m["gris"]))
+    os.makedirs(os.path.join(salida, "minis"), exist_ok=True)
+    rutas = sorted(os.path.join(r, f) for r, _d, fs in os.walk(origen) for f in fs if f.lower().endswith(".png"))
+    with Pool() as pool:
+        filas = [m for m in pool.imap_unordered(_medir_seguro, rutas, chunksize=4) if m]
+    for m in filas:
+        m["mini"].save(os.path.join(salida, "minis", os.path.basename(m["ruta"])))
+        del m["mini"]
+    filas.sort(key=lambda m: (not m["valida"], os.path.basename(m["ruta"])))
     with open(os.path.join(salida, "medidas.csv"), "w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=["ruta", "valida", "gris", "tinta", "borde", "zonas"])
+        w = csv.DictWriter(fh, fieldnames=["ruta", "valida", "tinta", "zonas"])
         w.writeheader()
         w.writerows(filas)
     buenas = [m for m in filas if m["valida"]]
     print(len(filas), "medidas,", len(buenas), "pasan los filtros", file=sys.stderr)
-    # hojas de contacto de 6x5 numeradas
+    # hojas de contacto 6x5 numeradas, con la lámina ya limpia (lo que verá quien pinta)
     for h in range(0, len(buenas), 30):
         hoja = Image.new("L", (6 * 330, 5 * 350), 255)
         d = ImageDraw.Draw(hoja)
         for k, m in enumerate(buenas[h:h + 30]):
             x, y = (k % 6) * 330, (k // 6) * 350
-            hoja.paste(Image.open(m["ruta"]).convert("L").resize((320, 320)), (x + 5, y + 5))
-            d.text((x + 8, y + 328), "%d %s" % (h + k, os.path.basename(m["ruta"])[:40]), fill=0)
+            hoja.paste(Image.open(os.path.join(salida, "minis", os.path.basename(m["ruta"]))).resize((320, 320)), (x + 5, y + 5))
+            d.text((x + 8, y + 328), "%d %s" % (h + k, os.path.basename(m["ruta"])[:44]), fill=0)
         hoja.save(os.path.join(salida, "hoja_%03d.png" % (h // 30)))
 
 

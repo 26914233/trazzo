@@ -34,8 +34,19 @@ func categoria(id: String) -> Dictionary:
 ## "Mandala 12", "Vitral 3"...
 func nombre(id: String) -> String:
 	var cat := categoria(_por_id[id]["categoria"]) if existe(id) else {}
-	var singular := {"mandalas": "Mandala", "vitrales": "Vitral", "flores": "Flores", "geometria": "Geometría"}
-	return "%s %d" % [singular.get(cat.get("id", ""), "Lámina"), id.get_slice("_", 1).to_int()]
+	return "%s %d" % [cat.get("nombre", "Lámina"), numero(id)]
+
+
+## Número de la lámina dentro de su categoría (las hechas por código y las
+## ilustradas se numeran seguidas: primero las ilustradas).
+func numero(id: String) -> int:
+	if not existe(id):
+		return 0
+	var lista: Array = categoria(_por_id[id]["categoria"])["laminas"]
+	for i in lista.size():
+		if lista[i]["id"] == id:
+			return i + 1
+	return 0
 
 
 func total() -> int:

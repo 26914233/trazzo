@@ -15,7 +15,7 @@ dest_files=["res://.godot/imported/vitrales_016_mini.png-8bd26240439a3b846780164
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

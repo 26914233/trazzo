@@ -528,11 +528,17 @@ GEOMETRIAS = [flor_de_la_vida, truchet, espiral_cuadrados, estrellas_islamicas, 
 
 # --------------------------------------------------------------------- salida
 
+def fachadas(rng, lz, i):
+    from dibujos.arquitectura import fachada   # import aquí: dibujos importa este módulo
+    fachada(rng, lz, i)
+
+
 CATEGORIAS = [
     ("mandalas", "Mandalas", mandala, 60),
     ("vitrales", "Vitrales", vitral, 30),
     ("flores", "Flores", flores, 30),
     ("geometria", "Geometría", geometria, 28),
+    ("fachadas", "Fachadas", fachadas, 3),
 ]
 
 
@@ -567,7 +573,8 @@ def procesar_tinta(tinta):
     reg[..., 0] = etiquetas & 255
     reg[..., 1] = etiquetas >> 8
     lineas = np.zeros((LADO, LADO, 2), dtype=np.uint8)     # gris + alfa: negro con alfa
-    lineas[..., 1] = tinta.clip(0, 255)
+    # 4 niveles de alfa: se ve igual y ocupa una quinta parte (las láminas van en el APK)
+    lineas[..., 1] = (np.round(tinta.clip(0, 255) / 85.0) * 85).astype(np.uint8)
     lin_img = Image.fromarray(lineas, "LA")
     mini = Image.fromarray((255 - tinta.clip(0, 255)).astype(np.uint8), "L").resize((MINI, MINI), Image.LANCZOS)
     return lin_img, Image.fromarray(reg, "RGB"), mini, k
@@ -579,13 +586,23 @@ def main():
     ap.add_argument("--solo", default="")
     ap.add_argument("--cuantas", type=int, default=0)
     args = ap.parse_args()
+    # Se conserva el resto del índice (otras categorías e ilustraciones importadas):
+    # solo se reemplazan las láminas hechas por código de lo que se regenera.
+    ruta_indice = os.path.join(args.salida, "indice.json")
     indice = {"version": 1, "lado": LADO, "categorias": []}
+    if os.path.exists(ruta_indice):
+        indice = json.load(open(ruta_indice, encoding="utf-8"))
+    por_id = {c["id"]: c for c in indice["categorias"]}
     for cid, nombre, gen, cuantas in CATEGORIAS:
         if args.solo and cid != args.solo:
             continue
         cuantas = args.cuantas or cuantas
         os.makedirs(os.path.join(args.salida, cid), exist_ok=True)
-        cat = {"id": cid, "nombre": nombre, "laminas": []}
+        cat = por_id.get(cid)
+        if cat is None:
+            cat = {"id": cid, "nombre": nombre, "laminas": []}
+            indice["categorias"].append(cat)
+        cat["laminas"] = [l for l in cat["laminas"] if "_i" in l["id"]]   # deja las ilustradas
         for i in range(cuantas):
             lid = "%s_%03d" % (cid, i + 1)
             rng = np.random.default_rng(zlib.crc32(lid.encode()))
@@ -598,8 +615,7 @@ def main():
             mini.save(base + "_mini.png", optimize=True)
             cat["laminas"].append({"id": lid, "zonas": k})
             print("%s: %d zonas" % (lid, k), file=sys.stderr)
-        indice["categorias"].append(cat)
-    with open(os.path.join(args.salida, "indice.json"), "w", encoding="utf-8") as f:
+    with open(ruta_indice, "w", encoding="utf-8") as f:
         json.dump(indice, f, ensure_ascii=False, indent=1)
 
 

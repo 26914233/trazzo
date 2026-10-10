@@ -15,7 +15,7 @@ dest_files=["res://.godot/imported/flores_026_mini.png-5dc5724a9a6c18560731bd1b1
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

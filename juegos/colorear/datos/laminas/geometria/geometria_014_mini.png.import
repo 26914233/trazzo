@@ -15,7 +15,7 @@ dest_files=["res://.godot/imported/geometria_014_mini.png-3603eacf326a615df3c42e
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

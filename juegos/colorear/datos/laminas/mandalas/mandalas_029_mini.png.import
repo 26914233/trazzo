@@ -15,7 +15,7 @@ dest_files=["res://.godot/imported/mandalas_029_mini.png-f151e5abdf9a8722eb16dd1
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
