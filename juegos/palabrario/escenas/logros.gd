@@ -31,6 +31,8 @@ func _ready() -> void:
 		["Sopas al azar", str(int(d["aleatorias"]))],
 		["Palabras encontradas", str(int(d["palabras"]))],
 		["Pistas usadas", str(int(d["pistas_usadas"]))],
+		["Palabras extra", str(int(d["extras"]))],
+		["Ganadas a contrarreloj", str(int(d["reloj_ganadas"]))],
 	]:
 		rejilla.add_child(_dato(dato[0], dato[1]))
 	lista.add_child(rejilla)

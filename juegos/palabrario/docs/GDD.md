@@ -96,3 +96,11 @@ Copiados como función (no como código, textos ni arte) de las apps revisadas e
 - **Estadísticas** (pantalla Logros): sopas resueltas, partidas, racha y mejor racha,
   comodín, sopas del día, al azar, palabras encontradas, pistas usadas y mejor tiempo
   por dificultad. Van en el guardado firmado y se acotan al leer.
+- **Palabras extra:** hasta 3 escondidas por sopa (del mismo tema si no entran en esa
+  dificultad; si no, de otros temas de la categoría). No están en la lista; el contador
+  dice cuántas hay. Cada 3 encontradas dan 1 pista, como mucho 2 pistas al día por esta
+  vía (si no, las sopas al azar serían pistas infinitas). Se dibujan con trazo fino.
+- **Contrarreloj** (Ajustes, apagado por defecto): 20 s por palabra + 5 s por nivel de
+  dificultad. Si se acaba: seguir sin reloj (sin perder nada), reintentar o salir. Solo
+  cuenta como ganada a contrarreloj si se termina dentro del tiempo.
+- **Diseño Contraste** (accesibilidad): negro, blanco y amarillo; texto a más de 15:1.

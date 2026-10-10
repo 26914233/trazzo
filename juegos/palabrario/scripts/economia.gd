@@ -41,6 +41,17 @@ static func avanzar_racha(racha: int, ultimo_dia: String, hoy: String) -> Array:
 	return [1, true]
 
 
+## Palabras extra: cada EXTRAS_POR_PISTA encontradas dan una pista, con tope
+## diario (si no, las sopas al azar serian pistas infinitas).
+const EXTRAS_POR_PISTA := 3
+const PISTAS_EXTRA_DIA := 2
+
+
+## Contrarreloj opcional: generoso, para que sea un reto y no un castigo.
+static func tiempo_limite(palabras: int, dificultad: int) -> int:
+	return palabras * (20 + 5 * clampi(dificultad, 0, 3))
+
+
 ## Un comodin por semana: si faltas un solo dia, la racha sigue (las reseñas
 ## castigan perder una racha larga por un despiste).
 const DIAS_COMODIN := 7

@@ -17,16 +17,16 @@ const VERSION := 2
 # (riesgo aceptado: valor bajo, un jugador, sin ranking; docs/LANZAMIENTO.md).
 const SAL := "palabrario-v1-7f3c91e2"
 const ESCALAS := [0.85, 1.0, 1.15, 1.3]
-const DISENOS := ["cielo", "papel", "noche"]
+const DISENOS := ["cielo", "papel", "noche", "contraste"]
 const RACHA_MAX := 3650            # diez años seguidos
 const COMPLETADAS_MAX := 10_000_000
 # Si la fecha mas alta vista queda mas de esto por delante del reloj, el reloj
 # estuvo mal (p. ej. en otro año) y se vuelve a la fecha real para no dejar la
 # sopa del dia congelada. Atrasos cortos siguen sin devolver nada (SEC-002).
 const DIAS_RELOJ_ROTO := 30
-const FECHAS := ["ultimo_dia", "max_dia", "diario_hecho", "pistas_dia", "comodin_usado"]
+const FECHAS := ["ultimo_dia", "max_dia", "diario_hecho", "pistas_dia", "comodin_usado", "extras_dia"]
 const TIEMPO_MAX := 86_400         # segundos: un dia
-const CONTADORES := ["racha_max", "diarias", "aleatorias", "palabras", "pistas_usadas"]
+const CONTADORES := ["racha_max", "diarias", "aleatorias", "palabras", "pistas_usadas", "extras", "reloj_ganadas"]
 
 var ruta := "user://progreso.save"
 var datos: Dictionary = {}
@@ -67,6 +67,11 @@ static func por_defecto() -> Dictionary:
 		"palabras": 0,             # palabras encontradas en partidas ganadas
 		"pistas_usadas": 0,
 		"mejor_tiempo": [0, 0, 0, 0],   # segundos por dificultad (0 = sin marca)
+		"extras": 0,               # palabras extra encontradas
+		"extras_dia": "",          # fecha de las pistas ganadas con extras
+		"extras_premio_hoy": 0,    # pistas ganadas ese dia con extras
+		"reloj_ganadas": 0,        # sopas ganadas dentro del contrarreloj
+		"contrarreloj": false,     # ajuste
 	}
 
 
@@ -130,6 +135,7 @@ func _sanear() -> void:
 		if not es_fecha(str(datos[k])):
 			datos[k] = ""
 	datos["pistas_hoy"] = clampi(int(datos["pistas_hoy"]), 0, Economia.PISTAS_GRATIS_DIA)
+	datos["extras_premio_hoy"] = clampi(int(datos["extras_premio_hoy"]), 0, Economia.PISTAS_EXTRA_DIA)
 	datos["pistas_compradas"] = clampi(int(datos["pistas_compradas"]), 0, Economia.PISTAS_MAX)
 	if not float(datos["escala_texto"]) in ESCALAS:
 		datos["escala_texto"] = 1.0
@@ -235,7 +241,9 @@ func registrar_victoria(cat: String, sub: String, dificultad: int, estrellas: in
 
 ## Estadisticas de una partida ganada. Las sopas al azar no tienen estrellas
 ## ni pasan por registrar_victoria: aqui cuentan como partida completada.
-func registrar_partida(dificultad: int, segundos: float, palabras: int, pistas: int, aleatoria: bool) -> void:
+func registrar_partida(dificultad: int, segundos: float, palabras: int, pistas: int, aleatoria: bool, a_tiempo: bool = false) -> void:
+	if a_tiempo:
+		datos["reloj_ganadas"] = mini(int(datos["reloj_ganadas"]) + 1, COMPLETADAS_MAX)
 	datos["palabras"] = mini(int(datos["palabras"]) + maxi(palabras, 0), COMPLETADAS_MAX)
 	datos["pistas_usadas"] = mini(int(datos["pistas_usadas"]) + maxi(pistas, 0), COMPLETADAS_MAX)
 	if dificultad >= 0 and dificultad < 4:
@@ -260,6 +268,21 @@ func ultima() -> Dictionary:
 func fijar_ultima(cat: String, sub: String) -> void:
 	datos["ultima"] = {"categoria": cat, "subtema": sub}
 	guardar()
+
+
+## Palabra extra encontrada. Devuelve true si ganó una pista.
+func registrar_extra(hoy: String) -> bool:
+	datos["extras"] = mini(int(datos["extras"]) + 1, COMPLETADAS_MAX)
+	if datos["extras_dia"] != hoy:
+		datos["extras_dia"] = hoy
+		datos["extras_premio_hoy"] = 0
+	var premio := int(datos["extras"]) % Economia.EXTRAS_POR_PISTA == 0 \
+		and int(datos["extras_premio_hoy"]) < Economia.PISTAS_EXTRA_DIA
+	if premio:
+		datos["extras_premio_hoy"] = int(datos["extras_premio_hoy"]) + 1
+		datos["pistas_compradas"] = mini(pistas_compradas() + 1, Economia.PISTAS_MAX)
+	guardar()
+	return premio
 
 
 # ---------------------------------------------------------------- pistas
@@ -341,6 +364,8 @@ func _volver_a(sistema: String) -> void:
 		datos["pistas_dia"] = sistema
 	if str(datos["diario_hecho"]) > sistema:
 		datos["diario_hecho"] = ""
+	if str(datos["extras_dia"]) > sistema:
+		datos["extras_dia"] = sistema
 	if str(datos["comodin_usado"]) > sistema:
 		datos["comodin_usado"] = sistema     # no se regala un comodin al volver
 	guardar()

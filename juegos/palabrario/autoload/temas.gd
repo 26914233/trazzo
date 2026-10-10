@@ -105,15 +105,42 @@ func generar(cat: String, sub: String, dificultad: int) -> GeneradorSopa.Sopa:
 	var palabras := palabras_sopa(cat, sub, dificultad)
 	var lado := lado_para(palabras, dificultad)
 	var base := semilla(cat, sub, dificultad)
+	var extras := candidatas_extra(cat, sub, palabras, base)
 	var sopa: GeneradorSopa.Sopa
 	for intento in 40:
 		if intento > 0 and intento % 10 == 0:
 			lado += 1
-		sopa = GeneradorSopa.generar(palabras, lado, dificultad, base + intento)
+		sopa = GeneradorSopa.generar(palabras, lado, dificultad, base + intento, extras)
 		if sopa.descartadas.is_empty():
 			return sopa
 	push_error("Sopa incompleta: %s/%s dificultad %d" % [cat, sub, dificultad])
 	return sopa
+
+
+## Candidatas a palabra extra: primero las del tema que no entran en esta
+## dificultad, luego las de otros temas de la categoria (orden fijo por semilla).
+func candidatas_extra(cat: String, sub: String, usadas: PackedStringArray, semilla_: int) -> PackedStringArray:
+	var fuera := {}
+	for p in usadas:
+		fuera[GeneradorSopa.normalizar(p)] = true
+	var del_tema: Array = []
+	var otras: Array = []
+	for s in categoria(cat).get("subtemas", []):
+		for p in s["palabras"]:
+			var n := GeneradorSopa.normalizar(p)
+			if fuera.has(n) or n.length() > 9:
+				continue
+			fuera[n] = true
+			(del_tema if s["id"] == sub else otras).append(p)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = semilla_ ^ 0x5EC12E7
+	for lista_ in [del_tema, otras]:
+		for i in range(lista_.size() - 1, 0, -1):
+			var j := rng.randi_range(0, i)
+			var t = lista_[i]
+			lista_[i] = lista_[j]
+			lista_[j] = t
+	return PackedStringArray((del_tema + otras).slice(0, 8))
 
 
 ## Sopa al azar (modo sin fin): palabras de todos los temas de una categoria,
@@ -137,12 +164,13 @@ func generar_aleatoria(cat: String, dificultad: int, semilla_: int) -> Generador
 		pool[j] = t
 	var n: int = Economia.DIFICULTADES[dificultad]["palabras"]
 	var palabras := PackedStringArray(pool.slice(0, n))
+	var extras := PackedStringArray(pool.slice(n, n + 8).filter(func(p): return GeneradorSopa.normalizar(p).length() <= 9))
 	var lado := lado_para(palabras, dificultad)
 	var sopa: GeneradorSopa.Sopa
 	for intento in 40:
 		if intento > 0 and intento % 10 == 0:
 			lado += 1
-		sopa = GeneradorSopa.generar(palabras, lado, dificultad, semilla_ + intento)
+		sopa = GeneradorSopa.generar(palabras, lado, dificultad, semilla_ + intento, extras)
 		if sopa.descartadas.is_empty():
 			return sopa
 	push_error("Sopa al azar incompleta: %s dificultad %d" % [cat, dificultad])

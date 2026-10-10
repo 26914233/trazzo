@@ -1,5 +1,5 @@
 # Estilo visual con variantes de diseño ("cielo", el principal; "papel" y
-# "noche", elegibles en Ajustes) y
+# "noche" y "contraste" (alto contraste), elegibles en Ajustes) y
 # utilidades de interfaz: pantallas, botones, tarjetas, dialogos y avisos.
 # Paletas de ui-ux-pro-max; texto con contraste >= 4.5 sobre su fondo.
 class_name Estilo
@@ -34,6 +34,17 @@ const VARIANTES := {
 		"acento": "#FBBF24", "sobre_acento": "#1C1400",
 		"borde": "#26324D", "bloqueado": "#111A2C", "tablero": "#131C30", "letra": "#E2E8F0",
 		"radio": 24, "grosor": 1, "sombra": "#00000059", "sombra_tam": 18, "sombra_y": 6,
+		"titulo": "Nunito-ExtraBold.ttf", "texto_fuente": "Nunito-Bold.ttf", "negrita": "Nunito-ExtraBold.ttf",
+	},
+	# Alto contraste (accesibilidad): negro, blanco y amarillo, bordes marcados.
+	"contraste": {
+		"nombre": "Contraste",
+		"fondo": "#000000", "fondo_2": "#000000", "superficie": "#111111",
+		"texto": "#FFFFFF", "texto_suave": "#E6E6E6",
+		"primario": "#FFD60A", "sobre_primario": "#000000",
+		"acento": "#FFD60A", "sobre_acento": "#000000",
+		"borde": "#FFFFFF", "bloqueado": "#1A1A1A", "tablero": "#000000", "letra": "#FFFFFF",
+		"radio": 18, "grosor": 3, "sombra": "#00000000", "sombra_tam": 0, "sombra_y": 0,
 		"titulo": "Nunito-ExtraBold.ttf", "texto_fuente": "Nunito-Bold.ttf", "negrita": "Nunito-ExtraBold.ttf",
 	},
 }
@@ -94,6 +105,8 @@ static func es_oscuro() -> bool:
 
 ## Color de una categoria adaptado al diseño: suave en los claros, intenso en el oscuro.
 static func tinte(c: Color) -> Color:
+	if actual == "contraste":
+		return c.darkened(0.72)        # el texto blanco necesita un fondo muy oscuro
 	return c.darkened(0.45) if es_oscuro() else c.lightened(0.78)
 
 

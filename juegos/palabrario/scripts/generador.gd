@@ -22,6 +22,9 @@ const DIR_INVERSAS: Array[Vector2i] = [
 # las palabras: una cuadricula llena de K, W y X canta demasiado.
 const BOLSA_RELLENO := "AAAAAAAAAAAAEEEEEEEEEEEEOOOOOOOOOSSSSSSSSRRRRRRRNNNNNNNIIIIIIILLLLLDDDDDCCCCCTTTTTUUUUUMMMMPPPBBGGVVYYQQHHFFZJXKWÑ"
 
+## Palabras extra escondidas como mucho (no estan en la lista; dan premio).
+const MAX_EXTRAS := 3
+
 ## Una palabra ya situada en la cuadricula.
 class Colocada extends RefCounted:
 	var palabra: String          ## normalizada, tal como aparece en la cuadricula
@@ -41,6 +44,7 @@ class Sopa extends RefCounted:
 	var cuadricula: Array = []            ## Array de Array de String (una letra)
 	var colocadas: Array[Colocada] = []
 	var descartadas: PackedStringArray = []
+	var extras: Array[Colocada] = []      ## escondidas fuera de la lista
 
 	func letra(c: Vector2i) -> String:
 		if c.x < 0 or c.y < 0 or c.x >= lado or c.y >= lado:
@@ -61,6 +65,15 @@ class Sopa extends RefCounted:
 		var inv: Array[Vector2i] = celdas.duplicate()
 		inv.reverse()
 		for c in colocadas:
+			if c.celdas == celdas or c.celdas == inv:
+				return c
+		return null
+
+	## Como buscar_en, pero entre las palabras extra.
+	func buscar_extra(celdas: Array[Vector2i]) -> Colocada:
+		var inv: Array[Vector2i] = celdas.duplicate()
+		inv.reverse()
+		for c in extras:
 			if c.celdas == celdas or c.celdas == inv:
 				return c
 		return null
@@ -113,11 +126,14 @@ static func celdas_en_linea(a: Vector2i, b: Vector2i) -> Array[Vector2i]:
 
 
 ## Genera una sopa. `palabras` llega como viene del tema (con tildes).
+## `extras`: candidatas a palabra extra; se esconden hasta MAX_EXTRAS despues de
+## la lista, solo si caben (nunca quitan sitio a la lista).
 static func generar(
 	palabras: PackedStringArray,
 	lado: int,
 	dificultad: int = 1,
-	semilla: int = 0
+	semilla: int = 0,
+	extras: PackedStringArray = PackedStringArray()
 ) -> Sopa:
 	var sopa := Sopa.new()
 	sopa.lado = lado
@@ -152,6 +168,16 @@ static func generar(
 	for item in ordenadas:
 		if not _colocar(sopa, item["norm"], item["original"], lado, dirs, rng):
 			sopa.descartadas.append(item["original"])
+
+	for original in extras:
+		if sopa.extras.size() >= MAX_EXTRAS:
+			break
+		var norm := normalizar(original)
+		if norm.length() < 3 or norm.length() > lado or vistas.has(norm):
+			continue
+		if _colocar(sopa, norm, original, lado, dirs, rng):
+			vistas[norm] = true
+			sopa.extras.append(sopa.colocadas.pop_back())   # _colocar la mete en colocadas
 
 	_rellenar(sopa, lado, rng)
 	return sopa

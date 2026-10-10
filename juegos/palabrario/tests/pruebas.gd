@@ -37,6 +37,9 @@ func _ready() -> void:
 	prueba_estadisticas()
 	prueba_logros()
 	prueba_sopa_aleatoria()
+	prueba_palabras_extra()
+	prueba_premio_extras()
+	prueba_contrarreloj()
 	await prueba_guardado_y_firma()
 	prueba_esquema_guardado()
 	prueba_reloj_no_retrocede()
@@ -51,6 +54,7 @@ func _ready() -> void:
 	prueba_disenos()
 	await prueba_partida_completa()
 	await prueba_partida_aleatoria()
+	await prueba_partida_extra_y_reloj()
 	await prueba_pantallas()
 
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Progreso.ruta))
@@ -337,6 +341,75 @@ func prueba_sopa_aleatoria() -> void:
 				comprobar(false, "cabe en %s dificultad %d" % [c["id"], d])
 
 
+func prueba_palabras_extra() -> void:
+	caso("palabras extra ocultas")
+	var c: Dictionary = Temas.categoria("animales")
+	var sub: String = c["subtemas"][0]["id"]
+	var s0 := Temas.generar("animales", sub, 0)
+	comprobar(s0.extras.size() >= 1 and s0.extras.size() <= GeneradorSopa.MAX_EXTRAS, "Facil trae extras (%d)" % s0.extras.size())
+	var principales := {}
+	for col in s0.colocadas:
+		principales[col.palabra] = true
+	comprobar(s0.extras.all(func(e): return not principales.has(e.palabra)), "las extras no son de la lista")
+	comprobar(s0.extras.all(func(e): return _se_lee(s0, e)), "cada extra se lee en la cuadricula")
+	var e0: GeneradorSopa.Colocada = s0.extras[0]
+	var inv: Array[Vector2i] = e0.celdas.duplicate()
+	inv.reverse()
+	comprobar(s0.buscar_extra(e0.celdas) == e0 and s0.buscar_extra(inv) == e0, "se encuentra en los dos sentidos")
+	comprobar(s0.buscar_en(e0.celdas) == null, "no cuenta como palabra de la lista")
+	comprobar(Temas.generar("animales", sub, 0).texto() == s0.texto(), "sigue siendo reproducible")
+	var s3 := Temas.generar("animales", sub, 3)
+	comprobar(s3.extras.size() >= 1, "en Experto tambien (de otros temas de la categoria)")
+	comprobar(s3.descartadas.is_empty() and s3.colocadas.size() == 12, "las extras no quitan sitio a la lista")
+	var sa := Temas.generar_aleatoria("animales", 1, 5)
+	comprobar(sa.extras.size() >= 1, "la sopa al azar tambien trae")
+	var sin := GeneradorSopa.generar(PackedStringArray(["GATO", "PERRO"]), 8, 0, 1)
+	comprobar(sin.extras.is_empty(), "sin pedir extras no hay")
+	var sin_total := 0
+	for cat in Temas.lista:
+		for st in cat["subtemas"]:
+			if Temas.generar(cat["id"], st["id"], 1).extras.is_empty():
+				sin_total += 1
+	comprobar(sin_total * 10 < Temas.total_sopas(), "casi todas las sopas en Normal tienen extras (sin: %d)" % sin_total)
+
+
+func _se_lee(sopa: GeneradorSopa.Sopa, e: GeneradorSopa.Colocada) -> bool:
+	var t := ""
+	for c in e.celdas:
+		t += sopa.letra(c)
+	return t == e.palabra
+
+
+func prueba_premio_extras() -> void:
+	caso("premio por palabras extra")
+	_reiniciar_progreso()
+	var pistas := Progreso.pistas_compradas()
+	comprobar(not Progreso.registrar_extra(HOY) and not Progreso.registrar_extra(HOY), "1 y 2: sin premio")
+	comprobar(Progreso.registrar_extra(HOY) and Progreso.pistas_compradas() == pistas + 1, "3: una pista")
+	for i in 3:
+		Progreso.registrar_extra(HOY)
+	comprobar(Progreso.pistas_compradas() == pistas + 2, "6: dos pistas")
+	for i in 6:
+		Progreso.registrar_extra(HOY)
+	comprobar(Progreso.pistas_compradas() == pistas + Economia.PISTAS_EXTRA_DIA, "tope de %d pistas al dia por extras" % Economia.PISTAS_EXTRA_DIA)
+	comprobar(int(Progreso.datos["extras"]) == 12, "se cuentan todas")
+	for i in 3:
+		Progreso.registrar_extra("2026-10-10")
+	comprobar(Progreso.pistas_compradas() == pistas + Economia.PISTAS_EXTRA_DIA + 1, "al dia siguiente vuelve a premiar")
+	comprobar(Logros.lista(Progreso.datos).any(func(l): return l["id"] == "extras_25"), "hay logro de palabras extra")
+
+
+func prueba_contrarreloj() -> void:
+	caso("contrarreloj")
+	comprobar(Economia.tiempo_limite(6, 0) == 120 and Economia.tiempo_limite(12, 3) == 420, "tiempo generoso por palabra y dificultad")
+	comprobar(Progreso.por_defecto()["contrarreloj"] == false, "apagado por defecto")
+	_reiniciar_progreso()
+	Progreso.registrar_partida(1, 100.0, 9, 0, false, true)
+	comprobar(int(Progreso.datos["reloj_ganadas"]) == 1, "cuenta las ganadas a tiempo")
+	Progreso.registrar_partida(1, 100.0, 9, 0, false)
+	comprobar(int(Progreso.datos["reloj_ganadas"]) == 1, "sin contrarreloj no suma")
+
+
 func prueba_economia() -> void:
 	caso("estrellas")
 	comprobar(Economia.estrellas(30, 5, 0) == 3, "rapido y sin pistas: 3")
@@ -577,7 +650,7 @@ func prueba_escapar_bbcode() -> void:
 
 
 func prueba_disenos() -> void:
-	caso("tres diseños con contraste suficiente")
+	caso("diseños con contraste suficiente")
 	for id in Estilo.VARIANTES:
 		Estilo.aplicar(id)
 		comprobar(Estilo.FUENTE_TITULO != null and Estilo.FUENTE_TEXTO != null, "%s: fuentes cargadas" % id)
@@ -585,6 +658,13 @@ func prueba_disenos() -> void:
 		comprobar(_contraste(Estilo.TEXTO_SUAVE, Estilo.FONDO) >= 4.5, "%s: texto suave sobre fondo >= 4.5" % id)
 		comprobar(_contraste(Estilo.SOBRE_PRIMARIO, Estilo.PRIMARIO) >= 3.0, "%s: boton principal >= 3 (texto grande)" % id)
 		comprobar(_contraste(Estilo.LETRA, Estilo.TABLERO) >= 7.0, "%s: letras del tablero >= 7" % id)
+		comprobar(_contraste(Estilo.TEXTO, Estilo.tinte(Estilo.ACENTO)) >= 4.5, "%s: texto sobre tarjeta tintada >= 4.5 (%.1f)" % [id, _contraste(Estilo.TEXTO, Estilo.tinte(Estilo.ACENTO))])
+	comprobar(Estilo.VARIANTES.has("contraste"), "hay diseño de alto contraste")
+	Estilo.aplicar("contraste")
+	comprobar(_contraste(Estilo.TEXTO, Estilo.FONDO) >= 15.0, "alto contraste: texto >= 15")
+	comprobar(_contraste(Estilo.TEXTO_SUAVE, Estilo.FONDO) >= 12.0, "alto contraste: texto suave >= 12")
+	comprobar(_contraste(Estilo.SOBRE_PRIMARIO, Estilo.PRIMARIO) >= 12.0, "alto contraste: boton >= 12")
+	comprobar(Progreso.DISENOS == Estilo.VARIANTES.keys(), "el guardado acepta todos los diseños")
 	Estilo.aplicar("cielo")
 
 
@@ -648,6 +728,36 @@ func prueba_partida_aleatoria() -> void:
 	await get_tree().create_timer(1.2).timeout
 	var botones := juego.find_children("*", "Button", true, false).filter(func(b): return b.text == "Otra al azar")
 	comprobar(botones.size() == 1, "el panel ofrece otra al azar")
+	juego.queue_free()
+	await get_tree().process_frame
+
+
+func prueba_partida_extra_y_reloj() -> void:
+	caso("palabra extra y contrarreloj en la escena real")
+	_reiniciar_progreso()
+	Progreso.fijar_ajuste("contrarreloj", true)
+	var c: Dictionary = Temas.categoria("animales")
+	Temas.seleccion = {"categoria": "animales", "subtema": c["subtemas"][0]["id"], "dificultad": 0, "diario": false}
+	var juego: Control = load("res://escenas/juego.tscn").instantiate()
+	add_child(juego)
+	await get_tree().process_frame
+	var sopa: GeneradorSopa.Sopa = juego._sopa
+	comprobar(juego._reloj.text == "2:00", "el reloj cuenta hacia atras desde el limite (%s)" % juego._reloj.text)
+	juego._al_seleccionar(sopa.extras[0].celdas.duplicate())
+	comprobar(juego._extras.size() == 1 and int(Progreso.datos["extras"]) == 1, "la extra cuenta")
+	comprobar(juego._encontradas.is_empty(), "y no como palabra de la lista")
+	juego._al_seleccionar(sopa.extras[0].celdas.duplicate())
+	comprobar(int(Progreso.datos["extras"]) == 1, "repetirla no suma")
+	juego._segundos = 200.0
+	juego._process(0.1)
+	await get_tree().process_frame
+	comprobar(juego._agotado, "al pasar el limite se acaba el tiempo")
+	juego._seguir_sin_reloj()
+	comprobar(not juego._contrarreloj and juego._tablero.activo, "se puede seguir sin reloj")
+	for col in sopa.colocadas:
+		juego._al_seleccionar(col.celdas.duplicate())
+	comprobar(juego._terminado and int(Progreso.datos["reloj_ganadas"]) == 0, "ganar tras agotar el tiempo no cuenta como contrarreloj")
+	Progreso.fijar_ajuste("contrarreloj", false)
 	juego.queue_free()
 	await get_tree().process_frame
 

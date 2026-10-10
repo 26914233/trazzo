@@ -59,6 +59,8 @@ func _serie(id: String) -> void:
 	var sopa: GeneradorSopa.Sopa = juego._sopa
 	for i in 4:
 		juego._al_seleccionar(sopa.colocadas[i].celdas.duplicate())
+	if not sopa.extras.is_empty():
+		juego._al_seleccionar(sopa.extras[0].celdas.duplicate())
 	juego._segundos = 52.0
 	var t: Tablero = juego._tablero
 	t._seleccion = sopa.colocadas[4].celdas.slice(0, 3)

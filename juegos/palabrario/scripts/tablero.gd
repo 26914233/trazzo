@@ -44,8 +44,9 @@ func preparar(nueva: GeneradorSopa.Sopa, color: Color) -> void:
 	queue_redraw()
 
 
-func marcar_encontrada(celdas: Array[Vector2i], color: Color) -> void:
-	_encontradas.append({"celdas": celdas, "color": color})
+## extra = palabra extra escondida: trazo mas fino para distinguirla.
+func marcar_encontrada(celdas: Array[Vector2i], color: Color, extra: bool = false) -> void:
+	_encontradas.append({"celdas": celdas, "color": color, "grosor": 0.42 if extra else GROSOR_TRAZO})
 	if _pista in celdas:
 		_pista = Vector2i(-1, -1)
 	queue_redraw()
@@ -147,7 +148,7 @@ func _draw() -> void:
 	var alfa := 0.55 if Estilo.es_oscuro() else 0.38
 
 	for e in _encontradas:
-		_trazo(e["celdas"], Color(e["color"], alfa), Vector2.ZERO)
+		_trazo(e["celdas"], Color(e["color"], alfa), Vector2.ZERO, e["grosor"])
 	if _seleccion.size() > 0:
 		_trazo(_seleccion, Color(Estilo.PRIMARIO, 0.45), desplaza)
 	if _pista.x >= 0:
@@ -171,11 +172,11 @@ func _draw() -> void:
 			draw_string(fuente, base, letra, HORIZONTAL_ALIGNMENT_LEFT, -1, tam, Estilo.LETRA)
 
 
-func _trazo(celdas: Array, color: Color, desplaza: Vector2) -> void:
+func _trazo(celdas: Array, color: Color, desplaza: Vector2, grosor: float = GROSOR_TRAZO) -> void:
 	var l := _lado_celda()
 	var a := _centro(celdas[0]) + desplaza
 	var b := _centro(celdas[celdas.size() - 1]) + desplaza
-	var r := l * GROSOR_TRAZO / 2.0
+	var r := l * grosor / 2.0
 	draw_line(a, b, color, r * 2.0, true)
 	draw_circle(a, r, color)
 	draw_circle(b, r, color)

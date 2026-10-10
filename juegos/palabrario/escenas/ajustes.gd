@@ -27,6 +27,7 @@ func _ready() -> void:
 
 	col.add_child(_interruptor("Sonido", "sonido"))
 	col.add_child(_interruptor("Vibración", "vibracion"))
+	col.add_child(_interruptor("Contrarreloj", "contrarreloj"))
 
 	col.add_child(Estilo.etiqueta("Tamaño de las letras del tablero", 38, Estilo.TEXTO_SUAVE, false))
 	var tamanos := HBoxContainer.new()

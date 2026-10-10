@@ -12,6 +12,10 @@ var _pistas_usadas := 0
 var _terminado := false
 var _hoy := Progreso.hoy()
 var _aleatoria := false
+var _extras := {}                 ## palabras extra encontradas
+var _contrarreloj := false
+var _limite := 0
+var _agotado := false
 
 var _tablero: Tablero
 var _lista: RichTextLabel
@@ -33,12 +37,15 @@ func _ready() -> void:
 		_sopa = Temas.generar(_sel["categoria"], _sel["subtema"], _sel["dificultad"])
 		if not _sel["diario"]:
 			Progreso.fijar_ultima(_sel["categoria"], _sel["subtema"])
+	_contrarreloj = bool(Progreso.ajuste("contrarreloj"))
+	_limite = Economia.tiempo_limite(_sopa.colocadas.size(), _sel["dificultad"])
 	_construir()
 
 
 func _construir() -> void:
 	var col := Estilo.pantalla(self)
 	_reloj = Estilo.etiqueta("0:00", 40, Estilo.TEXTO_SUAVE, false, false)
+	_pintar_reloj()
 	Estilo.barra(col, _sub.get("nombre", ""), _salir, _reloj)
 	var detalle: String = "Sopa del día" if _sel["diario"] else _cat.get("nombre", "")
 	if _aleatoria:
@@ -70,10 +77,47 @@ func _construir() -> void:
 
 
 func _process(delta: float) -> void:
-	if _terminado:
+	if _terminado or _agotado:
 		return
 	_segundos += delta
-	_reloj.text = "%d:%02d" % [int(_segundos) / 60, int(_segundos) % 60]
+	_pintar_reloj()
+	if _contrarreloj and _segundos >= _limite:
+		_tiempo_agotado()
+
+
+## Hacia arriba normalmente; hacia abajo en contrarreloj (aviso en los ultimos 10 s).
+func _pintar_reloj() -> void:
+	var t := _segundos
+	var color := Estilo.TEXTO_SUAVE
+	if _contrarreloj:
+		t = maxf(_limite - _segundos, 0.0)
+		if t <= 10.0:
+			color = Estilo.ACENTO
+	_reloj.text = "%d:%02d" % [int(ceilf(t)) / 60 if _contrarreloj else int(t) / 60, int(ceilf(t)) % 60 if _contrarreloj else int(t) % 60]
+	_reloj.add_theme_color_override("font_color", color)
+
+
+func _tiempo_agotado() -> void:
+	_agotado = true
+	_tablero.activo = false
+	Sonido.tocar("error")
+	var i := await Estilo.dialogo(self, "Se acabó el tiempo", "Puedes seguir sin reloj: no pierdes lo que ya encontraste.",
+		["Seguir sin reloj", "Reintentar", "Salir"])
+	if not is_inside_tree():
+		return
+	if i == 1:
+		Estilo.ir(self, "juego")
+	elif i == 2:
+		Estilo.ir(self, _destino_al_salir())
+	else:
+		_seguir_sin_reloj()
+
+
+func _seguir_sin_reloj() -> void:
+	_contrarreloj = false
+	_agotado = false
+	_tablero.activo = true
+	_pintar_reloj()
 
 
 func _notification(que: int) -> void:
@@ -92,6 +136,8 @@ func _refrescar() -> void:
 			partes.append("[b]%s[/b]" % texto)
 	_lista.text = "[center]" + "    ".join(partes) + "[/center]"
 	_contador.text = "%d de %d palabras" % [_encontradas.size(), _sopa.colocadas.size()]
+	if not _sopa.extras.is_empty():
+		_contador.text += "   ·   extra: %d de %d escondidas" % [_extras.size(), _sopa.extras.size()]
 	var gratis := Progreso.pistas_gratis_hoy(_hoy)
 	if gratis > 0:
 		_boton_pista.text = "Pista  ·  %d gratis hoy" % gratis
@@ -105,6 +151,11 @@ func _refrescar() -> void:
 
 func _al_seleccionar(celdas: Array[Vector2i]) -> void:
 	var c := _sopa.buscar_en(celdas)
+	if c == null:
+		var e := _sopa.buscar_extra(celdas)
+		if e != null and not _extras.has(e.palabra):
+			_encontrar_extra(e)
+			return
 	if c == null or _encontradas.has(c.palabra):
 		_tablero.sacudir()
 		Sonido.tocar("error")
@@ -116,6 +167,16 @@ func _al_seleccionar(celdas: Array[Vector2i]) -> void:
 	_refrescar()
 	if _encontradas.size() == _sopa.colocadas.size():
 		_victoria()
+
+
+func _encontrar_extra(e: GeneradorSopa.Colocada) -> void:
+	_extras[e.palabra] = true
+	_tablero.marcar_encontrada(e.celdas, Estilo.ACENTO, true)
+	Sonido.tocar("acierto")
+	Sonido.vibrar(25)
+	var premio := Progreso.registrar_extra(_hoy)
+	Estilo.aviso(self, "¡Palabra extra: %s!%s" % [e.original.to_upper(), "  +1 pista" if premio else ""])
+	_refrescar()
 
 
 func _pedir_pista() -> void:
@@ -203,7 +264,7 @@ func _victoria() -> void:
 	Sonido.vibrar(60)
 	var estrellas := Economia.estrellas(_segundos, _sopa.colocadas.size(), _pistas_usadas)
 	var antes := Logros.hechos(Progreso.datos)
-	Progreso.registrar_partida(_sel["dificultad"], _segundos, _sopa.colocadas.size(), _pistas_usadas, _aleatoria)
+	Progreso.registrar_partida(_sel["dificultad"], _segundos, _sopa.colocadas.size(), _pistas_usadas, _aleatoria, _contrarreloj)
 	if not _aleatoria:
 		Progreso.registrar_victoria(_sel["categoria"], _sel["subtema"], _sel["dificultad"], estrellas, _sel["diario"], _hoy)
 	var logros := Logros.nuevos(antes, Progreso.datos)
@@ -218,6 +279,10 @@ func _panel_victoria(estrellas: int, logros: Array = []) -> void:
 	if not _aleatoria:
 		col.add_child(Estilo.etiqueta(Estilo.estrellas_texto(estrellas), 120, Estilo.ACENTO))
 	col.add_child(Estilo.etiqueta("%d:%02d  ·  %d %s" % [int(_segundos) / 60, int(_segundos) % 60, _pistas_usadas, "pista" if _pistas_usadas == 1 else "pistas"], 40, Estilo.TEXTO_SUAVE))
+	if _contrarreloj:
+		col.add_child(Estilo.etiqueta("Contrarreloj: te sobraron %d s" % maxi(_limite - int(_segundos), 0), 40, Estilo.TEXTO))
+	if not _extras.is_empty():
+		col.add_child(Estilo.etiqueta("Palabras extra: %d de %d" % [_extras.size(), _sopa.extras.size()], 40, Estilo.TEXTO))
 	for id in logros:
 		col.add_child(Estilo.etiqueta("Nuevo logro: %s" % Logros.nombre(id), 40, Estilo.ACENTO))
 	if _aleatoria:
