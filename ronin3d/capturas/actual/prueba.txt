@@ -22,10 +22,10 @@ OK     Animación anime: 12 poses por segundo; T cambia a suave (cada paso)  ani
 OK     La galería de criaturas se abre desde la pausa y reparte páginas  10 páginas; la tercera tiene 7 criaturas y 125 piezas
 OK     Al cerrar la galería se vuelve a la pausa y el juego sigue entero  en pausa=true, juego en el árbol=true
 OK     El catálogo del bestiario se carga y todos sus datos son válidos  929 criaturas (123 con modelo propio), 0 con datos no válidos
-OK     Todas las criaturas del catálogo se construyen dentro del presupuesto de piezas  929 criaturas (1163 construcciones con los rangos 2 y 3 de 1 de cada 8) en 1253 ms; rango 1: media 20.5 piezas, máximo 42; máximo con rangos: 42
+OK     Todas las criaturas del catálogo se construyen dentro del presupuesto de piezas  929 criaturas (1163 construcciones con los rangos 2 y 3 de 1 de cada 8) en 987 ms; rango 1: media 20.5 piezas, máximo 42; máximo con rangos: 42
 OK     Los modelos detallados se cargan con textura y cel-shading (el Aka-oni, con sus tres rangos)  rango 1: 14024 triángulos, 1.91 m; rango 2: 14024 triángulos, 2.29 m; rango 3: 14024 triángulos, 1.91 m; modelo 353: 41471 triángulos; modelo 680: 2588 triángulos
 OK     Los cuatro aspectos de Akira llevan la cicatriz y el sastre los enseña en la pausa  triángulos: { "joven": 3594, "curtido": 3642, "veterano": 3671, "mujer": 3469 }
-OK     Los personajes son sprites pixel art: 6 hojas con todas sus poses y 8 direcciones  hojas bien: 6 de 6 · dirección 7 → 3 al girar la cámara 180°
+OK     Personajes en pixel art: Akira y Shiro en 8 direcciones; los enemigos, en hojas del estilo del oni  hojas bien: 6 de 6 · hojas de enemigos: 4 de 4 · dirección 7 → 3 al girar la cámara 180°
 OK     Shiro olfatea, escarba y desentierra monedas  4 monedas desenterradas
 OK     Akira recoge las monedas al pasar y el HUD las cuenta  7 → 8
 OK     Shiro trae las monedas que Akira deja atrás  entregó 3 · monedas 9 → 12
@@ -50,4 +50,4 @@ OK     El oni despierta, salta y su golpe de área cae donde marca la sombra  de
 OK     Tres cortes con el kanabō clavado rompen la postura; a la segunda rotura, furia  roturas=2, furia=true
 OK     En furia, un iai perfecto contra su barrido de kanabō lo remata  vivo=false, vida de Akira 6 → 6
 Resultado: 50 de 50 comprobaciones correctas
-FPS al caminar por el patio: 5.2 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)
+FPS al caminar por el patio: 5.5 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)

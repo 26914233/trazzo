@@ -7,6 +7,8 @@ extends CharacterBody3D
 const Datos := preload("res://scripts/datos.gd")
 const Enemigos := preload("res://scripts/enemigos.gd")
 const VisualYokai := preload("res://scripts/visual_yokai.gd")
+const VisualHoja := preload("res://scripts/visual_hoja.gd")
+const VisualSprite := preload("res://scripts/visual_sprite.gd")
 
 enum Estado { QUIETO, ALERTA, PREPARANDO, ATACANDO, RECUPERANDO, ATURDIDO, REVERENCIA, MUERTO }
 
@@ -53,8 +55,12 @@ func configurar(tipo_nuevo: String, lugar: Vector3, akira, aspecto) -> void:
 	position = lugar
 	azar.seed = hash(lugar)
 	angulo_orbita = azar.randf() * TAU
-	visual = VisualYokai.new()
-	visual.configurar(aspecto, perfil)
+	if VisualSprite.activo and perfil.has("hoja"):
+		visual = VisualHoja.new()
+		visual.configurar(String(perfil.hoja), float(perfil.alto), perfil.get("flota", false))
+	else:
+		visual = VisualYokai.new()
+		visual.configurar(aspecto, perfil)
 	add_child(visual)
 
 

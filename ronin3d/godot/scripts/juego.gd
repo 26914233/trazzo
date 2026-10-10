@@ -22,6 +22,7 @@ const Yokai := preload("res://scripts/yokai.gd")
 const JefeOni := preload("res://scripts/jefe_oni.gd")
 const Enemigos := preload("res://scripts/enemigos.gd")
 const Depuracion := preload("res://scripts/depuracion.gd")
+const VisualHoja := preload("res://scripts/visual_hoja.gd")
 const ALCANCE_FIJADO := 7.0          # el enemigo más cercano a esta distancia queda fijado
 const SHADER_PROFUNDIDAD := preload("res://shaders/profundidad.gdshader")
 
@@ -282,9 +283,14 @@ func _crear_profundidad() -> void:
 func _crear_visual(soldado: bool, apariencia := "") -> Node3D:
 	if apariencia == "":
 		apariencia = Apariencias.elegida
+	if VisualSprite.activo and soldado:
+		# Los soldados de Genzo, en el estilo del oni del usuario (hoja de perfil).
+		var hoja = VisualHoja.new()
+		hoja.configurar("soldado_hoja", Datos.ALTO_SOLDADO_HOJA)
+		return hoja
 	if VisualSprite.activo:
 		var sprite = VisualSprite.new()
-		sprite.configurar(aspecto, "soldado" if soldado else "akira", "" if soldado else apariencia)
+		sprite.configurar(aspecto, "akira", apariencia)
 		return sprite
 	var modelo = VisualModelo.new()
 	modelo.configurar(aspecto, soldado, "" if soldado else apariencia)

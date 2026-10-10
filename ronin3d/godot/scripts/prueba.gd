@@ -14,6 +14,7 @@ const ModeloCriatura := preload("res://scripts/modelo_criatura.gd")
 const Apariencias := preload("res://scripts/apariencias_akira.gd")
 const Partida := preload("res://scripts/partida.gd")
 const VisualSprite := preload("res://scripts/visual_sprite.gd")
+const VisualHoja := preload("res://scripts/visual_hoja.gd")
 const MOVIMIENTOS := ["mover_adelante", "mover_atras", "mover_izquierda", "mover_derecha"]
 
 var principal
@@ -821,18 +822,28 @@ func _comprobar_sprites() -> void:
 				bien = bien and datos.animaciones.has(nombre)
 		hojas_bien += 1 if bien else 0
 	var juego = _juego()
+	# Los enemigos van en el estilo del oni del usuario: hojas de perfil (visual_hoja.gd).
 	var son_sprites: bool = juego.akira.visual is VisualSprite and juego.shiro.visual is VisualSprite \
-		and juego.soldados.all(func(soldado): return not is_instance_valid(soldado) or not soldado is Soldado \
-			or soldado.visual is VisualSprite)
+		and juego.soldados.all(func(e): return not is_instance_valid(e) or not (e is Soldado or e is Yokai) \
+			or e.visual is VisualHoja)
+	var hojas_enemigos := 0
+	for id in ["soldado_hoja", "kappa_hoja", "onibi_hoja", "oni_jefe"]:
+		var hoja = JSON.parse_string(FileAccess.get_file_as_string("res://recursos/sprites/%s.json" % id))
+		var completa: bool = hoja is Dictionary and load("res://recursos/sprites/%s.png" % id) != null
+		if completa:
+			for nombre in ["reposo", "caminar", "ataque", "golpe", "muerte"]:
+				completa = completa and hoja.animaciones.has(nombre) and int(hoja.animaciones[nombre].cuadros) >= 2
+		hojas_enemigos += 1 if completa else 0
 	var antes: int = juego.akira.visual._direccion()
 	juego.camara.giro += 180.0
 	juego.camara.colocar_de_golpe()
 	var despues: int = juego.akira.visual._direccion()
 	juego.camara.giro -= 180.0
 	juego.camara.colocar_de_golpe()
-	_registrar("Los personajes son sprites pixel art: 6 hojas con todas sus poses y 8 direcciones",
-		hojas_bien == 6 and son_sprites and posmod(despues - antes, 8) == 4,
-		"hojas bien: %d de 6 · dirección %d → %d al girar la cámara 180°" % [hojas_bien, antes, despues])
+	_registrar("Personajes en pixel art: Akira y Shiro en 8 direcciones; los enemigos, en hojas del estilo del oni",
+		hojas_bien == 6 and hojas_enemigos == 4 and son_sprites and posmod(despues - antes, 8) == 4,
+		"hojas bien: %d de 6 · hojas de enemigos: %d de 4 · dirección %d → %d al girar la cámara 180°" % [hojas_bien,
+		hojas_enemigos, antes, despues])
 
 
 func _preparar_shiro() -> void:

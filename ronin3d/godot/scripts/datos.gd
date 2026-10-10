@@ -58,6 +58,7 @@ const DURACION_CORTE_LUNA := 1.4      # segundos reales de la secuencia
 const PASO_ANIME := 1.0 / 12.0
 
 # --- Soldados -----------------------------------------------------------------
+const ALTO_SOLDADO_HOJA := 2.2        # m de su sprite contando la yari (el cuerpo, unos 1,7)
 const VIDA_SOLDADO := 4               # la cadena de la katana (4 cortes) lo derriba
 const TIEMPO_POSTURA_ROTA := 1.2      # vendido tras romperle el equilibrio: el siguiente golpe remata
 const RECUPERA_POSTURA := 0.25        # equilibrio que recupera por segundo si no lo golpean

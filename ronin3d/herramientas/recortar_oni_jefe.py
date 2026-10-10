@@ -89,7 +89,8 @@ def recortar(imagen: np.ndarray, fila, columnas) -> Image.Image:
 def main() -> None:
     imagen = np.array(Image.open(HOJA).convert("RGB"))
     cuadros = []
-    descripcion = {"tam": list(CELDA), "pies": list(PIES), "animaciones": {}}
+    # alto_px: lo que mide el oni en reposo (sin el pelo que sobresale), para darle su altura.
+    descripcion = {"id": "oni_jefe", "tam": list(CELDA), "pies": list(PIES), "alto_px": 105, "animaciones": {}}
     for nombre, fila, columnas, fps in ANIMACIONES:
         descripcion["animaciones"][nombre] = {"inicio": len(cuadros), "cuadros": len(columnas), "fps": fps}
         for x0x1 in columnas:

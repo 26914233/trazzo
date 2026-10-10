@@ -1,6 +1,7 @@
 # Yōkai del capítulo 1 como datos, sacados de las fichas de ronin3d/BESTIARIO.md §3 (los
-# números son los provisionales de las fichas). El aspecto sale del bestiario (las mismas
-# recetas que la galería) y el comportamiento lo pone yokai.gd.
+# números son los provisionales de las fichas). El aspecto es su hoja de sprites en el estilo del
+# oni del usuario («hoja» y «alto», con visual_hoja.gd); la «receta» del bestiario queda para la
+# galería y para jugar con --modelos3d. El comportamiento lo pone yokai.gd.
 #
 # Cada ataque: aviso (s con el «!» antes de golpear), activo (s en que hace daño), recuperacion,
 # alcance y ancho (m, una franja hacia delante), danio, parable (si el iai lo desvía),
@@ -22,7 +23,7 @@ static func perfil(tipo: String) -> Dictionary:
 			# el agua del plato y lo deja de un golpe. Si Akira se queda en postura de iai frente
 			# a él 2 s sin atacar, hace la reverencia y derrama el agua solo.
 			return {
-				"nombre": "Kappa", "id": 353, "vida": 2, "velocidad": 6.0, "peso": 0.7,
+				"nombre": "Kappa", "id": 353, "hoja": "kappa_hoja", "alto": 1.3, "vida": 2, "velocidad": 6.0, "peso": 0.7,
 				"vision": 10.0, "correa": 9.0, "distancia_ataque": 2.2, "reverencia": true,
 				"receta": {"familia": "bipedo", "tamano": "S", "elemento": "agua", "rol": "veloz",
 					"semilla": 353, "id": 353, "rango": 1, "nombre": "Kappa",
@@ -35,7 +36,7 @@ static func perfil(tipo: String) -> Dictionary:
 			# lo mata) y golpe de kanabō que no se para («!!» rojo, 0,9 s). Si falla, el garrote
 			# queda clavado 1 s y el oni queda abierto. Vida: 6.
 			return {
-				"nombre": "Aka-oni", "id": 2315, "vida": 6, "velocidad": 2.6, "peso": 2.5,
+				"nombre": "Aka-oni", "id": 2315, "hoja": "oni_jefe", "alto": 2.2, "vida": 6, "velocidad": 2.6, "peso": 2.5,
 				"vision": 11.0, "correa": 10.0, "distancia_ataque": 2.4,
 				"resiste_iai": {"danio": 3, "aturdido": 1.5},
 				"receta": {"familia": "bipedo", "tamano": "M", "elemento": "fuego", "rol": "poderoso",
@@ -51,7 +52,7 @@ static func perfil(tipo: String) -> Dictionary:
 			# Enjambre: grupos que giran alrededor de Akira y se lanzan de uno en uno (aviso de
 			# 0,4 s). Queman 1 de vida, mueren de un golpe y cada uno da espíritu.
 			return {
-				"nombre": "Onibi", "id": 2301, "vida": 1, "velocidad": 4.0, "peso": 0.4,
+				"nombre": "Onibi", "id": 2301, "hoja": "onibi_hoja", "alto": 0.9, "vida": 1, "velocidad": 4.0, "peso": 0.4,
 				"vision": 12.0, "correa": 14.0, "distancia_ataque": 3.4, "flota": true,
 				"orbita": 3.0, "espiritu_al_morir": 0.2,
 				"receta": {"familia": "flotante", "tamano": "S", "elemento": "fuego", "rol": "enjambre",
