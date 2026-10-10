@@ -1,0 +1,24 @@
+feature,area,priority,original,clone,notes
+Paleta que se mueve con el dedo,juego,must,yes,yes,clasico de romper ladrillos
+Bola que rebota con angulo segun donde golpea la paleta,juego,must,yes,yes,da el control al jugador
+Ladrillos de varios golpes,juego,must,yes,yes,
+Ladrillos indestructibles,juego,must,yes,yes,
+Vidas y perder la bola,juego,must,yes,yes,
+Potenciadores que caen (paleta ancha / multibola / laser),juego,must,yes,yes,
+Niveles con forma (dibujos hechos de ladrillos),niveles,must,yes,yes,
+Mas de 100 niveles,niveles,must,yes,yes,Bricks Breaker Quest / Real Brick Breaker venden cientos
+Estrellas por nivel,progreso,must,yes,yes,
+Pausa y reanudar,juego,must,yes,yes,
+Mundos o capitulos con fondo distinto,niveles,should,yes,yes,
+Ladrillos explosivos,juego,should,yes,yes,
+Bola de fuego que atraviesa,juego,should,yes,yes,
+Iman para atrapar la bola,juego,should,yes,yes,
+Ladrillos que se mueven,niveles,should,yes,no,mundos avanzados
+Modo infinito,modos,should,yes,no,
+Desafio diario,modos,should,yes,no,
+Puntuacion y combos,juego,should,yes,yes,
+Sonido y vibracion que se apagan de verdad,ajustes,should,yes,yes,queja en las resenas (Classic BrickBreaker)
+Sin quedarse atascado (bola en bucle horizontal),juego,should,yes,yes,queja de soft-lock en las resenas
+Logros,progreso,could,yes,no,
+Editor de niveles,modos,could,yes,skip,Real Brick Breaker lo ofrece; fuera de la primera version
+Anuncios y vidas de pago,negocio,could,yes,skip,es lo que mas odian las resenas (147 de 253): no se copia

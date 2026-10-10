@@ -6,7 +6,7 @@ Orden acordado: uno completo primero y después los demás sobre el mismo molde.
 |---|---|---|---|
 | 1 | **Palabrario** — sopa de letras | **Casi terminado, en espera**: 545 sopas, app de pago + paquetes de pistas, auditado, APK y AAB exportados. Se sube cuando la cuenta de Play esté lista (`palabrario/docs/LANZAMIENTO.md`) | — |
 | 2 | **Lienzo Zen** — colorear (749 láminas), dos formas de pintar | **En curso** | Medio |
-| 3 | **Rebotazz** — plataforma, bola y bloques | Diseño abajo | Bajo-medio |
+| 3 | **Rebotazz** — romper ladrillos (tipo «Brick Breaker») | **En curso**: núcleo jugable, 120 niveles en 6 mundos, 7 potenciadores; falta modo infinito, desafío diario, logros y ficha (`rebote/docs/GDD.md`) | Bajo-medio |
 | 4 | **Zona Zero** — supervivencia zombi 2D | Diseño abajo, alcance recortado | Alto |
 
 \* Relativo entre ellos, no en horas: depende de cuánto arte nuevo haga falta.

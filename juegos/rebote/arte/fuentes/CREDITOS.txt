@@ -1,0 +1,7 @@
+Fuentes incluidas en Rebotazz. Bajo SIL Open Font License 1.1 (ver OFL.txt).
+Descargadas de Google Fonts.
+
+Fredoka-Medium.ttf: Fredoka Medium Regular
+  Copyright 2016 The Fredoka Project Authors (https://github.com/hafontia/Fredoka-One)
+Fredoka-SemiBold.ttf: Fredoka SemiBold Regular
+  Copyright 2016 The Fredoka Project Authors (https://github.com/hafontia/Fredoka-One)

@@ -1,0 +1,51 @@
+; Rebotazz (nombre de trabajo): romper ladrillos para Android.
+; Godot 4.7. Vertical, renderizador compatible para moviles de gama baja.
+
+config_version=5
+
+[application]
+
+config/name="Rebotazz"
+config/description="Romper ladrillos clasico: paleta, bola y potenciadores. Sin anuncios."
+run/main_scene="res://escenas/menu.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+boot_splash/show_image=false
+boot_splash/bg_color=Color(0.043, 0.063, 0.149, 1)
+config/quit_on_go_back=false
+config/version="0.1.0"
+config/icon="res://arte/icono.png"
+
+[autoload]
+
+Ajustes="*res://autoload/ajustes.gd"
+Sonido="*res://autoload/sonido.gd"
+Niveles="*res://autoload/niveles.gd"
+Progreso="*res://autoload/progreso.gd"
+
+[display]
+
+window/size/viewport_width=1080
+window/size/viewport_height=1920
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=1
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
+[physics]
+
+common/physics_ticks_per_second=120
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true
+environment/defaults/default_clear_color=Color(0.043, 0.063, 0.149, 1)
+
+[juego]
+
+; Paquete de Android: no se puede cambiar tras subirlo a Play.
+paquete="com.thunderdarkness.rebotazz"
