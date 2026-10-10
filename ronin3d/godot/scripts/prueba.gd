@@ -1095,6 +1095,16 @@ func _comprobar_tras_iai() -> void:
 	var akira = _juego().akira
 	_registrar("Tras un iai perfecto, atacar sigue la cadena desde el 2.º corte", akira.paso_combo == 1,
 		"paso=%d" % akira.paso_combo)
+	# Ataque a la carrera: atacar mientras corre da el corte de carrera del arma.
+	akira.ataque = {}
+	akira.enfriamiento = 0.0
+	akira.corriendo = true
+	akira.buffer_ataque = 0.25
+	akira._resolver_buffer()
+	var nombre: String = akira.ataque.get("nombre", "")
+	_registrar("Atacar corriendo da el ataque a la carrera del arma", nombre == "Iai a la carrera",
+		"corte=%s" % nombre)
+	akira.ataque = {}
 	_proteger(true)
 
 

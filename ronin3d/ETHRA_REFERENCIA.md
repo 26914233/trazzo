@@ -27,7 +27,7 @@ RONIN. La historia y el bestiario de RONIN no cambian.
 |---|---|---|---|
 | Espada: cadena de 3 cortes (horizontal, revés, estocada o corte bajo) | 02:38-03:03, 10:38 | Alta | **Katana**: 4 cortes de iai (nukitsuke, kesa-giri, gyaku-kesa, karatake-wari) |
 | Mantener ataque: carga y corte giratorio de 360° | 02:59 | Alta | Mantener «Atacar» 0,55 s: **iai de luna creciente** (360°) |
-| Ataque a la carrera | 02:46 | Media | Pendiente |
+| Ataque a la carrera | 02:46 | Media | Atacar corriendo: un corte propio por arma |
 | Lanza: estocadas rápidas, largas y estrechas | 21:28, 36:00 | Media | **Yari**: 3 estocadas, 2,6 m, cono de 40° |
 | Mandoble: barridos lentos (~20-25 cuadros de preparación), anchos, rompen postura | 39:20-39:35, 49:22 | Media (cuadros estimados) | **Nodachi**: 0,36 s de preparación, cono de 200°, rompe la postura en 2 golpes |
 | Esquiva: paso corto con el objetivo fijado y voltereta sin fijar; gasta aguante | 04:47-04:59 | Alta | **Esquiva** de 0,32 s, invulnerable entre 0,03 y 0,24 s, 25 de aguante; cancela la recuperación |
@@ -77,6 +77,8 @@ Segundos: preparación / corte / recuperación.
   - yari: estocada, con la yari en la mano;
   - nodachi: barrido y barrido giratorio, con el nodachi en la mano;
   - esquiva.
+- **Ataque a la carrera** de cada arma (EthrA 02:46): iai de paso, tsuki o nagi; la cadena
+  sigue desde el 2.º corte (0.12).
 - **Fijado de objetivo** automático con retícula: anillo rojo y rombo.
 - **Vista de depuración** con F3: conos de los cortes, zonas de golpe y franjas de los ataques.
 - **Juego en vertical** (720×1280).
@@ -87,6 +89,5 @@ Segundos: preparación / corte / recuperación.
 
 - Medir los cuadros exactos con el video en local: ahora son estimaciones del análisis de vidIQ.
 - Probar en un móvil de verdad: respuesta de los toques, ventana del iai y fluidez.
-- Ataque a la carrera (EthrA 02:46).
 - Los yōkai se ven con sus modelos 3D del bestiario, no en pixel art: los sprites solo existen
   para Akira, Shiro y los soldados.

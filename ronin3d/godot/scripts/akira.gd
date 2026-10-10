@@ -137,6 +137,9 @@ func _resolver_buffer() -> void:
 	if tras_iai > 0.0:
 		_empezar_corte(combo[mini(1, combo.size() - 1)], mini(1, combo.size() - 1))
 		tras_iai = 0.0
+	elif enfriamiento <= 0.0 and corriendo and is_on_floor():
+		# Atacar corriendo: el ataque a la carrera de cada arma; la cadena sigue desde el 2.º corte.
+		_empezar_corte(datos_arma().carrera, 0)
 	elif enfriamiento <= 0.0:
 		_empezar_corte(combo[0], 0)
 

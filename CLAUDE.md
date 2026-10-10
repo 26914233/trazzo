@@ -421,7 +421,7 @@ Tu trabajo es ayudarme a convertir una idea en un producto real.
   para el móvil y enemigos del bestiario. Referencia y tiempos: `ronin3d/ETHRA_REFERENCIA.md`. Los
   combos por arma (katana con cadena de iai, yari, nodachi), la carga, la esquiva y la postura
   están en `godot/scripts/armas.gd`. Yōkai (`enemigos.gd`, `yokai.gd`) y jefe (`jefe_oni.gd`).
-  APK de prueba **0.11** (vertical); prueba automática 48 de 48 (10-10-2026).
+  APK de prueba **0.12** (vertical); prueba automática 49 de 49 (10-10-2026).
 
 - **En pausa en la 0.9 desde el 02-10-2026 (DECISIÓN 22):** antes se prueban los prototipos de
   puzles de `puzles/` (sección del final). RONIN no se abandona: todo sigue en el repositorio y en

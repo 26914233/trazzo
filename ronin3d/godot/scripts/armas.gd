@@ -59,6 +59,7 @@ static func datos(arma: String) -> Dictionary:
 					_corte("Ni-dan tsuki", 0.06, 0.10, 0.20, 1, 0.20, 3.5, 2.6, 40.0, 3.0, 0.05, 0.22, "tsuki"),
 					_corte("Sandan tsuki", 0.12, 0.14, 0.34, 1, 0.35, 6.0, 2.9, 50.0, 5.0, 0.08, 0.35, "tsuki"),
 				],
+				"carrera": _corte("Tsuki a la carrera", 0.06, 0.16, 0.32, 1, 0.35, 6.0, 2.8, 40.0, 9.0, 0.07, 0.3, "tsuki"),
 				"cargado": _corte("Estocada del cometa", 0.10, 0.22, 0.45, 2, 0.6, 8.0, 4.0, 45.0, 12.0, 0.10, 0.5, "tsuki"),
 			}
 		"nodachi":
@@ -70,6 +71,7 @@ static func datos(arma: String) -> Dictionary:
 					_corte("Yoko-nagi", 0.36, 0.16, 0.42, 2, 0.55, 7.5, 2.3, 200.0, 1.5, 0.11, 0.5, "barrido"),
 					_corte("Gyaku-nagi", 0.34, 0.16, 0.55, 2, 0.75, 10.0, 2.3, 200.0, 1.5, 0.13, 0.6, "barrido"),
 				],
+				"carrera": _corte("Nagi a la carrera", 0.22, 0.18, 0.5, 2, 0.6, 9.0, 2.4, 160.0, 7.0, 0.12, 0.55, "barrido"),
 				"cargado": _corte("Tenchi-giri", 0.30, 0.20, 0.65, 3, 1.2, 11.0, 2.8, 360.0, 0.0, 0.16, 0.8, "barrido_giro"),
 			}
 		_:
@@ -84,6 +86,8 @@ static func datos(arma: String) -> Dictionary:
 					_corte("Gyaku-kesa", 0.06, 0.12, 0.20, 1, 0.25, 4.5, 1.7, 110.0, 2.0, 0.06, 0.30, "gyaku"),
 					_corte("Karatake-wari", 0.12, 0.14, 0.36, 1, 0.45, 8.0, 1.9, 90.0, 3.5, 0.10, 0.45, "ataque"),
 				],
+				# A la carrera: un iai de paso que lleva el cuerpo hacia delante (EthrA 02:46).
+				"carrera": _corte("Iai a la carrera", 0.05, 0.16, 0.3, 1, 0.35, 6.0, 1.9, 100.0, 9.0, 0.07, 0.32, "desenvaine"),
 				# Como el corte giratorio de la espada de EthrA (02:59): un iai alrededor.
 				"cargado": _corte("Iai de luna creciente", 0.08, 0.18, 0.45, 2, 0.8, 7.0, 2.4, 360.0, 0.0, 0.12, 0.55, "giro"),
 			}
