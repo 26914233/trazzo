@@ -28,6 +28,8 @@ signal mensaje(texto: String)
 signal monedas_cambiadas(total: int)
 signal vida_maxima_cambiada(maxima: int)
 signal aviso_interaccion(texto: String)     # vacío: no hay nada con lo que interactuar
+signal aguante_cambiado(valor: float)
+signal arma_cambiada(arma: String)
 
 var aspecto
 var efectos
@@ -78,6 +80,9 @@ func iniciar(con_intro := true) -> void:
 	akira.paro.connect(_al_iai_perfecto)
 	akira.pidio_corte_de_luna.connect(_al_pedir_corte_de_luna)
 	akira.espiritu_cambiado.connect(func(valor): espiritu_cambiado.emit(valor))
+	akira.aguante_cambiado.connect(func(valor): aguante_cambiado.emit(valor))
+	akira.arma_cambiada.connect(func(arma): arma_cambiada.emit(arma))
+	akira.esquivo.connect(func(): efectos.esquiva(akira.global_position + Vector3.UP * 0.4))
 	akira.vida_cambiada.connect(func(_vida): efectos.herido(akira.global_position + Vector3.UP * 1.1))
 
 	jizo = Jizo.new()
@@ -252,17 +257,18 @@ func _al_derrotar() -> void:
 	derrotados_cambiados.emit(derrotados, Datos.PATRULLAS.size())
 
 
+# Alcance y cono del corte en curso (cada corte de armas.gd tiene los suyos).
 func _en_alcance_espada(soldado) -> bool:
 	var hacia: Vector3 = soldado.global_position - akira.global_position
 	if absf(hacia.y) > 1.2:
 		return false
 	hacia.y = 0.0
 	var distancia := hacia.length()
-	if distancia > Datos.ALCANCE_ESPADA + Datos.RADIO_PERSONAJE:
+	if distancia > float(akira.ataque.alcance) + Datos.RADIO_PERSONAJE:
 		return false
 	if distancia < 0.5:
 		return true
-	return akira.mirando.angle_to(hacia) <= deg_to_rad(Datos.CONO_ESPADA / 2.0)
+	return akira.mirando.angle_to(hacia) <= deg_to_rad(float(akira.ataque.cono) / 2.0)
 
 
 func soldados_vivos() -> Array:
@@ -319,8 +325,12 @@ func _physics_process(delta: float) -> void:
 		for soldado in soldados_vivos():
 			if not akira.golpeados.has(soldado) and _en_alcance_espada(soldado):
 				akira.golpeados.append(soldado)
-				var mortal: bool = soldado.recibir_golpe(akira.global_position)
-				efectos.golpe(_punto_entre(akira, soldado), mortal)
+				var corte: Dictionary = akira.ataque
+				var vida_antes: int = soldado.vida
+				var mortal: bool = soldado.recibir_golpe(akira.global_position, false, corte.danio,
+					corte.postura, corte.empuje)
+				var punto := _punto_entre(akira, soldado)
+				efectos.golpe_de(punto, mortal, corte, vida_antes - maxi(soldado.vida, 0), soldado.postura_rota())
 				akira.ganar_espiritu(Datos.ESPIRITU_POR_GOLPE)
 	if akira.vivo() and akira.global_position.x > Datos.LIMITE_PORTON_X and absf(akira.global_position.z) < 3.0:
 		akira.controlable = false

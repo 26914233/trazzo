@@ -34,6 +34,8 @@ var luna_cortado := false
 var luna_cortes_sonados := 0
 var racha_monedas := 0                # monedas seguidas: cada una suena un poco más aguda
 var tiempo_racha := 0.0
+var numeros_vivos := 0                # números de daño en pantalla (para las pruebas)
+var numeros_creados := 0
 
 
 func _ready() -> void:
@@ -146,6 +148,64 @@ func golpe(punto: Vector3, mortal: bool) -> void:
 	sonar("golpe", punto)
 	if mortal:
 		sonar("caida", punto, -3.0)
+
+
+# Golpe de un corte de armas.gd: la congelación y la sacudida salen del propio corte (más
+# fuertes con el mandoble y en el remate), y se ven el daño y la postura rota, como en EthrA.
+func golpe_de(punto: Vector3, mortal: bool, corte: Dictionary, danio: int, rota: bool) -> void:
+	var extra := 1.4 if mortal else (1.25 if rota else 1.0)
+	pausa_de_impacto(float(corte.pausa) * extra)
+	sacudir(minf(1.0, float(corte.sacudida) * extra))
+	var color: Color = Color(1.0, 0.75, 0.35) if not corte.get("cargado", false) else Color(0.75, 0.85, 1.0)
+	chispas(punto, 22 if mortal else 12 + int(float(corte.sacudida) * 12.0), color)
+	sonar("golpe", punto, 0.0 if float(corte.pausa) < 0.1 else 2.0)
+	numero(punto + Vector3.UP * 0.5, str(danio) if not mortal or danio > 0 else "", mortal)
+	if rota and not mortal:
+		texto_flotante(punto + Vector3.UP * 0.9, "¡Postura rota!", Color(1.0, 0.85, 0.3), 0.007)
+		sonar("parada", punto, -2.0)
+	if mortal:
+		sonar("caida", punto, -3.0)
+		polvo_de_pixeles(punto)
+
+
+# Número de daño que sube y se desvanece sobre el enemigo.
+func numero(punto: Vector3, texto: String, mortal := false) -> void:
+	if texto == "":
+		return
+	texto_flotante(punto, texto, Color(1.0, 0.35, 0.25) if mortal else Color(1, 1, 1), 0.006)
+
+
+func texto_flotante(punto: Vector3, texto: String, color: Color, tamano: float) -> void:
+	var etiqueta := Label3D.new()
+	etiqueta.text = texto
+	etiqueta.pixel_size = tamano
+	etiqueta.font_size = 48
+	etiqueta.outline_size = 14
+	etiqueta.modulate = color
+	etiqueta.outline_modulate = Color(0.05, 0.02, 0.02)
+	etiqueta.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	etiqueta.no_depth_test = true
+	etiqueta.position = punto + Vector3(azar.randf_range(-0.15, 0.15), 0.0, 0.0)
+	add_child(etiqueta)
+	numeros_vivos += 1
+	numeros_creados += 1
+	var subida := create_tween()
+	subida.tween_property(etiqueta, "position:y", punto.y + 0.6, 0.7).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	subida.parallel().tween_property(etiqueta, "modulate:a", 0.0, 0.35).set_delay(0.35)
+	subida.tween_callback(func():
+		numeros_vivos -= 1
+		etiqueta.queue_free())
+
+
+# Al morir, el enemigo se deshace en un estallido de cuadraditos (EthrA 12:10, 39:36).
+func polvo_de_pixeles(punto: Vector3) -> void:
+	chispas(punto, 26, Color(0.85, 0.82, 0.78), 3.0, 0.7, -2.0, 0.12)
+	chispas(punto + Vector3.UP * 0.3, 14, Color(0.3, 0.28, 0.3), 2.0, 0.9, 1.0, 0.1)
+
+
+func esquiva(punto: Vector3) -> void:
+	chispas(punto, 8, Color(0.9, 0.9, 0.85), 1.5, 0.3, 0.0, 0.08)
+	sonar("tajo", punto, -10.0, 0.2)
 
 
 func desenvaine(punto: Vector3) -> void:

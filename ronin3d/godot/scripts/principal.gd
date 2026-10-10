@@ -11,6 +11,7 @@ extends Node
 const Datos := preload("res://scripts/datos.gd")
 const Juego := preload("res://scripts/juego.gd")
 const Hud := preload("res://scripts/hud.gd")
+const Armas := preload("res://scripts/armas.gd")
 const Prueba := preload("res://scripts/prueba.gd")
 const ControlesTactiles := preload("res://scripts/controles_tactiles.gd")
 const VisualModelo := preload("res://scripts/visual_modelo.gd")
@@ -75,6 +76,9 @@ func _registrar_acciones(clic_ataca: bool) -> void:
 		"atacar": [KEY_J],
 		"parar": [KEY_K],
 		"especial": [KEY_L],
+		"esquivar": [KEY_C],
+		"cambiar_arma": [KEY_I],
+		"depurar_golpes": [KEY_F3],
 		"estilo_animacion": [KEY_T],
 		"galeria": [KEY_G],
 		"apariencia": [KEY_V],
@@ -120,6 +124,7 @@ func _registrar_acciones(clic_ataca: bool) -> void:
 		"estilo_animacion": JOY_BUTTON_BACK,
 		"correr": JOY_BUTTON_RIGHT_SHOULDER, "pausa": JOY_BUTTON_START,
 		"acercar": JOY_BUTTON_DPAD_UP, "alejar": JOY_BUTTON_DPAD_DOWN,
+		"esquivar": JOY_BUTTON_B, "cambiar_arma": JOY_BUTTON_DPAD_RIGHT,
 	}
 	for accion in botones:
 		var boton := InputEventJoypadButton.new()
@@ -140,6 +145,10 @@ func _iniciar_juego(con_intro: bool) -> void:
 	juego.vida_cambiada.connect(hud.poner_vida)
 	juego.derrotados_cambiados.connect(hud.poner_derrotados)
 	juego.espiritu_cambiado.connect(hud.poner_espiritu)
+	juego.aguante_cambiado.connect(hud.poner_aguante)
+	juego.arma_cambiada.connect(func(arma):
+		hud.poner_arma(Armas.datos(arma).nombre)
+		hud.mostrar_mensaje("Arma: %s" % Armas.datos(arma).nombre, 1.2))
 	juego.mensaje.connect(hud.mostrar_mensaje)
 	juego.monedas_cambiadas.connect(_al_cambiar_monedas)
 	juego.vida_maxima_cambiada.connect(hud.poner_vida_maxima)
@@ -147,6 +156,8 @@ func _iniciar_juego(con_intro: bool) -> void:
 	hud.poner_espiritu(0.0)
 	hud.poner_aviso_interaccion("")
 	juego.iniciar(con_intro)
+	hud.poner_aguante(juego.akira.aguante)
+	hud.poner_arma(Armas.datos(juego.akira.arma).nombre)
 	hud.poner_monedas(Partida.monedas, false)
 	hud.poner_vida_maxima(juego.akira.vida_maxima)
 	hud.poner_vida(juego.akira.vida)

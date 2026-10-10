@@ -127,8 +127,33 @@ func _ready() -> void:
 		[42.3, _comprobar_jizo],
 		[42.5, _capturar.bind("jizo")],
 		[42.6, _comprobar_guardado],
-		[42.8, _terminar],
+		[42.7, _preparar_combo],
 	]
+	# Cadena de la katana: pulsar atacar cada 0,1 s (las pulsaciones se guardan y encadenan).
+	for i in 16:
+		pasos.append([42.8 + i * 0.1, _pulsar.bind("atacar")])
+	pasos.append_array([
+		[44.6, _comprobar_combo],
+		[44.7, _preparar_carga],
+		[44.8, _enviar_accion.bind("atacar", true)],
+		[45.8, _enviar_accion.bind("atacar", false)],
+		[46.6, _comprobar_carga],
+		[46.7, _preparar_esquiva],
+		[46.8, _pulsar.bind("atacar")],
+		[47.0, _pulsar.bind("esquivar")],
+		[47.12, _comprobar_esquiva],
+		[47.6, _pulsar.bind("cambiar_arma")],
+		[47.8, _comprobar_cambio_arma],
+		[47.9, _preparar_postura],
+		[48.0, _pulsar.bind("atacar")],
+		[48.4, _pulsar.bind("atacar")],
+		[48.6, _pulsar.bind("atacar")],
+		[49.7, _comprobar_postura],
+		[49.8, _preparar_tras_iai],
+		[49.85, _pulsar.bind("atacar")],
+		[50.0, _comprobar_tras_iai],
+		[50.2, _terminar],
+	])
 
 
 func _process(delta: float) -> void:
@@ -906,6 +931,115 @@ func _terminar_medida() -> void:
 	var segundos := (Time.get_ticks_usec() - medida_inicio_us) / 1000000.0
 	if segundos > 0.0:
 		fps_medidos = (Engine.get_frames_drawn() - medida_inicio_cuadros) / segundos
+
+
+# --- Combate al estilo de EthrA: combos, carga, esquiva, armas y postura -------------------
+
+const Soldado := preload("res://scripts/soldado.gd")
+const Armas := preload("res://scripts/armas.gd")
+var muneco = null
+var pasos_vistos: Array = []
+var cargados_vistos := 0
+var numeros_antes := 0
+
+
+# Un soldado quieto (sin pensar) delante de Akira, para golpearlo.
+func _crear_muneco(vida: int) -> void:
+	var juego = _juego()
+	var akira = juego.akira
+	_proteger(true)
+	var lugar: Vector3 = Datos.INICIO_AKIRA + Vector3(3.0, 0.0, 0.0)
+	muneco = Soldado.new()
+	juego.add_child(muneco)
+	muneco.configurar(lugar, lugar + Vector3(0.1, 0, 0), akira)
+	muneco.visual = juego._crear_visual(true)
+	muneco.add_child(muneco.visual)
+	muneco.global_position = lugar
+	muneco.vida = vida
+	muneco.process_mode = Node.PROCESS_MODE_DISABLED
+	juego.soldados.append(muneco)
+	_teletransportar(lugar - Vector3(1.3, 0, 0), Vector3.RIGHT)
+	akira.aguante = Armas.AGUANTE_MAXIMO
+
+
+func _preparar_combo() -> void:
+	var akira = _juego().akira
+	akira.cambiar_arma("katana")
+	akira.ataco.connect(func():
+		pasos_vistos.append(akira.paso_combo)
+		if akira.ataque.get("cargado", false):
+			cargados_vistos += 1)
+	numeros_antes = _juego().efectos.numeros_creados
+	_crear_muneco(Datos.VIDA_SOLDADO)
+	pasos_vistos.clear()
+
+
+func _comprobar_combo() -> void:
+	var cadena: bool = pasos_vistos.slice(0, 4) == [0, 1, 2, 3]
+	var derribado: bool = not muneco.vivo()
+	var numeros: int = _juego().efectos.numeros_creados - numeros_antes
+	_registrar("La katana encadena 4 cortes de iai y derriba al soldado (4 de vida)", cadena and derribado,
+		"pasos=%s, derribado=%s" % [str(pasos_vistos), derribado])
+	_registrar("Cada impacto muestra su número de daño", numeros >= 4, "%d números" % numeros)
+
+
+func _preparar_carga() -> void:
+	cargados_vistos = 0
+	_crear_muneco(Datos.VIDA_SOLDADO)
+
+
+func _comprobar_carga() -> void:
+	_registrar("Mantener atacar suelta el corte cargado (iai de luna creciente, 360°)",
+		cargados_vistos == 1 and muneco.vida < Datos.VIDA_SOLDADO,
+		"cargados=%d, vida del soldado %d → %d" % [cargados_vistos, Datos.VIDA_SOLDADO, muneco.vida])
+
+
+func _preparar_esquiva() -> void:
+	_crear_muneco(99)
+
+
+func _comprobar_esquiva() -> void:
+	var akira = _juego().akira
+	_registrar("La esquiva cancela el corte, gasta aguante y da invulnerabilidad",
+		akira.esquivando() and not akira.atacando() and akira.invulnerable_por_esquiva()
+		and akira.aguante < Armas.AGUANTE_MAXIMO,
+		"esquivando=%s, atacando=%s, invulnerable=%s, aguante=%.0f" % [akira.esquivando(),
+		akira.atacando(), akira.invulnerable_por_esquiva(), akira.aguante])
+
+
+func _comprobar_cambio_arma() -> void:
+	var akira = _juego().akira
+	_registrar("«Arma» cambia de katana a yari, con su propia cadena", akira.arma == "yari"
+		and akira.datos_arma().combo.size() == 3 and principal.hud.marcador.arma == "Yari",
+		"arma=%s, cortes=%d, HUD=%s" % [akira.arma, akira.datos_arma().combo.size(), principal.hud.marcador.arma])
+
+
+func _preparar_postura() -> void:
+	_juego().akira.cambiar_arma("nodachi")
+	_crear_muneco(99)
+
+
+func _comprobar_postura() -> void:
+	var nodachi: Dictionary = Armas.datos("nodachi").combo[0]
+	var katana: Dictionary = Armas.datos("katana").combo[0]
+	_registrar("El nodachi es lento y rompe la postura en dos barridos",
+		muneco.postura_rota() and nodachi.anticipacion > katana.anticipacion * 4.0,
+		"postura rota=%s, preparación %.2f s frente a %.2f s" % [muneco.postura_rota(),
+		nodachi.anticipacion, katana.anticipacion])
+
+
+func _preparar_tras_iai() -> void:
+	var akira = _juego().akira
+	akira.cambiar_arma("katana")
+	akira.enfriamiento = 0.0
+	akira.tras_iai = Armas.VENTANA_TRAS_IAI
+
+
+func _comprobar_tras_iai() -> void:
+	var akira = _juego().akira
+	_registrar("Tras un iai perfecto, atacar sigue la cadena desde el 2.º corte", akira.paso_combo == 1,
+		"paso=%d" % akira.paso_combo)
+	_proteger(true)
 
 
 func _terminar() -> void:

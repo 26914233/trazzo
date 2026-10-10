@@ -21,7 +21,7 @@ OK     Animación anime: 12 poses por segundo; T cambia a suave (cada paso)  ani
 OK     La galería de criaturas se abre desde la pausa y reparte páginas  10 páginas; la tercera tiene 7 criaturas y 125 piezas
 OK     Al cerrar la galería se vuelve a la pausa y el juego sigue entero  en pausa=true, juego en el árbol=true
 OK     El catálogo del bestiario se carga y todos sus datos son válidos  929 criaturas (123 con modelo propio), 0 con datos no válidos
-OK     Todas las criaturas del catálogo se construyen dentro del presupuesto de piezas  929 criaturas (1163 construcciones con los rangos 2 y 3 de 1 de cada 8) en 468 ms; rango 1: media 20.5 piezas, máximo 42; máximo con rangos: 42
+OK     Todas las criaturas del catálogo se construyen dentro del presupuesto de piezas  929 criaturas (1163 construcciones con los rangos 2 y 3 de 1 de cada 8) en 909 ms; rango 1: media 20.5 piezas, máximo 42; máximo con rangos: 42
 OK     Los modelos detallados se cargan con textura y cel-shading (el Aka-oni, con sus tres rangos)  rango 1: 14024 triángulos, 1.91 m; rango 2: 14024 triángulos, 2.29 m; rango 3: 14024 triángulos, 1.91 m; modelo 353: 41471 triángulos; modelo 680: 2588 triángulos
 OK     Los cuatro aspectos de Akira llevan la cicatriz y el sastre los enseña en la pausa  triángulos: { "joven": 3546, "curtido": 3594, "veterano": 3623, "mujer": 3421 }
 OK     Los personajes son sprites pixel art: 6 hojas con todas sus poses y 8 direcciones  hojas bien: 6 de 6 · dirección 7 → 3 al girar la cámara 180°
@@ -31,5 +31,12 @@ OK     Shiro trae las monedas que Akira deja atrás  entregó 3 · monedas 9 →
 OK     Las skins están bloqueadas y se compran al sastre con monedas  bloqueada=true, comprada=true (quedan 70 mon), al salir=true
 OK     El jizō da +1 de vida máxima a cambio de monedas  aviso=true, vida máxima 6, monedas 70 → 30
 OK     La partida se guarda y se carga (monedas, skins y bendiciones)  [30, ["joven", "curtido"], 1] → [30, ["joven", "curtido"], 1]
-Resultado: 32 de 32 comprobaciones correctas
-FPS al caminar por el patio: 11.5 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)
+OK     La katana encadena 4 cortes de iai y derriba al soldado (4 de vida)  pasos=[0, 1, 2, 3, 0, 1, 2], derribado=true
+OK     Cada impacto muestra su número de daño  4 números
+OK     Mantener atacar suelta el corte cargado (iai de luna creciente, 360°)  cargados=1, vida del soldado 4 → 1
+OK     La esquiva cancela el corte, gasta aguante y da invulnerabilidad  esquivando=true, atacando=false, invulnerable=true, aguante=75
+OK     «Arma» cambia de katana a yari, con su propia cadena  arma=yari, cortes=3, HUD=Yari
+OK     El nodachi es lento y rompe la postura en dos barridos  postura rota=true, preparación 0.36 s frente a 0.05 s
+OK     Tras un iai perfecto, atacar sigue la cadena desde el 2.º corte  paso=1
+Resultado: 39 de 39 comprobaciones correctas
+FPS al caminar por el patio: 6.0 (llvmpipe (LLVM 20.1.2, 256 bits), opengl3)

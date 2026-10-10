@@ -44,6 +44,8 @@ class MarcadorVida extends Control:
 	var vida := 5
 	var maximo := 5
 	var espiritu := 0.0
+	var aguante := 1.0                # 0-1, barra amarilla (como el «Aguante» de EthrA)
+	var arma := "Katana"
 	var latido := 0.0
 	var monedas := 0
 	var brillo_moneda := 0.0          # destello del contador al ganar monedas
@@ -65,6 +67,14 @@ class MarcadorVida extends Control:
 		if espiritu >= 1.0:
 			draw_string_outline(fuente, Vector2(barra.end.x + 8, 42), "LUNA", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, 4, Color(0, 0, 0, 0.8))
 			draw_string(fuente, Vector2(barra.end.x + 8, 42), "LUNA", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, dorado)
+		# Aguante bajo el espíritu: lo gastan la esquiva y el ataque cargado.
+		var barra_aguante := Rect2(barra.position + Vector2(0, 11), Vector2(barra.size.x, 5))
+		draw_rect(barra_aguante.grow(2.0), Color(0, 0, 0, 0.7))
+		draw_rect(barra_aguante, Color(0.16, 0.13, 0.1))
+		draw_rect(Rect2(barra_aguante.position, Vector2(barra_aguante.size.x * aguante, 5)), Color(0.95, 0.78, 0.25))
+		# Arma en la mano
+		draw_string_outline(fuente, Vector2(barra.end.x + 8, 58), arma, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, 4, Color(0, 0, 0, 0.8))
+		draw_string(fuente, Vector2(barra.end.x + 8, 58), arma, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color(0.85, 0.9, 1.0))
 		# Monedas: un mon de cobre (con su agujero cuadrado) y la cantidad
 		var centro_moneda := Vector2(9, 64)
 		var cobre := color_moneda.lerp(Color(1.0, 0.95, 0.75), brillo_moneda)
@@ -317,6 +327,16 @@ func poner_version(texto: String) -> void:
 	etiqueta_version.text = texto
 
 
+func poner_aguante(valor: float) -> void:
+	marcador.aguante = clampf(valor / 100.0, 0.0, 1.0)
+	marcador.queue_redraw()
+
+
+func poner_arma(nombre: String) -> void:
+	marcador.arma = nombre
+	marcador.queue_redraw()
+
+
 func poner_espiritu(valor: float) -> void:
 	marcador.espiritu = valor
 	marcador.queue_redraw()
@@ -363,8 +383,8 @@ func completar_texto() -> void:
 	cuerpo.visible_characters = -1
 
 
-const AYUDA_TECLADO := "WASD: moverse · SHIFT: correr · ESPACIO: saltar · J: atacar · K: iaidō (mantén y suelta al «!») · L: corte de luna · Q/E: cámara · T: animación · ESC: pausa"
-const AYUDA_TACTIL := "Joystick: moverse · Mantén «Iai» y suéltalo justo al «!»\nArrastra el dedo: girar la cámara · «Luna»: corte especial con la barra llena"
+const AYUDA_TECLADO := "WASD: moverse · SHIFT: correr · ESPACIO: saltar · J: atacar (mantén: cargado) · C: esquivar · I: arma · K: iaidō (mantén y suelta al «!») · L: corte de luna · Q/E: cámara · T: animación · ESC: pausa"
+const AYUDA_TACTIL := "Joystick: moverse · «Atacar» encadena cortes; mantenlo para cargar\n«Iai»: suéltalo justo al «!» · «Esquivar» · «Arma» cambia de arma"
 
 
 func mostrar_ayuda(tactil := false) -> void:

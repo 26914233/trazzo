@@ -21,6 +21,9 @@ var mirando := Vector3.FORWARD
 var temporizador := 0.0
 var sin_ver := 0.0
 var destello := 0.0
+var postura := 0.0                     # equilibrio perdido: con 1 se rompe (queda vendido)
+var peso := 1.0                        # cuanto más pesa, menos lo empujan los golpes
+var rota := 0.0                        # segundos que quedan con la postura rota
 var muerte := -1.0
 var moviendose := false
 var golpe_dado := false
@@ -100,28 +103,43 @@ func lo_ve() -> bool:
 	return mirando.angle_to(hacia) <= deg_to_rad(Datos.CONO_VISION / 2.0)
 
 
-# «letal»: el iai perfecto y el corte de luna derriban de un solo corte.
-func recibir_golpe(desde: Vector3, letal := false) -> bool:
+# «letal»: el iai perfecto y el corte de luna derriban de un solo corte. Cada golpe resta
+# «danio», llena la barra de equilibrio con «postura_golpe» y empuja según «empuje» y el peso.
+# Con la postura rota el soldado queda vendido un momento y el siguiente golpe lo remata.
+func recibir_golpe(desde: Vector3, letal := false, danio := 1, postura_golpe := 0.0,
+		empuje_golpe := -1.0) -> bool:
 	if not vivo():
 		return false
-	vida -= vida if letal else 1
+	if rota > 0.0:
+		letal = true
+	vida -= vida if letal else danio
 	destello = 1.0
 	var empuje := _plano(global_position - desde)
 	empuje = empuje.normalized() if empuje.length() > 0.01 else -mirando
 	if vida <= 0:
 		estado = Estado.MUERTO
 		muerte = 0.0
-		velocity = Vector3.ZERO
+		velocity = empuje * (Datos.EMPUJE_SOLDADO * 0.6)
 		collision_layer = 0
 		collision_mask = 1
 		mirando = -empuje
 		derrotado.emit()
 		return true
+	postura += postura_golpe
 	estado = Estado.ATURDIDO
 	temporizador = Datos.TIEMPO_ATURDIDO
-	velocity = empuje * Datos.EMPUJE_SOLDADO
+	if postura >= 1.0:
+		postura = 0.0
+		rota = Datos.TIEMPO_POSTURA_ROTA
+		temporizador = Datos.TIEMPO_POSTURA_ROTA
+	var fuerza := Datos.EMPUJE_SOLDADO if empuje_golpe < 0.0 else empuje_golpe
+	velocity = empuje * fuerza / peso
 	mirando = -empuje
 	return false
+
+
+func postura_rota() -> bool:
+	return rota > 0.0
 
 
 func _intentar_golpe() -> void:
@@ -141,6 +159,9 @@ func _intentar_golpe() -> void:
 
 func _physics_process(delta: float) -> void:
 	destello = maxf(0.0, destello - delta * 6.0)
+	rota = maxf(0.0, rota - delta)
+	if estado != Estado.ATURDIDO and rota <= 0.0:
+		postura = maxf(0.0, postura - delta * Datos.RECUPERA_POSTURA)
 	var deseada := Vector3.ZERO
 	moviendose = false
 	match estado:
