@@ -43,7 +43,17 @@ func _ready() -> void:
 	_guardar("colorear_terminada")
 	e.lamina.imagen().save_png(_salida.path_join("imagen_exportada.png"))
 	Obras.guardar(e.lamina)
+	Ajustes.fijar("mis_colores", ["#e63946", "#2a9d8f", "#e9c46a"])
+	e._poner_paleta(Paletas.MIS_COLORES)
+	e.elegir_color_libre()
+	await _esperar(20)
+	_guardar("color_libre")
 	await _captura("menu_obras", "res://escenas/menu.tscn")
+	preload("res://escenas/menu.gd").categoria_actual = "animales"
+	var mn := await _captura("menu_animales", "res://escenas/menu.tscn")
+	mn.abrir_ajustes()
+	await _esperar(20)
+	_guardar("menu_ajustes")
 	get_tree().quit()
 
 

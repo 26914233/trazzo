@@ -11,9 +11,9 @@ Lienzo: animación al terminar la lámina,colorear,must,yes,yes,Happy Color / Ze
 Lienzo: guardar imagen en la galería,compartir,must,yes,partial,Abovegames / casi todos; falta validar en teléfono que aparezca en la galería
 Lienzo: lámina del día,biblioteca,should,yes,yes,Recolor / Quarzo / ColorTime / Pixel Art
 Lienzo: racha de láminas del día,biblioteca,should,yes,yes,
-Lienzo: ocultar láminas terminadas,biblioteca,should,yes,no,Colorscapes / Lake (reseñas)
-Lienzo: selector libre de color,colorear,should,yes,no,Recolor / ColorMe
-Lienzo: sonido ambiental opcional,ajustes,should,yes,no,Zen Color / Abovegames
+Lienzo: ocultar láminas terminadas,biblioteca,should,yes,yes,Colorscapes / Lake (reseñas)
+Lienzo: selector libre de color,colorear,should,yes,yes,Recolor / ColorMe
+Lienzo: sonido ambiental opcional,ajustes,should,yes,yes,Zen Color / Abovegames
 Lienzo: compartir la imagen,compartir,should,yes,no,necesita plugin Android
 Lienzo: repetición time-lapse,compartir,could,yes,no,Pixel Art / Candy Mobile
 Lienzo: colecciones y logros por categoría,progreso,could,yes,no,Happy Color / Zen Color

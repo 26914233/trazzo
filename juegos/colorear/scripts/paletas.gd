@@ -14,6 +14,10 @@ const LISTA := [
 ]
 
 
+## Indice de la paleta propia del jugador ("Mis colores"), tras las curadas.
+const MIS_COLORES := 8
+
+
 static func colores(i: int) -> Array:
 	return LISTA[posmod(i, LISTA.size())]["colores"].map(func(h): return Color.html(h))
 

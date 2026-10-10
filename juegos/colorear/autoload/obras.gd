@@ -5,6 +5,7 @@ extends Node
 const MINI := 320
 
 var carpeta := "user://obras/"
+var _terminadas = null          # id -> true; se lee del disco la primera vez
 
 
 func _ready() -> void:
@@ -39,13 +40,45 @@ func guardar(lamina: Lamina) -> void:
 	if d["colores"].is_empty() and not tiene(lamina.id):
 		return   # abierta y sin tocar: no es una obra
 	d["fecha"] = int(Time.get_unix_time_from_system())
+	d["terminada"] = lamina.terminada()
 	if Archivo.escribir(_json(lamina.id), JSON.stringify(d)):
 		miniatura(lamina).save_png(_png(lamina.id))
+		_cache()
+		if d["terminada"]:
+			_terminadas[lamina.id] = true
+		else:
+			_terminadas.erase(lamina.id)
 
 
 func borrar(id: String) -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(_json(id)))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(_png(id)))
+	if _terminadas != null:
+		_terminadas.erase(id)
+
+
+func terminada(id: String) -> bool:
+	return _cache().has(id)
+
+
+## Quita las terminadas si `ocultar` (filtro del menu).
+func filtrar(ids: Array, ocultar: bool) -> Array:
+	return ids.filter(func(id): return not terminada(id)) if ocultar else ids
+
+
+func olvidar_cache() -> void:
+	_terminadas = null
+
+
+func _cache() -> Dictionary:
+	if _terminadas == null:
+		_terminadas = {}
+		for f in DirAccess.get_files_at(carpeta):
+			if f.ends_with(".json"):
+				var d = JSON.parse_string(FileAccess.get_file_as_string(carpeta + f))
+				if typeof(d) == TYPE_DICTIONARY and d.get("terminada", false) == true:
+					_terminadas[f.get_basename()] = true
+	return _terminadas
 
 
 ## Ids de las obras, la mas reciente primero.

@@ -29,6 +29,12 @@ revisadas en `juegos/ANALISIS_COMPETENCIA.md`; matriz en `juegos/replica/feature
   en la carpeta de la app. Pendiente de validar en un teléfono que salga en la galería.
 - **Lámina del día** en el menú, la misma para todos, sin repetir hasta recorrer todas.
   **Racha suave:** pintar la del día suma; faltar un solo día no la rompe.
+- **Mis colores:** la última paleta es la del jugador. El «+» abre una rueda de color
+  con barra de luz y muestra; el color elegido se guarda (hasta 12, sale el más antiguo).
+- **Ajustes** (⚙ en el menú): sonido, música ambiental, vibración y ocultar láminas
+  terminadas. Las terminadas llevan una marca ✓ en las miniaturas.
+- **Música ambiental:** bucle de 64 s sintetizado con `herramientas/musica.py` (licencia
+  propia). Apagada por defecto; entra y sale con fundido.
 
 ## Público y tono
 Adultos que colorean para relajarse (búsquedas «colorear para adultos», «mandalas»), y

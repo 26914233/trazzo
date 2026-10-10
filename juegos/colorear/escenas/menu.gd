@@ -10,7 +10,19 @@ var _chips := HBoxContainer.new()
 func _ready() -> void:
 	var col := Estilo.pantalla(self)
 	col.add_theme_constant_override("separation", 28)
-	col.add_child(Estilo.titulo(str(ProjectSettings.get_setting("application/config/name")), 110, true))
+	var cabecera := HBoxContainer.new()
+	var hueco := Control.new()
+	hueco.custom_minimum_size.x = 112
+	cabecera.add_child(hueco)
+	var titulo := Estilo.titulo(str(ProjectSettings.get_setting("application/config/name")), 110, true)
+	titulo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	cabecera.add_child(titulo)
+	var engranaje := Estilo.boton("⚙", "suave", 112)
+	engranaje.custom_minimum_size.x = 112
+	engranaje.add_theme_font_size_override("font_size", 56)
+	engranaje.pressed.connect(abrir_ajustes)
+	cabecera.add_child(engranaje)
+	col.add_child(cabecera)
 	col.add_child(Estilo.etiqueta("%d láminas para colorear" % Laminas.total(), 40, Estilo.TEXTO_SUAVE))
 	col.add_child(_lamina_del_dia())
 
@@ -49,9 +61,54 @@ func _ready() -> void:
 
 
 func _llenar() -> void:
-	var ids: Array = Obras.lista() if categoria_actual == "obras" else Laminas.categoria(categoria_actual)["laminas"].map(func(l): return l["id"])
+	var ids: Array
+	if categoria_actual == "obras":
+		ids = Obras.lista()
+	else:
+		var todas: Array = Laminas.categoria(categoria_actual)["laminas"].map(func(l): return l["id"])
+		ids = Obras.filtrar(todas, bool(Ajustes.valor("ocultar_terminadas")))
+		if ids.is_empty() and not todas.is_empty():
+			var aviso := Estilo.etiqueta("¡Terminaste todas las láminas de esta categoría!", 40, Estilo.TEXTO_SUAVE)
+			aviso.custom_minimum_size.x = 900
+			_rejilla.add_child(aviso)
 	for id in ids:
 		_rejilla.add_child(_miniatura(id))
+
+
+## Ajustes en un panel: sonido, musica, vibracion y ocultar terminadas.
+func abrir_ajustes() -> void:
+	var m := Estilo.modal(self)
+	var velo: ColorRect = m[0]
+	var col: VBoxContainer = m[1]
+	col.add_child(Estilo.titulo("Ajustes", 60, true))
+	for a in [["Sonido", "sonido"], ["Música ambiental", "musica"], ["Vibración", "vibracion"], ["Ocultar terminadas", "ocultar_terminadas"]]:
+		col.add_child(_interruptor(a[0], a[1]))
+	var listo := Estilo.boton("Listo", "primario", 130)
+	col.add_child(listo)
+	var cerrar := func():
+		velo.queue_free()
+		Estilo.ir(self, "menu")          # vuelve a pintar el menu con el filtro nuevo
+	listo.pressed.connect(cerrar)
+	velo.gui_input.connect(func(e):
+		if e is InputEventScreenTouch and e.pressed:
+			cerrar.call())
+
+
+func _interruptor(texto: String, clave: String) -> Button:
+	var b := Estilo.boton("", "normal", 124)
+	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	b.add_theme_font_size_override("font_size", 42)
+	var pintar := func() -> void:
+		var on := bool(Ajustes.valor(clave))
+		b.text = "%s:  %s" % [texto, "Sí" if on else "No"]
+		Estilo.colorear(b, Estilo.SUPERFICIE if on else Color(Estilo.TEXTO, 0.06), Estilo.TEXTO if on else Estilo.TEXTO_SUAVE)
+	b.pressed.connect(func():
+		Ajustes.fijar(clave, not bool(Ajustes.valor(clave)))
+		if clave == "musica":
+			Sonido.actualizar_musica()
+		pintar.call())
+	pintar.call()
+	return b
 
 
 ## Tarjeta de la lamina del dia: miniatura, nombre y racha.
@@ -106,6 +163,18 @@ func _miniatura(id: String) -> Control:
 	img.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	img.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	(t[1] as VBoxContainer).add_child(img)
+	if Obras.terminada(id):
+		var marca := Estilo.etiqueta("✓", 44, Estilo.SOBRE_PRIMARIO, true, false)
+		var fondo := PanelContainer.new()
+		var caja := Estilo.caja(Estilo.PRIMARIO, 30, 0, false)
+		caja.content_margin_left = 16
+		caja.content_margin_right = 16
+		fondo.add_theme_stylebox_override("panel", caja)
+		fondo.add_child(marca)
+		fondo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		marca.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		fondo.position = Vector2(14, 14)
+		b.add_child(fondo)
 	return b
 
 

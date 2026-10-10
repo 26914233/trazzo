@@ -14,6 +14,7 @@ var _deshacer: Button
 var _rehacer: Button
 var _goma: Button
 var _modo: Button
+var _mas: Button                # "+" de Mis colores
 var _evitar := {}               # zonas ya propuestas por "buscar zona sin pintar"
 var _estaba_terminada := false
 var _celebrando := false
@@ -97,17 +98,27 @@ func _poner_modo() -> void:
 
 
 func _cambiar_paleta(paso: int) -> void:
-	var i := posmod(int(Ajustes.valor("paleta")) + paso, Paletas.LISTA.size())
+	var i := posmod(int(Ajustes.valor("paleta")) + paso, Paletas.MIS_COLORES + 1)
 	Ajustes.fijar("paleta", i)
 	_poner_paleta(i)
 
 
+## Colores de la paleta i; la ultima es "Mis colores" (la del jugador).
+func _colores_de(i: int) -> Array:
+	return Ajustes.mis_colores() if i == Paletas.MIS_COLORES else Paletas.colores(i)
+
+
 func _poner_paleta(i: int) -> void:
-	_nombre_paleta.text = Paletas.nombre(i)
+	i = posmod(i, Paletas.MIS_COLORES + 1)
+	_nombre_paleta.text = "Mis colores" if i == Paletas.MIS_COLORES else Paletas.nombre(i)
 	for m in _muestras:
 		m.queue_free()
 	_muestras.clear()
-	for c in Paletas.colores(i):
+	if _mas:
+		_mas.queue_free()
+		_mas = null
+	var cols := _colores_de(i)
+	for c in cols:
 		var b := Button.new()
 		b.custom_minimum_size = Vector2(0, 140)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -117,7 +128,62 @@ func _poner_paleta(i: int) -> void:
 			_elegir(c))
 		_rejilla.add_child(b)
 		_muestras.append(b)
-	_elegir(Paletas.colores(i)[0])
+	if i == Paletas.MIS_COLORES:
+		_mas = Estilo.boton("+", "suave", 140)
+		_mas.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_mas.add_theme_font_size_override("font_size", 64)
+		_mas.pressed.connect(elegir_color_libre)
+		_rejilla.add_child(_mas)
+	if not cols.is_empty():
+		_elegir(cols[0])
+	else:
+		_elegir(color_actual)
+
+
+## Selector libre: cualquier color, que queda en "Mis colores".
+func elegir_color_libre() -> void:
+	var m := Estilo.modal(self, 960)
+	var velo: ColorRect = m[0]
+	var col: VBoxContainer = m[1]
+	col.add_child(Estilo.titulo("Elige un color", 56, true))
+	var selector := ColorPicker.new()
+	selector.edit_alpha = false
+	selector.picker_shape = ColorPicker.SHAPE_OKHSL_CIRCLE
+	selector.sampler_visible = false
+	selector.color_modes_visible = false
+	selector.presets_visible = false
+	selector.hex_visible = false
+	selector.can_add_swatches = false
+	selector.sliders_visible = false     # rueda + barra de luz bastan; los deslizadores RGB confunden
+	selector.color = color_actual if color_actual != Color.WHITE else Color.html("#4D908E")
+	selector.add_theme_constant_override("sv_width", 600)
+	selector.add_theme_constant_override("sv_height", 600)
+	selector.add_theme_constant_override("h_width", 60)
+	selector.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	col.add_child(selector)
+	var muestra := Panel.new()
+	muestra.custom_minimum_size = Vector2(0, 90)
+	var pintar_muestra := func(c: Color):
+		var caja := Estilo.caja(c, 45, 0, false)
+		muestra.add_theme_stylebox_override("panel", caja)
+	pintar_muestra.call(selector.color)
+	selector.color_changed.connect(pintar_muestra)
+	col.add_child(muestra)
+	var fila := HBoxContainer.new()
+	var cancelar := Estilo.boton("Cancelar", "suave", 124)
+	var anadir := Estilo.boton("Usar este color", "primario", 124)
+	for b in [cancelar, anadir]:
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		fila.add_child(b)
+	col.add_child(fila)
+	cancelar.pressed.connect(velo.queue_free)
+	anadir.pressed.connect(func():
+		var c := selector.color
+		c.a = 1.0
+		Ajustes.agregar_color(c)
+		velo.queue_free()
+		_poner_paleta(Paletas.MIS_COLORES)
+		_elegir(c))
 
 
 func _elegir(c: Color) -> void:
@@ -218,7 +284,9 @@ func _confeti() -> void:
 	p.scale_amount_min = 10
 	p.scale_amount_max = 22
 	var g := Gradient.new()
-	var colores := Paletas.colores(int(Ajustes.valor("paleta")))
+	var colores := _colores_de(int(Ajustes.valor("paleta")))
+	if colores.size() < 2:
+		colores = Paletas.colores(0)
 	g.offsets = PackedFloat32Array(range(colores.size()).map(func(k): return float(k) / maxf(colores.size() - 1, 1)))
 	g.colors = PackedColorArray(colores)
 	p.color_initial_ramp = g

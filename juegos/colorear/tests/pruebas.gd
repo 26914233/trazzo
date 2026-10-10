@@ -37,7 +37,11 @@ func _ready() -> void:
 	prueba_imagen()
 	prueba_lamina_del_dia()
 	prueba_racha()
+	prueba_terminadas()
+	prueba_mis_colores()
+	prueba_musica()
 	await prueba_pantallas()
+	await prueba_ajustes_menu()
 	await prueba_celebracion()
 
 	_vaciar(Obras.carpeta)
@@ -482,3 +486,83 @@ func prueba_celebracion() -> void:
 	e.queue_free()
 	await get_tree().process_frame
 	Obras.borrar("mandalas_001")
+
+
+func prueba_terminadas() -> void:
+	caso("ocultar laminas terminadas")
+	var l := Laminas.abrir("mandalas_002")
+	for k in range(1, l.zonas + 1):
+		l.pintar(k, Color.RED)
+	Obras.guardar(l)
+	var m := Laminas.abrir("mandalas_003")
+	m.pintar(1, Color.RED)
+	Obras.guardar(m)
+	comprobar(Obras.terminada("mandalas_002") and not Obras.terminada("mandalas_003"), "sabe cual esta terminada")
+	comprobar(not Obras.terminada("mandalas_004"), "sin obra: no terminada")
+	Obras.olvidar_cache()
+	comprobar(Obras.terminada("mandalas_002") and not Obras.terminada("mandalas_003"), "se lee del disco")
+	var ids := ["mandalas_002", "mandalas_003", "mandalas_004"]
+	comprobar(Obras.filtrar(ids, true) == ["mandalas_003", "mandalas_004"], "ocultar quita solo las terminadas")
+	comprobar(Obras.filtrar(ids, false) == ids, "sin ocultar: todas")
+	m.desde_datos({})
+	for k in range(1, m.zonas + 1):
+		m.pintar(k, Color.BLUE)
+	m.pintar(2, Color.WHITE)
+	Obras.guardar(m)
+	comprobar(not Obras.terminada("mandalas_003"), "borrar una zona la deja sin terminar")
+	Obras.borrar("mandalas_002")
+	comprobar(not Obras.terminada("mandalas_002"), "al borrar la obra deja de contar")
+	Obras.borrar("mandalas_003")
+
+
+func prueba_mis_colores() -> void:
+	caso("mis colores")
+	Ajustes.fijar("mis_colores", [])
+	comprobar(Ajustes.mis_colores().is_empty(), "empieza vacia")
+	Ajustes.agregar_color(Color.html("#123456"))
+	Ajustes.agregar_color(Color.html("#123456"))
+	comprobar(Ajustes.mis_colores() == [Color.html("#123456")], "sin repetidos")
+	for i in 15:
+		Ajustes.agregar_color(Color(0.05 * i, 0.5, 0.5))
+	comprobar(Ajustes.mis_colores().size() == Ajustes.MAX_COLORES, "tope de %d" % Ajustes.MAX_COLORES)
+	comprobar(not Color.html("#123456") in Ajustes.mis_colores(), "al llenarse sale el mas antiguo")
+	Ajustes.agregar_color(Color.WHITE)
+	comprobar(not Color.WHITE in Ajustes.mis_colores(), "el blanco no (es la goma)")
+	var f := FileAccess.open(Ajustes.ruta, FileAccess.WRITE)
+	f.store_string('{"mis_colores": ["#ff0000", "basura", 5, "#00ff00"]}')
+	f.close()
+	Ajustes.cargar()
+	Ajustes.datos["sonido"] = false
+	comprobar(Ajustes.mis_colores() == [Color.html("#ff0000"), Color.html("#00ff00")], "al leer se descartan los invalidos")
+	comprobar(Paletas.MIS_COLORES == Paletas.LISTA.size(), "Mis colores va despues de las curadas")
+	Ajustes.fijar("mis_colores", [])
+
+
+func prueba_musica() -> void:
+	caso("musica ambiental")
+	Ajustes.fijar("musica", true)
+	Sonido.actualizar_musica()
+	comprobar(Sonido.musica_activa(), "se enciende")
+	comprobar((Sonido.MUSICA as AudioStreamOggVorbis).loop, "en bucle")
+	Ajustes.fijar("musica", false)
+	Sonido.actualizar_musica(true)
+	comprobar(not Sonido.musica_activa(), "se apaga")
+	comprobar(Ajustes.POR_DEFECTO["musica"] == false, "apagada por defecto")
+
+
+func prueba_ajustes_menu() -> void:
+	caso("ajustes desde el menu")
+	var log := ContadorErrores.new()
+	OS.add_logger(log)
+	var menu: Control = load("res://escenas/menu.tscn").instantiate()
+	add_child(menu)
+	await get_tree().process_frame
+	menu.abrir_ajustes()
+	await get_tree().process_frame
+	var textos := menu.find_children("*", "Button", true, false).map(func(b): return b.text)
+	comprobar(textos.any(func(t): return t.begins_with("Música")), "hay interruptor de musica")
+	comprobar(textos.any(func(t): return t.begins_with("Ocultar terminadas")), "hay interruptor de ocultar terminadas")
+	menu.queue_free()
+	await get_tree().process_frame
+	OS.remove_logger(log)
+	comprobar(log.errores.is_empty(), "sin errores: %s" % str(log.errores.slice(0, 3)))
