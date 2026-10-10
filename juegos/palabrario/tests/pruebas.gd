@@ -58,6 +58,7 @@ func _ready() -> void:
 	await prueba_partida_completa()
 	await prueba_partida_aleatoria()
 	await prueba_partida_extra_y_reloj()
+	await prueba_arrastrar_listas()
 	await prueba_pantallas()
 
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Progreso.ruta))
@@ -835,6 +836,61 @@ func prueba_partida_extra_y_reloj() -> void:
 	Progreso.fijar_ajuste("contrarreloj", false)
 	juego.queue_free()
 	await get_tree().process_frame
+
+
+## Las listas largas se tienen que poder bajar arrastrando el dedo (en el movil no
+## hay rueda del raton). El mapa no bajaba: su lienzo se quedaba con el toque.
+func prueba_arrastrar_listas() -> void:
+	caso("las listas largas bajan arrastrando el dedo")
+	for nombre in ["mapa", "categorias", "sopas", "logros", "menu"]:
+		var e: Control = load("res://escenas/%s.tscn" % nombre).instantiate()
+		add_child(e)
+		for i in 4:
+			await get_tree().process_frame
+		var scroll: ScrollContainer = null
+		for s in e.find_children("*", "ScrollContainer", true, false):
+			if s.get_v_scroll_bar().max_value > s.size.y + 1:
+				scroll = s
+		if scroll == null:
+			comprobar(nombre != "mapa", "%s: el mapa debe tener una lista desplazable" % nombre)
+			e.queue_free()
+			await get_tree().process_frame
+			continue
+		var centro := scroll.get_global_rect().get_center()
+		await _arrastrar(centro + Vector2(0, 300), centro - Vector2(0, 300))
+		comprobar(scroll.scroll_vertical > 100, "%s: baja al arrastrar (%d px)" % [nombre, scroll.scroll_vertical])
+		e.queue_free()
+		await get_tree().process_frame
+
+
+## Arrastre como en un movil: Godot solo desplaza al arrastrar si hay pantalla
+## tactil, asi que se emula desde el raton (como hace Input en el telefono).
+func _arrastrar(desde: Vector2, hasta: Vector2) -> void:
+	var antes := Input.emulate_touch_from_mouse
+	Input.emulate_touch_from_mouse = true
+	var p := InputEventMouseButton.new()
+	p.button_index = MOUSE_BUTTON_LEFT
+	p.position = desde
+	p.global_position = desde
+	p.pressed = true
+	get_viewport().push_input(p, true)
+	await get_tree().process_frame
+	for k in range(1, 13):
+		var m := InputEventMouseMotion.new()
+		m.position = desde.lerp(hasta, k / 12.0)
+		m.global_position = m.position
+		m.relative = (hasta - desde) / 12.0
+		m.button_mask = MOUSE_BUTTON_MASK_LEFT
+		get_viewport().push_input(m, true)
+		await get_tree().process_frame
+	var f := InputEventMouseButton.new()
+	f.button_index = MOUSE_BUTTON_LEFT
+	f.position = hasta
+	f.global_position = hasta
+	f.pressed = false
+	get_viewport().push_input(f, true)
+	await get_tree().process_frame
+	Input.emulate_touch_from_mouse = antes
 
 
 class ContadorErrores extends Logger:

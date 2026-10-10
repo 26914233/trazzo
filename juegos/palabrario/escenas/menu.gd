@@ -11,7 +11,7 @@ func _ready() -> void:
 		_dia_registrado = hoy
 		racha = Progreso.registrar_dia(hoy)
 
-	var col := Estilo.pantalla(self)
+	var col := Estilo.columna_desplazable(Estilo.pantalla(self))
 	var arriba := HBoxContainer.new()
 	if racha > 1:
 		arriba.add_child(Estilo.etiqueta("Racha: %d días" % racha, 36, Estilo.ACENTO, false, false))
@@ -64,6 +64,7 @@ func _ready() -> void:
 	col.add_child(fila)
 	col.add_child(Estilo.etiqueta("%d de %d sopas resueltas" % [Progreso.resueltas_total(), Temas.total_sopas()], 34, Estilo.TEXTO_SUAVE))
 
+	Estilo.permitir_arrastre(col)
 	# Si el guardado se descarto al abrir, se dice una vez en vez de borrar
 	# el progreso en silencio (SEC-007).
 	if Progreso.ultimo_rechazo != "":

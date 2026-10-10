@@ -306,6 +306,30 @@ static func escapar_bbcode(texto: String) -> String:
 	return texto.replace("[", "[lb]")
 
 
+## Columna desplazable que ocupa todo el alto disponible: si el contenido cabe, los
+## huecos con EXPAND se reparten el espacio como siempre; si no cabe (pantallas mas
+## bajas, barra de navegacion), se puede bajar arrastrando.
+static func columna_desplazable(padre: VBoxContainer) -> VBoxContainer:
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	padre.add_child(scroll)
+	var col := VBoxContainer.new()
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(col)
+	scroll.resized.connect(func(): col.custom_minimum_size.y = scroll.size.y)
+	return col
+
+
+## Dentro de una lista desplazable, botones y tarjetas deben dejar pasar el toque:
+## con MOUSE_FILTER_STOP se lo quedan y en el movil la lista no baja al arrastrar.
+## (Godot cancela la pulsacion del boton cuando empieza el desplazamiento.)
+static func permitir_arrastre(raiz: Node) -> void:
+	for c in raiz.find_children("*", "Control", true, false):
+		if (c as Control).mouse_filter == Control.MOUSE_FILTER_STOP:
+			(c as Control).mouse_filter = Control.MOUSE_FILTER_PASS
+
+
 static func ir(desde: Node, escena: String) -> void:
 	desde.get_tree().change_scene_to_file("res://escenas/%s.tscn" % escena)
 

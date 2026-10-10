@@ -24,6 +24,7 @@ func _ready() -> void:
 	var subs: Array = _cat["subtemas"]
 	for i in subs.size():
 		lista.add_child(_fila(i, subs[i], dif))
+	Estilo.permitir_arrastre(lista)
 
 
 func _fila(i: int, s: Dictionary, dif: int) -> Button:

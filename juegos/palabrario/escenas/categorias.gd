@@ -49,6 +49,7 @@ func _pintar() -> void:
 		h.queue_free()
 	for c in Temas.lista:
 		_rejilla.add_child(_tarjeta(c, dif))
+	Estilo.permitir_arrastre(_rejilla)
 
 
 func _tarjeta(c: Dictionary, dif: int) -> Button:

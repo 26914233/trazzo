@@ -47,6 +47,7 @@ func _ready() -> void:
 	lista.add_child(Estilo.titulo("Logros  %d/%d" % [hechos, logros.size()], 48))
 	for l in logros:
 		lista.add_child(_logro(l))
+	Estilo.permitir_arrastre(lista)
 
 
 func _dato(nombre: String, valor: String) -> Control:

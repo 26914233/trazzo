@@ -57,6 +57,8 @@ func _colocar() -> void:
 		var p := Vector2(ancho / 2.0 + sin(i * 1.1) * ancho * 0.27, 90 + i * PASO)
 		_puntos.append(p)
 		_parada(c, p, i)
+	_camino.mouse_filter = Control.MOUSE_FILTER_PASS
+	Estilo.permitir_arrastre(_camino)
 	_camino.queue_redraw()
 
 
