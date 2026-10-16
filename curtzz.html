@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curtzz — Encierra al enemigo sin rozarlo</title>
+<meta name="description" content="Curtzz es un juego de precisión para Android: encierra al enemigo con la Línea sin llegar a tocarlo. Cada corte cuenta, cada píxel importa.">
+<link rel="canonical" href="https://26914233.github.io/trazzo/curtzz.html">
+<meta property="og:title" content="Curtzz">
+<meta property="og:description" content="Encierra al enemigo sin rozarlo. Cada corte cuenta, cada píxel importa.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://26914233.github.io/trazzo/curtzz.html">
+<meta property="og:site_name" content="thunderDarkness">
+<meta property="og:image" content="https://26914233.github.io/trazzo/assets/img/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="thunderDarkness, estudio de videojuegos: un laboratorio de juegos de precisión.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0B0E13">
+<link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="preload" href="assets/fonts/SpaceGrotesk.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/Inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/estudio.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Curtzz","description":"Juego de precisión para Android: encierra al enemigo con la Línea sin llegar a tocarlo.","url":"https://26914233.github.io/trazzo/curtzz.html","image":"https://26914233.github.io/trazzo/assets/img/curtzz-logo.png","inLanguage":"es","gamePlatform":"Android","operatingSystem":"Android","applicationCategory":"Game","publisher":{"@type":"Organization","name":"thunderDarkness","url":"https://26914233.github.io/trazzo/"}}
+</script>
+<style>
+  /* ---------- hero ---------- */
+  .hero{position:relative;overflow:hidden;padding:72px 0 80px}
+  #board{position:absolute;inset:0;width:100%;height:100%;opacity:.5}
+  .hero::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 75% 45%,rgba(34,211,238,.14),transparent 60%);pointer-events:none}
+  .hero .wrap{position:relative;z-index:2;display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+  .path{font:500 .9rem "JetBrains Mono",monospace;color:var(--curtzz)}
+  .path span{color:var(--dim)}
+  .badge{display:inline-flex;align-items:center;gap:10px;margin-top:22px;border:1px solid var(--line-2);background:rgba(255,255,255,.04);border-radius:8px;padding:8px 14px;font:600 .78rem "JetBrains Mono",monospace;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+  .badge i{width:8px;height:8px;border-radius:50%;background:var(--wip);box-shadow:0 0 10px var(--wip)}
+  .brand{display:flex;align-items:center;gap:20px;margin:26px 0 0}
+  .brand img{width:84px;height:84px;border-radius:22px}
+  .brand h1{font-size:clamp(3.4rem,10vw,7rem);line-height:.95;font-weight:700;letter-spacing:-.04em;background:linear-gradient(120deg,#fff 30%,var(--curtzz));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .tagline{font:600 clamp(1.3rem,3vw,1.8rem) "Space Grotesk",sans-serif;margin:18px 0 0;letter-spacing:-.01em}
+  .sub{color:var(--muted);margin:14px 0 0;max-width:34em;font-size:1.1rem}
+  .phone{justify-self:center;width:min(250px,100%);border-radius:40px;padding:9px;background:linear-gradient(160deg,#2a3348,#0d1220);box-shadow:0 40px 90px -20px rgba(34,211,238,.35),0 0 0 1px rgba(255,255,255,.12) inset;transform:rotate(4deg)}
+  .phone img{display:block;width:100%;height:auto;border-radius:32px}
+
+  /* ---------- tarjetas ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
+  .card{background:var(--panel);border:1px solid var(--line-2);border-radius:16px;padding:26px}
+  .card h3{margin:0 0 .5rem;font-size:1.2rem;display:flex;align-items:center;gap:.7rem}
+  .card p{margin:0;color:var(--muted);font-size:.97rem}
+  .chip{width:11px;height:11px;border-radius:3px;flex:0 0 auto}
+  .c-cyan{background:var(--curtzz)}.c-amber{background:var(--wip)}.c-green{background:var(--ok)}
+  .rule{border-left:3px solid var(--curtzz);padding:.2rem 0 .2rem 18px;margin:0 0 28px;font-size:1.15rem;max-width:44em}
+  .rule strong{color:#fff}
+
+  /* ---------- skins ---------- */
+  .skins{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;list-style:none;margin:0;padding:0}
+  .skins li{border:1px solid var(--line-2);border-radius:16px;background:var(--panel);padding:18px 14px 20px;text-align:center}
+  .skins img{width:100%;max-width:130px;height:auto;margin:0 auto;display:block;filter:drop-shadow(0 12px 14px rgba(0,0,0,.55))}
+  .skins b{display:block;margin-top:10px;font:700 1.02rem "Space Grotesk",sans-serif}
+  .skins span{display:block;margin-top:2px;font:500 .74rem "JetBrains Mono",monospace;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
+
+  /* ---------- pausa de la animación ---------- */
+  .pausa{margin-top:22px}
+  .pausa .btn[aria-pressed=true]{background:rgba(34,211,238,.16);border-color:var(--curtzz);color:#fff}
+  .pausa .btn[aria-pressed=true]::before{content:"✓";content:"✓" / ""}
+
+  @media (max-width:980px){
+    .hero{padding:44px 0 56px}
+    .hero .wrap{grid-template-columns:1fr}
+    .phone{width:min(260px,100%);margin-top:10px}
+    .brand img{width:64px;height:64px;border-radius:18px}
+    .skins{grid-template-columns:repeat(2,1fr)}.skins li:last-child{grid-column:1/-1}
+  }
+  @media (prefers-reduced-motion:reduce){#board,.pausa{display:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="logo" href="./" aria-label="thunderDarkness, inicio"><img src="assets/mark.svg" alt="" width="34" height="34"><em class="wm"><b>thunder</b>Darkness</em></a>
+    <nav aria-label="Principal">
+      <a href="./">/estudio</a><a href="curtzz.html" aria-current="page">/curtzz</a>
+    </nav>
+    <span class="live"><i></i>Buscando testers</span>
+  </div>
+</header>
+
+<main id="contenido">
+<div class="hero">
+  <canvas id="board" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div>
+      <div class="path">~/thunderDarkness <span>/</span> curtzz</div>
+      <span class="badge"><i></i>Próximamente en Google Play</span>
+      <div class="brand"><img src="assets/img/curtzz-logo.png" alt="" width="84" height="84"><h1>CURTZZ</h1></div>
+      <p class="tagline">Encierra al enemigo sin rozarlo.</p>
+      <p class="sub">Un juego de precisión donde trazas una Línea de muro a muro y rompes el cristal que quede sin enemigos — y cada milímetro de más te cuesta la partida. Cada corte cuenta, cada píxel importa.</p>
+      <div class="pausa"><button type="button" class="btn ghost" id="pausa" aria-pressed="false">Pausar animación</button></div>
+    </div>
+    <div class="phone"><img src="assets/img/curtzz-juego.jpg" alt="Captura de Curtzz: un tablero con muros, espinas móviles y un Tanque" width="720" height="1600" fetchpriority="high"></div>
+  </div>
+</div>
+
+<section id="juego" aria-labelledby="t-dec">
+  <div class="wrap">
+    <div class="sh">
+      <div><div class="l">// la decisión</div><h2 id="t-dec">La decisión que define cada partida</h2></div>
+      <p>No se trata de dónde cortar. Se trata de cuánto arriesgar.</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3><span class="chip c-green"></span>Corte corto</h3>
+        <p>Se completa rápido y casi nunca falla. Pero apenas reduce el tablero, y el objetivo sigue lejos.</p>
+      </div>
+      <div class="card">
+        <h3><span class="chip c-amber"></span>Corte largo</h3>
+        <p>Avanza muchísimo. Pero tarda más en completarse, y ese tiempo es la ventana que el enemigo necesita.</p>
+      </div>
+      <div class="card">
+        <h3><span class="chip c-cyan"></span>Corte perfecto</h3>
+        <p>Pasar a una fracción de celda sin tocarlo. El juego se ralentiza, marca la distancia exacta y te la enseña.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="t-dif">
+  <div class="wrap">
+    <div class="sh">
+      <div><div class="l">// dificultad</div><h2 id="t-dif">Fácil de entender. Difícil de dominar.</h2></div>
+      <p>Los primeros minutos son amables. Después, el juego deja de serlo.</p>
+    </div>
+
+    <div class="rule">Cada dos niveles el juego sube un peldaño: <strong>un enemigo más o un poco más de velocidad</strong>. Y al final de cada tramo te espera un jefe.</div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Enemigos que no se parecen</h3>
+        <p>Rebote, Cazador, Errático, Divisor y Tanque, y tableros con Cajas de colores y Generadores: cada pieza obliga a cortar de otra manera.</p>
+      </div>
+      <div class="card">
+        <h3>Un jefe al final de cada tramo</h3>
+        <p>Dieciséis tramos, dieciséis jefes, cada uno con su truco. Y espinas que se mueven por el tablero.</p>
+      </div>
+      <div class="card">
+        <h3>La derrota siempre es legible</h3>
+        <p>Al fallar se marca el punto exacto del contacto. Siempre sabes qué hiciste mal. Por eso lo intentas otra vez.</p>
+      </div>
+      <div class="card">
+        <h3>Juega como quieras</h3>
+        <p>La Línea sigue tu dedo; el Rectángulo se estira y se sella. O cruceta y mando para la precisión celda a celda.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="t-tq">
+  <div class="wrap">
+    <div class="sh">
+      <div><div class="l">// el tanque</div><h2 id="t-tq">Un enemigo, cinco pieles</h2></div>
+      <p>El Tanque dispara a lo que dibujas, y cada piel lo hace por donde le toca: colmillos, cola, boca.</p>
+    </div>
+    <ul class="skins">
+      <li><img src="assets/img/skin-guerra.webp" alt="" width="130" height="130" loading="lazy"><b>Tanque de guerra</b><span>Con el Pase</span></li>
+      <li><img src="assets/img/skin-escorpion.webp" alt="" width="130" height="130" loading="lazy"><b>Escorpión acorazado</b><span>Con el Pase</span></li>
+      <li><img src="assets/img/skin-arana.webp" alt="" width="130" height="130" loading="lazy"><b>Araña robot</b><span>De compra</span></li>
+      <li><img src="assets/img/skin-platillo.webp" alt="" width="130" height="130" loading="lazy"><b>Platillo volante</b><span>De compra</span></li>
+      <li><img src="assets/img/skin-dragon.webp" alt="" width="130" height="130" loading="lazy"><b>Dragón</b><span>De compra</span></li>
+    </ul>
+  </div>
+</section>
+
+<section aria-labelledby="t-pro">
+  <div class="wrap">
+    <div class="sh">
+      <div><div class="l">// próximamente</div><h2 id="t-pro">Llega a Google Play</h2></div>
+      <p>La fecha se anunciará cuando el juego esté listo de verdad.</p>
+    </div>
+    <div class="btns" style="margin-top:0">
+      <a class="btn main" href="mailto:prueba1bysisne@gmail.com?subject=Quiero%20probar%20Curtzz&body=Hola%2C%20quiero%20ser%20tester%20de%20Curtzz.%20Mi%20correo%20de%20Google%20es%3A%20">Quiero ser tester</a>
+      <a class="btn ghost" href="./">Volver al estudio</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <a class="logo" href="./"><img src="assets/mark.svg" alt="" width="34" height="34"><em class="wm"><b>thunder</b>Darkness</em></a>
+    <span>© <span id="year">2026</span> Curtzz · thunderDarkness</span>
+    <nav aria-label="Pie"><a href="./">estudio</a><a href="mailto:prueba1bysisne@gmail.com">contacto</a><a href="privacidad.html">privacidad</a></nav>
+  </div>
+</footer>
+
+<script src="assets/comun.js"></script>
+<script src="assets/curtzz.js"></script>
+</body>
+</html>

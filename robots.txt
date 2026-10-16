@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://26914233.github.io/trazzo/sitemap.xml

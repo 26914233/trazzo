@@ -1,0 +1,21 @@
+# Reseñas copiadas de las tiendas: material de investigación, no se publican en el repo
+juegos/replica/reviews*.csv
+juegos/replica/feedback*.md
+
+# Cache de Python (scripts de skills)
+__pycache__/
+*.pyc
+
+# Claves de firma y credenciales: nunca al repositorio, que es público
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.pem
+export_credentials.cfg
+.env
+.env.*
+clave.txt
+# APK y firmas sueltas (los APK van a Google Drive)
+*.apk
+*.idsig

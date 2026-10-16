@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https:; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Curtzz — Tienda</title>
+<meta name="description" content="Tienda web de Prismas de Curtzz. Todavía no está abierta.">
+<meta name="theme-color" content="#0B0E13">
+<link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="preload" href="assets/fonts/SpaceGrotesk.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/Inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/estudio.css">
+<style>
+  :root{--violet:#C084FC;--green:#4ADE80;--red:#F87171;--bg-2:var(--panel)}
+  [hidden]{display:none!important}
+  .page{max-width:860px;margin:0 auto;padding:0 28px}
+  .aviso{margin:28px 0 0;padding:16px 20px;border:1px solid var(--wip);border-left-width:6px;border-radius:12px;background:#2A2208;color:#fff;font-weight:600;font-size:1.05rem}
+  .top{padding:28px 0 6px}
+  .path{font:500 .9rem "JetBrains Mono",monospace;color:var(--curtzz)}
+  .path span{color:var(--dim)}
+  h1{font-size:clamp(2rem,7vw,3.2rem);letter-spacing:-.03em;margin:.7rem 0 .4rem;font-weight:700}
+  h1 span{background:linear-gradient(120deg,#fff 30%,var(--violet));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .lead{color:var(--muted);max-width:60ch}
+  .lead strong{color:var(--violet)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin:28px 0}
+  .pack{background:var(--panel);border:1px solid var(--line-2);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:.35rem;cursor:pointer;color:var(--txt);font:inherit;text-align:left;transition:transform .15s,border-color .15s}
+  .pack:hover,.pack.sel{transform:translateY(-3px);border-color:var(--violet)}
+  .pack.sel{box-shadow:0 0 0 1px var(--violet) inset}
+  .pack .n{font:700 1.6rem "Space Grotesk",sans-serif}
+  .pack .b{color:var(--violet);font-size:.9rem}
+  .pack .p{margin-top:.6rem;font:700 1.15rem "Space Grotesk",sans-serif}
+  .btn.main{background:var(--violet);color:#1a0b2e;font-weight:700}
+  .box{background:var(--panel);border:1px solid var(--line-2);border-radius:14px;padding:22px;margin:22px 0}
+  .box h2{font-size:1.15rem;margin:0 0 .5rem}
+  .box .nota{font-size:.85rem}
+  .code{font-family:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;font-size:clamp(1.1rem,5vw,1.7rem);letter-spacing:.06em;background:#0a0f1d;border:1px dashed var(--violet);border-radius:10px;padding:14px;text-align:center;margin:12px 0;word-break:break-all}
+  .ok{color:var(--green)} .bad{color:var(--red)} .muted{color:var(--muted)}
+  .pago-nota{font-size:.85rem;margin-top:12px}
+  ol{padding-left:1.2rem;color:var(--muted)}
+  main a:not(.btn){text-decoration:underline;text-underline-offset:3px}
+  footer.site{margin-top:56px}
+  footer.site .wrap{font-size:.8rem}
+  @media (prefers-reduced-motion:reduce){.pack{transition:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="logo" href="./" aria-label="thunderDarkness, inicio"><img src="assets/mark.svg" alt="" width="34" height="34"><em class="wm"><b>thunder</b>Darkness</em></a>
+    <nav aria-label="Principal">
+      <a href="./">/estudio</a><a href="curtzz.html">/curtzz</a><a href="tienda.html" aria-current="page">/tienda</a>
+    </nav>
+    <span class="live"><i></i>Tienda de Prismas</span>
+  </div>
+</header>
+
+<main id="contenido" class="page">
+  <p class="aviso" id="aviso">La tienda web abre más adelante.</p>
+
+  <div class="top">
+    <div class="path">~/thunderDarkness <span>/</span> curtzz <span>/</span> tienda</div>
+    <h1><span>Tienda de Prismas</span></h1>
+    <p class="lead">El mismo precio que en el juego, con un <strong>25 % más de Prismas</strong>. Al pagar recibes un código para canjear en <em>Tienda → Prismas → Canjear código</em>.</p>
+  </div>
+
+  <noscript><div class="box bad">Esta página necesita JavaScript para mostrar los paquetes y abrir el pago. Actívalo en tu navegador o escríbenos al correo del pie de la página.</div></noscript>
+
+  <div id="estado" role="status" aria-live="polite"></div>
+
+  <div id="compra" hidden>
+    <div class="grid" id="packs" role="group" aria-label="Paquetes de Prismas"></div>
+    <button class="btn main" id="pagar" type="button" disabled>Elige un paquete</button>
+    <p class="muted pago-nota">El pago lo procesa Mercado Pago (tarjeta, PSE, efectivo y más, según tu país). Curtzz nunca ve los datos de tu tarjeta.</p>
+  </div>
+
+  <div class="box">
+    <h2>Cómo canjear tu código</h2>
+    <ol>
+      <li>Abre Curtzz y toca tus Prismas (arriba a la derecha) o entra en <em>Tienda → Prismas</em>.</li>
+      <li>Toca <em>Canjear código</em> y escríbelo tal cual (mayúsculas o minúsculas, da igual).</li>
+      <li>Los Prismas se suman al momento. Cada código vale una sola vez.</li>
+    </ol>
+  </div>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>© <span id="year">2026</span> Curtzz · thunderDarkness</span>
+    <nav aria-label="Pie"><a href="privacidad.html">privacidad</a><a href="mailto:prueba1bysisne@gmail.com?subject=Problema%20con%20un%20pago">¿Problemas con un pago? prueba1bysisne@gmail.com</a></nav>
+  </div>
+</footer>
+
+<script src="assets/comun.js"></script>
+<script src="assets/tienda.js"></script>
+</body>
+</html>
