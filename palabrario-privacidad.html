@@ -2,89 +2,107 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https:; base-uri 'self'; form-action 'self'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Privacidad de Palabrario</title>
-<meta name="description" content="Política de privacidad de Palabrario, sopa de letras para Android.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%230B1020'/><rect x='22' y='22' width='56' height='56' fill='none' stroke='%2322D3EE' stroke-width='8'/><circle cx='50' cy='50' r='9' fill='%23FBBF24'/></svg>">
+<title>Política de privacidad — Palabrario</title>
+<meta name="description" content="Política de privacidad del juego para Android Palabrario y de esta página web.">
+<link rel="canonical" href="https://26914233.github.io/trazzo/palabrario-privacidad.html">
+<meta property="og:title" content="Política de privacidad — Palabrario">
+<meta property="og:description" content="Qué información trata el juego Palabrario, para qué se usa y qué derechos tienes.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://26914233.github.io/trazzo/palabrario-privacidad.html">
+<meta property="og:site_name" content="thunderDarkness">
+<meta property="og:image" content="https://26914233.github.io/trazzo/assets/img/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="thunderDarkness, estudio de videojuegos: un laboratorio de juegos de precisión.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0B0E13">
+<link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="preload" href="assets/fonts/SpaceGrotesk.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/Inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/estudio.css">
 <style>
-  :root{
-    --bg:#0B1020;--bg-2:#121a30;--txt:#E8ECF6;--muted:#94A3B8;
-    --cyan:#22D3EE;--amber:#FBBF24;--line:rgba(255,255,255,.09);
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0;background:var(--bg);color:var(--txt);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    line-height:1.7;-webkit-font-smoothing:antialiased;
-  }
-  .wrap{max-width:760px;margin:0 auto;padding:0 20px}
-  a{color:var(--cyan)}
-  header{padding:48px 0 28px;border-bottom:1px solid var(--line)}
-  .back{font-size:.9rem;color:var(--muted);text-decoration:none}
-  .back:hover{color:var(--cyan)}
-  h1{font-size:clamp(1.7rem,5vw,2.4rem);letter-spacing:-.02em;margin:1.2rem 0 .4rem}
+  .doc{max-width:780px}
+  .doc-h{padding:56px 0 24px;border-bottom:1px solid var(--line)}
+  .path{font:500 .9rem "JetBrains Mono",monospace;color:var(--curtzz)}
+  .path a{display:inline-flex;align-items:center;min-height:44px}
+  .path a:hover{text-decoration:underline}
+  .path span{color:var(--dim)}
+  h1{font-size:clamp(1.9rem,5vw,2.8rem);margin:.4rem 0 .4rem;font-weight:700}
   .updated{color:var(--muted);font-size:.9rem;margin:0}
-  main{padding:8px 0 64px}
-  h2{font-size:1.15rem;margin:2.4rem 0 .6rem;letter-spacing:-.01em}
-  p,li{color:#cfd6e6}
-  ul{padding-left:1.2rem}
-  li{margin:.4rem 0}
-  .box{
-    background:var(--bg-2);border:1px solid var(--line);
-    border-radius:12px;padding:18px 20px;margin:20px 0;
-  }
-  code{
-    background:rgba(255,255,255,.07);padding:.1rem .35rem;
-    border-radius:5px;font-size:.9em;
-  }
-  footer{border-top:1px solid var(--line);padding:28px 0 56px;color:var(--muted);font-size:.9rem}
+  main.doc{padding-bottom:40px;line-height:1.75}
+  main.doc h2{font-size:1.2rem;margin:2.4rem 0 .6rem}
+  main.doc p,main.doc li{color:#cfd6e6}
+  main.doc a{color:var(--curtzz);text-decoration:underline;text-underline-offset:3px}
+  main.doc a.volver{text-decoration:none}
+  main.doc ul{padding-left:1.2rem}
+  main.doc li{margin:.4rem 0}
+  code{background:rgba(255,255,255,.07);padding:.1rem .35rem;border-radius:5px;font-size:.9em}
 </style>
 </head>
 <body>
-<header>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<header class="bar">
   <div class="wrap">
-    <a class="back" href="index.html">&larr; Volver a la web</a>
-    <h1>Política de privacidad de Palabrario</h1>
-    <p class="updated">Última actualización: 9 de octubre de 2026</p>
+    <a class="logo" href="./" aria-label="thunderDarkness, inicio"><img src="assets/mark.svg" alt="" width="34" height="34"><em class="wm"><b>thunder</b>Darkness</em></a>
+    <nav aria-label="Principal">
+      <a href="./">/estudio</a><a href="./">/juegos</a><a href="palabrario-privacidad.html" aria-current="page">/privacidad</a>
+    </nav>
+    <span class="live"><i></i>Política de privacidad</span>
   </div>
 </header>
 
-<main class="wrap">
-  <p>Esta política explica qué información trata el juego para Android <strong>Palabrario</strong> (en adelante, «el juego»). Responsable: thunderDarkness (Colombia). <a href="index.html#contacto">Contacto</a>.</p>
-
-  <div class="box">
-    <strong>En corto:</strong> el juego no recoge, no envía y no comparte ningún dato tuyo. No tiene anuncios, no pide cuenta y funciona sin conexión. Las compras opcionales de pistas las procesa Google Play.
+<main id="contenido" class="wrap doc">
+  <div class="doc-h">
+    <div class="path"><a class="volver" href="./">&larr; Volver al estudio</a></div>
+    <h1>Política de privacidad de Palabrario</h1>
+    <p class="updated">Última actualización: <time datetime="2026-10-19">19 de octubre de 2026</time></p>
   </div>
+
+  <p>Esta política explica qué información trata <strong>Palabrario</strong> (en adelante, «el juego»), un juego de sopas de letras para Android, para qué se usa y qué derechos tienes. Responsable del tratamiento: <strong>Juan Pablo Ramirez</strong> (estudio thunderDarkness), persona natural con domicilio en Ecuador. Contacto: <a href="mailto:prueba1bysisne@gmail.com">prueba1bysisne@gmail.com</a>.</p>
 
   <h2>1. Lo que NO recogemos</h2>
   <ul>
-    <li>Nombre, correo, fecha de nacimiento, ubicación, contactos, fotos, micrófono ni cámara.</li>
-    <li>Identificadores de publicidad: <strong>el juego no tiene anuncios</strong> ni herramientas de análisis o seguimiento.</li>
-    <li>Datos de pago: el juego y los paquetes de pistas se compran en Google Play, que procesa el pago con su propia <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">política de privacidad</a>. Nunca vemos esos datos.</li>
+    <li>Nombre, correo, fecha de nacimiento, ubicación exacta, contactos, fotos, micrófono ni cámara.</li>
+    <li>Datos de tarjetas o cuentas bancarias.</li>
+    <li>Herramientas de análisis, seguimiento o publicidad: no las hay.</li>
   </ul>
-
-  <h2>Compras de pistas</h2>
-  <p>Si compras un paquete de pistas, Google Play confirma la compra al juego dentro de tu teléfono y el juego suma las pistas a tu saldo. No recibimos tu nombre, tu correo ni tu método de pago, y esa confirmación no se envía a ningún servidor nuestro. Las devoluciones se gestionan según la política de Google Play.</p>
+  <p>No hace falta crear una cuenta para jugar y el juego funciona sin conexión.</p>
 
   <h2>2. Lo que se guarda en tu teléfono</h2>
-  <p>Tu progreso (sopas resueltas, estrellas, pistas, racha y ajustes) se guarda <strong>solo en tu teléfono</strong>, protegido contra modificaciones. No sale del dispositivo. Si desinstalas el juego o restableces el teléfono, se borra, incluidas las pistas compradas que no hayas usado.</p>
+  <p>Tu progreso (sopas resueltas, pistas, racha, sopa del día y ajustes) se guardan <strong>solo en tu teléfono</strong>. Si desinstalas el juego, se borran.</p>
 
-  <h2>3. Enlaces externos</h2>
-  <p>Desde Ajustes puedes abrir esta página en tu navegador. Lo que ocurra en el navegador se rige por su propia política.</p>
+  <h2>3. Sin anuncios</h2>
+  <p>El juego <strong>no muestra anuncios</strong> ni lleva ningún kit de publicidad o de análisis de terceros.</p>
 
-  <h2>4. Menores de edad</h2>
-  <p>El juego no recoge datos de nadie, tampoco de menores. Las compras dentro del juego pasan por Google Play, que aplica sus propios controles parentales.</p>
+  <h2>4. Compras</h2>
+  <p>El juego se compra en <strong>Google Play</strong> y, dentro, puedes comprar paquetes de pistas opcionales. Google Play procesa todos los pagos: nosotros nunca vemos tu nombre, tu correo ni tu método de pago. Para entregar las pistas, el juego comprueba en tu teléfono el recibo firmado que da Google Play (producto y código de compra) y guarda en el teléfono qué compras ya entregó, para no entregar la misma dos veces. No se envía nada a servidores nuestros. Para comprobar que la copia del juego se instaló desde Google Play, el juego pregunta a Android qué tienda lo instaló. Las devoluciones se gestionan según la política de Google Play.</p>
 
-  <h2>5. Tus derechos</h2>
-  <p>Como no guardamos datos tuyos en ningún servidor, no tenemos nada que entregarte ni borrar: lo que hay en tu teléfono lo borras desinstalando el juego. Para cualquier duda, escríbenos desde la <a href="index.html#contacto">página de contacto</a>, conforme a la Ley 1581 de 2012 de Colombia.</p>
+  <h2>5. Pruebas del juego (probadores)</h2>
+  <p>Si te unes a la prueba cerrada de Google Play (a través de su grupo de Google), Google gestiona tu participación con tu cuenta de Gmail. Si nos escribes a <a href="mailto:prueba1bysisne@gmail.com">prueba1bysisne@gmail.com</a>, recibimos tu correo y lo usamos solo para la prueba; lo borramos si nos lo pides.</p>
 
-  <h2>6. Cambios</h2>
+  <h2>6. Menores de edad</h2>
+  <p>El juego no está dirigido a menores de 13 años y no recogemos a sabiendas datos de ellos. Si crees que un menor nos ha dado datos, escríbenos y los eliminaremos.</p>
+
+  <h2>7. Tus derechos</h2>
+  <p>Puedes pedir acceso, corrección o eliminación de cualquier dato que tengamos sobre ti escribiendo a <a href="mailto:prueba1bysisne@gmail.com">prueba1bysisne@gmail.com</a>, conforme a la Ley Orgánica de Protección de Datos Personales de Ecuador (2021). Respondemos en un máximo de 15 días hábiles. Los datos de la compra en Google Play los trata Google: puedes gestionarlos en tu cuenta de Google.</p>
+
+  <h2>8. Seguridad</h2>
+  <p>No tenemos servidores que guarden datos tuyos. Lo que se guarda en tu teléfono lo protege Android. Ningún sistema es infalible, pero guardamos lo mínimo posible.</p>
+
+  <h2>9. Cambios</h2>
   <p>Si cambia esta política, actualizaremos la fecha de arriba y, si el cambio es importante, lo avisaremos en el juego.</p>
 </main>
 
-<footer>
+<footer class="site">
   <div class="wrap">
-    <a href="index.html" style="color:var(--muted)">thunderDarkness</a> — Privacidad de Palabrario
+    <a class="logo" href="./"><img src="assets/mark.svg" alt="" width="34" height="34"><em class="wm"><b>thunder</b>Darkness</em></a>
+    <span>Palabrario — Política de privacidad</span>
+    <nav aria-label="Pie"><a href="./">estudio</a></nav>
   </div>
 </footer>
 
